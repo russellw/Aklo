@@ -42,7 +42,7 @@ def parse(filename):
                 # next line
                 ti += 1
                 if ti == len(text):
-                    break
+                    return
                 line += 1
 
                 # measure indent
@@ -123,6 +123,7 @@ def parse(filename):
                 "+=",
                 "--",
                 "-=",
+                "//",
                 "<=",
                 "==",
                 "==",
@@ -154,7 +155,12 @@ def parse(filename):
 
     def expect(s):
         if not eat(s):
-            err(f"'{repr(tok)}': expected '{repr(s)}'")
+            err(f"{repr(tok)}: expected {repr(s)}")
+
+    def word():
+        if tok[0].isalpha() or tok[0] == "_":
+            return lex1()
+        err(f"{repr(tok)}: expected word")
 
     # expressions
     def commas(a, end):
@@ -171,8 +177,12 @@ def parse(filename):
 
     def primary():
         # word or number
-        if tok[0].isalnum() or tok[0] == "_":
+        if tok[0].isalpha() or tok[0] == "_":
             return lex1()
+
+        # number
+        if tok[0].isdigit():
+            return int(lex1())
 
         # symbol
         if tok[0] == "'":
@@ -196,18 +206,21 @@ def parse(filename):
             return a
 
         # none of the above
-        err(f"'{repr(tok)}': expected expression")
+        err(f"{repr(tok)}: expected expression")
 
     def postfix():
-        a = expr()
+        a = primary()
         while 1:
             if eat("("):
                 a = [a]
                 commas(a, ")")
                 continue
             if eat("["):
-                a = ["[", a, expr()]
+                a = "[", a, expr()
                 expect("]")
+                continue
+            if eat("."):
+                a = "get", a, ("'", word())
                 continue
             if tok in ("++", "--"):
                 return "post" + lex1(), a
@@ -217,11 +230,29 @@ def parse(filename):
                     a.append(expr())
             return a
 
+    def params():
+        a = []
+        if tok in (":", ".indent"):
+            return a
+        if eat("("):
+            commas(a, ")")
+        else:
+            while 1:
+                a.append(word())
+                if not eat(","):
+                    break
+        return a
+
     def prefix():
         if tok in ("!", "++", "--"):
             return lex1(), prefix()
         if eat("-"):
             return "neg", prefix()
+        if tok == "\\":
+            a = [lex1(), params()]
+            expect(":")
+            a.append(assignment())
+            return a
         return postfix()
 
     # operator precedence parser
@@ -282,10 +313,71 @@ def parse(filename):
             return lex1(), a, assignment()
         return a
 
+    def block(a):
+        expect(".indent")
+        while not eat(".dedent"):
+            a.append((".line", filename, line))
+            a.append(stmt())
+
+    def block1():
+        a = [".do"]
+        block(a)
+        return a
+
+    def if1():
+        a = ["if", expr(), block1()]
+        if eat("elif"):
+            a.append(if1())
+        elif eat("else"):
+            a.append(block1())
+        return a
+
+    def stmt():
+        a = [tok]
+        if eat("assert"):
+            s = f"{filename}:{line}: assert failed\n"
+            a.append(expr())
+            a.append(s)
+            expect("\n")
+            return a
+        if eat("dowhile") or eat("while"):
+            a.append(expr())
+            block(a)
+            return a
+        if eat("for"):
+            a.append(word())
+            a.append(tuple1())
+            block(a)
+            return a
+        if eat("fn"):
+            a.append(word())
+            a.append(params())
+            block(a)
+            return a
+        if eat("if"):
+            return if1()
+        if eat("nonlocal") or eat(":") or eat("goto"):
+            a.append(word())
+            expect("\n")
+            return a
+        if eat("return"):
+            if eat("\n"):
+                return a
+            a.append(tuple1())
+            expect("\n")
+            return a
+        a = assignment()
+        expect("\n")
+        return a
+
     # module
     lex()
     eat("\n")
-    print(tok)
+    a = []
+    while tok != ".dedent":
+        a.append(stmt())
+    return a
 
 
-parse(sys.argv[1])
+a = parse(sys.argv[1])
+print(a)
