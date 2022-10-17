@@ -456,33 +456,33 @@ def ir(body):
 
                 # test
                 code.append(("if", rec(test, 1), yesLabel))
-                rec(("goto", noLabel))
+                code.append(("goto", noLabel))
 
                 if receiver:
                     r = gensym("ifResult")
 
                     # yes
-                    rec((":", yesLabel))
+                    code.append((":", yesLabel))
                     rec(("=", r, yes))
-                    rec(("goto", afterLabel))
+                    code.append(("goto", afterLabel))
 
                     # no
-                    rec((":", noLabel))
+                    code.append((":", noLabel))
                     rec(("=", r, no))
                 else:
                     r = None
 
                     # yes
-                    rec((":", yesLabel))
+                    code.append((":", yesLabel))
                     rec(yes)
-                    rec(("goto", afterLabel))
+                    code.append(("goto", afterLabel))
 
                     # no
-                    rec((":", noLabel))
+                    code.append((":", noLabel))
                     rec(no)
 
                 # after
-                rec((":", afterLabel))
+                code.append((":", afterLabel))
                 return r
             case "if", test, yes:
                 return rec(("if", test, yes, 0), receiver)
@@ -495,39 +495,39 @@ def ir(body):
                 loop = testLabel, afterLabel
 
                 # body
-                rec((":", bodyLabel))
+                code.append((":", bodyLabel))
                 block(loop, body)
 
                 # test
-                rec((":", testLabel))
+                code.append((":", testLabel))
                 rec(("if", test, ("goto", bodyLabel)))
 
                 # after
-                rec((":", afterLabel))
+                code.append((":", afterLabel))
             case "while", test, *body:
                 bodyLabel = gensym("whileBody")
                 testLabel = gensym("whileTest")
                 afterLabel = gensym("whileAfter")
                 loop = testLabel, afterLabel
 
-                rec(("goto", testLabel))
+                code.append(("goto", testLabel))
 
                 # body
-                rec((":", bodyLabel))
+                code.append((":", bodyLabel))
                 block(loop, body)
 
                 # test
-                rec((":", testLabel))
+                code.append((":", testLabel))
                 rec(("if", test, ("goto", bodyLabel)))
 
                 # after
-                rec((":", afterLabel))
+                code.append((":", afterLabel))
             case "continue":
-                return rec(("goto", loop[0]))
+                code.append(("goto", loop[0]))
             case "break":
-                return rec(("goto", loop[1]))
+                code.append(("goto", loop[1]))
             case "return":
-                return rec((a, 0))
+                rec((a, 0))
             case f, *args:
                 args = [rec(x, 1) for x in args]
                 a = f, *args
