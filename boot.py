@@ -413,9 +413,139 @@ def gensym(s):
 
 
 def ir(body):
+    filename = 0
+    line = 0
+
     vs = {}
     fs = {}
     code = []
 
+    def term(loop, a, receiver=0):
+        nonlocal filename
+        nonlocal line
+
+        def rec(a, receiver=0):
+            term(loop, a, receiver)
+
+        match a:
+            case "fn", name, params, body:
+                if name in fs:
+                    raise Exception(name)
+                fs[name] = filename, line, name, params, ir(body)
+            case "=", name, x:
+                if name not in vs:
+                    vs[name] = filename, line, name
+                x = rec(x, 1)
+                code.append(("=", name, x))
+            case ".line", filename1, line1:
+                filename = filename1
+                line = line1
+                code.append(a)
+            case "assert", test, msg:
+                rec(("if", ("!", test), ("fprint", "stderr", msg)))
+            case "if", test, yes, no:
+                yesLabel = gensym("ifYes")
+                noLabel = gensym("ifNo")
+                afterLabel = gensym("ifAfter")
+
+                # test
+                code.append(("if", rec(test, 1), yesLabel))
+                rec(("goto", noLabel))
+
+                if receiver:
+                    r = gensym("ifResult")
+
+                    # yes
+                    rec((":", yesLabel))
+                    rec(("=", r, yes))
+                    rec(("goto", afterLabel))
+
+                    # no
+                    rec((":", noLabel))
+                    rec(("=", r, no))
+                else:
+                    r = None
+
+                    # yes
+                    rec((":", yesLabel))
+                    rec(yes)
+                    rec(("goto", afterLabel))
+
+                    # no
+                    rec((":", noLabel))
+                    rec(no)
+
+                # after
+                rec((":", afterLabel))
+                return r
+            case "if", test, yes:
+                return rec(("if", test, yes, 0), receiver)
+            case "!", x:
+                return rec(("if", x, 0, 1), receiver)
+            case "dowhile", test, *body:
+                bodyLabel = gensym("dowhileBody")
+                testLabel = gensym("dowhileTest")
+                afterLabel = gensym("dowhileAfter")
+                loop = testLabel, afterLabel
+
+                # body
+                rec((":", bodyLabel))
+                block(loop, body)
+
+                # test
+                rec((":", testLabel))
+                rec(("if", test, ("goto", bodyLabel)))
+
+                # after
+                rec((":", afterLabel))
+            case "while", test, *body:
+                bodyLabel = gensym("whileBody")
+                testLabel = gensym("whileTest")
+                afterLabel = gensym("whileAfter")
+                loop = testLabel, afterLabel
+
+                rec(("goto", testLabel))
+
+                # body
+                rec((":", bodyLabel))
+                block(loop, body)
+
+                # test
+                rec((":", testLabel))
+                rec(("if", test, ("goto", bodyLabel)))
+
+                # after
+                rec((":", afterLabel))
+            case "continue":
+                return rec(("goto", loop[0]))
+            case "break":
+                return rec(("goto", loop[1]))
+            case "return":
+                return rec((a, 0))
+            case f, *args:
+                args = [rec(x, 1) for x in args]
+                a = f, *args
+                if receiver:
+                    r = gensym("r")
+                    code.append(("=", r, a))
+                    return r
+                else:
+                    code.append(a)
+            case _:
+                if isinstance(a, str) or isinstance(a, int):
+                    return a
+                raise Exception(a)
+
+    def block(loop, a):
+        r = 0
+        for b in a:
+            r = term(loop, b)
+        return r
+
+    term(None, ("return", block(None, body)))
+    return list(vs.values()), list(fs.values()), code
+
 
 a = parse(sys.argv[1])
+a = ir(a)
+print(a)
