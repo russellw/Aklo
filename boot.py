@@ -1,5 +1,6 @@
 import sys
 
+
 # parser
 def unquote(s):
     s = s[1:-1]
@@ -379,5 +380,24 @@ def parse(filename):
     return a
 
 
+# intermediate representation
+syms = {}
+
+
+def gensym(s):
+    s = "_" + s
+    if s not in syms:
+        syms[s] = 0
+        return s
+    i = syms[s] + 1
+    syms[s] = i
+    return s + str(i)
+
+
+def ir(body):
+    vs = {}
+    fs = {}
+    code = []
+
+
 a = parse(sys.argv[1])
-print(a)
