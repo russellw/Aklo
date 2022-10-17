@@ -428,10 +428,16 @@ def ir(body):
             term(loop, a, receiver)
 
         match a:
-            case "fn", name, params, body:
+            case "'", x:
+                return a
+            case "\\", params, body:
+                name = gensym("lambda")
+                return rec(("fn", name, params, body), receiver)
+            case "fn", name, params, *body:
                 if name in fs:
                     raise Exception(name)
                 fs[name] = filename, line, name, params, ir(body)
+                return name
             case "=", name, x:
                 if name not in vs:
                     vs[name] = filename, line, name
