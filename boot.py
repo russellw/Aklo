@@ -55,7 +55,7 @@ def parse(filename):
                     ti += 1
                     col += 1
 
-                # nothing on this line
+                # nothing important on this line, keep going
                 if text[ti] in ("\n", ";") or text[ti : ti + 2] == "/*":
                     continue
 
@@ -212,19 +212,22 @@ def parse(filename):
     def postfix():
         a = primary()
         while 1:
-            if eat("("):
-                a = [a]
-                commas(a, ")")
-                continue
-            if eat("["):
-                a = "[", a, expr()
-                expect("]")
-                continue
-            if eat("."):
-                a = "get", a, ("'", word())
-                continue
-            if tok in ("++", "--"):
-                return "post" + lex1(), a
+            match tok:
+                case "(":
+                    lex()
+                    a = [a]
+                    commas(a, ")")
+                    continue
+                case "[":
+                    a = lex1(), a, expr()
+                    expect("]")
+                    continue
+                case ".":
+                    lex()
+                    a = "get", a, ("'", word())
+                    continue
+                case "++" | "--":
+                    return "post" + lex1(), a
             if isPrimary():
                 a = [a, expr()]
                 while eat(","):
@@ -233,27 +236,31 @@ def parse(filename):
 
     def params():
         a = []
-        if tok in (":", ".indent"):
-            return a
-        if eat("("):
-            commas(a, ")")
-        else:
-            while 1:
-                a.append(word())
-                if not eat(","):
-                    break
+        match tok:
+            case ":" | ".indent":
+                pass
+            case "(":
+                lex()
+                commas(a, ")")
+            case _:
+                while 1:
+                    a.append(word())
+                    if not eat(","):
+                        break
         return a
 
     def prefix():
-        if tok in ("!", "++", "--"):
-            return lex1(), prefix()
-        if eat("-"):
-            return "neg", prefix()
-        if tok == "\\":
-            a = [lex1(), params()]
-            expect(":")
-            a.append(assignment())
-            return a
+        match tok:
+            case "!" | "++" | "--":
+                return lex1(), prefix()
+            case "-":
+                lex()
+                return "neg", prefix()
+            case "\\":
+                a = [lex1(), params()]
+                expect(":")
+                a.append(assignment())
+                return a
         return postfix()
 
     # operator precedence parser
@@ -326,47 +333,58 @@ def parse(filename):
         return a
 
     def if1():
+        assert tok in ("if", "elif")
+        lex()
         a = ["if", expr(), block1()]
-        if eat("elif"):
-            a.append(if1())
-        elif eat("else"):
-            a.append(block1())
+        match tok:
+            case "elif":
+                a.append(if1())
+            case "else":
+                lex()
+                a.append(block1())
         return a
 
     def stmt():
         a = [tok]
-        if eat("assert"):
-            s = f"{filename}:{line}: assert failed\n"
-            a.append(expr())
-            a.append(s)
-            expect("\n")
-            return a
-        if eat("dowhile") or eat("while"):
-            a.append(expr())
-            block(a)
-            return a
-        if eat("for"):
-            a.append(word())
-            a.append(tuple1())
-            block(a)
-            return a
-        if eat("fn"):
-            a.append(word())
-            a.append(params())
-            block(a)
-            return a
-        if eat("if"):
-            return if1()
-        if eat("nonlocal") or eat(":") or eat("goto"):
-            a.append(word())
-            expect("\n")
-            return a
-        if eat("return"):
-            if eat("\n"):
+        match tok:
+            case "assert":
+                lex()
+                s = f"{filename}:{line}: assert failed\n"
+                a.append(expr())
+                a.append(s)
+                expect("\n")
                 return a
-            a.append(tuple1())
-            expect("\n")
-            return a
+            case "dowhile" | "while":
+                lex()
+                a.append(expr())
+                block(a)
+                return a
+            case "for":
+                lex()
+                a.append(word())
+                a.append(tuple1())
+                block(a)
+                return a
+            case "fn":
+                lex()
+                a.append(word())
+                a.append(params())
+                block(a)
+                return a
+            case "if":
+                return if1()
+            case "nonlocal" | ":" | "goto":
+                lex()
+                a.append(word())
+                expect("\n")
+                return a
+            case "return":
+                lex()
+                if eat("\n"):
+                    return a
+                a.append(tuple1())
+                expect("\n")
+                return a
         a = assignment()
         expect("\n")
         return a
