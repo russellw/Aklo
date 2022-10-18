@@ -394,6 +394,7 @@ def parse(filename):
     eat("\n")
     a = []
     while tok != ".dedent":
+        a.append((".line", filename, line))
         a.append(stmt())
     return a
 
@@ -555,5 +556,6 @@ def ir(body):
 
 
 a = parse(sys.argv[1])
+print(a)
 a = ir(a)
 print(a)
