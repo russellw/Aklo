@@ -1,4 +1,5 @@
 import inspect
+import os
 import subprocess
 import sys
 
@@ -437,7 +438,8 @@ def ir(body):
 
         match a:
             case "'", x:
-                return a
+                x = [".list"] + list(bytes(x, "utf8"))
+                return rec(("intern", x), receiver)
             case "\\", params, body:
                 name = gensym("lambda")
                 return rec(("fn", name, params, body), receiver)
@@ -538,6 +540,23 @@ def ir(body):
 
                 # after
                 code.append((":", afterLabel))
+            case "for", x, s, *body:
+                s1 = gensym("s")
+                n = gensym("n")
+                i = gensym("i")
+                return rec(
+                    (
+                        ".do",
+                        ("=", s1, s),
+                        ("=", n, ("len", s1)),
+                        (
+                            "while",
+                            ("<", i, n),
+                            ("=", x, ("[", s1, ("post++", i))),
+                            *body,
+                        ),
+                    )
+                )
             case "continue":
                 code.append(("goto", loop[0]))
             case "break":
@@ -578,7 +597,11 @@ program = ir(program)
 
 
 # output
+here = os.path.dirname(os.path.realpath(__file__))
+lib = os.path.join(here, "boot.cs")
+
 outf = open("a.cs", "w")
+outf.write(open(lib).read())
 
 
 def emit(a):
@@ -646,7 +669,7 @@ def stmt(a):
         case "goto", label:
             emit(f"goto {label};\n")
         case "if", test, label:
-            emit(f"if ({test}) goto {label};\n")
+            emit(f"if (truth({test})) goto {label};\n")
         case ".line", fil, line:
             # emit(f'#line {line} "{fil}"\n')
             pass
