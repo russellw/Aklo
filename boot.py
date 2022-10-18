@@ -643,7 +643,6 @@ outf.close()
 
 
 # compile
-subprocess.call(("csc", "a.cs"))
 p = subprocess.Popen(
     ("csc", "-nologo", "a.cs"),
     encoding="utf8",
