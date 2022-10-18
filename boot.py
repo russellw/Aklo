@@ -565,9 +565,7 @@ def ir(body):
 
 fil = sys.argv[1]
 program = parse(fil)
-show(program)
 program = ir(program)
-show(program)
 
 
 # output
@@ -646,3 +644,11 @@ outf.close()
 
 # compile
 subprocess.call(("csc", "a.cs"))
+p = subprocess.Popen(
+    ("csc", "-nologo", "a.cs"),
+    encoding="utf8",
+    stdout=subprocess.PIPE,
+)
+outs, errs = p.communicate()
+for s in outs.split("\n")[:10]:
+    print(s)
