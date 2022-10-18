@@ -13,8 +13,8 @@ def unquote(s):
     return s.encode("utf-8").decode("unicode_escape")
 
 
-def parse(filename):
-    text = open(filename).read()
+def parse(fil):
+    text = open(fil).read()
     ti = 0
     line = 1
 
@@ -25,7 +25,7 @@ def parse(filename):
     tok = None
 
     def err(msg):
-        raise Exception(f"{filename}:{line}: {msg}")
+        raise Exception(f"{fil}:{line}: {msg}")
 
     # tokenizer
     def lex():
@@ -330,7 +330,7 @@ def parse(filename):
     def block(a):
         expect(".indent")
         while not eat(".dedent"):
-            a.append((".line", filename, line))
+            a.append((".line", fil, line))
             a.append(stmt())
 
     def block1():
@@ -355,7 +355,7 @@ def parse(filename):
         match tok:
             case "assert":
                 lex()
-                s = f"{filename}:{line}: assert failed\n"
+                s = f"{fil}:{line}: assert failed\n"
                 a.append(expr())
                 a.append(s)
                 expect("\n")
@@ -400,7 +400,7 @@ def parse(filename):
     eat("\n")
     a = []
     while tok != ".dedent":
-        a.append((".line", filename, line))
+        a.append((".line", fil, line))
         a.append(stmt())
     return a
 
@@ -420,7 +420,7 @@ def gensym(s):
 
 
 def ir(body):
-    filename = 0
+    fil = 0
     line = 0
 
     vs = {}
@@ -428,7 +428,7 @@ def ir(body):
     code = []
 
     def term(loop, a, receiver=0):
-        nonlocal filename
+        nonlocal fil
         nonlocal line
 
         def rec(a, receiver=0):
@@ -443,16 +443,16 @@ def ir(body):
             case "fn", name, params, *body:
                 if name in fs:
                     raise Exception(name)
-                fs[name] = filename, line, name, params, ir(body)
+                fs[name] = fil, line, name, params, ir(body)
                 return name
             case "=", name, x:
                 if name not in vs:
-                    vs[name] = filename, line, name
+                    vs[name] = fil, line, name
                 x = rec(x, 1)
                 code.append(("=", name, x))
                 return name
-            case ".line", filename1, line1:
-                filename = filename1
+            case ".line", fil1, line1:
+                fil = fil1
                 line = line1
                 code.append(a)
             case "assert", test, msg:
@@ -542,7 +542,7 @@ def ir(body):
                 if receiver:
                     r = gensym("r")
                     assert r not in vs
-                    vs[r] = filename, line, r
+                    vs[r] = fil, line, r
                     code.append(("=", r, a))
                     return r
                 code.append(a)
@@ -562,8 +562,8 @@ def ir(body):
     return list(vs.values()), list(fs.values()), code
 
 
-filename = sys.argv[1]
-program = parse(filename)
+fil = sys.argv[1]
+program = parse(fil)
 show(program)
 program = ir(program)
 show(program)
@@ -574,21 +574,63 @@ outf = open("a.cs", "w")
 
 
 def emit(a):
+    if isinstance(a, int):
+        a = str(a)
     outf.write(a)
 
 
+def commas(a):
+    more = 0
+    for b in a:
+        if more:
+            emit(",")
+        more = 1
+        emit(b)
+
+
+def expr(a):
+    match a:
+        case _:
+            if isinstance(a, int):
+                emit(a)
+                return
+            raise Exception(a)
+
+
+def stmt(a):
+    match a:
+        case "=", name, x:
+            emit(name + "=")
+            expr(x)
+            emit(";\n")
+        case ":", label:
+            emit(f"{label}:\n")
+        case "goto", label:
+            emit(f"goto {label};\n")
+        case "if", test, label:
+            emit(f"if ({test}) goto {label};\n")
+        case ".line", fil, line:
+            emit(f'#line {line} "{fil}"\n')
+        case _:
+            raise Exception(a)
+
+
 def var(a):
-    filename, line, name = a
-    emit(f'#line {line} "{filename}"\n')
+    fil, line, name = a
+    stmt((".line", fil, line))
     emit(f"object {name}\n")
 
 
 def fn(a):
-    name, params, vs, fs, code = a
+    fil, line, name, params, vs, fs, code = a
+    stmt((".line", fil, line))
     emit(f"object {name}(")
+    commas("object " + x for x in params)
     emit(") {\n")
+    for a in code:
+        stmt(a)
     emit("}\n")
 
 
-program = (filename, 1, ()) + program
+program = (fil, 1, "main", ()) + program
 fn(program)
