@@ -432,7 +432,7 @@ def ir(body):
         nonlocal line
 
         def rec(a, receiver=0):
-            term(loop, a, receiver)
+            return term(loop, a, receiver)
 
         match a:
             case "'", x:
@@ -450,6 +450,7 @@ def ir(body):
                     vs[name] = filename, line, name
                 x = rec(x, 1)
                 code.append(("=", name, x))
+                return name
             case ".line", filename1, line1:
                 filename = filename1
                 line = line1
@@ -561,7 +562,33 @@ def ir(body):
     return list(vs.values()), list(fs.values()), code
 
 
-a = parse(sys.argv[1])
-show(a)
-a = ir(a)
-show(a)
+filename = sys.argv[1]
+program = parse(filename)
+show(program)
+program = ir(program)
+show(program)
+
+
+# output
+outf = open("a.cs", "w")
+
+
+def emit(a):
+    outf.write(a)
+
+
+def var(a):
+    filename, line, name = a
+    emit(f'#line {line} "{filename}"\n')
+    emit(f"object {name}\n")
+
+
+def fn(a):
+    name, params, vs, fs, code = a
+    emit(f"object {name}(")
+    emit(") {\n")
+    emit("}\n")
+
+
+program = (filename, 1, ()) + program
+fn(program)
