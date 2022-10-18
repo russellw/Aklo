@@ -589,9 +589,9 @@ program = ir(program)
 
 # output
 here = os.path.dirname(os.path.realpath(__file__))
-lib = os.path.join(here, "boot.cs")
+lib = os.path.join(here, "boot.java")
 
-outf = open("a.cs", "w")
+outf = open("a.java", "w")
 outf.write(open(lib).read())
 
 
@@ -693,15 +693,3 @@ def fn(a):
 
 program = (fil, 1, "main", ()) + program
 fn(program)
-outf.close()
-
-
-# compile
-p = subprocess.Popen(
-    ("csc", "-debug", "-nologo", "a.cs"),
-    encoding="utf8",
-    stdout=subprocess.PIPE,
-)
-outs, errs = p.communicate()
-for s in outs.split("\n")[:10]:
-    print(s)
