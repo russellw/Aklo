@@ -527,20 +527,22 @@ def ir(body):
             case "break":
                 code.append(("goto", loop[1]))
             case "return":
-                rec((a, 0))
+                code.append(("return", 0))
             case f, *args:
                 args = [rec(x, 1) for x in args]
                 a = f, *args
                 if receiver:
                     r = gensym("r")
+                    assert r not in vs
+                    vs[r] = filename, line, r
                     code.append(("=", r, a))
                     return r
-                else:
-                    code.append(a)
+                code.append(a)
             case _:
                 if isinstance(a, str) or isinstance(a, int):
                     return a
                 raise Exception(a)
+        return 0
 
     def block(loop, a):
         r = 0
@@ -548,7 +550,7 @@ def ir(body):
             r = term(loop, b)
         return r
 
-    term(None, ("return", block(None, body)))
+    code.append(("return", block(None, body)))
     return list(vs.values()), list(fs.values()), code
 
 
