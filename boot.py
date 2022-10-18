@@ -1,4 +1,10 @@
+import inspect
 import sys
+
+
+def show(a):
+    info = inspect.getframeinfo(inspect.currentframe().f_back)
+    print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
 
 
 # parser
@@ -556,6 +562,6 @@ def ir(body):
 
 
 a = parse(sys.argv[1])
-print(a)
+show(a)
 a = ir(a)
-print(a)
+show(a)
