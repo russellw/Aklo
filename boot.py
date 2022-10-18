@@ -554,6 +554,10 @@ def ir(body):
                 return block(loop, a)
             case ("goto", _) | (":", _):
                 code.append(a)
+            case ("print", *args) | ("eprint", *args):
+                args = map(rec, args)
+                a = a[0], *args
+                code.append(a)
             case f, *args:
                 args = map(rec, args)
                 a = f, *args
@@ -614,11 +618,14 @@ def expr(a):
             expr(x)
             emit("/")
             expr(y)
+        case "+", x, y:
+            expr(("add", x, y))
+        case "-", x, y:
+            expr(("sub", x, y))
+        case "==", x, y:
+            expr(("eq", x, y))
         case "[", x, y:
-            expr(x)
-            emit("[")
-            expr(y)
-            emit("]")
+            expr(("subscript", x, y))
         case ".list", *args:
             expr(["ls"] + args)
         case f, *args:
