@@ -356,9 +356,9 @@ def parse(fil):
         match tok:
             case "assert":
                 lex()
-                s = f"{fil}:{line}: assert failed\n"
+                msg = f"{fil}:{line}: assert failed\n"
                 a.append(expr())
-                a.append(s)
+                a.append(msg)
                 expect("\n")
                 return a
             case "dowhile" | "while":
@@ -457,7 +457,14 @@ def ir(body):
                 line = line1
                 code.append(a)
             case "assert", test, msg:
+                msg = [".list"] + list(bytes(msg, "utf8"))
                 rec(("if", ("!", test), ("fprint", "stderr", msg)))
+            case "||", x, y:
+                r = gensym("or")
+                return rec((".do", ("=", r, x), ("if", r, r, y)), receiver)
+            case "&&", x, y:
+                r = gensym("and")
+                return rec((".do", ("=", r, x), ("if", r, y, r)), receiver)
             case "if", test, yes, no:
                 yesLabel = gensym("ifYes")
                 noLabel = gensym("ifNo")
@@ -537,6 +544,8 @@ def ir(body):
                 code.append(("goto", loop[1]))
             case "return":
                 code.append(("return", 0))
+            case ".do", *a:
+                return block(loop, a)
             case f, *args:
                 args = [rec(x, 1) for x in args]
                 a = f, *args
@@ -575,6 +584,8 @@ outf = open("a.cs", "w")
 def emit(a):
     if isinstance(a, int):
         a = str(a)
+    if a.endswith("?"):
+        a = a[:-1] + "p"
     outf.write(a)
 
 
@@ -589,10 +600,34 @@ def commas(f, a):
 
 def expr(a):
     match a:
+        case "//", x, y:
+            expr(x)
+            emit("/")
+            expr(y)
+        case "[", x, y:
+            expr(x)
+            emit("[")
+            expr(y)
+            emit("]")
+        case ".list", *args:
+            expr(["ls"] + args)
         case f, *args:
-            emit(f + "(")
-            commas(expr, args)
-            emit(")")
+            if f[0].isalpha():
+                emit(f)
+                emit("(")
+                commas(expr, args)
+                emit(")")
+                return
+            match args:
+                case x,:
+                    emit(f)
+                    expr(x)
+                case x, y:
+                    expr(x)
+                    emit(f)
+                    expr(y)
+                case _:
+                    raise Exception(a)
         case _:
             if isinstance(a, str) or isinstance(a, int):
                 emit(a)
