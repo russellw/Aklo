@@ -1,4 +1,5 @@
 import inspect
+import subprocess
 import sys
 
 
@@ -198,7 +199,7 @@ def parse(fil):
         # string
         if tok[0] == '"':
             s = unquote(lex1())
-            return ("'", [ord(c) for c in s])
+            return [".list"] + [ord(c) for c in s]
 
         # parenthesized expression
         if eat("("):
@@ -579,19 +580,23 @@ def emit(a):
     outf.write(a)
 
 
-def commas(a):
+def commas(f, a):
     more = 0
     for b in a:
         if more:
             emit(",")
         more = 1
-        emit(b)
+        f(b)
 
 
 def expr(a):
     match a:
+        case f, *args:
+            emit(f + "(")
+            commas(expr, args)
+            emit(")")
         case _:
-            if isinstance(a, int):
+            if isinstance(a, str) or isinstance(a, int):
                 emit(a)
                 return
             raise Exception(a)
@@ -610,9 +615,11 @@ def stmt(a):
         case "if", test, label:
             emit(f"if ({test}) goto {label};\n")
         case ".line", fil, line:
-            emit(f'#line {line} "{fil}"\n')
+            # emit(f'#line {line} "{fil}"\n')
+            pass
         case _:
-            raise Exception(a)
+            expr(a)
+            emit(";\n")
 
 
 def var(a):
@@ -625,7 +632,7 @@ def fn(a):
     fil, line, name, params, vs, fs, code = a
     stmt((".line", fil, line))
     emit(f"object {name}(")
-    commas("object " + x for x in params)
+    commas(emit, ("object " + x for x in params))
     emit(") {\n")
     for a in code:
         stmt(a)
@@ -634,3 +641,8 @@ def fn(a):
 
 program = (fil, 1, "main", ()) + program
 fn(program)
+outf.close()
+
+
+# compile
+subprocess.call(("csc", "a.cs"))
