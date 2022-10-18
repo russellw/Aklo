@@ -429,20 +429,20 @@ def ir(body):
     fs = {}
     code = []
 
-    def term(loop, a, receiver=0):
+    def term(loop, a):
         nonlocal fil
         nonlocal line
 
-        def rec(a, receiver=0):
-            return term(loop, a, receiver)
+        def rec(a):
+            return term(loop, a)
 
         match a:
             case "'", x:
                 x = [".list"] + list(bytes(x, "utf8"))
-                return rec(("intern", x), receiver)
+                return rec(("intern", x))
             case "\\", params, body:
                 name = gensym("lambda")
-                return rec(("fn", name, params, body), receiver)
+                return rec(("fn", name, params, body))
             case "fn", name, params, *body:
                 if name in fs:
                     raise Exception(name)
@@ -451,7 +451,7 @@ def ir(body):
             case "=", name, x:
                 if name not in vs:
                     vs[name] = fil, line, name
-                x = rec(x, 1)
+                x = rec(x)
                 code.append(("=", name, x))
                 return name
             case ".line", fil1, line1:
@@ -463,49 +463,36 @@ def ir(body):
                 rec(("if", ("!", test), ("eprint", msg)))
             case "||", x, y:
                 r = gensym("or")
-                return rec((".do", ("=", r, x), ("if", r, r, y)), receiver)
+                return rec((".do", ("=", r, x), ("if", r, r, y)))
             case "&&", x, y:
                 r = gensym("and")
-                return rec((".do", ("=", r, x), ("if", r, y, r)), receiver)
+                return rec((".do", ("=", r, x), ("if", r, y, r)))
             case "if", test, yes, no:
                 yesLabel = gensym("ifYes")
                 noLabel = gensym("ifNo")
                 afterLabel = gensym("ifAfter")
+                r = gensym("ifResult")
 
                 # test
-                code.append(("if", rec(test, 1), yesLabel))
+                code.append(("if", rec(test), yesLabel))
                 code.append(("goto", noLabel))
 
-                if receiver:
-                    r = gensym("ifResult")
+                # yes
+                code.append((":", yesLabel))
+                rec(("=", r, yes))
+                code.append(("goto", afterLabel))
 
-                    # yes
-                    code.append((":", yesLabel))
-                    rec(("=", r, yes))
-                    code.append(("goto", afterLabel))
-
-                    # no
-                    code.append((":", noLabel))
-                    rec(("=", r, no))
-                else:
-                    r = None
-
-                    # yes
-                    code.append((":", yesLabel))
-                    rec(yes)
-                    code.append(("goto", afterLabel))
-
-                    # no
-                    code.append((":", noLabel))
-                    rec(no)
+                # no
+                code.append((":", noLabel))
+                rec(("=", r, no))
 
                 # after
                 code.append((":", afterLabel))
                 return r
             case "if", test, yes:
-                return rec(("if", test, yes, 0), receiver)
+                return rec(("if", test, yes, 0))
             case "!", x:
-                return rec(("if", x, 0, 1), receiver)
+                return rec(("if", x, 0, 1))
             case "dowhile", test, *body:
                 bodyLabel = gensym("dowhileBody")
                 testLabel = gensym("dowhileTest")
@@ -565,16 +552,16 @@ def ir(body):
                 code.append(("return", 0))
             case ".do", *a:
                 return block(loop, a)
-            case f, *args:
-                args = [rec(x, 1) for x in args]
-                a = f, *args
-                if receiver:
-                    r = gensym("r")
-                    assert r not in vs
-                    vs[r] = fil, line, r
-                    code.append(("=", r, a))
-                    return r
+            case ("goto", _) | (":", _):
                 code.append(a)
+            case f, *args:
+                args = map(rec, args)
+                a = f, *args
+                r = gensym("r")
+                assert r not in vs
+                vs[r] = fil, line, r
+                code.append(("=", r, a))
+                return r
             case _:
                 if isinstance(a, str) or isinstance(a, int):
                     return a
