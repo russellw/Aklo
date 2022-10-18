@@ -460,7 +460,7 @@ def ir(body):
                 code.append(a)
             case "assert", test, msg:
                 msg = [".list"] + list(bytes(msg, "utf8"))
-                rec(("if", ("!", test), ("fprint", "stderr", msg)))
+                rec(("if", ("!", test), ("eprint", msg)))
             case "||", x, y:
                 r = gensym("or")
                 return rec((".do", ("=", r, x), ("if", r, r, y)), receiver)
@@ -681,7 +681,7 @@ def stmt(a):
 def var(a):
     fil, line, name = a
     stmt((".line", fil, line))
-    emit(f"object {name}\n")
+    emit(f"object {name} = 0;\n")
 
 
 def fn(a):
@@ -690,6 +690,8 @@ def fn(a):
     emit(f"object {name}(")
     commas(emit, ("object " + x for x in params))
     emit(") {\n")
+    for a in vs:
+        var(a)
     for a in code:
         stmt(a)
     emit("}\n")
@@ -702,7 +704,7 @@ outf.close()
 
 # compile
 p = subprocess.Popen(
-    ("csc", "-nologo", "a.cs"),
+    ("csc", "-debug", "-nologo", "a.cs"),
     encoding="utf8",
     stdout=subprocess.PIPE,
 )
