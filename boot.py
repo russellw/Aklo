@@ -353,7 +353,7 @@ def parse(fil):
             a.append(stmt())
 
     def block1():
-        a = [".do"]
+        a = []
         block(a)
         return a
 
@@ -404,7 +404,7 @@ def parse(fil):
             case "return":
                 lex()
                 if eat("\n"):
-                    return a
+                    return "return"
                 a.append(tuple1())
                 expect("\n")
                 return a
@@ -472,18 +472,41 @@ def ir(a):
             t = "Object"
             params = [("Object", x) for x in params]
 
+            # recur
+            body = list(map(ir, body))
+
+            # separate the local functions
             fs = []
             body1 = []
             for a in body:
-                a = ir(a)
                 if a[0] == "fn":
                     fs.append(a)
                 else:
                     body1.append(a)
             body = body1
 
+            # if the trailing return is implicit, make it explicit
+            b = body[-1]
+            match b:
+                case "return" | ("return", _):
+                    pass
+                case _:
+                    body[-1] = "return", b
+
+            # if there are local functions, we need to generate a class
             if fs:
-                return ".class", modifiers, name, params, *body
+                ctor = ["fn", [], "", name, params]
+                for _, x in params:
+                    ctor.append(("=", "this." + x, x))
+                fs.append(ctor)
+
+                run = ["fn", [], "Object", "run", params]
+                run.extend(body)
+                fs.append(run)
+
+                return ".class", modifiers, name, params, *fs
+
+            # otherwise, we still just have a function
             return "fn", modifiers, t, name, params, *body
         case _, *_:
             return list(map(ir, a))
@@ -567,6 +590,20 @@ def expr(a):
 
 def stmt(a):
     match a:
+        case "if", test, yes, no:
+            emit("if (")
+            expr(test)
+            emit(") {\n")
+            each(stmt, yes)
+            emit("} else {\n")
+            each(stmt, no)
+            emit("}\n")
+        case "if", test, yes:
+            emit("if (")
+            expr(test)
+            emit(") {\n")
+            each(stmt, yes)
+            emit("}\n")
         case "assert", x:
             emit("assert ")
             expr(x)
@@ -594,5 +631,4 @@ def stmt(a):
             emit(";\n")
 
 
-show(program)
 stmt(program)
