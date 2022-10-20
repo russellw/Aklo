@@ -4,9 +4,27 @@ import subprocess
 import sys
 
 
+def each(f, a):
+    for b in a:
+        f(b)
+
+
 def show(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
+
+
+syms = {}
+
+
+def gensym(s):
+    s = "_" + s
+    if s not in syms:
+        syms[s] = 0
+        return s
+    i = syms[s] + 1
+    syms[s] = i
+    return s + str(i)
 
 
 # parser
@@ -200,7 +218,7 @@ def parse(fil):
         # string
         if tok[0] == '"':
             s = unquote(lex1())
-            return [".list"] + [ord(c) for c in s]
+            return ["List.of"] + [ord(c) for c in s]
 
         # parenthesized expression
         if eat("("):
@@ -210,7 +228,7 @@ def parse(fil):
 
         # list
         if eat("["):
-            a = [".list"]
+            a = ["List.of"]
             commas(a, "]")
             return a
 
@@ -332,7 +350,6 @@ def parse(fil):
     def block(a):
         expect(".indent")
         while not eat(".dedent"):
-            a.append((".line", fil, line))
             a.append(stmt())
 
     def block1():
@@ -357,9 +374,7 @@ def parse(fil):
         match tok:
             case "assert":
                 lex()
-                msg = f"{fil}:{line}: assert failed\n"
                 a.append(expr())
-                a.append(msg)
                 expect("\n")
                 return a
             case "dowhile" | "while":
@@ -381,7 +396,7 @@ def parse(fil):
                 return a
             case "if":
                 return if1()
-            case "nonlocal" | ":" | "goto":
+            case "nonlocal":
                 lex()
                 a.append(word())
                 expect("\n")
@@ -402,25 +417,14 @@ def parse(fil):
     eat("\n")
     a = []
     while tok != ".dedent":
-        a.append((".line", fil, line))
         a.append(stmt())
     return a
 
 
+program = parse(sys.argv[1])
+
+
 # intermediate representation
-syms = {}
-
-
-def gensym(s):
-    s = "_" + s
-    if s not in syms:
-        syms[s] = 0
-        return s
-    i = syms[s] + 1
-    syms[s] = i
-    return s + str(i)
-
-
 def ir(body):
     fil = 0
     line = 0
@@ -454,136 +458,27 @@ def ir(body):
                 x = rec(x)
                 code.append(("=", name, x))
                 return name
-            case ".line", fil1, line1:
-                fil = fil1
-                line = line1
-                code.append(a)
-            case "assert", test, msg:
-                msg = [".list"] + list(bytes(msg, "utf8"))
-                rec(("if", ("!", test), ("eprint", msg)))
-            case "||", x, y:
-                r = gensym("or")
-                return rec((".do", ("=", r, x), ("if", r, r, y)))
-            case "&&", x, y:
-                r = gensym("and")
-                return rec((".do", ("=", r, x), ("if", r, y, r)))
-            case "if", test, yes, no:
-                yesLabel = gensym("ifYes")
-                noLabel = gensym("ifNo")
-                afterLabel = gensym("ifAfter")
-                r = gensym("ifResult")
-
-                # test
-                code.append(("if", rec(test), yesLabel))
-                code.append(("goto", noLabel))
-
-                # yes
-                code.append((":", yesLabel))
-                rec(("=", r, yes))
-                code.append(("goto", afterLabel))
-
-                # no
-                code.append((":", noLabel))
-                rec(("=", r, no))
-
-                # after
-                code.append((":", afterLabel))
-                return r
-            case "if", test, yes:
-                return rec(("if", test, yes, 0))
-            case "!", x:
-                return rec(("if", x, 0, 1))
-            case "dowhile", test, *body:
-                bodyLabel = gensym("dowhileBody")
-                testLabel = gensym("dowhileTest")
-                afterLabel = gensym("dowhileAfter")
-                loop = testLabel, afterLabel
-
-                # body
-                code.append((":", bodyLabel))
-                block(loop, body)
-
-                # test
-                code.append((":", testLabel))
-                rec(("if", test, ("goto", bodyLabel)))
-
-                # after
-                code.append((":", afterLabel))
-            case "while", test, *body:
-                bodyLabel = gensym("whileBody")
-                testLabel = gensym("whileTest")
-                afterLabel = gensym("whileAfter")
-                loop = testLabel, afterLabel
-
-                code.append(("goto", testLabel))
-
-                # body
-                code.append((":", bodyLabel))
-                block(loop, body)
-
-                # test
-                code.append((":", testLabel))
-                rec(("if", test, ("goto", bodyLabel)))
-
-                # after
-                code.append((":", afterLabel))
-            case "for", x, s, *body:
-                s1 = gensym("s")
-                n = gensym("n")
-                i = gensym("i")
-                return rec(
-                    (
-                        ".do",
-                        ("=", s1, s),
-                        ("=", n, ("len", s1)),
-                        (
-                            "while",
-                            ("<", i, n),
-                            ("=", x, ("[", s1, ("post++", i))),
-                            *body,
-                        ),
-                    )
-                )
-            case "continue":
-                code.append(("goto", loop[0]))
-            case "break":
-                code.append(("goto", loop[1]))
-            case "return":
-                code.append(("return", 0))
-            case ".do", *a:
-                return block(loop, a)
-            case ("goto", _) | (":", _):
-                code.append(a)
-            case ("print", *args) | ("eprint", *args):
-                args = map(rec, args)
-                a = a[0], *args
-                code.append(a)
-            case f, *args:
-                args = map(rec, args)
-                a = f, *args
-                r = gensym("r")
-                assert r not in vs
-                vs[r] = fil, line, r
-                code.append(("=", r, a))
-                return r
-            case _:
-                if isinstance(a, str) or isinstance(a, int):
-                    return a
-                raise Exception(a)
         return 0
 
-    def block(loop, a):
-        r = 0
-        for b in a:
-            r = term(loop, b)
-        return r
 
-    code.append(("return", block(None, body)))
-    return list(vs.values()), list(fs.values()), code
+def ir(a):
+    match a:
+        case "while", test, *body:
+            test = ir(test)
+            body = list(map(ir, body))
+            return "while", test, *body
+        case "fn", name, params, *body:
+            modifiers = []
+            t = "Object"
+            params = [("Object", x) for x in params]
+            body = list(map(ir, body))
+            return "fn", modifiers, t, name, params, *body
+        case _, *_:
+            return list(map(ir, a))
+    return a
 
 
-fil = sys.argv[1]
-program = parse(fil)
+program = "fn", "Main1", [], *program
 program = ir(program)
 
 
@@ -626,8 +521,6 @@ def expr(a):
             expr(("eq", x, y))
         case "[", x, y:
             expr(("subscript", x, y))
-        case ".list", *args:
-            expr(["ls"] + args)
         case f, *args:
             if f[0].isalpha():
                 emit(f)
@@ -654,42 +547,9 @@ def expr(a):
 
 def stmt(a):
     match a:
-        case "=", name, x:
-            emit(name + "=")
-            expr(x)
-            emit(";\n")
-        case ":", label:
-            emit(f"{label}:\n")
-        case "goto", label:
-            emit(f"goto {label};\n")
-        case "if", test, label:
-            emit(f"if (truth({test})) goto {label};\n")
-        case ".line", fil, line:
-            # emit(f'#line {line} "{fil}"\n')
-            pass
         case _:
             expr(a)
             emit(";\n")
 
 
-def var(a):
-    fil, line, name = a
-    stmt((".line", fil, line))
-    emit(f"object {name} = 0;\n")
-
-
-def fn(a):
-    fil, line, name, params, vs, fs, code = a
-    stmt((".line", fil, line))
-    emit(f"object {name}(")
-    commas(emit, ("object " + x for x in params))
-    emit(") {\n")
-    for a in vs:
-        var(a)
-    for a in code:
-        stmt(a)
-    emit("}\n")
-
-
-program = (fil, 1, "main", ()) + program
-fn(program)
+stmt(program)

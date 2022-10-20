@@ -1,6 +1,12 @@
 import java.io.*;
 import java.util.*;
 
+class Main {
+  public static void main(String[] args) {
+    new Main1.run();
+  }
+}
+
 class Etc {
   int add(Object a, Object b) {
     return (int) a + (int) b;

@@ -216,15 +216,6 @@ for c "ABC"
 assert n==3
 assert m==65+66+67
 
-;goto
-i = 1
-n = 0
-:loop
-n += i
-i++
-if i <= 10
-	goto loop
-
 ;records
 a=[['x',1],['y',2]]
 
