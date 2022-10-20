@@ -471,7 +471,19 @@ def ir(a):
             modifiers = []
             t = "Object"
             params = [("Object", x) for x in params]
-            body = list(map(ir, body))
+
+            fs = []
+            body1 = []
+            for a in body:
+                a = ir(a)
+                if a[0] == "fn":
+                    fs.append(a)
+                else:
+                    body1.append(a)
+            body = body1
+
+            if fs:
+                return ".class", modifiers, name, params, *body
             return "fn", modifiers, t, name, params, *body
         case _, *_:
             return list(map(ir, a))
@@ -559,6 +571,13 @@ def stmt(a):
             emit("assert ")
             expr(x)
             emit(";\n")
+        case ".class", modifiers, name, params, *decls:
+            emit(modifiers)
+            emit(" class ")
+            emit(name)
+            emit("{\n")
+            each(stmt, decls)
+            emit("}\n")
         case "fn", modifiers, t, name, params, *body:
             emit(modifiers)
             emit(" ")
@@ -575,4 +594,5 @@ def stmt(a):
             emit(";\n")
 
 
+show(program)
 stmt(program)
