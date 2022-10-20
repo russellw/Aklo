@@ -336,7 +336,7 @@ def parse(fil):
         a = expr()
         if tok != ",":
             return a
-        a = [".list", a]
+        a = ["List.of", a]
         while eat(","):
             a.append(expr())
         return a
@@ -442,7 +442,7 @@ def ir(body):
 
         match a:
             case "'", x:
-                x = [".list"] + list(bytes(x, "utf8"))
+                x = ["List.of"] + list(bytes(x, "utf8"))
                 return rec(("intern", x))
             case "\\", params, body:
                 name = gensym("lambda")
@@ -512,6 +512,11 @@ def emit(a, separator=" "):
 
 def expr(a):
     match a:
+        case "\\", params, body:
+            emit("(")
+            emit(params, ",")
+            emit(") ->")
+            expr(body)
         case "//", x, y:
             expr(x)
             emit("/")
@@ -550,7 +555,11 @@ def expr(a):
 
 def stmt(a):
     match a:
-        case "fn", modifiers, t, name, params, body:
+        case "assert", x:
+            emit("assert ")
+            expr(x)
+            emit(";\n")
+        case "fn", modifiers, t, name, params, *body:
             emit(modifiers)
             emit(" ")
             emit(t)
