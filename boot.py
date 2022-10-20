@@ -490,21 +490,24 @@ outf = open("a.java", "w")
 outf.write(open(lib).read())
 
 
-def emit(a):
-    if isinstance(a, int):
-        a = str(a)
-    if a.endswith("?"):
-        a = a[:-1] + "p"
-    outf.write(a)
-
-
-def commas(f, a):
+def separate(f, a, separator):
     more = 0
     for b in a:
         if more:
-            emit(",")
+            emit(separator)
         more = 1
         f(b)
+
+
+def emit(a, separator=" "):
+    if isinstance(a, int):
+        a = str(a)
+    if not isinstance(a, str):
+        separate(emit, a, separator)
+        return
+    if a.endswith("?"):
+        a = a[:-1] + "p"
+    outf.write(a)
 
 
 def expr(a):
@@ -525,7 +528,7 @@ def expr(a):
             if f[0].isalpha():
                 emit(f)
                 emit("(")
-                commas(expr, args)
+                separate(expr, args, ",")
                 emit(")")
                 return
             match args:
@@ -547,6 +550,17 @@ def expr(a):
 
 def stmt(a):
     match a:
+        case "fn", modifiers, t, name, params, body:
+            emit(modifiers)
+            emit(" ")
+            emit(t)
+            emit(" ")
+            emit(name)
+            emit("(")
+            emit(params, ",")
+            emit(") {\n")
+            each(stmt, body)
+            emit("}\n")
         case _:
             expr(a)
             emit(";\n")
