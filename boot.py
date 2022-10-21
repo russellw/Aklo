@@ -473,6 +473,25 @@ def ir(a):
                         body1.append(a)
             body = body1
 
+            # which variables are int?
+            ints = set()
+
+            def f(a):
+                match a:
+                    case ("++", x) | ("--", x) | ("post++", x) | ("post--", x) | (
+                        "+=",
+                        x,
+                        _,
+                    ) | ("-=", x, _):
+                        ints.add(x)
+
+            eachr(f, body)
+
+            def ty(x):
+                if x in ints:
+                    return "int"
+                return "Object"
+
             # get the local variables
             nonlocals = set()
             body1 = []
@@ -494,10 +513,10 @@ def ir(a):
                             vs[x] = 1
 
             eachr(f, body)
-            vs = [(".var", [], "Object", x, 0) for x in vs.keys()]
+            vs = [(".var", [], ty(x), x, 0) for x in vs.keys()]
 
             # parameter types
-            params = [("Object", x) for x in params]
+            params = [(ty(x), x) for x in params]
 
             # if the trailing return is implicit, make it explicit
             a = body[-1]
@@ -585,7 +604,10 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
-        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args):
+        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args) | (
+            "intern",
+            *args,
+        ):
             expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
