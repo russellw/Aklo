@@ -95,6 +95,18 @@ class Etc {
     if (a instanceof Integer) return (int) a != 0;
     return true;
   }
+
+  static boolean nump(Object a) {
+    return a instanceof Integer;
+  }
+
+  static boolean symp(Object a) {
+    return a instanceof Sym;
+  }
+
+  static boolean listp(Object a) {
+    return a instanceof List;
+  }
 }
 
 final class Sym {
