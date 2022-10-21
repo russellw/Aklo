@@ -79,6 +79,10 @@ class Etc {
     return a1.get(i1);
   }
 
+  static boolean truth(boolean a) {
+    return a;
+  }
+
   static boolean truth(Object a) {
     if (a instanceof Integer) return (int) a != 0;
     return true;

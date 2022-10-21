@@ -294,7 +294,7 @@ def parse(fil):
                 return lex1(), prefix()
             case "-":
                 lex()
-                return "neg", prefix()
+                return "Etc.neg", prefix()
             case "\\":
                 a = [lex1(), params()]
                 expect(":")
@@ -482,14 +482,16 @@ def ir(body):
 
 def ir(a):
     match a:
-        case "while", test, *body:
-            test = ir(test)
+        case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
+            args = [("Etc.truth", ir(x)) for x in args]
+            return a[0], *args
+        case ("dowhile", test, *body) | ("while", test, *body):
+            test = "Etc.truth", ir(test)
             body = list(map(ir, body))
-            return "while", test, *body
+            return a[0], test, *body
         case "fn", name, params, *body:
             modifiers = []
             t = "Object"
-            params = [("Object", x) for x in params]
 
             # recur
             body = list(map(ir, body))
@@ -507,10 +509,14 @@ def ir(a):
 
             # get the local variables
             nonlocals = set()
+            body1 = []
             for a in body:
                 match a:
                     case "nonlocal", x:
                         nonlocals.add(x)
+                    case _:
+                        body1.append(a)
+            body = body1
 
             # dict keeps deterministic order
             vs = {}
@@ -523,6 +529,9 @@ def ir(a):
 
             eachr(f, body)
             vs = [(".var", [], "Object", x, 0) for x in vs.keys()]
+
+            # parameter types
+            params = [("Object", x) for x in params]
 
             # if the trailing return is implicit, make it explicit
             a = body[-1]
@@ -610,6 +619,8 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
+        case "len", x:
+            expr(("Etc.len", x))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
         case f, *args:
