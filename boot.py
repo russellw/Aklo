@@ -588,6 +588,13 @@ def expr(a):
             expr(x)
             emit(a[0][4:])
         case "\\", params, body:
+            match len(params):
+                case 0:
+                    emit("(Procedure<Object>)")
+                case 1:
+                    emit("(UnaryOperator<Object>)")
+                case 2:
+                    emit("(BinaryOperator<Object>)")
             emit("(")
             emit(params, ",")
             emit(") ->")

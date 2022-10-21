@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 class Main {
   public static void main(String[] args) {
