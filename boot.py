@@ -9,6 +9,14 @@ def each(f, a):
         f(b)
 
 
+def eachr(f, a):
+    f(a)
+    match a:
+        case _, *_:
+            for b in a:
+                eachr(f, b)
+
+
 def show(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
@@ -31,6 +39,10 @@ def gensym(s):
 def unquote(s):
     s = s[1:-1]
     return s.encode("utf-8").decode("unicode_escape")
+
+
+def quoteSym(s):
+    return "intern", ["List.of"] + [ord(c) for c in s]
 
 
 def parse(fil):
@@ -213,7 +225,8 @@ def parse(fil):
 
         # symbol
         if tok[0] == "'":
-            return unquote(lex1())
+            s = unquote(lex1())
+            return quoteSym(s)
 
         # string
         if tok[0] == '"':
@@ -250,7 +263,7 @@ def parse(fil):
                     continue
                 case ".":
                     lex()
-                    a = "get", a, ("'", word())
+                    a = "get", a, quoteSym(word())
                     continue
                 case "++" | "--":
                     return "post" + lex1(), a
@@ -326,7 +339,13 @@ def parse(fil):
                 return a
             op = lex1()
             b = infix(ops[op] + 1)
-            a = op, a, b
+            match op:
+                case ">":
+                    a = "<", b, a
+                case ">=":
+                    a = "<=", b, a
+                case _:
+                    a = op, a, b
 
     def expr():
         return infix(0)
@@ -479,19 +498,39 @@ def ir(a):
             fs = []
             body1 = []
             for a in body:
-                if a[0] == "fn":
-                    fs.append(a)
-                else:
-                    body1.append(a)
+                match a:
+                    case "fn", *_:
+                        fs.append(a)
+                    case _:
+                        body1.append(a)
             body = body1
 
+            # get the local variables
+            nonlocals = set()
+            for a in body:
+                match a:
+                    case "nonlocal", x:
+                        nonlocals.add(x)
+
+            # dict keeps deterministic order
+            vs = {}
+
+            def f(a):
+                match a:
+                    case "=", x, _:
+                        if x not in params and x not in nonlocals:
+                            vs[x] = 1
+
+            eachr(f, body)
+            vs = [(".var", [], "Object", x, 0) for x in vs.keys()]
+
             # if the trailing return is implicit, make it explicit
-            b = body[-1]
-            match b:
+            a = body[-1]
+            match a:
                 case "return" | ("return", _):
                     pass
                 case _:
-                    body[-1] = "return", b
+                    body[-1] = "return", a
 
             # if there are local functions, we need to generate a class
             if fs:
@@ -504,10 +543,10 @@ def ir(a):
                 run.extend(body)
                 fs.append(run)
 
-                return ".class", modifiers, name, params, *fs
+                return ".class", modifiers, name, params, *(vs + fs)
 
             # otherwise, we still just have a function
-            return "fn", modifiers, t, name, params, *body
+            return "fn", modifiers, t, name, params, *(vs + body)
         case _, *_:
             return list(map(ir, a))
     return a
@@ -547,6 +586,9 @@ def emit(a, separator=" "):
 
 def expr(a):
     match a:
+        case ("post++", x) | ("post--", x):
+            expr(x)
+            emit(a[0][4:])
         case "\\", params, body:
             emit("(")
             emit(params, ",")
@@ -556,14 +598,20 @@ def expr(a):
             expr(x)
             emit("/")
             expr(y)
+        case "<", x, y:
+            expr(("Etc.lt", x, y))
+        case "<=", x, y:
+            expr(("Etc.le", x, y))
         case "+", x, y:
-            expr(("add", x, y))
+            expr(("Etc.add", x, y))
+        case "*", x, y:
+            expr(("Etc.mul", x, y))
         case "-", x, y:
-            expr(("sub", x, y))
+            expr(("Etc.sub", x, y))
         case "==", x, y:
-            expr(("eq", x, y))
+            expr(("Etc.eq", x, y))
         case "[", x, y:
-            expr(("subscript", x, y))
+            expr(("Etc.subscript", x, y))
         case f, *args:
             if f[0].isalpha():
                 emit(f)
@@ -590,6 +638,20 @@ def expr(a):
 
 def stmt(a):
     match a:
+        case "for", x, s, *body:
+            emit("for (var ")
+            expr(x)
+            emit(":")
+            expr(s)
+            emit(") {\n")
+            each(stmt, body)
+            emit("}\n")
+        case "while", test, *body:
+            emit("while (")
+            expr(test)
+            emit(") {\n")
+            each(stmt, body)
+            emit("}\n")
         case "if", test, yes, no:
             emit("if (")
             expr(test)
@@ -607,6 +669,15 @@ def stmt(a):
         case "assert", x:
             emit("assert ")
             expr(x)
+            emit(";\n")
+        case ".var", modifiers, t, name, val:
+            emit(modifiers)
+            emit(" ")
+            emit(t)
+            emit(" ")
+            emit(name)
+            emit("=")
+            expr(val)
             emit(";\n")
         case ".class", modifiers, name, params, *decls:
             emit(modifiers)
