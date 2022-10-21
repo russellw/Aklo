@@ -195,7 +195,6 @@ while i <= 10
 	n += i
 	i++
 	continue
-	break
 assert n == 55
 
 i = 1
@@ -230,9 +229,6 @@ assert  a.z==0
 ;lambda
 f=\x,y:x+y
 assert f(2,3)==5
-
-assert fn?(f)
-assert !fn?(9)
 
 f=\():77
 assert f()==77
@@ -308,4 +304,4 @@ assert str(123)=="123"
 assert str('xyz')=="xyz"
 
 /* signal that tests actually completed */
-writeStream(stdout,"ok\n")
+print("ok\n")

@@ -25,6 +25,13 @@ class Etc {
     return (int) a * (int) b;
   }
 
+  static List<Object> str(Object a) {
+    var s = a.toString();
+    var r = new ArrayList<Object>();
+    for (var i = 0; i < s.length(); i++) r.add((int) s.charAt(i));
+    return r;
+  }
+
   static List<Object> append(Object a, Object b) {
     var a1 = (List<Object>) a;
     var r = new ArrayList<Object>(a1);
@@ -62,8 +69,9 @@ class Etc {
     return -(int) a;
   }
 
-  static void print(Object a) {
+  static Object print(Object a) {
     fprint(System.out, a);
+    return null;
   }
 
   static int sub(Object a, Object b) {

@@ -446,6 +446,10 @@ program = parse(sys.argv[1])
 # intermediate representation
 def ir(a):
     match a:
+        case "return", x:
+            return "return", ir(x)
+        case "return":
+            return (a, 0)
         case "push", x, y:
             return ir(("=", x, ("cat", x, ("List.of", y))))
         case "pushs", x, y:
@@ -525,7 +529,7 @@ def ir(a):
             # if the trailing return is implicit, make it explicit
             a = body[-1]
             match a:
-                case "return" | ("return", _):
+                case "return", _:
                     pass
                 case _:
                     body[-1] = "return", a
@@ -558,6 +562,7 @@ program = ir(program)
 here = os.path.dirname(os.path.realpath(__file__))
 lib = os.path.join(here, "boot.java")
 
+# TODO: print to stdout?
 outf = open("a.java", "w")
 outf.write(open(lib).read())
 
@@ -582,19 +587,23 @@ def emit(a, separator=" "):
     outf.write(a)
 
 
+def fcast(params):
+    match len(params):
+        case 0:
+            emit("(Supplier<Object>)")
+        case 1:
+            emit("(UnaryOperator<Object>)")
+        case 2:
+            emit("(BinaryOperator<Object>)")
+
+
 def expr(a):
     match a:
         case ("post++", x) | ("post--", x):
             expr(x)
             emit(a[0][4:])
         case "\\", params, body:
-            match len(params):
-                case 0:
-                    emit("(Supplier<Object>)")
-                case 1:
-                    emit("(UnaryOperator<Object>)")
-                case 2:
-                    emit("(BinaryOperator<Object>)")
+            fcast(params)
             emit("(")
             emit(params, ",")
             emit(") ->")
@@ -628,17 +637,30 @@ def expr(a):
             | ("num?", *args)
             | ("sym?", *args)
             | ("list?", *args)
+            | ("str", *args)
+            | ("print", *args)
         ):
             expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
         case f, *args:
             if f[0].isalpha():
-                emit(f)
+                if len(f) == 1:
+                    emit("(")
+                    fcast(args)
+                    emit(f)
+                    emit(")")
+                    if len(args):
+                        emit(".apply")
+                    else:
+                        emit(".get")
+                else:
+                    emit(f)
                 emit("(")
                 separate(expr, args, ",")
                 emit(")")
                 return
+            # TODO: delete?
             match args:
                 case x,:
                     emit(f)
