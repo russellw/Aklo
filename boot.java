@@ -96,3 +96,48 @@ class Etc {
     return true;
   }
 }
+
+final class Sym {
+  static final Map<String, Sym> syms = new HashMap<>();
+  static final Map<String, Integer> suffixes = new HashMap<>();
+  final String stem;
+  String name;
+
+  Sym() {
+    stem = null;
+  }
+
+  Sym(String stem) {
+    this.stem = stem;
+  }
+
+  static Sym intern(String name) {
+    var a = syms.get(name);
+    if (a == null) {
+      a = new Sym();
+      a.name = name;
+      syms.put(name, a);
+    }
+    return a;
+  }
+
+  static Sym intern(List<Object> name) {
+    var sb = new StringBuilder();
+    for (var c : name) sb.append((char) (int) c);
+    return intern(name.toString());
+  }
+
+  @Override
+  public String toString() {
+    if (name == null) {
+      var i = suffixes.get(stem);
+      if (i == null) {
+        name = stem;
+        i = 1;
+      } else name = stem + i++;
+      suffixes.put(stem, i);
+      name = '#' + name;
+    }
+    return name;
+  }
+}

@@ -604,10 +604,11 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
-        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args) | (
-            "intern",
-            *args,
-        ):
+        case "intern", x:
+            expr(("Sym.intern", x))
+        case "gensym",:
+            expr(("new Sym",))
+        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args):
             expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
