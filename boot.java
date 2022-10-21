@@ -34,18 +34,14 @@ class Etc {
   }
 
   static List<Object> append(Object a, Object b) {
-    var a1 = (List<Object>) a;
-    var r = new ArrayList<Object>(a1);
+    var r = new ArrayList<Object>((List<Object>) a);
     r.add(b);
     return r;
   }
 
   static List<Object> cat(Object a, Object b) {
-    // TODO: refactor casts?
-    var a1 = (List<Object>) a;
-    var b1 = (List<Object>) b;
-    var r = new ArrayList<Object>(a1);
-    r.addAll(b1);
+    var r = new ArrayList<Object>((List<Object>) a);
+    r.addAll((List<Object>) b);
     return r;
   }
 
@@ -55,16 +51,14 @@ class Etc {
 
   static void fprint(PrintStream stream, Object a) {
     if (a instanceof List) {
-      var a1 = (List<Object>) a;
-      for (var c : a1) stream.print((char) (int) c);
+      for (var c : (List<Object>) a) stream.print((char) (int) c);
       return;
     }
     throw new IllegalArgumentException(a.toString());
   }
 
   static int len(Object a) {
-    var a1 = (List<Object>) a;
-    return a1.size();
+    return ((List<Object>) a).size();
   }
 
   static int neg(Object a) {
@@ -93,9 +87,7 @@ class Etc {
   }
 
   static Object subscript(Object a, Object i) {
-    var a1 = (List<Object>) a;
-    var i1 = (int) i;
-    return a1.get(i1);
+    return ((List<Object>) a).get((int) i);
   }
 
   static boolean truth(boolean a) {
