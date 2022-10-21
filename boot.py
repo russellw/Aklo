@@ -12,7 +12,7 @@ def each(f, a):
 def eachr(f, a):
     f(a)
     match a:
-        case _, *_:
+        case [*_]:
             for b in a:
                 eachr(f, b)
 
@@ -545,7 +545,7 @@ def ir(a):
 
             # otherwise, we still just have a function
             return "fn", modifiers, t, name, params, *(vs + body)
-        case _, *_:
+        case [*_]:
             return list(map(ir, a))
     return a
 
@@ -590,7 +590,7 @@ def expr(a):
         case "\\", params, body:
             match len(params):
                 case 0:
-                    emit("(Procedure<Object>)")
+                    emit("(Supplier<Object>)")
                 case 1:
                     emit("(UnaryOperator<Object>)")
                 case 2:
