@@ -423,7 +423,7 @@ def parse(fil):
             case "return":
                 lex()
                 if eat("\n"):
-                    return "return"
+                    return "return", 0
                 a.append(tuple1())
                 expect("\n")
                 return a
@@ -446,10 +446,6 @@ program = parse(sys.argv[1])
 # intermediate representation
 def ir(a):
     match a:
-        case "return", x:
-            return "return", ir(x)
-        case "return":
-            return (a, 0)
         case "push", x, y:
             return ir(("=", x, ("cat", x, ("List.of", y))))
         case "pushs", x, y:
@@ -660,7 +656,6 @@ def expr(a):
                 separate(expr, args, ",")
                 emit(")")
                 return
-            # TODO: delete?
             match args:
                 case x,:
                     emit(f)
