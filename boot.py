@@ -268,9 +268,9 @@ def parse(fil):
                 case "++" | "--":
                     return "post" + lex1(), a
             if isPrimary():
-                a = [a, expr()]
+                a = [a, prefix()]
                 while eat(","):
-                    a.append(expr())
+                    a.append(prefix())
             return a
 
     def params():
@@ -444,44 +444,10 @@ program = parse(sys.argv[1])
 
 
 # intermediate representation
-def ir(body):
-    fil = 0
-    line = 0
-
-    vs = {}
-    fs = {}
-    code = []
-
-    def term(loop, a):
-        nonlocal fil
-        nonlocal line
-
-        def rec(a):
-            return term(loop, a)
-
-        match a:
-            case "'", x:
-                x = ["List.of"] + list(bytes(x, "utf8"))
-                return rec(("intern", x))
-            case "\\", params, body:
-                name = gensym("lambda")
-                return rec(("fn", name, params, body))
-            case "fn", name, params, *body:
-                if name in fs:
-                    raise Exception(name)
-                fs[name] = fil, line, name, params, ir(body)
-                return name
-            case "=", name, x:
-                if name not in vs:
-                    vs[name] = fil, line, name
-                x = rec(x)
-                code.append(("=", name, x))
-                return name
-        return 0
-
-
 def ir(a):
     match a:
+        case "range", x:
+            return ir(("range", 0, x))
         case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
             args = [("Etc.truth", ir(x)) for x in args]
             return a[0], *args
@@ -619,8 +585,8 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
-        case "len", x:
-            expr(("Etc.len", x))
+        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args):
+            expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
         case f, *args:

@@ -12,6 +12,14 @@ class Etc {
     return (int) a + (int) b;
   }
 
+  static List<Object> range(Object i, Object j) {
+    var i1 = (int) i;
+    var j1 = (int) j;
+    var r = new ArrayList<Object>();
+    while (i1 < j1) r.add(i1++);
+    return r;
+  }
+
   static int mul(Object a, Object b) {
     return (int) a * (int) b;
   }
