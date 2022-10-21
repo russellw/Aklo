@@ -557,10 +557,7 @@ program = ir(program)
 # output
 here = os.path.dirname(os.path.realpath(__file__))
 lib = os.path.join(here, "boot.java")
-
-# TODO: print to stdout?
-outf = open("a.java", "w")
-outf.write(open(lib).read())
+sys.stdout.write(open(lib).read())
 
 
 def separate(f, a, separator):
@@ -580,7 +577,7 @@ def emit(a, separator=" "):
         return
     if a.endswith("?"):
         a = a[:-1] + "p"
-    outf.write(a)
+    sys.stdout.write(a)
 
 
 def fcast(params):
