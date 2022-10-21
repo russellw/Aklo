@@ -745,4 +745,5 @@ def stmt(a):
             emit(";\n")
 
 
+emit('@SuppressWarnings("unchecked")\n')
 stmt(program)

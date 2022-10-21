@@ -8,6 +8,7 @@ class Main {
   }
 }
 
+@SuppressWarnings("unchecked")
 class Etc {
   static int add(Object a, Object b) {
     return (int) a + (int) b;
@@ -40,6 +41,7 @@ class Etc {
   }
 
   static List<Object> cat(Object a, Object b) {
+    // TODO: refactor casts?
     var a1 = (List<Object>) a;
     var b1 = (List<Object>) b;
     var r = new ArrayList<Object>(a1);
