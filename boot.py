@@ -4,6 +4,9 @@ import subprocess
 import sys
 
 
+here = os.path.dirname(os.path.realpath(__file__))
+
+
 def each(f, a):
     for b in a:
         f(b)
@@ -19,7 +22,7 @@ def eachr(f, a):
 
 def show(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
-    print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
+    sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
 
 syms = {}
@@ -440,6 +443,7 @@ def parse(fil):
     return a
 
 
+global1 = parse(os.path.join(here, "global.k"))
 program = parse(sys.argv[1])
 
 
@@ -523,6 +527,8 @@ def ir(a):
             params = [(ty(x), x) for x in params]
 
             # if the trailing return is implicit, make it explicit
+            if not body:
+                body = [0]
             a = body[-1]
             match a:
                 case "return", _:
@@ -550,14 +556,16 @@ def ir(a):
     return a
 
 
-program = "fn", "Main1", [], *program
-program = ir(program)
+def ir1(name, module):
+    return ir(("fn", name, [], *module))
+
+
+global1 = ir1("Global", global1)
+program = ir1("Main1", program)
 
 
 # output
-here = os.path.dirname(os.path.realpath(__file__))
-lib = os.path.join(here, "boot.java")
-sys.stdout.write(open(lib).read())
+sys.stdout.write(open(os.path.join(here, "boot.java")).read())
 
 
 def separate(f, a, separator):
@@ -588,6 +596,13 @@ def fcast(params):
             emit("(UnaryOperator<Object>)")
         case 2:
             emit("(BinaryOperator<Object>)")
+
+
+globals1 = set()
+for a in global1:
+    match a:
+        case "fn", modifiers, t, name, params, *body:
+            globals1.add(name)
 
 
 def expr(a):
@@ -648,6 +663,8 @@ def expr(a):
                     else:
                         emit(".get")
                 else:
+                    if f in globals1:
+                        emit("Global.")
                     emit(f)
                 emit("(")
                 separate(expr, args, ",")
@@ -741,6 +758,8 @@ def stmt(a):
             expr(a)
             emit(";\n")
 
+
+stmt(global1)
 
 emit('@SuppressWarnings("unchecked")\n')
 stmt(program)
