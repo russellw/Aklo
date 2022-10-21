@@ -104,6 +104,14 @@ class Etc {
     return a instanceof Sym;
   }
 
+  static Object get(Object record, Object key) {
+    for (var entry : (List<Object>) record) {
+      var entry1 = (List<Object>) entry;
+      if (entry1.get(0).equals(key)) return entry1.get(1);
+    }
+    return 0;
+  }
+
   static boolean listp(Object a) {
     return a instanceof List;
   }

@@ -446,12 +446,16 @@ program = parse(sys.argv[1])
 # intermediate representation
 def ir(a):
     match a:
+        case "push", x, y:
+            return ir(("=", x, ("cat", x, ("List.of", y))))
+        case "pushs", x, y:
+            return ir(("=", x, ("cat", x, y)))
         case "range", x:
             return ir(("range", 0, x))
         case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
             args = [("Etc.truth", ir(x)) for x in args]
             return a[0], *args
-        case ("dowhile", test, *body) | ("while", test, *body):
+        case ("dowhile", test, *body) | ("while", test, *body) | ("if", test, *body):
             test = "Etc.truth", ir(test)
             body = list(map(ir, body))
             return a[0], test, *body
@@ -608,10 +612,16 @@ def expr(a):
             expr(("Sym.intern", x))
         case "gensym",:
             expr(("new Sym",))
-        case ("len", *args) | ("cat", *args) | ("append", *args) | ("range", *args) | (
-            "num?",
-            *args,
-        ) | ("sym?", *args) | ("list?", *args):
+        case (
+            ("len", *args)
+            | ("cat", *args)
+            | ("get", *args)
+            | ("append", *args)
+            | ("range", *args)
+            | ("num?", *args)
+            | ("sym?", *args)
+            | ("list?", *args)
+        ):
             expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
@@ -655,6 +665,12 @@ def stmt(a):
             emit(") {\n")
             each(stmt, body)
             emit("}\n")
+        case "dowhile", test, *body:
+            emit("do {\n")
+            each(stmt, body)
+            emit("} while (")
+            expr(test)
+            emit(");\n")
         case "if", test, yes, no:
             emit("if (")
             expr(test)
