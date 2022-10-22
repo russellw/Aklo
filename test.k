@@ -304,7 +304,7 @@ assert str(123)=="123"
 assert str('xyz')=="xyz"
 
 ;characters
-assert upper? 65
+;assert upper? 65
 
 /* signal that tests actually completed */
 print("ok\n")

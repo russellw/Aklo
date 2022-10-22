@@ -96,6 +96,7 @@ class Etc {
 
   static boolean truth(Object a) {
     if (a instanceof Integer) return (int) a != 0;
+    if (a instanceof List) return ((List<Object>) a).size() != 0;
     return true;
   }
 

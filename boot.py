@@ -531,6 +531,8 @@ def ir(a):
                 body = [0]
             a = body[-1]
             match a:
+                case "assert", _:
+                    body.append(("return", 0))
                 case "return", _:
                     pass
                 case _:
