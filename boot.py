@@ -473,6 +473,24 @@ def getTypes(a):
     return types
 
 
+def localVars(params, a):
+    nonlocals = set()
+
+    # dict keeps deterministic order
+    vs = {}
+
+    def f(a):
+        match a:
+            case "nonlocal", x:
+                nonlocals.add(x)
+            case "=", x, _:
+                if x not in params and x not in nonlocals:
+                    vs[x] = 1
+
+    eachr(f, a)
+    return list(vs.keys())
+
+
 def ir(a):
     match a:
         case "push", x, y:
@@ -500,28 +518,9 @@ def ir(a):
 
             # get the local variables
             types = getTypes(body)
-
-            nonlocals = set()
-            body1 = []
-            for a in body:
-                match a:
-                    case "nonlocal", x:
-                        nonlocals.add(x)
-                    case _:
-                        body1.append(a)
-            body = body1
-
-            # dict keeps deterministic order
-            vs = {}
-
-            def f(a):
-                match a:
-                    case "=", x, _:
-                        if x not in params and x not in nonlocals:
-                            vs[x] = 1
-
-            eachr(f, body)
-            vs = [(".var", [], types.get(x, "Object"), x, 0) for x in vs.keys()]
+            vs = localVars(params, body)
+            body = [a for a in body if a[0] != "nonlocal"]
+            vs = [(".var", [], types.get(x, "Object"), x, 0) for x in vs]
 
             # parameter types
             params = [(types.get(x, "Object"), x) for x in params]
