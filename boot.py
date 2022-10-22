@@ -557,12 +557,39 @@ def ir(a):
     return a
 
 
-def ir1(name, module):
-    return ir(("fn", name, [], *module))
+def irModule(name, body):
+    params = []
+    modifiers = []
+
+    # recur
+    body = list(map(ir, body))
+
+    # separate the local functions
+    fs, body = partition(lambda a: a[0] == "fn", body)
+
+    def f(a):
+        match a:
+            case "fn", modifiers, t, name, params, *body:
+                modifiers = ["static"]
+                return "fn", modifiers, t, name, params, *body
+
+    fs = list(map(f, fs))
+
+    # get the local variables
+    types = getTypes(body)
+    vs = localVars(params, body)
+    vs = [(".var", ["static"], types.get(x, "Object"), x, 0) for x in vs]
+
+    # always need to generate a class
+    run = ["fn", ["static"], "void", "run", params]
+    run.extend(body)
+    fs.append(run)
+
+    return ".class", modifiers, name, params, *(vs + fs)
 
 
-global1 = ir1("Global", global1)
-program = ir1("Main1", program)
+global1 = irModule("Global", global1)
+program = irModule("Main1", program)
 
 
 # output
