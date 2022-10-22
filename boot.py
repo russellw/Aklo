@@ -20,6 +20,12 @@ def eachr(f, a):
                 eachr(f, b)
 
 
+def partition(f, a):
+    b = [x for x in a if f(x)]
+    c = [x for x in a if not f(x)]
+    return b, c
+
+
 def show(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
@@ -471,15 +477,7 @@ def ir(a):
             body = list(map(ir, body))
 
             # separate the local functions
-            fs = []
-            body1 = []
-            for a in body:
-                match a:
-                    case "fn", *_:
-                        fs.append(a)
-                    case _:
-                        body1.append(a)
-            body = body1
+            fs, body = partition(lambda a: a[0] == "fn", body)
 
             # which variables are int?
             ints = set()
