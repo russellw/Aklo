@@ -454,6 +454,25 @@ program = parse(sys.argv[1])
 
 
 # intermediate representation
+def getTypes(a):
+    types = {}
+
+    def f(a):
+        match a:
+            case (
+                ("++", x)
+                | ("--", x)
+                | ("post++", x)
+                | ("post--", x)
+                | ("+=", x, _)
+                | ("-=", x, _)
+            ):
+                types[x] = "int"
+
+    eachr(f, a)
+    return types
+
+
 def ir(a):
     match a:
         case "push", x, y:
@@ -479,26 +498,9 @@ def ir(a):
             # separate the local functions
             fs, body = partition(lambda a: a[0] == "fn", body)
 
-            # which variables are int?
-            ints = set()
-
-            def f(a):
-                match a:
-                    case ("++", x) | ("--", x) | ("post++", x) | ("post--", x) | (
-                        "+=",
-                        x,
-                        _,
-                    ) | ("-=", x, _):
-                        ints.add(x)
-
-            eachr(f, body)
-
-            def ty(x):
-                if x in ints:
-                    return "int"
-                return "Object"
-
             # get the local variables
+            types = getTypes(body)
+
             nonlocals = set()
             body1 = []
             for a in body:
@@ -519,10 +521,10 @@ def ir(a):
                             vs[x] = 1
 
             eachr(f, body)
-            vs = [(".var", [], ty(x), x, 0) for x in vs.keys()]
+            vs = [(".var", [], types.get(x, "Object"), x, 0) for x in vs.keys()]
 
             # parameter types
-            params = [(ty(x), x) for x in params]
+            params = [(types.get(x, "Object"), x) for x in params]
 
             # if the trailing return is implicit, make it explicit
             if not body:
