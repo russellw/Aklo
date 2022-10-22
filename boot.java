@@ -14,6 +14,11 @@ class Etc {
     return (int) a + (int) b;
   }
 
+  @SuppressWarnings("unused")
+  public static void show(Object a) {
+    System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
+  }
+
   static List<Object> range(Object i, Object j) {
     var i1 = (int) i;
     var j1 = (int) j;
@@ -148,7 +153,7 @@ final class Sym {
   static Sym intern(List<Object> name) {
     var sb = new StringBuilder();
     for (var c : name) sb.append((char) (int) c);
-    return intern(name.toString());
+    return intern(sb.toString());
   }
 
   @Override
