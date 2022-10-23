@@ -449,6 +449,8 @@ def parse(fil):
                 expect("\n")
                 return a
         a = assignment()
+        if eat(":"):
+            return ":", a, stmt()
         expect("\n")
         return a
 
@@ -837,6 +839,15 @@ def stmt(a):
             emit("{\n")
             each(stmt, s)
             emit("}\n")
+        case ("break", label) | ("continue", label):
+            emit(a[0])
+            emit(" ")
+            emit(label)
+            emit(";\n")
+        case ":", label, loop:
+            emit(label)
+            emit(":")
+            stmt(loop)
         case _:
             expr(a)
             emit(";\n")

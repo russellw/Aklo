@@ -215,6 +215,13 @@ for c "ABC"
 assert n==3
 assert m==65+66+67
 
+outer: while 1
+	i=0
+	inner: while i<10
+		i++
+		break outer
+assert i==1
+
 ;records
 a=[['x',1],['y',2]]
 
