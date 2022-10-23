@@ -330,5 +330,13 @@ assert b==2
 assert c==3
 assert d==4
 
+;case
+/*
+case '+',1,2
+	'+',x,y
+		a=x+y
+assert a==3
+*/
+
 /* signal that tests actually completed */
 print("ok\n")

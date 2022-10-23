@@ -400,6 +400,18 @@ def parse(fil):
     def stmt():
         a = [tok]
         match tok:
+            case "case":
+                lex()
+                a.append(tuple1())
+                expect(".indent")
+                while not eat(".dedent"):
+                    patterns = [tuple1()]
+                    while eat("\n"):
+                        patterns.append(tuple1())
+                    body = block()
+                    for pattern in patterns:
+                        a.append(pattern, *body)
+                return a
             case "assert":
                 lex()
                 a.append(expr())
@@ -491,21 +503,26 @@ def localVars(params, a):
     return list(vs.keys())
 
 
-def assign(y, x):
-    match y:
+def assign(pattern, x):
+    match pattern:
         case "List.of", *s:
             x1 = gensym("x")
             r = ["{", ("=", x1, x)]
             for i in range(len(s)):
                 r.append(assign(s[i], ("Etc.subscript", x1, i)))
             return r
-    return "=", y, x
+    return "=", pattern, x
 
 
 def ir(a):
     match a:
-        case "=", y, x:
-            return assign(y, ir(x))
+        case "case", x, *cases:
+            x1 = gensym("x")
+            r = ["dowhile", 0, ("=", x1, x)]
+            for pattern, *body in cases:
+                pass
+        case "=", pattern, x:
+            return assign(pattern, ir(x))
         case "push", x, y:
             return ir(("=", x, ("cat", x, ("List.of", y))))
         case "pushs", x, y:
