@@ -498,6 +498,8 @@ def localVars(params, a):
             case "nonlocal", x:
                 nonlocals.add(x)
             case "=", x, _:
+                if not isinstance(x, str):
+                    raise Exception(a)
                 if x not in params and x not in nonlocals:
                     vs[x] = 1
 
@@ -518,9 +520,23 @@ def ir(a):
 
                 def assign(pattern, x):
                     match pattern:
+                        case "intern", ("List.of", *_):
+                            r.append(
+                                ("if", ("!=", x, pattern), [("break", innerLabel)])
+                            )
                         case "List.of", *params:
                             args = gensym("x")
                             r.append(("=", args, x))
+                            r.append(
+                                ("if", ("!", ("list?", args)), [("break", innerLabel)])
+                            )
+                            r.append(
+                                (
+                                    "if",
+                                    ("!=", ("len", args), len(params)),
+                                    [("break", innerLabel)],
+                                )
+                            )
                             for i in range(len(params)):
                                 assign(params[i], ("Etc.subscript", args, i))
                         case _:
@@ -721,6 +737,12 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
+        case "!=", x, y:
+            emit("!Etc.eq(")
+            expr(x)
+            emit(",")
+            expr(y)
+            emit(")")
         case "intern", x:
             expr(("Sym.intern", x))
         case "gensym",:
