@@ -304,6 +304,9 @@ def parse(fil):
             case "-":
                 lex()
                 return "Etc.neg", prefix()
+            case "*":
+                lex()
+                return ".rest", prefix()
             case "\\":
                 a = [lex1(), params()]
                 expect(":")
@@ -533,12 +536,16 @@ def ir(a):
                             r.append(
                                 (
                                     "if",
-                                    ("!=", ("len", args), len(params)),
+                                    ("<", ("len", args), len(params)),
                                     [("break", innerLabel)],
                                 )
                             )
                             for i in range(len(params)):
-                                assign(params[i], ("Etc.subscript", args, i))
+                                match params[i]:
+                                    case ".rest", y:
+                                        assign(y, ("Etc.from", args, i))
+                                    case y:
+                                        assign(y, ("Etc.subscript", args, i))
                         case _:
                             r.append(("=", pattern, x))
 
@@ -560,7 +567,11 @@ def ir(a):
                         args = gensym("x")
                         r.append(("=", args, x))
                         for i in range(len(params)):
-                            assign(params[i], ("Etc.subscript", args, i))
+                            match params[i]:
+                                case ".rest", y:
+                                    assign(y, ("Etc.from", args, i))
+                                case y:
+                                    assign(y, ("Etc.subscript", args, i))
                     case _:
                         r.append(("=", pattern, x))
 

@@ -95,6 +95,11 @@ class Etc {
     return ((List<Object>) a).get((int) i);
   }
 
+  static Object from(Object a, Object i) {
+    var a1 = (List<Object>) a;
+    return a1.subList((int) i, a1.size());
+  }
+
   static boolean truth(boolean a) {
     return a;
   }

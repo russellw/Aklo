@@ -337,6 +337,10 @@ assert b==2
 assert c==3
 assert d==4
 
+a,*s=1,2,3
+assert a==1
+assert s==[2,3]
+
 ;case
 case '+',1,2
 	'+',x,y
@@ -370,6 +374,11 @@ case [1,[2,3],[4,5]]
 	a,(b,c),(d,e)
 		r=a+b+c+d+e
 assert r==15
+
+case 1,2,3,4
+	a,*s
+		r=s
+assert r==[2,3,4]
 
 /* signal that tests actually completed */
 print("ok\n")
