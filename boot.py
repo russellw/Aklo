@@ -307,7 +307,7 @@ def parse(fil):
             case "\\":
                 a = [lex1(), params()]
                 expect(":")
-                a.append(assignment())
+                a.append(expr())
                 return a
         return postfix()
 
@@ -652,6 +652,8 @@ def expr(a):
             expr(("Etc.lt", x, y))
         case "<=", x, y:
             expr(("Etc.le", x, y))
+        case ("+=", x, y) | ("-=", x, y):
+            expr(("=", x, (a[0][0], x, y)))
         case "+", x, y:
             expr(("Etc.add", x, y))
         case "*", x, y:
@@ -720,7 +722,7 @@ def stmt(a):
         case "for", x, s, *body:
             emit("for (var ")
             expr(x)
-            emit(":")
+            emit(": (List)")
             expr(s)
             emit(") {\n")
             each(stmt, body)
@@ -787,6 +789,7 @@ def stmt(a):
             emit(";\n")
 
 
+emit('@SuppressWarnings("unchecked")\n')
 stmt(global1)
 
 emit('@SuppressWarnings("unchecked")\n')

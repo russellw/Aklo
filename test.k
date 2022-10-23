@@ -304,7 +304,11 @@ assert str(123)=="123"
 assert str('xyz')=="xyz"
 
 ;characters
-;assert upper? 65
+assert upper? 65
+assert !upper? 97
+
+;higher-order functions
+assert map( \x:x*x,[1,2,3])==[1,4,9]
 
 /* signal that tests actually completed */
 print("ok\n")
