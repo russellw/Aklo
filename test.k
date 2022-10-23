@@ -82,34 +82,34 @@ assert a == 9
 assert b == 9
 
 ;augmented assignment
-x = 3
-x += 4
-assert x == 7
-x -= 1
-assert x == 6
-x=32
-y = x += 10
-assert x == 42
-assert y == 42
+i = 3
+i += 4
+assert i == 7
+i -= 1
+assert i == 6
+i=32
+j = i += 10
+assert i == 42
+assert j == 42
 
 ;increment and decrement
-x = 0
+i = 0
 
-y = ++x
-assert x == 1
-assert y == 1
+j = ++i
+assert i == 1
+assert j == 1
 
-y = --x
-assert x == 0
-assert y == 0
+j = --i
+assert i == 0
+assert j == 0
 
-y = x++
-assert x == 1
-assert y == 0
+j = i++
+assert i == 1
+assert j == 0
 
-y = x--
-assert x == 0
-assert y == 1
+j = i--
+assert i == 0
+assert j == 1
 
 ;symbols
 assert 'a'=='a'
@@ -338,12 +338,10 @@ assert c==3
 assert d==4
 
 ;case
-/*
 case '+',1,2
-	'+',x,y
+	o,x,y
 		a=x+y
 assert a==3
-*/
 
 /* signal that tests actually completed */
 print("ok\n")

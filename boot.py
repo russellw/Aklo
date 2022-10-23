@@ -408,9 +408,9 @@ def parse(fil):
                     patterns = [tuple1()]
                     while eat("\n"):
                         patterns.append(tuple1())
-                    body = block()
+                    body = block1()
                     for pattern in patterns:
-                        a.append(pattern, *body)
+                        a.append((pattern, *body))
                 return a
             case "assert":
                 lex()
@@ -505,26 +505,51 @@ def localVars(params, a):
     return list(vs.keys())
 
 
-def assign(pattern, x):
-    match pattern:
-        case "List.of", *s:
-            x1 = gensym("x")
-            r = ["{", ("=", x1, x)]
-            for i in range(len(s)):
-                r.append(assign(s[i], ("Etc.subscript", x1, i)))
-            return r
-    return "=", pattern, x
-
-
 def ir(a):
     match a:
         case "case", x, *cases:
+            outerLabel = gensym("outer")
+            innerLabel = gensym("inner")
             x1 = gensym("x")
-            r = ["dowhile", 0, ("=", x1, x)]
+
+            q = ["dowhile", "false", ("=", x1, ir(x))]
             for pattern, *body in cases:
-                pass
+                r = ["dowhile", "false"]
+
+                def assign(pattern, x):
+                    match pattern:
+                        case "List.of", *params:
+                            args = gensym("x")
+                            r.append(("=", args, x))
+                            for i in range(len(params)):
+                                assign(params[i], ("Etc.subscript", args, i))
+                        case _:
+                            r.append(("=", pattern, x))
+
+                assign(pattern, x1)
+                r.extend(body)
+                r.append(("break", outerLabel))
+                q.append((":", innerLabel, r))
+            return ":", outerLabel, q
         case "=", pattern, x:
-            return assign(pattern, ir(x))
+            x = ir(x)
+            if isinstance(pattern, str):
+                return "=", pattern, x
+
+            r = ["{"]
+
+            def assign(pattern, x):
+                match pattern:
+                    case "List.of", *params:
+                        args = gensym("x")
+                        r.append(("=", args, x))
+                        for i in range(len(params)):
+                            assign(params[i], ("Etc.subscript", args, i))
+                    case _:
+                        r.append(("=", pattern, x))
+
+            assign(pattern, x)
+            return r
         case "push", x, y:
             return ir(("=", x, ("cat", x, ("List.of", y))))
         case "pushs", x, y:
