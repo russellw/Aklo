@@ -315,5 +315,20 @@ assert filter( even,[1,2,3])==[2]
 assert filter( odd,[1,2,3])==[1,3]
 assert filter( digit?,"abc123")=="123"
 
+;pattern matching assignment
+a=1,2,3
+assert a==[1,2,3]
+
+a,b,c=1,2,3
+assert a==1
+assert b==2
+assert c==3
+
+a,(b,c),d=1,(2,3),4
+assert a==1
+assert b==2
+assert c==3
+assert d==4
+
 /* signal that tests actually completed */
 print("ok\n")

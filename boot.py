@@ -491,8 +491,21 @@ def localVars(params, a):
     return list(vs.keys())
 
 
+def assign(y, x):
+    match y:
+        case "List.of", *s:
+            x1 = gensym("x")
+            r = ["{", ("=", x1, x)]
+            for i in range(len(s)):
+                r.append(assign(s[i], ("Etc.subscript", x1, i)))
+            return r
+    return "=", y, x
+
+
 def ir(a):
     match a:
+        case "=", y, x:
+            return assign(y, ir(x))
         case "push", x, y:
             return ir(("=", x, ("cat", x, ("List.of", y))))
         case "pushs", x, y:
@@ -802,6 +815,10 @@ def stmt(a):
             emit(params, ",")
             emit(") {\n")
             each(stmt, body)
+            emit("}\n")
+        case "{", *s:
+            emit("{\n")
+            each(stmt, s)
             emit("}\n")
         case _:
             expr(a)
