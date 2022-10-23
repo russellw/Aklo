@@ -18,3 +18,10 @@ fn map f,a
 	for b a
 		push r,f  b
 	r
+
+fn filter f,a
+	r=[]
+	for b a
+		if f b
+			push r,b
+	r

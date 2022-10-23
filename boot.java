@@ -4,7 +4,7 @@ import java.util.function.*;
 
 class Main {
   public static void main(String[] args) {
-    Main1.run();
+    Program.run();
   }
 }
 

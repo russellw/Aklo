@@ -589,7 +589,7 @@ def irModule(name, body):
 
 
 global1 = irModule("Global", global1)
-program = irModule("Main1", program)
+program = irModule("Program", program)
 
 
 # output
@@ -617,7 +617,9 @@ def emit(a, separator=" "):
 
 
 def fcast(params):
-    match len(params):
+    if not isinstance(params, int):
+        params = len(params)
+    match params:
         case 0:
             emit("(Supplier<Object>)")
         case 1:
@@ -681,6 +683,23 @@ def expr(a):
             expr(("Etc." + a[0], *args))
         case "[", x, y:
             expr(("Etc.subscript", x, y))
+        case ("map", f, s) | ("filter", f, s):
+            emit("Global.")
+            emit(a[0])
+            emit("(")
+            if f[0] == "\\":
+                expr(f)
+            else:
+                fcast(1)
+                if f in globals1:
+                    emit("Global")
+                else:
+                    emit(moduleName)
+                emit("::")
+                expr(f)
+            emit(",")
+            expr(s)
+            emit(")")
         case f, *args:
             if f[0].isalpha():
                 if len(f) == 1:
@@ -790,7 +809,9 @@ def stmt(a):
 
 
 emit('@SuppressWarnings("unchecked")\n')
+moduleName = "Global"
 stmt(global1)
 
 emit('@SuppressWarnings("unchecked")\n')
+moduleName = "Program"
 stmt(program)
