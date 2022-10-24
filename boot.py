@@ -468,7 +468,7 @@ def parse(fil):
     return a
 
 
-global1 = parse(os.path.join(here, "global.k"))
+global1 = parse(os.path.join(here, "src", "global.k"))
 program = parse(sys.argv[1])
 
 
