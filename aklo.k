@@ -1,3 +1,5 @@
+import parser
+
 fn usage
 	eprintln"Usage: aklo [options] file"
 	exit 1

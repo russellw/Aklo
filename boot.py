@@ -4,9 +4,6 @@ import subprocess
 import sys
 
 
-here = os.path.dirname(os.path.realpath(__file__))
-
-
 def each(f, a):
     for b in a:
         f(b)
@@ -31,6 +28,7 @@ def show(a):
     sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
 
+# in the bootstrap compiler, strings substitute for symbols
 syms = {}
 
 
@@ -42,6 +40,10 @@ def gensym(s):
     i = syms[s] + 1
     syms[s] = i
     return s + str(i)
+
+
+# library files need to be read from where the compiler is
+here = os.path.dirname(os.path.realpath(__file__))
 
 
 # parser
