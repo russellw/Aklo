@@ -341,6 +341,9 @@ a,*s=1,2,3
 assert a==1
 assert s==[2,3]
 
+b=a,*s
+assert b==[1,2,3]
+
 ;case
 case '+',1,2
 	'+',x,y

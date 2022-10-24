@@ -38,6 +38,13 @@ class Etc {
     return r;
   }
 
+  static List<Object> listRest(Object... a) {
+    var r = new ArrayList<Object>();
+    for (var i = 0; i < a.length - 1; i++) r.add(a[i]);
+    r.addAll((List<Object>) a[a.length - 1]);
+    return r;
+  }
+
   static List<Object> append(Object a, Object b) {
     var r = new ArrayList<Object>((List<Object>) a);
     r.add(b);

@@ -790,6 +790,20 @@ def expr(a):
             emit(",")
             expr(s)
             emit(")")
+        case "List.of", *args:
+            if args:
+                match args[-1]:
+                    case ".rest", s:
+                        emit("Etc.listRest(")
+                        for x in args[:-1]:
+                            expr(x)
+                            emit(",")
+                        expr(s)
+                        emit(")")
+                        return
+            emit("List.of(")
+            separate(expr, args, ",")
+            emit(")")
         case f, *args:
             if f[0].isalpha():
                 if len(f) == 1:
