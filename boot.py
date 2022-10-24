@@ -292,11 +292,7 @@ def parse(fil):
                 commas(a, ")")
             case _:
                 while 1:
-                    if eat("*"):
-                        x = "Object...", word()
-                    else:
-                        x = word()
-                    a.append(x)
+                    a.append(expr())
                     if not eat(","):
                         break
         return a
@@ -310,7 +306,7 @@ def parse(fil):
                 return "Etc.neg", prefix()
             case "*":
                 lex()
-                return ".rest", prefix()
+                return "Object...", prefix()
             case "\\":
                 a = [lex1(), params()]
                 expect(":")
@@ -523,6 +519,7 @@ def ir(a):
 
             q = ["dowhile", "false", ("=", x1, ir(x))]
             for pattern, *body in cases:
+                body = list(map(ir, body))
                 r = ["dowhile", "false"]
 
                 def assign(pattern, x):
@@ -549,7 +546,7 @@ def ir(a):
                             )
                             for i in range(len(params)):
                                 match params[i]:
-                                    case ".rest", y:
+                                    case "Object...", y:
                                         assign(y, ("Etc.from", args, i))
                                     case y:
                                         assign(y, ("Etc.subscript", args, i))
@@ -577,7 +574,7 @@ def ir(a):
                         r.append(("=", args, x))
                         for i in range(len(params)):
                             match params[i]:
-                                case ".rest", y:
+                                case "Object...", y:
                                     assign(y, ("Etc.from", args, i))
                                 case y:
                                     assign(y, ("Etc.subscript", args, i))
@@ -812,7 +809,7 @@ def expr(a):
         case "List.of", *args:
             if args:
                 match args[-1]:
-                    case ".rest", s:
+                    case "Object...", s:
                         emit("Etc.listRest(")
                         for x in args[:-1]:
                             expr(x)

@@ -315,6 +315,9 @@ assert a==2
 assert str(123)=="123"
 assert str('xyz')=="xyz"
 
+assert fmt"abc"=="abc"
+assert fmt"ab%scd","xy"=="abxycd"
+
 ;characters
 assert upper? 65
 assert !upper? 97

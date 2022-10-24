@@ -28,3 +28,22 @@ fn filter f,a
 
 fn tail a
 	from a,1
+
+fn fmt(s,*args)
+	i = 0
+	j = 0
+	r = ""
+	while i < len(s)
+		c = s[i++]
+		if [c] != "%"
+			push r, c
+			continue
+		c = s[i++]
+		case [c ]
+			"s"
+				pushs r, args[j++]
+			"d"
+				pushs r, str(args[j++])
+			_
+				push r, c
+	r
