@@ -30,4 +30,4 @@ while i<len argv
 	file=s
 if !file
 	usage()
-println(file)
+readFile(file)

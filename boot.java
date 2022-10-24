@@ -1,5 +1,6 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -18,6 +19,25 @@ final class Etc {
     var stream1 = (PrintStream) stream;
     for (var c : (List<Object>) s) stream1.write((int) c);
     return null;
+  }
+
+  static String decode(Object a) {
+    return new String(bytes(a), StandardCharsets.UTF_8);
+  }
+
+  static List<Object> readFile(Object file) {
+    try {
+      return list(Files.readAllBytes(Path.of(decode(file))));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  static byte[] bytes(Object a) {
+    var a1 = (List<Object>) a;
+    var b = new byte[a1.size()];
+    for (var i = 0; i < b.length; i++) b[i] = (byte) (int) a1.get(i);
+    return b;
   }
 
   static List<Object> list(byte[] a) {

@@ -802,6 +802,7 @@ def expr(a):
             | ("append", *args)
             | ("range", *args)
             | ("writeStream", *args)
+            | ("readFile", *args)
             | ("num?", *args)
             | ("sym?", *args)
             | ("list?", *args)
