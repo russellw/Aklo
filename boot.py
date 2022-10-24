@@ -721,6 +721,8 @@ for a in global1:
 
 def expr(a):
     match a:
+        case "argv":
+            emit("Etc.argv")
         case ("post++", x) | ("post--", x):
             expr(x)
             emit(a[0][4:])

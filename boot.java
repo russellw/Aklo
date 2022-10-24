@@ -1,21 +1,35 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
 
 class Main {
   public static void main(String[] args) {
+    for (var s : args) Etc.argv.add(Etc.encode(s));
     Program.run();
   }
 }
 
 @SuppressWarnings("unchecked")
 class Etc {
+  static List<Object> argv = new ArrayList();
+
+  static List<Object> list(byte[] a) {
+    var r = new Object[a.length];
+    for (var i = 0; i < r.length; i++) r[i] = (int) a[i] & 0xff;
+    return List.of(r);
+  }
+
+  static List<Object> encode(String s) {
+    return list(s.getBytes(StandardCharsets.UTF_8));
+  }
+
   static int add(Object a, Object b) {
     return (int) a + (int) b;
   }
 
   @SuppressWarnings("unused")
-  public static void show(Object a) {
+  static void show(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
