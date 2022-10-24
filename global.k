@@ -50,3 +50,25 @@ fn fmt(s,*args)
 
 fn printf *s
 	print(apply(fmt, s))
+
+fn eprintf *s
+	eprint(apply(fmt, s))
+
+fn println *args
+	apply print,args
+	print"\n"
+
+fn eprintln *args
+	apply eprint,args
+	eprint"\n"
+
+fn print *args
+	for a args
+		printStream stdout,a
+
+fn eprint *args
+	for a args
+		printStream stderr,a
+
+fn printStream stream,		a
+	writeStream(stream,a)

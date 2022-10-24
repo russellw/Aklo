@@ -3,7 +3,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.*;
 
-class Main {
+final class Main {
   public static void main(String[] args) {
     for (var s : args) Etc.argv.add(Etc.encode(s));
     Program.run();
@@ -11,8 +11,14 @@ class Main {
 }
 
 @SuppressWarnings("unchecked")
-class Etc {
+final class Etc {
   static List<Object> argv = new ArrayList();
+
+  static Object writeStream(Object stream, Object s) {
+    var stream1 = (PrintStream) stream;
+    for (var c : (List<Object>) s) stream1.write((int) c);
+    return null;
+  }
 
   static List<Object> list(byte[] a) {
     var r = new Object[a.length];
@@ -71,18 +77,6 @@ class Etc {
     return r;
   }
 
-  static void eprint(Object a) {
-    fprint(System.err, a);
-  }
-
-  static void fprint(PrintStream stream, Object a) {
-    if (a instanceof List) {
-      for (var c : (List<Object>) a) stream.print((char) (int) c);
-      return;
-    }
-    throw new IllegalArgumentException(a.toString());
-  }
-
   static int len(Object a) {
     return ((List<Object>) a).size();
   }
@@ -94,11 +88,6 @@ class Etc {
 
   static int neg(Object a) {
     return -(int) a;
-  }
-
-  static Object print(Object a) {
-    fprint(System.out, a);
-    return null;
   }
 
   static int sub(Object a, Object b) {

@@ -1,5 +1,5 @@
 fn usage
-	eprint"Usage: aklo [options] file\n"
+	eprintln"Usage: aklo [options] file"
 	exit 1
 
 file=0
@@ -13,21 +13,19 @@ while i<len argv
 		case o
 			"h"
 			"help"
-				print"-h  Show help\n"
-				print"-V  Show version\n"
+				println"-h  Show help"
+				println"-V  Show version"
 				exit 0
 			"V"
 			"version"
-				print"Aklo version 0\n"
+				println"Aklo version 0"
 				exit 0
 			_
-				eprint(s)
-				eprint": unknown option\n"
+				eprintf"%s: unknown option\n",s
 				exit 1
 	if file
 		usage()
 	file=s
 if !file
 	usage()
-print(file)
-print("\n")
+println(file)

@@ -625,7 +625,7 @@ def ir(a):
                 body = [0]
             a = body[-1]
             match a:
-                case "assert", _:
+                case ("assert", _) | ("for", *_):
                     body.append(("return", 0))
                 case "return", _:
                     pass
@@ -778,12 +778,11 @@ def expr(a):
             | ("exit", *args)
             | ("append", *args)
             | ("range", *args)
+            | ("writeStream", *args)
             | ("num?", *args)
             | ("sym?", *args)
             | ("list?", *args)
             | ("str", *args)
-            | ("print", *args)
-            | ("eprint", *args)
             | ("from", *args)
         ):
             expr(("Etc." + a[0], *args))
@@ -811,6 +810,10 @@ def expr(a):
             emit("(")
             expr(s)
             emit(".toArray())")
+        case "stdout":
+            emit("System.out")
+        case "stderr":
+            emit("System.err")
         case "List.of", *args:
             if args:
                 match args[-1]:
