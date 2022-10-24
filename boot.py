@@ -292,7 +292,11 @@ def parse(fil):
                 commas(a, ")")
             case _:
                 while 1:
-                    a.append(word())
+                    if eat("*"):
+                        x = "Object...", word()
+                    else:
+                        x = word()
+                    a.append(x)
                     if not eat(","):
                         break
         return a
@@ -607,7 +611,12 @@ def ir(a):
             vs = [(".var", [], types.get(x, "Object"), x, 0) for x in vs]
 
             # parameter types
-            params = [(types.get(x, "Object"), x) for x in params]
+            def f(x):
+                if isinstance(x, str):
+                    return types.get(x, "Object"), x
+                return x
+
+            params = list(map(f, params))
 
             # if the trailing return is implicit, make it explicit
             if not body:
@@ -905,8 +914,18 @@ def stmt(a):
             emit(" ")
             emit(name)
             emit("(")
+            x = 0
+            if params and params[-1][0] == "Object...":
+                x = params[-1][1]
+                params[-1] = "Object...", x + "_"
             emit(params, ",")
             emit(") {\n")
+            if x:
+                emit("var ")
+                emit(x)
+                emit("= List.of(")
+                emit(x)
+                emit("_);\n")
             each(stmt, body)
             emit("}\n")
         case "{", *s:
