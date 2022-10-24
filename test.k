@@ -399,4 +399,4 @@ case 2
 assert a=="two"
 
 /* signal that tests actually completed */
-print("ok\n")
+printf("%s\n","ok")

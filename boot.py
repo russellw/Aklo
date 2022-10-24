@@ -806,6 +806,11 @@ def expr(a):
             emit(",")
             expr(s)
             emit(")")
+        case "apply", f, s:
+            expr(f)
+            emit("(")
+            expr(s)
+            emit(".toArray())")
         case "List.of", *args:
             if args:
                 match args[-1]:
@@ -919,18 +924,21 @@ def stmt(a):
             emit(" ")
             emit(name)
             emit("(")
-            x = 0
             if params and params[-1][0] == "Object...":
-                x = params[-1][1]
-                params[-1] = "Object...", x + "_"
-            emit(params, ",")
-            emit(") {\n")
-            if x:
+                emit("Object...args_) {\n")
+                for i in range(0, len(params) - 1):
+                    emit(params[i])
+                    emit("= args_[")
+                    emit(i)
+                    emit("];\n")
                 emit("var ")
-                emit(x)
-                emit("= List.of(")
-                emit(x)
-                emit("_);\n")
+                emit(params[-1][1])
+                emit("= List.of(Arrays.copyOfRange(args_, ")
+                emit(len(params) - 1)
+                emit(", args_.length));\n")
+            else:
+                emit(params, ",")
+                emit(") {\n")
             each(stmt, body)
             emit("}\n")
         case "{", *s:

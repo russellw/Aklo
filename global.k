@@ -47,3 +47,6 @@ fn fmt(s,*args)
 			_
 				push r, c
 	r
+
+fn printf *s
+	print(apply(fmt, s))
