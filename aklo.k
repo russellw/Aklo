@@ -5,11 +5,12 @@ fn usage
 file=0
 i=0
 while i<len argv
-	s=argv[i]
+	s=argv[i++]
 	if s[0]=='-'
-		while s[0]=='-'
-			s=tail s
-		case s
+		o=s
+		while o&&o[0]=='-'
+			o=tail o
+		case o
 			"h"
 			"help"
 				print"-h  Show help\n"
@@ -20,6 +21,7 @@ while i<len argv
 				print"Aklo version 0\n"
 				exit 0
 			_
+				eprint(s)
 				eprint": unknown option\n"
 				exit 1
 	if file
@@ -27,3 +29,5 @@ while i<len argv
 	file=s
 if !file
 	usage()
+print(file)
+print("\n")
