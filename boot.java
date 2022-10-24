@@ -87,6 +87,11 @@ class Etc {
     return ((List<Object>) a).size();
   }
 
+  static Object exit(Object a) {
+    System.exit((int) a);
+    return null;
+  }
+
   static int neg(Object a) {
     return -(int) a;
   }

@@ -526,6 +526,9 @@ def ir(a):
                 r = ["dowhile", "false"]
 
                 def assign(pattern, x):
+                    if isinstance(pattern, int):
+                        r.append(("if", ("!=", x, pattern), [("break", innerLabel)]))
+                        return
                     match pattern:
                         case "intern", ("List.of", *_):
                             r.append(
@@ -550,6 +553,8 @@ def ir(a):
                                         assign(y, ("Etc.from", args, i))
                                     case y:
                                         assign(y, ("Etc.subscript", args, i))
+                        case "_":
+                            pass
                         case _:
                             r.append(("=", pattern, x))
 
@@ -773,6 +778,7 @@ def expr(a):
             ("len", *args)
             | ("cat", *args)
             | ("get", *args)
+            | ("exit", *args)
             | ("append", *args)
             | ("range", *args)
             | ("num?", *args)
@@ -780,6 +786,8 @@ def expr(a):
             | ("list?", *args)
             | ("str", *args)
             | ("print", *args)
+            | ("eprint", *args)
+            | ("from", *args)
         ):
             expr(("Etc." + a[0], *args))
         case "[", x, y:

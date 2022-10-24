@@ -25,3 +25,6 @@ fn filter f,a
 		if f b
 			push r,b
 	r
+
+fn tail a
+	from a,1

@@ -388,5 +388,12 @@ case 1,2,3,4
 		r=s
 assert r==[2,3,4]
 
+case 2
+	1
+		a="one"
+	2
+		a="two"
+assert a=="two"
+
 /* signal that tests actually completed */
 print("ok\n")
