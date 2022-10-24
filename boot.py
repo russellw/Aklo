@@ -47,6 +47,9 @@ here = os.path.dirname(os.path.realpath(__file__))
 
 
 # parser
+modules = {}
+
+
 def unquote(s):
     s = s[1:-1]
     return s.encode("utf-8").decode("unicode_escape")
@@ -56,7 +59,10 @@ def quoteSym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
-def parse(fil):
+def parse(name, fil):
+    if name in modules:
+        return
+
     text = open(fil).read()
     ti = 0
     line = 1
@@ -459,17 +465,25 @@ def parse(fil):
         expect("\n")
         return a
 
-    # module
+    # top level
     lex()
     eat("\n")
+
+    # imports
+    while eat("import"):
+        name1 = word()
+        parse(name1, os.path.join(here, "src", name1 + ".k"))
+        expect("\n")
+
+    # module
     a = []
     while tok != ".dedent":
         a.append(stmt())
-    return a
+    modules[name] = a
 
 
-global1 = parse(os.path.join(here, "src", "global.k"))
-program = parse(sys.argv[1])
+parse("global", os.path.join(here, "src", "global.k"))
+parse("program", sys.argv[1])
 
 
 # intermediate representation
@@ -606,12 +620,23 @@ def ir(a):
             body = list(map(ir, body))
 
             # separate the local functions
-            fs, body = partition(lambda a: a[0] == "fn", body)
+            def f(a):
+                match a:
+                    case "fn", *_:
+                        return 1
+
+            fs, body = partition(f, body)
 
             # get the local variables
             types = getTypes(body)
             vs = localVars(params, body)
-            body = [a for a in body if a[0] != "nonlocal"]
+
+            def f(a):
+                match a:
+                    case "nonlocal", *_:
+                        return 1
+
+            body = [a for a in body if not f(a)]
             vs = [(".var", [], types.get(x, "Object"), x, 0) for x in vs]
 
             # parameter types
@@ -654,7 +679,7 @@ def ir(a):
     return a
 
 
-def irModule(name, body):
+for name, body in modules.items():
     params = []
     modifiers = []
 
@@ -682,11 +707,7 @@ def irModule(name, body):
     run.extend(body)
     fs.append(run)
 
-    return ".class", modifiers, name, params, *(vs + fs)
-
-
-global1 = irModule("Global", global1)
-program = irModule("Program", program)
+    modules[name] = ".class", modifiers, name.title(), params, *(vs + fs)
 
 
 # output
@@ -726,7 +747,7 @@ def fcast(params):
 
 
 globals1 = set()
-for a in global1:
+for a in modules["global"]:
     match a:
         case "fn", modifiers, t, name, params, *body:
             globals1.add(name)
@@ -964,10 +985,7 @@ def stmt(a):
             emit(";\n")
 
 
-emit('@SuppressWarnings("unchecked")\n')
-moduleName = "Global"
-stmt(global1)
-
-emit('@SuppressWarnings("unchecked")\n')
-moduleName = "Program"
-stmt(program)
+for moduleName, module in modules.items():
+    moduleName = moduleName.title()
+    emit('@SuppressWarnings("unchecked")\n')
+    stmt(module)
