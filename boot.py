@@ -681,7 +681,7 @@ def ir(a):
                     ctor.append(("=", "this." + x, x))
                 fs.append(ctor)
 
-                run = ["fn", [], "Object", "run", params]
+                run = ["fn", [], "Object", "run", []]
                 run.extend(body)
                 fs.append(run)
 
@@ -748,7 +748,7 @@ def f(a):
     match a:
         case f, *args:
             if isinstance(f, str) and f.split(".")[-1] in classes:
-                return f + ".run", *args
+                return ".run", ("new " + f, *args)
 
 
 for name, body in modules.items():
@@ -883,6 +883,9 @@ def expr(a):
             emit("System.out")
         case "stderr":
             emit("System.err")
+        case ".run", x:
+            expr(x)
+            emit(".run()")
         case "List.of", *args:
             if args:
                 match args[-1]:
