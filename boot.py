@@ -10,11 +10,21 @@ def each(f, a):
 
 
 def eachr(f, a):
-    f(a)
     match a:
         case [*_]:
             for b in a:
                 eachr(f, b)
+    f(a)
+
+
+def mapr(f, a):
+    match a:
+        case [*_]:
+            a = [mapr(f, b) for b in a]
+    b = f(a)
+    if b is None:
+        return a
+    return b
 
 
 def partition(f, a):
@@ -717,6 +727,32 @@ for name, body in modules.items():
     fs.append(run)
 
     modules[name] = ".class", modifiers, name.title(), params, *(vs + fs)
+
+
+# check which functions are represented as classes
+classes = set()
+
+
+def f(a):
+    match a:
+        case ".class", modifiers, name, *_:
+            classes.add(name)
+
+
+for name, body in modules.items():
+    eachr(f, body)
+
+
+# they need to be called with a different syntax
+def f(a):
+    match a:
+        case f, *args:
+            if isinstance(f, str) and f.split(".")[-1] in classes:
+                return f + ".run", *args
+
+
+for name, body in modules.items():
+    modules[name] = mapr(f, body)
 
 
 # output
