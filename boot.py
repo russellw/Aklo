@@ -666,7 +666,8 @@ def ir(a):
             # if there are local functions, we need to generate a class
             if fs:
                 ctor = ["fn", [], "", name, params]
-                for _, x in params:
+                for t, x in params:
+                    vs.append((".var", [], t, x, 0))
                     ctor.append(("=", "this." + x, x))
                 fs.append(ctor)
 
@@ -691,13 +692,17 @@ for name, body in modules.items():
     body = list(map(ir, body))
 
     # separate the local functions
-    fs, body = partition(lambda a: a[0] == "fn", body)
-
     def f(a):
         match a:
-            case "fn", modifiers, t, name, params, *body:
-                modifiers = ["static"]
-                return "fn", modifiers, t, name, params, *body
+            case ("fn", *_) | (".class", *_):
+                return 1
+
+    fs, body = partition(f, body)
+
+    def f(a):
+        op, modifiers, *s = a
+        modifiers = ["static"]
+        return op, modifiers, *s
 
     fs = list(map(f, fs))
 
