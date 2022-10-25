@@ -280,7 +280,11 @@ def parse(name, fil):
                     continue
                 case ".":
                     lex()
-                    a = "get", a, quoteSym(word())
+                    field = word()
+                    if a in modules:
+                        a = a.title() + "." + field
+                    else:
+                        a = "get", a, quoteSym(field)
                     continue
                 case "++" | "--":
                     return "post" + lex1(), a
