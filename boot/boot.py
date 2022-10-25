@@ -486,7 +486,7 @@ def parse(name, fil):
     # imports
     while eat("import"):
         name1 = word()
-        parse(name1, os.path.join(here, "src", name1 + ".k"))
+        parse(name1, os.path.join(here, "..", "src", name1 + ".k"))
         expect("\n")
 
     # module
@@ -496,7 +496,7 @@ def parse(name, fil):
     modules[name] = a
 
 
-parse("global", os.path.join(here, "src", "global.k"))
+parse("global", os.path.join(here, "..", "src", "global.k"))
 parse("program", sys.argv[1])
 
 
@@ -756,7 +756,7 @@ for name, body in modules.items():
 
 
 # output
-sys.stdout.write(open(os.path.join(here, "boot.java")).read())
+sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
 
 
 def separate(f, a, separator):
