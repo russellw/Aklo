@@ -272,7 +272,29 @@ assert foo 3==4
 fn f_rest a,b,*c
 	a,b,c
 
-assert f_rest (1,2,3,4,5)==	[1,2,[3,4,5]]
+assert f_rest (
+	1,
+	2,
+	3,
+	4,
+	5,
+)==	[1,2,[3,4,5]]
+
+assert f_rest (
+	1,
+	2,
+	3,
+	4,
+	5
+)==	[1,2,[3,4,5]]
+
+assert f_rest (
+	1
+	2
+	3
+	4
+	5
+)==	[1,2,[3,4,5]]
 
 ;mutual recursion
 fn even n

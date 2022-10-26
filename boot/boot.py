@@ -230,9 +230,14 @@ def parse(name, fil):
 
     # expressions
     def commas(a, end):
-        while 1:
-            if eat(end):
-                break
+        if eat(".indent"):
+            while not eat(".dedent"):
+                a.append(expr())
+                eat(",")
+                expect("\n")
+            expect(end)
+            return
+        while not eat(end):
             a.append(expr())
             if eat(end):
                 break
