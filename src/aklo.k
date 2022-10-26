@@ -7,10 +7,10 @@ fn usage
 file=0
 i=0
 while i<len argv
-	s=argv[i++]
-	if s[0]=='-'
+	s=argv!i++
+	if s!0=='-'
 		o=s
-		while o&&o[0]=='-'
+		while o&&o!0=='-'
 			o=tail o
 		case o
 			"h"

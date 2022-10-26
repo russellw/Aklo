@@ -1,11 +1,11 @@
 fn upper? c
-	"A"[0]<=c&&c<="Z"[0]
+	"A"!0<=c&&c<="Z"!0
 
 fn lower? c
-	"a"[0]<=c&&c<="z"[0]
+	"a"!0<=c&&c<="z"!0
 
 fn digit? c
-	"0"[0]<=c&&c<="9"[0]
+	"0"!0<=c&&c<="9"!0
 
 fn alpha? c
 	lower? c||upper? c
@@ -34,16 +34,16 @@ fn fmt(s,*args)
 	j = 0
 	r = ""
 	while i < len(s)
-		c = s[i++]
-		if [c] != "%"
+		c = s!i++
+		if [c,] != "%"
 			push r, c
 			continue
-		c = s[i++]
-		case [c ]
+		c = s!i++
+		case c ,
 			"s"
-				pushs r, args[j++]
+				pushs (r, args!j++)
 			"d"
-				pushs r, str(args[j++])
+				pushs r, str(args!j++)
 			_
 				push r, c
 	r

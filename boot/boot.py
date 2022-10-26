@@ -202,6 +202,10 @@ def parse(name, fil):
                     tok = s
                     return
 
+            if tok == "[":
+                tok = "("
+            if tok == "]":
+                tok = ")"
             ti += 1
             return
 
@@ -229,17 +233,17 @@ def parse(name, fil):
         err(f"{repr(tok)}: expected word")
 
     # expressions
-    def commas(a, end):
+    def commas(a):
         if eat(".indent"):
             while not eat(".dedent"):
                 a.append(expr())
                 eat(",")
                 expect("\n")
-            expect(end)
+            expect(")")
             return
-        while not eat(end):
+        while not eat(")"):
             a.append(expr())
-            if eat(end):
+            if eat(")"):
                 break
             expect(",")
 
@@ -265,16 +269,12 @@ def parse(name, fil):
             s = unquote(lex1())
             return ["List.of"] + [ord(c) for c in s]
 
-        # parenthesized expression
+        # bracketed expression or list
         if eat("("):
+            if eat(")"):
+                return ("List.of",)
             a = tuple1()
             expect(")")
-            return a
-
-        # list
-        if eat("["):
-            a = ["List.of"]
-            commas(a, "]")
             return a
 
         # none of the above
@@ -287,11 +287,7 @@ def parse(name, fil):
                 case "(":
                     lex()
                     a = [a]
-                    commas(a, ")")
-                    continue
-                case "[":
-                    a = lex1(), a, expr()
-                    expect("]")
+                    commas(a)
                     continue
                 case ".":
                     lex()
@@ -316,7 +312,7 @@ def parse(name, fil):
                 pass
             case "(":
                 lex()
-                commas(a, ")")
+                commas(a)
             case _:
                 while 1:
                     a.append(expr())
@@ -348,6 +344,9 @@ def parse(name, fil):
     def init(s):
         ops[s] = prec
 
+    init("!")
+
+    prec -= 1
     init("%")
     init("*")
     init("//")
@@ -379,6 +378,8 @@ def parse(name, fil):
             op = lex1()
             b = infix(ops[op] + 1)
             match op:
+                case "!":
+                    a = "Etc.subscript", a, b
                 case ">":
                     a = "<", b, a
                 case ">=":
@@ -396,7 +397,8 @@ def parse(name, fil):
             return a
         a = ["List.of", a]
         while eat(","):
-            a.append(expr())
+            if tok not in (")", "\n", ".indent"):
+                a.append(expr())
         return a
 
     def assignment():
@@ -861,8 +863,6 @@ def expr(a):
             | ("from", *args)
         ):
             expr(("Etc." + a[0], *args))
-        case "[", x, y:
-            expr(("Etc.subscript", x, y))
         case ("map", f, s) | ("filter", f, s):
             emit("Global.")
             emit(a[0])

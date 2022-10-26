@@ -53,11 +53,11 @@ assert 1 - (2 - 3) == 2
 
 ;lists
 assert "ABC"==[65,66,67]
-assert "A"==[65]
+assert "A"==[65,]
 
-assert "ABC"[0]==65
-assert "ABC"[1]==66
-assert "ABC"[2]==67
+assert "ABC"!0==65
+assert "ABC"!1==66
+assert "ABC"!2==67
 
 assert len "ABC"==3
 assert  cat"ab","cd"=="abcd"
@@ -202,7 +202,7 @@ a=""
 b=[]
 while i <= 5
 	push a,65
-	pushs b,[65]
+	pushs b,[65,]
 	i++
 assert a=="AAAAA"
 assert b=="AAAAA"
@@ -353,7 +353,7 @@ assert !upper? 97
 assert map( \x:x*x,[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
-assert filter( even,[1,2,3])==[2]
+assert filter( even,[1,2,3])==[2,]
 assert filter( odd,[1,2,3])==[1,3]
 assert filter( digit?,"abc123")=="123"
 
