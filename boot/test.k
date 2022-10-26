@@ -209,7 +209,7 @@ assert b=="AAAAA"
 
 n=0
 m=0
-for c "ABC"
+for c: "ABC"
 	n++
 	m+=c
 assert n==3
@@ -236,6 +236,13 @@ assert  a.z==0
 ;lambda
 f=\x,y:x+y
 assert f(2,3)==5
+
+/*
+f=\x,y
+	z=x+y
+	return z
+assert f(2,3)==5
+*/
 
 f=\():77
 assert f()==77
@@ -279,7 +286,6 @@ assert f_rest (
 	4,
 	5,
 )==	[1,2,[3,4,5]]
-
 assert f_rest (
 	1,
 	2,
@@ -287,7 +293,6 @@ assert f_rest (
 	4,
 	5
 )==	[1,2,[3,4,5]]
-
 assert f_rest (
 	1
 	2

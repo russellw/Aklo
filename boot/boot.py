@@ -455,6 +455,7 @@ def parse(name, fil):
             case "for":
                 lex()
                 a.append(word())
+                expect(":")
                 a.append(tuple1())
                 block(a)
                 return a

@@ -15,13 +15,13 @@ fn alnum? c
 
 fn map f,a
 	r=[]
-	for b a
+	for b :a
 		push r,f  b
 	r
 
 fn filter f,a
 	r=[]
-	for b a
+	for b :a
 		if f b
 			push r,b
 	r
@@ -63,11 +63,11 @@ fn eprintln *args
 	eprint"\n"
 
 fn print *args
-	for a args
+	for a :args
 		printStream stdout,a
 
 fn eprint *args
-	for a args
+	for a :args
 		printStream stderr,a
 
 fn printStream stream,		a
