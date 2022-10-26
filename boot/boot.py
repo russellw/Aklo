@@ -271,8 +271,16 @@ def parse(name, fil):
 
         # bracketed expression or list
         if eat("("):
+            if eat(".indent"):
+                a = ["List.of"]
+                while not eat(".dedent"):
+                    a.append(expr())
+                    eat(",")
+                    expect("\n")
+                expect(")")
+                return a
             if eat(")"):
-                return ("List.of",)
+                return ["List.of"]
             a = tuple1()
             expect(")")
             return a
@@ -287,7 +295,18 @@ def parse(name, fil):
                 case "(":
                     lex()
                     a = [a]
-                    commas(a)
+                    if eat(".indent"):
+                        while not eat(".dedent"):
+                            a.append(expr())
+                            eat(",")
+                            expect("\n")
+                        expect(")")
+                        continue
+                    while not eat(")"):
+                        a.append(expr())
+                        if eat(")"):
+                            break
+                        expect(",")
                     continue
                 case ".":
                     lex()
