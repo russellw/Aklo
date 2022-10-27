@@ -268,7 +268,7 @@ def parse(name, fil):
             if eat(")"):
                 return ["List.of"]
             # TODO: should assignment be allowed here?
-            a = tuple1()
+            a = commas()
             expect(")")
             return a
 
@@ -365,7 +365,7 @@ def parse(name, fil):
                     return a
                 # TODO: should assignment be allowed here?
                 if tok != ")":
-                    a.append(tuple1())
+                    a.append(commas())
                 expect(")")
                 return a
         return postfix()
@@ -424,7 +424,7 @@ def parse(name, fil):
         return infix(0)
 
     # statements
-    def tuple1():
+    def commas():
         a = expr()
         if tok != ",":
             return a
@@ -435,7 +435,7 @@ def parse(name, fil):
         return a
 
     def assignment():
-        a = tuple1()
+        a = commas()
         if tok in ("=", "+=", "-="):
             return lex1(), a, assignment()
         return a
@@ -453,12 +453,15 @@ def parse(name, fil):
     def if1():
         assert tok in ("if", "elif")
         lex()
-        a = ["if", expr(), block1()]
+        a = ["if", expr()]
+        eat(":")
+        a.append(block1())
         match tok:
             case "elif":
                 a.append(if1())
             case "else":
                 lex()
+                eat(":")
                 a.append(block1())
         return a
 
@@ -467,12 +470,13 @@ def parse(name, fil):
         match tok:
             case "case":
                 lex()
-                a.append(tuple1())
+                a.append(commas())
+                eat(":")
                 expect(".indent")
                 while not eat(".dedent"):
-                    patterns = [tuple1()]
+                    patterns = [commas()]
                     while eat("\n"):
-                        patterns.append(tuple1())
+                        patterns.append(commas())
                     body = block1()
                     for pattern in patterns:
                         a.append((pattern, *body))
@@ -485,19 +489,22 @@ def parse(name, fil):
             case "dowhile" | "while":
                 lex()
                 a.append(expr())
+                eat(":")
                 block(a)
                 return a
             case "for":
                 lex()
                 a.append(word())
                 expect(":")
-                a.append(tuple1())
+                a.append(commas())
+                eat(":")
                 block(a)
                 return a
             case "fn":
                 lex()
                 a.append(word())
                 a.append(params())
+                eat(":")
                 block(a)
                 return a
             case "if":
@@ -511,7 +518,7 @@ def parse(name, fil):
                 lex()
                 if eat("\n"):
                     return "return", 0
-                a.append(tuple1())
+                a.append(commas())
                 expect("\n")
                 return a
         a = assignment()
