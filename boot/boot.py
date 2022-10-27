@@ -267,6 +267,7 @@ def parse(name, fil):
                 return a
             if eat(")"):
                 return ["List.of"]
+            # TODO: should assignment be allowed here?
             a = tuple1()
             expect(")")
             return a
@@ -353,8 +354,19 @@ def parse(name, fil):
                 return "Object...", prefix()
             case "\\":
                 a = [lex1(), params()]
-                expect(":")
-                a.append(expr())
+                eat(":")
+                if not eat("("):
+                    a.append(expr())
+                    return a
+                if eat(".indent"):
+                    while not eat(".dedent"):
+                        a.append(stmt())
+                    expect(")")
+                    return a
+                # TODO: should assignment be allowed here?
+                if tok != ")":
+                    a.append(tuple1())
+                expect(")")
                 return a
         return postfix()
 
@@ -834,12 +846,17 @@ def expr(a):
         case ("post++", x) | ("post--", x):
             expr(x)
             emit(a[0][4:])
-        case "\\", params, body:
+        case "\\", params, *body:
             fcast(params)
             emit("(")
             emit(params, ",")
             emit(") ->")
-            expr(body)
+            if len(body) == 1:
+                expr(body[0])
+                return
+            emit("{\n")
+            each(stmt, body)
+            emit("}")
         case "//", x, y:
             expr(x)
             emit("/")

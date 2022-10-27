@@ -237,12 +237,11 @@ assert  a.z==0
 f=\x,y:x+y
 assert f(2,3)==5
 
-/*
-f=\x,y
+f=\x,y(
 	z=x+y
 	return z
+)
 assert f(2,3)==5
-*/
 
 f=\():77
 assert f()==77
