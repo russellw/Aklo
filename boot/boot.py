@@ -113,7 +113,7 @@ def parse(name, fil):
 
                 # measure indent
                 col = 0
-                while text[ti] == "\t" or text[ti] == " ":
+                while text[ti] in ("\t", " "):
                     if text[ti] != dentc and dentc:
                         err("indented with tabs and spaces in same file")
                     dentc = text[ti]
