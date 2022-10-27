@@ -233,20 +233,6 @@ def parse(name, fil):
         err(f"{repr(tok)}: expected word")
 
     # expressions
-    def commas(a):
-        if eat(".indent"):
-            while not eat(".dedent"):
-                a.append(expr())
-                eat(",")
-                expect("\n")
-            expect(")")
-            return
-        while not eat(")"):
-            a.append(expr())
-            if eat(")"):
-                break
-            expect(",")
-
     def isPrimary():
         return tok[0].isalnum() or tok[0] in ("_", "'", '"')
 
@@ -324,6 +310,11 @@ def parse(name, fil):
                     a.append(prefix())
             return a
 
+    def param():
+        if eat("*"):
+            return "Object...", word()
+        return word()
+
     def params():
         a = []
         match tok:
@@ -331,10 +322,21 @@ def parse(name, fil):
                 pass
             case "(":
                 lex()
-                commas(a)
+                if eat(".indent"):
+                    while not eat(".dedent"):
+                        a.append(param())
+                        eat(",")
+                        expect("\n")
+                    expect(")")
+                else:
+                    while not eat(")"):
+                        a.append(param())
+                        if eat(")"):
+                            break
+                        expect(",")
             case _:
                 while 1:
-                    a.append(expr())
+                    a.append(param())
                     if not eat(","):
                         break
         return a
