@@ -169,17 +169,18 @@ def parse(name, fil):
                 return
 
             # quote
-            if text[ti] in ("'", '"'):
-                q = text[ti]
-                ti += 1
-                while text[ti] != q:
-                    # TODO: handle or disallow multiline strings
-                    if text[ti] == "\\":
+            match text[ti]:
+                case "'" | '"':
+                    q = text[ti]
+                    ti += 1
+                    while text[ti] != q:
+                        # TODO: handle or disallow multiline strings
+                        if text[ti] == "\\":
+                            ti += 1
                         ti += 1
                     ti += 1
-                ti += 1
-                tok = text[i:ti]
-                return
+                    tok = text[i:ti]
+                    return
 
             # punctuation
             punct = (
@@ -469,13 +470,16 @@ def parse(name, fil):
             return a
         a = ["List.of", a]
         while eat(","):
-            if tok not in (")", "\n", ".indent"):
-                a.append(expr())
+            match tok:
+                case ")" | "\n" | ".indent":
+                    pass
+                case _:
+                    a.append(expr())
         return a
 
     def assignment():
         a = commas()
-        if tok in ("=", "+=", "-=", "@="):
+        if tok.endswith("="):
             return lex1(), a, assignment()
         return a
 
