@@ -183,18 +183,35 @@ def parse(name, fil):
 
             # punctuation
             punct = (
+                # 4 characters
+                ">>>=",
+                # 3 characters
+                "**=",
+                "//=",
+                "<<=",
+                ">>=",
+                ">>>",
+                # 2 characters
                 "!=",
+                "%=",
                 "&&",
+                "&=",
+                "**",
+                "*=",
                 "++",
                 "+=",
-                "@=",
                 "--",
                 "-=",
                 "//",
+                "/=",
+                "<<",
                 "<=",
                 "==",
-                "==",
                 ">=",
+                ">>",
+                "@=",
+                "^=",
+                "|=",
                 "||",
             )
             for s in punct:
@@ -375,42 +392,63 @@ def parse(name, fil):
     prec = 99
     ops = {}
 
-    def init(s):
-        ops[s] = prec
+    def init(op, left):
+        ops[op] = prec, left
 
-    init("!")
-
-    prec -= 1
-    init("%")
-    init("*")
-    init("//")
+    init("!", 1)
 
     prec -= 1
-    init("+")
-    init("-")
-    init("@")
+    init("**", 0)
 
     prec -= 1
-    init("!=")
-    init("<")
-    init("<=")
-    init("==")
-    init(">")
-    init(">=")
+    init("%", 1)
+    init("*", 1)
+    init("//", 1)
+    init("/", 1)
 
     prec -= 1
-    init("&&")
+    init("+", 1)
+    init("-", 1)
+    init("@", 1)
 
     prec -= 1
-    init("||")
+    init("<<", 1)
+    init(">>", 1)
+    init(">>>", 1)
+
+    prec -= 1
+    init("&", 1)
+
+    prec -= 1
+    init("^", 1)
+
+    prec -= 1
+    init("|", 1)
+
+    prec -= 1
+    init("!=", 1)
+    init("<", 1)
+    init("<=", 1)
+    init("==", 1)
+    init(">", 1)
+    init(">=", 1)
+
+    prec -= 1
+    init("&&", 1)
+
+    prec -= 1
+    init("||", 1)
 
     def infix(prec):
         a = prefix()
         while 1:
-            if tok not in ops or ops[tok] < prec:
+            if tok not in ops:
+                return a
+            prec1, left1 = ops[tok]
+            if prec1 < prec:
                 return a
             op = lex1()
-            b = infix(ops[op] + 1)
+            b = infix(prec1 + left1)
             match op:
                 case "!":
                     a = "Etc.subscript", a, b
@@ -882,11 +920,7 @@ def expr(a):
         case "@", x, y:
             expr(("cat", x, y))
         case "!=", x, y:
-            emit("!Etc.eq(")
-            expr(x)
-            emit(",")
-            expr(y)
-            emit(")")
+            expr(("!", ("==", x, y)))
         case "intern", x:
             expr(("Sym.intern", x))
         case "gensym",:
