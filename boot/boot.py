@@ -60,6 +60,14 @@ here = os.path.dirname(os.path.realpath(__file__))
 modules = {}
 
 
+def isidstart(c):
+    return c.isalpha() or c == "_"
+
+
+def isidpart(c):
+    return isidstart(c) or c.isdigit()
+
+
 def unquote(s):
     s = s[1:-1]
     return s.encode("utf-8").decode("unicode_escape")
@@ -162,8 +170,8 @@ def parse(name, fil):
                 continue
 
             # word or number
-            if text[ti].isalnum() or text[ti] == "_":
-                while text[ti].isalnum() or text[ti] in ("_", "?"):
+            if isidpart(text[ti]):
+                while isidpart(text[ti]):
                     ti += 1
                 tok = text[i:ti]
                 return
@@ -247,17 +255,17 @@ def parse(name, fil):
             err(f"{repr(tok)}: expected {repr(s)}")
 
     def word():
-        if tok[0].isalpha() or tok[0] == "_":
+        if isidstart(tok[0]):
             return lex1()
         err(f"{repr(tok)}: expected word")
 
     # expressions
     def isprimary():
-        return tok[0].isalnum() or tok[0] in ("_", "'", '"')
+        return isidpart(tok[0]) or tok[0] in ("'", '"')
 
     def primary():
-        # word or number
-        if tok[0].isalpha() or tok[0] == "_":
+        # word
+        if isidstart(tok[0]):
             return lex1()
 
         # number
@@ -656,7 +664,7 @@ def ir(a):
                             args = gensym("x")
                             r.append(("=", args, x))
                             r.append(
-                                ("if", ("!", ("list?", args)), [("break", innerLabel)])
+                                ("if", ("!", ("islist", args)), [("break", innerLabel)])
                             )
                             r.append(
                                 (
@@ -861,8 +869,6 @@ def emit(a, separator=" "):
     if not isinstance(a, str):
         separate(emit, a, separator)
         return
-    if a.endswith("?"):
-        a = a[:-1] + "p"
     sys.stdout.write(a)
 
 
@@ -937,9 +943,9 @@ def expr(a):
             | ("range", *args)
             | ("writestream", *args)
             | ("readfile", *args)
-            | ("num?", *args)
-            | ("sym?", *args)
-            | ("list?", *args)
+            | ("isnum", *args)
+            | ("issym", *args)
+            | ("islist", *args)
             | ("str", *args)
         ):
             expr(("Etc." + a[0], *args))

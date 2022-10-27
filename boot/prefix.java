@@ -139,11 +139,11 @@ final class Etc {
     return true;
   }
 
-  static boolean nump(Object a) {
+  static boolean isnum(Object a) {
     return a instanceof Integer;
   }
 
-  static boolean symp(Object a) {
+  static boolean issym(Object a) {
     return a instanceof Sym;
   }
 
@@ -155,7 +155,7 @@ final class Etc {
     return 0;
   }
 
-  static boolean listp(Object a) {
+  static boolean islist(Object a) {
     return a instanceof List;
   }
 }

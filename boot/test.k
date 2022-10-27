@@ -127,17 +127,17 @@ assert a==a
 assert a!=b
 
 ;types
-assert num?(0)
-assert !sym?(0)
-assert !list?(0)
+assert isnum(0)
+assert !issym(0)
+assert !islist(0)
 
-assert !num?('a')
-assert sym?('a')
-assert !list?('a')
+assert !isnum('a')
+assert issym('a')
+assert !islist('a')
 
-assert !num?([])
-assert !sym?([])
-assert list?([])
+assert !isnum([])
+assert !issym([])
+assert islist([])
 
 ;if
 a = 0
@@ -346,8 +346,8 @@ assert fmt"abc"=="abc"
 assert fmt"ab%scd","xy"=="abxycd"
 
 ;characters
-assert upper? 65
-assert !upper? 97
+assert isupper 65
+assert !isupper 97
 
 ;higher-order functions
 assert map( \x:x*x,[1,2,3])==[1,4,9]
@@ -355,7 +355,7 @@ assert map( square,[1,2,3])==[1,4,9]
 
 assert filter( even,[1,2,3])==[2,]
 assert filter( odd,[1,2,3])==[1,3]
-assert filter( digit?,"abc123")=="123"
+assert filter( isdigit,"abc123")=="123"
 
 ;pattern matching assignment
 a=1,2,3

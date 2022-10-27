@@ -1,17 +1,23 @@
-fn upper? c
+fn isupper c
 	"A"!0<=c&&c<="Z"!0
 
-fn lower? c
+fn islower c
 	"a"!0<=c&&c<="z"!0
 
-fn digit? c
+fn isdigit c
 	"0"!0<=c&&c<="9"!0
 
-fn alpha? c
-	lower? c||upper? c
+fn isalpha c
+	islower c||isupper c
 
-fn alnum? c
-	alpha? c||digit? c
+fn isalnum c
+	isalpha c||isdigit c
+
+fn isidstart c
+	isalpha c||c=='_'
+
+fn isidpart c
+	isidstart c||isdigit c
 
 fn map f,a
 	r=[]
