@@ -30,4 +30,4 @@ while i<len argv
 	file=s
 if !file
 	usage()
-parser.parse(file,readFile(file))
+parser.parse(file,readfile(file))

@@ -15,7 +15,7 @@ final class Main {
 final class Etc {
   static List<Object> argv = new ArrayList();
 
-  static Object writeStream(Object stream, Object s) {
+  static Object writestream(Object stream, Object s) {
     var stream1 = (PrintStream) stream;
     for (var c : (List<Object>) s) stream1.write((int) c);
     return null;
@@ -25,7 +25,7 @@ final class Etc {
     return new String(bytes(a), StandardCharsets.UTF_8);
   }
 
-  static List<Object> readFile(Object file) {
+  static List<Object> readfile(Object file) {
     try {
       return list(Files.readAllBytes(Path.of(decode(file))));
     } catch (IOException e) {
@@ -82,7 +82,7 @@ final class Etc {
     return r;
   }
 
-  static List<Object> listRest(Object... a) {
+  static List<Object> cons(Object... a) {
     var r = new ArrayList<Object>();
     for (var i = 0; i < a.length - 1; i++) r.add(a[i]);
     r.addAll((List<Object>) a[a.length - 1]);

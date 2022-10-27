@@ -64,14 +64,14 @@ fn eprintln *args
 
 fn print *args
 	for a :args
-		printStream stdout,a
+		printstream stdout,a
 
 fn eprint *args
 	for a :args
-		printStream stderr,a
+		printstream stderr,a
 
-fn printStream stream,		a
-	writeStream(stream,a)
+fn printstream stream,		a
+	writestream(stream,a)
 
 fn from a,i
 	if i<0

@@ -65,7 +65,7 @@ def unquote(s):
     return s.encode("utf-8").decode("unicode_escape")
 
 
-def quoteSym(s):
+def quotesym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
@@ -252,7 +252,7 @@ def parse(name, fil):
         err(f"{repr(tok)}: expected word")
 
     # expressions
-    def isPrimary():
+    def isprimary():
         return tok[0].isalnum() or tok[0] in ("_", "'", '"')
 
     def primary():
@@ -267,7 +267,7 @@ def parse(name, fil):
         # symbol
         if tok[0] == "'":
             s = unquote(lex1())
-            return quoteSym(s)
+            return quotesym(s)
 
         # string
         if tok[0] == '"':
@@ -320,11 +320,11 @@ def parse(name, fil):
                     if a in modules:
                         a = a.title() + "." + field
                     else:
-                        a = "get", a, quoteSym(field)
+                        a = "get", a, quotesym(field)
                     continue
                 case "++" | "--":
                     return "post" + lex1(), a
-            if isPrimary():
+            if isprimary():
                 a = [a, prefix()]
                 while eat(","):
                     a.append(prefix())
@@ -592,7 +592,7 @@ parse("program", sys.argv[1])
 
 
 # intermediate representation
-def getTypes(a):
+def gettypes(a):
     types = {}
 
     def f(a):
@@ -611,7 +611,7 @@ def getTypes(a):
     return types
 
 
-def localVars(params, a):
+def localvars(params, a):
     nonlocals = set()
 
     # dict keeps deterministic order
@@ -729,8 +729,8 @@ def ir(a):
             fs, body = partition(f, body)
 
             # get the local variables
-            types = getTypes(body)
-            vs = localVars(params, body)
+            types = gettypes(body)
+            vs = localvars(params, body)
 
             def f(a):
                 match a:
@@ -804,8 +804,8 @@ for name, body in modules.items():
     fs = list(map(f, fs))
 
     # get the local variables
-    types = getTypes(body)
-    vs = localVars(params, body)
+    types = gettypes(body)
+    vs = localvars(params, body)
     vs = [(".var", ["static"], types.get(x, "Object"), x, 0) for x in vs]
 
     # always need to generate a class
@@ -935,8 +935,8 @@ def expr(a):
             | ("exit", *args)
             | ("slice", *args)
             | ("range", *args)
-            | ("writeStream", *args)
-            | ("readFile", *args)
+            | ("writestream", *args)
+            | ("readfile", *args)
             | ("num?", *args)
             | ("sym?", *args)
             | ("list?", *args)
@@ -976,7 +976,7 @@ def expr(a):
             if args:
                 match args[-1]:
                     case "Object...", s:
-                        emit("Etc.listRest(")
+                        emit("Etc.cons(")
                         for x in args[:-1]:
                             expr(x)
                             emit(",")
