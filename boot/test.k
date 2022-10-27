@@ -199,13 +199,10 @@ assert n == 55
 
 i = 1
 a=""
-b=[]
 while i <= 5
-	push a,65
-	pushs b,[65,]
+	a@=65,
 	i++
 assert a=="AAAAA"
-assert b=="AAAAA"
 
 n=0
 m=0

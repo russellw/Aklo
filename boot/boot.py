@@ -187,6 +187,7 @@ def parse(name, fil):
                 "&&",
                 "++",
                 "+=",
+                "@=",
                 "--",
                 "-=",
                 "//",
@@ -385,9 +386,9 @@ def parse(name, fil):
     init("//")
 
     prec -= 1
-    # TODO: @ for list concat?
     init("+")
     init("-")
+    init("@")
 
     prec -= 1
     init("!=")
@@ -436,7 +437,7 @@ def parse(name, fil):
 
     def assignment():
         a = commas()
-        if tok in ("=", "+=", "-="):
+        if tok in ("=", "+=", "-=", "@="):
             return lex1(), a, assignment()
         return a
 
@@ -661,10 +662,6 @@ def ir(a):
 
             assign(pattern, x)
             return r
-        case "push", x, y:
-            return ir(("=", x, ("cat", x, ("List.of", y))))
-        case "pushs", x, y:
-            return ir(("=", x, ("cat", x, y)))
         case "range", x:
             return ir(("range", 0, x))
         case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
@@ -872,7 +869,7 @@ def expr(a):
             expr(("Etc.lt", x, y))
         case "<=", x, y:
             expr(("Etc.le", x, y))
-        case ("+=", x, y) | ("-=", x, y):
+        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
         case "+", x, y:
             expr(("Etc.add", x, y))
@@ -882,6 +879,8 @@ def expr(a):
             expr(("Etc.sub", x, y))
         case "==", x, y:
             expr(("Etc.eq", x, y))
+        case "@", x, y:
+            expr(("cat", x, y))
         case "!=", x, y:
             emit("!Etc.eq(")
             expr(x)

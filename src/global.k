@@ -16,14 +16,14 @@ fn alnum? c
 fn map f,a
 	r=[]
 	for b :a
-		push r,f  b
+		r@=f(  b),
 	r
 
 fn filter f,a
 	r=[]
 	for b :a
 		if f b
-			push r,b
+			r@=b,
 	r
 
 fn tail a
@@ -36,16 +36,16 @@ fn fmt(s,*args)
 	while i < len(s)
 		c = s!i++
 		if [c,] != "%"
-			push r, c
+			r@= c,
 			continue
 		c = s!i++
 		case c ,
 			"s"
-				pushs (r, args!j++)
+				r@= args!j++
 			"d"
-				pushs r, str(args!j++)
+				r@= str(args!j++)
 			_
-				push r, c
+				r@= c,
 	r
 
 fn printf *s
