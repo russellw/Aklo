@@ -668,7 +668,7 @@ def ir(a):
                             for i in range(len(params)):
                                 match params[i]:
                                     case "Object...", y:
-                                        assign(y, ("Etc.from", args, i))
+                                        assign(y, ("from", args, i))
                                     case y:
                                         assign(y, ("Etc.subscript", args, i))
                         case "_":
@@ -696,7 +696,7 @@ def ir(a):
                         for i in range(len(params)):
                             match params[i]:
                                 case "Object...", y:
-                                    assign(y, ("Etc.from", args, i))
+                                    assign(y, ("from", args, i))
                                 case y:
                                     assign(y, ("Etc.subscript", args, i))
                     case _:
@@ -922,7 +922,7 @@ def expr(a):
         case "==", x, y:
             expr(("Etc.eq", x, y))
         case "@", x, y:
-            expr(("cat", x, y))
+            expr(("Etc.cat", x, y))
         case "!=", x, y:
             expr(("!", ("==", x, y)))
         case "intern", x:
@@ -931,10 +931,9 @@ def expr(a):
             expr(("new Sym",))
         case (
             ("len", *args)
-            | ("cat", *args)
             | ("get", *args)
             | ("exit", *args)
-            | ("append", *args)
+            | ("slice", *args)
             | ("range", *args)
             | ("writeStream", *args)
             | ("readFile", *args)
@@ -942,7 +941,6 @@ def expr(a):
             | ("sym?", *args)
             | ("list?", *args)
             | ("str", *args)
-            | ("from", *args)
         ):
             expr(("Etc." + a[0], *args))
         case ("map", f, s) | ("filter", f, s):

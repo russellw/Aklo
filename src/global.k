@@ -72,3 +72,8 @@ fn eprint *args
 
 fn printStream stream,		a
 	writeStream(stream,a)
+
+fn from a,i
+	if i<0
+		i+=len a
+	slice a,i,len a

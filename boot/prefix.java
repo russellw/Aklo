@@ -59,6 +59,10 @@ final class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
+  static List<Object> slice(Object a, Object i, Object j) {
+    return ((List<Object>) a).subList((int) i, (int) j);
+  }
+
   static List<Object> range(Object i, Object j) {
     var i1 = (int) i;
     var j1 = (int) j;
@@ -82,12 +86,6 @@ final class Etc {
     var r = new ArrayList<Object>();
     for (var i = 0; i < a.length - 1; i++) r.add(a[i]);
     r.addAll((List<Object>) a[a.length - 1]);
-    return r;
-  }
-
-  static List<Object> append(Object a, Object b) {
-    var r = new ArrayList<Object>((List<Object>) a);
-    r.add(b);
     return r;
   }
 
@@ -128,11 +126,6 @@ final class Etc {
 
   static Object subscript(Object a, Object i) {
     return ((List<Object>) a).get((int) i);
-  }
-
-  static Object from(Object a, Object i) {
-    var a1 = (List<Object>) a;
-    return a1.subList((int) i, a1.size());
   }
 
   static boolean truth(boolean a) {

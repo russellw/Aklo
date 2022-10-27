@@ -60,8 +60,7 @@ assert "ABC"!1==66
 assert "ABC"!2==67
 
 assert len "ABC"==3
-assert  cat"ab","cd"=="abcd"
-assert append([1,2],3)==[1,2,3]
+assert  "ab"@"cd"=="abcd"
 assert [1+2,3+4]==[3,7]
 
 assert range 1,5==[1,2,3,4]
@@ -69,6 +68,11 @@ assert range 5,1==[]
 assert range 5==[0,1,2,3,4]
 
 assert (1,2,3)==[1,2,3]
+
+assert slice "abcd",1,3=="bc"
+
+assert from"abcde",1=="bcde"
+assert from"abcde",-1=="e"
 
 ;variables
 x = 5
