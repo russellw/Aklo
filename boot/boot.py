@@ -94,6 +94,12 @@ def parse(name, fil):
     def err(msg):
         raise Exception(f"{fil}:{line}: {msg}")
 
+    def errtok(msg):
+        nonlocal line
+        if tok == "\n":
+            line -= 1
+        err(f"{repr(tok)}: {msg}")
+
     # tokenizer
     def lex():
         nonlocal dedents
@@ -298,13 +304,12 @@ def parse(name, fil):
 
     def expect(s):
         if not eat(s):
-            # TODO: decrement reported line if current token is newline?
-            err(f"{repr(tok)}: expected {repr(s)}")
+            errtok(f"expected {repr(s)}")
 
     def word():
         if isidstart(tok[0]):
             return lex1()
-        err(f"{repr(tok)}: expected word")
+        errtok("expected word")
 
     # expressions
     def isprimary():
@@ -372,7 +377,7 @@ def parse(name, fil):
             return a
 
         # none of the above
-        err(f"{repr(tok)}: expected expression")
+        errtok("expected expression")
 
     def postfix():
         a = primary()
