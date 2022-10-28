@@ -85,11 +85,11 @@ def parse(name, fil):
     ti = 0
     line = 1
 
-    dentc = None
+    dentc = 0
     cols = [0]
     dedents = 0
 
-    tok = None
+    tok = 0
 
     def err(msg):
         raise Exception(f"{fil}:{line}: {msg}")
@@ -371,7 +371,6 @@ def parse(name, fil):
                 return a
             if eat(")"):
                 return ["List.of"]
-            # TODO: should assignment be allowed here?
             a = commas()
             expect(")")
             return a
@@ -467,7 +466,6 @@ def parse(name, fil):
                         a.append(stmt())
                     expect(")")
                     return a
-                # TODO: should assignment be allowed here?
                 if tok != ")":
                     a.append(commas())
                 expect(")")
