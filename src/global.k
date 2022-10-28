@@ -92,6 +92,11 @@ fn in a,s
 		if a==b
 			return 1
 
+fn endswith s,t
+	if len s<len t
+		return
+	from s,-len t==t
+
 fn startswith s,t
 	to s,len t==t
 

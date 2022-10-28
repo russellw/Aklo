@@ -95,6 +95,10 @@ assert s=="a\nb\nc\n"
 assert startswith "qwerty","qwe"
 assert !startswith "qwerty","qwz"
 
+assert endswith "qwerty","rty"
+assert !endswith "ty","rty"
+assert !endswith "qwerty","ety"
+
 assert lower 97==97
 assert lower 65==97
 assert lower "ABC..."=="abc..."
