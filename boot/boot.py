@@ -2,6 +2,7 @@ import inspect
 import os
 import subprocess
 import sys
+import textwrap
 
 
 def each(f, a):
@@ -61,16 +62,14 @@ modules = {}
 
 
 def isidstart(c):
-    # TODO: allow $
-    return c.isalpha() or c == "_"
+    return c.isalpha() or c in ("_", "$")
 
 
 def isidpart(c):
     return isidstart(c) or c.isdigit()
 
 
-def unquote(s):
-    s = s[1:-1]
+def unesc(s):
     return s.encode("utf-8").decode("unicode_escape")
 
 
@@ -177,15 +176,28 @@ def parse(name, fil):
                 tok = text[i:ti]
                 return
 
+            # multiline string
+            if text[ti : ti + 3] == '"""':
+                ti += 3
+                while text[ti : ti + 3] != '"""':
+                    if text[ti] == "\n":
+                        line += 1
+                    ti += 1
+                ti += 3
+                tok = text[i:ti]
+                tok = '"""' + textwrap.dedent(tok[3:-3]) + '"""'
+                return
+
             # quote
             match text[ti]:
                 case "'" | '"':
                     q = text[ti]
                     ti += 1
                     while text[ti] != q:
-                        # TODO: handle or disallow multiline strings
                         if text[ti] == "\\":
                             ti += 1
+                        if text[ti] == "\n":
+                            err("unclosed quote")
                         ti += 1
                     ti += 1
                     tok = text[i:ti]
@@ -275,12 +287,18 @@ def parse(name, fil):
 
         # symbol
         if tok[0] == "'":
-            s = unquote(lex1())
+            s = tok[1:-1]
+            s = unesc(s)
+            lex()
             return quotesym(s)
 
         # string
         if tok[0] == '"':
-            s = unquote(lex1())
+            s = tok[1:-1]
+            if tok.startswith('"""'):
+                s = tok[3:-3]
+            s = unesc(s)
+            lex()
             return ["List.of"] + [ord(c) for c in s]
 
         # bracketed expression or list

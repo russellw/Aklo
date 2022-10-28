@@ -14,7 +14,7 @@ fn isalnum c
 	isalpha c||isdigit c
 
 fn isidstart c
-	isalpha c||c=='_'
+	isalpha c||in c,"_$"
 
 fn isidpart c
 	isidstart c||isdigit c

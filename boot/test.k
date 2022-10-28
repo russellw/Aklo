@@ -77,6 +77,15 @@ assert from"abcde",-1=="e"
 assert in 8,[6,7,8]
 assert! in 9,[6,7,8]
 
+assert"""abc"""=="abc"
+
+s="""
+	a
+	b
+	c
+"""
+assert s=="\na\nb\nc\n"
+
 ;variables
 x = 5
 assert x == 5
