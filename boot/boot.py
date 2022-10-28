@@ -743,7 +743,7 @@ def ir(a):
             return a[0], test, *body
         case "fn", name, params, *body:
             modifiers = []
-            t = "Object"
+            typ = "Object"
 
             # recur
             body = list(map(ir, body))
@@ -791,8 +791,8 @@ def ir(a):
             # if there are local functions, we need to generate a class
             if fs:
                 ctor = ["fn", [], "", name, params]
-                for t, x in params:
-                    vs.append((".var", [], t, x, 0))
+                for typ, x in params:
+                    vs.append((".var", [], typ, x, 0))
                     ctor.append(("=", "this." + x, x))
                 fs.append(ctor)
 
@@ -803,7 +803,7 @@ def ir(a):
                 return ".class", modifiers, name, params, *(vs + fs)
 
             # otherwise, we still just have a function
-            return "fn", modifiers, t, name, params, *(vs + body)
+            return "fn", modifiers, typ, name, params, *(vs + body)
         case [*_]:
             return list(map(ir, a))
     return a
@@ -907,7 +907,7 @@ def fcast(params):
 globals1 = set()
 for a in modules["global"]:
     match a:
-        case "fn", modifiers, t, name, params, *body:
+        case "fn", modifiers, typ, name, params, *body:
             globals1.add(name)
 
 
@@ -1088,10 +1088,10 @@ def stmt(a):
             emit("assert ")
             expr(x)
             emit(";\n")
-        case ".var", modifiers, t, name, val:
+        case ".var", modifiers, typ, name, val:
             emit(modifiers)
             emit(" ")
-            emit(t)
+            emit(typ)
             emit(" ")
             emit(name)
             emit("=")
@@ -1104,10 +1104,10 @@ def stmt(a):
             emit("{\n")
             each(stmt, decls)
             emit("}\n")
-        case "fn", modifiers, t, name, params, *body:
+        case "fn", modifiers, typ, name, params, *body:
             emit(modifiers)
             emit(" ")
-            emit(t)
+            emit(typ)
             emit(" ")
             emit(name)
             emit("(")
