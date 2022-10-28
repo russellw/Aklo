@@ -61,6 +61,7 @@ modules = {}
 
 
 def isidstart(c):
+    # TODO: allow $
     return c.isalpha() or c == "_"
 
 

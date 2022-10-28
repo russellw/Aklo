@@ -83,3 +83,8 @@ fn from a,i
 	if i<0
 		i+=len a
 	slice a,i,len a
+
+fn in x,s
+	for y :s
+		if x==y
+			return 1
