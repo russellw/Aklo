@@ -19,21 +19,21 @@ fn isidstart c
 fn isidpart c
 	isidstart c||isdigit c
 
-fn map f,a
+fn map f,s
 	r=[]
-	for b :a
-		r@=f(  b),
+	for a :s
+		r@=f(  a),
 	r
 
-fn filter f,a
+fn filter f,s
 	r=[]
-	for b :a
-		if f b
-			r@=b,
+	for a :s
+		if f a
+			r@=a,
 	r
 
-fn tail a
-	from a,1
+fn tail s
+	from s,1
 
 fn fmt(s,*args)
 	i = 0
@@ -54,11 +54,11 @@ fn fmt(s,*args)
 				r@= c,
 	r
 
-fn printf *s
-	print(apply(fmt, s))
+fn printf *args
+	print(apply(fmt, args))
 
-fn eprintf *s
-	eprint(apply(fmt, s))
+fn eprintf *args
+	eprint(apply(fmt, args))
 
 fn println *args
 	apply print,args
@@ -79,12 +79,18 @@ fn eprint *args
 fn printstream stream,		a
 	writestream(stream,a)
 
-fn from a,i
-	if i<0
-		i+=len a
-	slice a,i,len a
+fn to s,i
+	slice s,0,i
 
-fn in x,s
-	for y :s
-		if x==y
+fn from s,i
+	if i<0
+		i+=len s
+	slice s,i,len s
+
+fn in a,s
+	for b :s
+		if a==b
 			return 1
+
+fn startswith s,t
+	to s,len t==t

@@ -79,12 +79,15 @@ assert! in 9,[6,7,8]
 
 assert"""abc"""=="abc"
 
-s="""
+s="""\
 	a
 	b
 	c
 """
-assert s=="\na\nb\nc\n"
+assert s=="a\nb\nc\n"
+
+assert startswith "qwerty","qwe"
+assert !startswith "qwerty","qwz"
 
 ;variables
 x = 5

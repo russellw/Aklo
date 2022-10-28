@@ -21,8 +21,8 @@ final class Etc {
     return null;
   }
 
-  static String decode(Object a) {
-    return new String(bytes(a), StandardCharsets.UTF_8);
+  static String decode(Object s) {
+    return new String(bytes(s), StandardCharsets.UTF_8);
   }
 
   static List<Object> readfile(Object file) {
@@ -33,16 +33,16 @@ final class Etc {
     }
   }
 
-  static byte[] bytes(Object a) {
-    var a1 = (List<Object>) a;
-    var b = new byte[a1.size()];
-    for (var i = 0; i < b.length; i++) b[i] = (byte) (int) a1.get(i);
-    return b;
+  static byte[] bytes(Object s) {
+    var s1 = (List<Object>) s;
+    var r = new byte[s1.size()];
+    for (var i = 0; i < r.length; i++) r[i] = (byte) (int) s1.get(i);
+    return r;
   }
 
-  static List<Object> list(byte[] a) {
-    var r = new Object[a.length];
-    for (var i = 0; i < r.length; i++) r[i] = (int) a[i] & 0xff;
+  static List<Object> list(byte[] s) {
+    var r = new Object[s.length];
+    for (var i = 0; i < r.length; i++) r[i] = (int) s[i] & 0xff;
     return List.of(r);
   }
 
@@ -59,8 +59,8 @@ final class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
-  static List<Object> slice(Object a, Object i, Object j) {
-    return ((List<Object>) a).subList((int) i, (int) j);
+  static List<Object> slice(Object s, Object i, Object j) {
+    return ((List<Object>) s).subList((int) i, (int) j);
   }
 
   static List<Object> range(Object i, Object j) {
@@ -82,21 +82,21 @@ final class Etc {
     return r;
   }
 
-  static List<Object> cons(Object... a) {
+  static List<Object> cons(Object... args) {
     var r = new ArrayList<Object>();
-    for (var i = 0; i < a.length - 1; i++) r.add(a[i]);
-    r.addAll((List<Object>) a[a.length - 1]);
+    for (var i = 0; i < args.length - 1; i++) r.add(args[i]);
+    r.addAll((List<Object>) args[args.length - 1]);
     return r;
   }
 
-  static List<Object> cat(Object a, Object b) {
-    var r = new ArrayList<Object>((List<Object>) a);
-    r.addAll((List<Object>) b);
+  static List<Object> cat(Object s, Object t) {
+    var r = new ArrayList<Object>((List<Object>) s);
+    r.addAll((List<Object>) t);
     return r;
   }
 
-  static int len(Object a) {
-    return ((List<Object>) a).size();
+  static int len(Object s) {
+    return ((List<Object>) s).size();
   }
 
   static Object exit(Object a) {
@@ -124,8 +124,8 @@ final class Etc {
     return a.equals(b);
   }
 
-  static Object subscript(Object a, Object i) {
-    return ((List<Object>) a).get((int) i);
+  static Object subscript(Object s, Object i) {
+    return ((List<Object>) s).get((int) i);
   }
 
   static boolean truth(boolean a) {

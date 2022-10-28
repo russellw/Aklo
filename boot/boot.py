@@ -188,7 +188,7 @@ def parse(name, fil):
                 tok = '"""' + textwrap.dedent(tok[3:-3]) + '"""'
                 return
 
-            # quote
+            # symbol or string
             match text[ti]:
                 case "'" | '"':
                     q = text[ti]
@@ -299,6 +299,7 @@ def parse(name, fil):
                 s = tok[3:-3]
             s = unesc(s)
             lex()
+            s = textwrap.dedent(s)
             return ["List.of"] + [ord(c) for c in s]
 
         # bracketed expression or list
