@@ -95,6 +95,14 @@ assert s=="a\nb\nc\n"
 assert startswith "qwerty","qwe"
 assert !startswith "qwerty","qwz"
 
+assert lower 97==97
+assert lower 65==97
+assert lower "ABC..."=="abc..."
+
+assert upper 97==65
+assert upper 65==65
+assert upper "abc..."=="ABC..."
+
 ;variables
 x = 5
 assert x == 5

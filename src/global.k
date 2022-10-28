@@ -94,3 +94,17 @@ fn in a,s
 
 fn startswith s,t
 	to s,len t==t
+
+fn lower a
+	if islist a
+		return map lower,a
+	if isupper a
+		return a+32
+	a
+
+fn upper a
+	if islist a
+		return map upper,a
+	if islower a
+		return a-32
+	a
