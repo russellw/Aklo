@@ -225,6 +225,17 @@ def parse(name, fil):
                     tok = text[i:ti]
                     return
 
+            # raw string
+            if text[ti : ti + 2] == '#"':
+                ti += 2
+                while text[ti] != '"':
+                    if text[ti] == "\n":
+                        err("unclosed quote")
+                    ti += 1
+                ti += 1
+                tok = text[i:ti]
+                return
+
             # punctuation
             punct = (
                 # 4 characters
@@ -287,6 +298,7 @@ def parse(name, fil):
 
     def expect(s):
         if not eat(s):
+            # TODO: decrement reported line if current token is newline?
             err(f"{repr(tok)}: expected {repr(s)}")
 
     def word():
@@ -296,7 +308,7 @@ def parse(name, fil):
 
     # expressions
     def isprimary():
-        return isidpart(tok[0]) or tok[0] in ("'", '"')
+        return isidpart(tok[0]) or tok[0] in ("'", '"', "#")
 
     def primary():
         # word
@@ -318,20 +330,28 @@ def parse(name, fil):
             return a
 
         # symbol
-        if tok[0] == "'":
-            s = tok[1:-1]
-            s = unesc(s)
+        if tok.startswith("'"):
+            s = unesc(tok[1:-1])
             lex()
             return quotesym(s)
 
-        # string
-        if tok[0] == '"':
-            s = tok[1:-1]
-            if tok.startswith('"""'):
-                s = tok[3:-3]
-            s = unesc(s)
+        # multiline string
+        if tok.startswith('"""'):
+            s = unesc(tok[3:-3])
             lex()
             s = textwrap.dedent(s)
+            return ["List.of"] + [ord(c) for c in s]
+
+        # string
+        if tok.startswith('"'):
+            s = unesc(tok[1:-1])
+            lex()
+            return ["List.of"] + [ord(c) for c in s]
+
+        # raw string
+        if tok.startswith('#"'):
+            s = tok[2:-1]
+            lex()
             return ["List.of"] + [ord(c) for c in s]
 
         # bracketed expression or list

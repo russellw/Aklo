@@ -107,6 +107,8 @@ assert upper 97==65
 assert upper 65==65
 assert upper "abc..."=="ABC..."
 
+assert #"\n"=="\\n"
+
 ;variables
 x = 5
 assert x == 5
