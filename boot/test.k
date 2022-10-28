@@ -16,6 +16,12 @@ assert !(0 && 1)
 assert !(1 && 0)
 assert 1 && 1
 
+;numbers
+assert 0xff==255
+assert 0Xfe+2==256
+assert 0b10000==16
+assert 0o100==64
+
 ;comparison
 assert 1==1
 assert 1!=2

@@ -169,10 +169,32 @@ def parse(name, fil):
                 ti += 2
                 continue
 
-            # word or number
-            if isidpart(text[ti]):
+            # word
+            if isidstart(text[ti]):
                 while isidpart(text[ti]):
                     ti += 1
+                tok = text[i:ti]
+                return
+
+            # hexadecimal numbers are a separate case because they may contain 'e'
+            if text[ti : ti + 2].lower() == "0x":
+                while isidpart(text[ti]):
+                    ti += 1
+                tok = text[i:ti]
+                return
+
+            # other number
+            if text[ti].isdigit() or text[ti] == "." and text[ti + 1].isdigit():
+                while isidpart(text[ti]):
+                    ti += 1
+                if text[ti] == ".":
+                    ti += 1
+                    while isidpart(text[ti]):
+                        ti += 1
+                    if text[ti - 1].lower() == "e" and text[ti] in ("+", "-"):
+                        ti += 1
+                        while isidpart(text[ti]):
+                            ti += 1
                 tok = text[i:ti]
                 return
 
@@ -283,7 +305,17 @@ def parse(name, fil):
 
         # number
         if tok[0].isdigit():
-            return int(lex1())
+            match tok[:2].lower():
+                case "0x":
+                    a = int(tok[2:], 16)
+                case "0o":
+                    a = int(tok[2:], 8)
+                case "0b":
+                    a = int(tok[2:], 2)
+                case _:
+                    a = int(tok)
+            lex()
+            return a
 
         # symbol
         if tok[0] == "'":
