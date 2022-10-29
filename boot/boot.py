@@ -447,7 +447,7 @@ def parse(name, fil):
 
     def prefix():
         match tok:
-            case "!" | "++" | "--":
+            case "!" | "~" | "++" | "--":
                 return lex1(), prefix()
             case "-":
                 lex()
@@ -1000,6 +1000,20 @@ def expr(a):
             expr(("Etc.le", x, y))
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
+        case "~", x:
+            expr(("Etc.not", x))
+        case "&", x, y:
+            expr(("Etc.and", x, y))
+        case "|", x, y:
+            expr(("Etc.or", x, y))
+        case "^", x, y:
+            expr(("Etc.xor", x, y))
+        case "<<", x, y:
+            expr(("Etc.shl", x, y))
+        case ">>", x, y:
+            expr(("Etc.shr", x, y))
+        case ">>>", x, y:
+            expr(("Etc.ushr", x, y))
         case "+", x, y:
             expr(("Etc.add", x, y))
         case "*", x, y:
@@ -1007,7 +1021,7 @@ def expr(a):
         case "-", x, y:
             expr(("Etc.sub", x, y))
         case "==", x, y:
-            expr(("Etc.eq", x, y))
+            expr(("Objects.equals", x, y))
         case "@", x, y:
             expr(("Etc.cat", x, y))
         case "!=", x, y:

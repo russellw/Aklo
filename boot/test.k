@@ -16,6 +16,30 @@ assert !(0 && 1)
 assert !(1 && 0)
 assert 1 && 1
 
+;bitwise
+assert !(0 & 0)
+assert !(0 & 1)
+assert !(1 & 0)
+assert 1 & 1
+
+assert !(0 | 0)
+assert 0 | 1
+assert 1 | 0
+assert 1 | 1
+
+assert !(0 ^ 0)
+assert 0 ^ 1
+assert 1 ^ 0
+assert !(1 ^ 1)
+
+assert 1<<8==256
+assert  256>>8==1
+
+assert ~0==-1
+
+a=1
+assert ~a==-2
+
 ;numbers
 assert 0xff==255
 assert 0Xfe+2==256
@@ -57,7 +81,7 @@ assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
 
-;lists
+;lists and strings
 assert "ABC"==[65,66,67]
 assert "A"==[65,]
 
@@ -108,6 +132,13 @@ assert upper 65==65
 assert upper "abc..."=="ABC..."
 
 assert #"\n"=="\\n"
+
+assert utf8 0x24==(0x24,)
+assert utf8 0xa3==(0xc2,0xa3)
+assert utf8 0x939==(0xe0,0xa4,0xb9)
+assert utf8 0x20ac==(0xe2,0x82,0xac)
+assert utf8 0xd55c==(0xed,0x95,0x9c)
+assert utf8 0x10348==(0xf0,0x90,0x8d,0x88)
 
 ;variables
 x = 5

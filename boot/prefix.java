@@ -54,6 +54,30 @@ final class Etc {
     return (int) a + (int) b;
   }
 
+  static int and(Object a, Object b) {
+    return (int) a & (int) b;
+  }
+
+  static int or(Object a, Object b) {
+    return (int) a | (int) b;
+  }
+
+  static int xor(Object a, Object b) {
+    return (int) a ^ (int) b;
+  }
+
+  static int shl(Object a, Object b) {
+    return (int) a << (int) b;
+  }
+
+  static int shr(Object a, Object b) {
+    return (int) a >> (int) b;
+  }
+
+  static int ushr(Object a, Object b) {
+    return (int) a >>> (int) b;
+  }
+
   @SuppressWarnings("unused")
   static void show(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
@@ -108,6 +132,10 @@ final class Etc {
     return -(int) a;
   }
 
+  static int not(Object a) {
+    return ~(int) a;
+  }
+
   static int sub(Object a, Object b) {
     return (int) a - (int) b;
   }
@@ -118,10 +146,6 @@ final class Etc {
 
   static boolean le(Object a, Object b) {
     return (int) a <= (int) b;
-  }
-
-  static boolean eq(Object a, Object b) {
-    return a.equals(b);
   }
 
   static Object subscript(Object s, Object i) {
