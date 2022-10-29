@@ -89,6 +89,7 @@ final class Etc {
 
   static List<Object> range(Object i, Object j) {
     var i1 = (int) i;
+    // TODO: do the right thing when the argument is a list
     var j1 = (int) j;
     var r = new ArrayList<Object>();
     while (i1 < j1) r.add(i1++);

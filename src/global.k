@@ -136,6 +136,16 @@ fn isdigitb c,base
 
 fn unesc s
 	r=""
+
+	fn seq n,base
+			nonlocal i
+			while j<n
+				if !isdigitb( s!(i+j),base)
+					break
+				j++
+			r@=utf8(intstr (slice (s,i,i+j),base))
+			i+=j
+
 	while i<len s
 		c=s!i++
 		if (c,)!="\\"
@@ -160,9 +170,7 @@ fn unesc s
 			"e"
 				r@=27,
 			"x"
-				for j:range 2
-					if !isdigitb( s!(i+j),16)
-						break
+				seq 2,16
 			_
 				r@=c,
 	r
