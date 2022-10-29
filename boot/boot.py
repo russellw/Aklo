@@ -592,11 +592,11 @@ def parse(name, fil):
         return s
 
     def stmt():
-        a = [tok]
+        s = [tok]
         match tok:
             case "case":
                 lex()
-                a.append(commas())
+                s.append(commas())
                 eat(":")
                 expect(".indent")
                 while not eat(".dedent"):
@@ -605,48 +605,48 @@ def parse(name, fil):
                         patterns.append(commas())
                     body = block1()
                     for pattern in patterns:
-                        a.append((pattern, *body))
-                return a
+                        s.append((pattern, *body))
+                return s
             case "assert":
                 lex()
-                a.append(expr())
+                s.append(expr())
                 expect("\n")
-                return a
+                return s
             case "dowhile" | "while":
                 lex()
-                a.append(expr())
+                s.append(expr())
                 eat(":")
-                block(a)
-                return a
+                block(s)
+                return s
             case "for":
                 lex()
-                a.append(word())
+                s.append(word())
                 expect(":")
-                a.append(commas())
+                s.append(commas())
                 eat(":")
-                block(a)
-                return a
+                block(s)
+                return s
             case "fn":
                 lex()
-                a.append(word())
-                a.append(params())
+                s.append(word())
+                s.append(params())
                 eat(":")
-                block(a)
-                return a
+                block(s)
+                return s
             case "if":
                 return if1()
             case "nonlocal":
                 lex()
-                a.append(word())
+                s.append(word())
                 expect("\n")
-                return a
+                return s
             case "return":
                 lex()
                 if eat("\n"):
                     return "return", 0
-                a.append(commas())
+                s.append(commas())
                 expect("\n")
-                return a
+                return s
         a = assignment()
         if eat(":"):
             return ":", a, stmt()
@@ -664,10 +664,10 @@ def parse(name, fil):
         expect("\n")
 
     # module
-    a = []
+    s = []
     while tok != ".dedent":
-        a.append(stmt())
-    modules[name] = a
+        s.append(stmt())
+    modules[name] = s
 
 
 parse("global", os.path.join(here, "..", "src", "global.k"))
@@ -929,13 +929,13 @@ for name, body in modules.items():
 sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
 
 
-def separate(f, a, separator):
+def separate(f, s, separator):
     more = 0
-    for b in a:
+    for a in s:
         if more:
             emit(separator)
         more = 1
-        f(b)
+        f(a)
 
 
 def emit(a, separator=" "):
