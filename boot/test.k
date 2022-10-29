@@ -293,12 +293,12 @@ while i <= 5
 	i++
 assert a=="AAAAA"
 
-n=0
+i=0
 m=0
 for c: "ABC"
-	n++
+	i++
 	m+=c
-assert n==3
+assert i==3
 assert m==65+66+67
 
 outer: while 1

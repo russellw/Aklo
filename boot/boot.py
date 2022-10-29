@@ -1166,7 +1166,11 @@ def stmt(a):
         case ".var", modifiers, typ, name, val:
             emit(modifiers)
             emit(" ")
-            emit(typ)
+            match name:
+                case "i" | "j" | "k":
+                    emit("int")
+                case _:
+                    emit("Object")
             emit(" ")
             emit(name)
             emit("=")
