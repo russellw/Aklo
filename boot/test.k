@@ -153,9 +153,11 @@ assert isdigitb ("f"!0,16)
 assert !isdigitb ("*"!0,10)
 assert !isdigitb ("*"!0,16)
 
+/*
 assert unesc "abc"=="abc"
 assert unesc #"\tabc\n"=="\tabc\n"
 assert unesc #"\x41\x42"=="AB"
+*/
 
 ;variables
 x = 5

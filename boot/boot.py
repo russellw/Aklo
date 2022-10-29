@@ -793,8 +793,6 @@ def ir(a):
 
             assign(pattern, x)
             return r
-        case "range", x:
-            return ir(("range", 0, x))
         case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
             args = [("Etc.truth", ir(x)) for x in args]
             return a[0], *args
@@ -994,6 +992,8 @@ def expr(a):
             expr(x)
             emit("/")
             expr(y)
+        case "range", x:
+            expr(("range", 0, x))
         case "<", x, y:
             expr(("Etc.lt", x, y))
         case "<=", x, y:
