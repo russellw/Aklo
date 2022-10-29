@@ -825,7 +825,7 @@ def ir(a):
                         return 1
 
             body = [a for a in body if not f(a)]
-            vs = [(".var", [], x, 0) for x in vs]
+            vs = [(".var", [], x) for x in vs]
 
             # parameter types
             def f(x):
@@ -851,7 +851,7 @@ def ir(a):
             if fs:
                 ctor = ["fn", [], "", name, params]
                 for typ, x in params:
-                    vs.append((".var", [], x, 0))
+                    vs.append((".var", [], x))
                     ctor.append(("=", "this." + x, x))
                 fs.append(ctor)
 
@@ -893,7 +893,7 @@ for name, body in modules.items():
     # get the local variables
     types = gettypes(body)
     vs = localvars(params, body)
-    vs = [(".var", ["static"], x, 0) for x in vs]
+    vs = [(".var", ["static"], x) for x in vs]
 
     # always need to generate a class
     run = ["fn", ["static"], "void", "run", params]
@@ -1163,7 +1163,7 @@ def stmt(a):
             emit("assert ")
             expr(x)
             emit(";\n")
-        case ".var", modifiers, name, val:
+        case ".var", modifiers, name:
             emit(modifiers)
             emit(" ")
             match name:
@@ -1173,9 +1173,7 @@ def stmt(a):
                     emit("Object")
             emit(" ")
             emit(name)
-            emit("=")
-            expr(val)
-            emit(";\n")
+            emit("= 0;\n")
         case ".class", modifiers, name, params, *decls:
             emit(modifiers)
             emit(" class ")
