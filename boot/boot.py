@@ -675,20 +675,25 @@ parse("program", sys.argv[1])
 
 
 # intermediate representation
+def arithmetic(a):
+    match a:
+        case (
+            ("++", x)
+            | ("--", x)
+            | ("post++", x)
+            | ("post--", x)
+            | ("+=", x, _)
+            | ("-=", x, _)
+        ):
+            return 1
+
+
 def gettypes(a):
     types = {}
 
     def f(a):
-        match a:
-            case (
-                ("++", x)
-                | ("--", x)
-                | ("post++", x)
-                | ("post--", x)
-                | ("+=", x, _)
-                | ("-=", x, _)
-            ):
-                types[x] = "int"
+        if arithmetic(a):
+            types[a[1]] = "int"
 
     eachr(f, a)
     return types
@@ -704,11 +709,12 @@ def localvars(params, a):
         match a:
             case "nonlocal", x:
                 nonlocals.add(x)
-            case "=", x, _:
-                if not isinstance(x, str):
-                    raise Exception(a)
-                if x not in params and x not in nonlocals:
-                    vs[x] = 1
+            case op, x, *_:
+                if op == "=" or arithmetic(a):
+                    if not isinstance(x, str):
+                        raise Exception(a)
+                    if x not in params and x not in nonlocals:
+                        vs[x] = 1
 
     eachr(f, a)
     return list(vs.keys())

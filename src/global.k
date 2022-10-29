@@ -113,3 +113,30 @@ fn upper a
 	if islower a
 		return a-32
 	a
+
+fn unesc s
+	r=""
+	while i<len s
+		c=s!i++
+		if (c,)!="\\"
+			r@=c,
+			continue
+		c=s!i++
+		case c,
+			"a"
+				r@="\a"
+			"b "
+				r@="\b"
+			"f"
+				r@="\f"
+			"n"
+				r@="\n"
+			"r"
+				r@="\r"
+			"t"
+				r@="\t"
+			"v"
+				r@="\v"
+			"e"
+				r@=27,
+	r
