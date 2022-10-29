@@ -114,6 +114,26 @@ fn upper a
 		return a-32
 	a
 
+fn intstr s,base
+	n=0
+	while s
+		c,*s=s
+		n=n*base+intdigit c
+	n
+
+fn intdigit c
+	if isdigit c
+		return c-"0"!0
+	if islower c
+		return 10+c-"a"!0
+	if isupper c
+		return 10+c-"A"!0
+	-1
+
+fn isdigitb c,base
+	n=intdigit c
+	0<=n&&n<base
+
 fn unesc s
 	r=""
 	while i<len s
@@ -139,6 +159,12 @@ fn unesc s
 				r@="\v"
 			"e"
 				r@=27,
+			"x"
+				for j:range 2
+					if !isdigitb( s!(i+j),16)
+						break
+			_
+				r@=c,
 	r
 
 fn utf8 c

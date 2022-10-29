@@ -140,6 +140,22 @@ assert utf8 0x20ac==(0xe2,0x82,0xac)
 assert utf8 0xd55c==(0xed,0x95,0x9c)
 assert utf8 0x10348==(0xf0,0x90,0x8d,0x88)
 
+assert intstr "123",10==123
+assert intstr "ff",16==255
+assert intstr "FFFF",16==65535
+
+assert isdigitb ("9"!0,10)
+assert isdigitb ("9"!0,16)
+
+assert !isdigitb ("f"!0,10)
+assert isdigitb ("f"!0,16)
+
+assert !isdigitb ("*"!0,10)
+assert !isdigitb ("*"!0,16)
+
+assert unesc "abc"=="abc"
+assert unesc #"\tabc\n"=="\tabc\n"
+
 ;variables
 x = 5
 assert x == 5
