@@ -5,9 +5,9 @@ import sys
 import textwrap
 
 
-def each(f, a):
-    for b in a:
-        f(b)
+def each(f, s):
+    for a in s:
+        f(a)
 
 
 def eachr(f, a):
@@ -28,10 +28,10 @@ def mapr(f, a):
     return b
 
 
-def partition(f, a):
-    b = [x for x in a if f(x)]
-    c = [x for x in a if not f(x)]
-    return b, c
+def partition(f, s):
+    q = [a for a in s if f(a)]
+    r = [a for a in s if not f(a)]
+    return q, r
 
 
 def show(a):
@@ -362,13 +362,13 @@ def parse(name, fil):
         # bracketed expression or list
         if eat("("):
             if eat(".indent"):
-                a = ["List.of"]
+                s = ["List.of"]
                 while not eat(".dedent"):
-                    a.append(expr())
+                    s.append(expr())
                     eat(",")
                     expect("\n")
                 expect(")")
-                return a
+                return s
             if eat(")"):
                 return ["List.of"]
             a = commas()
@@ -420,7 +420,7 @@ def parse(name, fil):
         return word()
 
     def params():
-        a = []
+        s = []
         match tok:
             case ":" | ".indent":
                 pass
@@ -428,22 +428,22 @@ def parse(name, fil):
                 lex()
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        a.append(param())
+                        s.append(param())
                         eat(",")
                         expect("\n")
                     expect(")")
                 else:
                     while not eat(")"):
-                        a.append(param())
+                        s.append(param())
                         if eat(")"):
                             break
                         expect(",")
             case _:
                 while 1:
-                    a.append(param())
+                    s.append(param())
                     if not eat(","):
                         break
-        return a
+        return s
 
     def prefix():
         match tok:
@@ -456,20 +456,20 @@ def parse(name, fil):
                 lex()
                 return "Object...", prefix()
             case "\\":
-                a = [lex1(), params()]
+                s = [lex1(), params()]
                 eat(":")
                 if not eat("("):
-                    a.append(expr())
-                    return a
+                    s.append(expr())
+                    return s
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        a.append(stmt())
+                        s.append(stmt())
                     expect(")")
-                    return a
+                    return s
                 if tok != ")":
-                    a.append(commas())
+                    s.append(commas())
                 expect(")")
-                return a
+                return s
         return postfix()
 
     # operator precedence parser
@@ -551,14 +551,14 @@ def parse(name, fil):
         a = expr()
         if tok != ",":
             return a
-        a = ["List.of", a]
+        s = ["List.of", a]
         while eat(","):
             match tok:
                 case ")" | "\n" | ".indent":
                     pass
                 case _:
-                    a.append(expr())
-        return a
+                    s.append(expr())
+        return s
 
     def assignment():
         a = commas()
@@ -566,30 +566,30 @@ def parse(name, fil):
             return lex1(), a, assignment()
         return a
 
-    def block(a):
+    def block(s):
         expect(".indent")
         while not eat(".dedent"):
-            a.append(stmt())
+            s.append(stmt())
 
     def block1():
-        a = []
-        block(a)
-        return a
+        s = []
+        block(s)
+        return s
 
     def if1():
         assert tok in ("if", "elif")
         lex()
-        a = ["if", expr()]
+        s = ["if", expr()]
         eat(":")
-        a.append(block1())
+        s.append(block1())
         match tok:
             case "elif":
-                a.append(if1())
+                s.append(if1())
             case "else":
                 lex()
                 eat(":")
-                a.append(block1())
-        return a
+                s.append(block1())
+        return s
 
     def stmt():
         a = [tok]
