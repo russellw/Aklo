@@ -7,7 +7,7 @@ import java.util.function.*;
 final class Main {
   public static void main(String[] args) {
     for (var s : args) Etc.argv.add(Etc.encode(s));
-    Program.run();
+    program.run();
   }
 }
 

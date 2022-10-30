@@ -415,8 +415,6 @@ def parse(name, fil):
             return a
 
     def param():
-        if eat("*"):
-            return "Object...", word()
         return word()
 
     def params():
@@ -674,263 +672,36 @@ parse("global", os.path.join(here, "..", "src", "global.k"))
 parse("program", sys.argv[1])
 
 
-# intermediate representation
-def arithmetic(a):
-    match a:
-        case (
-            ("++", x)
-            | ("--", x)
-            | ("post++", x)
-            | ("post--", x)
-            | ("+=", x, _)
-            | ("-=", x, _)
-        ):
-            return 1
-
-
-def gettypes(a):
-    types = {}
-
-    def f(a):
-        if arithmetic(a):
-            types[a[1]] = "int"
-
-    eachr(f, a)
-    return types
+# output
+sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
 
 
 def localvars(params, a):
     nonlocals = set()
 
     # dict keeps deterministic order
-    vs = {}
+    vs = {x: 1 for x in params}
 
     def f(a):
         match a:
             case "nonlocal", x:
                 nonlocals.add(x)
-            case op, x, *_:
-                if op == "=" or arithmetic(a):
-                    if not isinstance(x, str):
-                        raise Exception(a)
-                    if x not in params and x not in nonlocals:
-                        vs[x] = 1
+            case (
+                ("++", x)
+                | ("--", x)
+                | ("post++", x)
+                | ("post--", x)
+                | ("+=", x, _)
+                | ("=", x, _)
+                | ("-=", x, _)
+            ):
+                if not isinstance(x, str):
+                    raise Exception(a)
+                if x not in nonlocals:
+                    vs[x] = 1
 
     eachr(f, a)
-    return list(vs.keys())
-
-
-def ir(a):
-    match a:
-        case "case", x, *cases:
-            outerLabel = gensym("outer")
-            innerLabel = gensym("inner")
-            x1 = gensym("x")
-
-            q = ["dowhile", "false", ("=", x1, ir(x))]
-            for pattern, *body in cases:
-                body = list(map(ir, body))
-                r = ["dowhile", "false"]
-
-                def assign(pattern, x):
-                    if isinstance(pattern, int):
-                        r.append(("if", ("!=", x, pattern), [("break", innerLabel)]))
-                        return
-                    match pattern:
-                        case "intern", ("List.of", *_):
-                            r.append(
-                                ("if", ("!=", x, pattern), [("break", innerLabel)])
-                            )
-                        case "List.of", *params:
-                            args = gensym("x")
-                            r.append(("=", args, x))
-                            r.append(
-                                ("if", ("!", ("islist", args)), [("break", innerLabel)])
-                            )
-                            r.append(
-                                (
-                                    "if",
-                                    ("<", ("len", args), len(params)),
-                                    [("break", innerLabel)],
-                                )
-                            )
-                            for i in range(len(params)):
-                                match params[i]:
-                                    case "Object...", y:
-                                        assign(y, ("from", args, i))
-                                    case y:
-                                        assign(y, ("Etc.subscript", args, i))
-                        case "_":
-                            pass
-                        case _:
-                            r.append(("=", pattern, x))
-
-                assign(pattern, x1)
-                r.extend(body)
-                r.append(("break", outerLabel))
-                q.append((":", innerLabel, r))
-            return ":", outerLabel, q
-        case "=", pattern, x:
-            x = ir(x)
-            if isinstance(pattern, str):
-                return "=", pattern, x
-
-            r = ["{"]
-
-            def assign(pattern, x):
-                match pattern:
-                    case "List.of", *params:
-                        args = gensym("x")
-                        r.append(("=", args, x))
-                        for i in range(len(params)):
-                            match params[i]:
-                                case "Object...", y:
-                                    assign(y, ("from", args, i))
-                                case y:
-                                    assign(y, ("Etc.subscript", args, i))
-                    case _:
-                        r.append(("=", pattern, x))
-
-            assign(pattern, x)
-            return r
-        case ("&&", *args) | ("||", *args) | ("!", *args) | ("assert", *args):
-            args = [("Etc.truth", ir(x)) for x in args]
-            return a[0], *args
-        case ("dowhile", test, *body) | ("while", test, *body) | ("if", test, *body):
-            test = "Etc.truth", ir(test)
-            body = list(map(ir, body))
-            return a[0], test, *body
-        case "fn", name, params, *body:
-            modifiers = []
-            typ = "Object"
-
-            # recur
-            body = list(map(ir, body))
-
-            # separate the local functions
-            def f(a):
-                match a:
-                    case "fn", *_:
-                        return 1
-
-            fs, body = partition(f, body)
-
-            # get the local variables
-            types = gettypes(body)
-            vs = localvars(params, body)
-
-            def f(a):
-                match a:
-                    case "nonlocal", *_:
-                        return 1
-
-            body = [a for a in body if not f(a)]
-            vs = [(".var", [], x) for x in vs]
-
-            # parameter types
-            def f(x):
-                if isinstance(x, str):
-                    return types.get(x, "Object"), x
-                return x
-
-            params = list(map(f, params))
-
-            # if the trailing return is implicit, make it explicit
-            if not body:
-                body = [0]
-            a = body[-1]
-            match a:
-                case ("assert", _) | ("for", *_):
-                    body.append(("return", 0))
-                case "return", _:
-                    pass
-                case _:
-                    body[-1] = "return", a
-
-            # if there are local functions, we need to generate a class
-            if fs:
-                ctor = ["fn", [], "", name, params]
-                for typ, x in params:
-                    vs.append((".var", [], x))
-                    ctor.append(("=", "this." + x, x))
-                fs.append(ctor)
-
-                run = ["fn", [], "Object", "run", []]
-                run.extend(body)
-                fs.append(run)
-
-                return ".class", modifiers, name, params, *(vs + fs)
-
-            # otherwise, we still just have a function
-            return "fn", modifiers, typ, name, params, *(vs + body)
-        case [*_]:
-            return list(map(ir, a))
-    return a
-
-
-for name, body in modules.items():
-    params = []
-    modifiers = []
-
-    # recur
-    body = list(map(ir, body))
-
-    # separate the local functions
-    def f(a):
-        match a:
-            case ("fn", *_) | (".class", *_):
-                return 1
-
-    fs, body = partition(f, body)
-
-    def f(a):
-        op, modifiers, *s = a
-        modifiers = ["static"]
-        return op, modifiers, *s
-
-    fs = list(map(f, fs))
-
-    # get the local variables
-    types = gettypes(body)
-    vs = localvars(params, body)
-    vs = [(".var", ["static"], x) for x in vs]
-
-    # always need to generate a class
-    run = ["fn", ["static"], "void", "run", params]
-    run.extend(body)
-    fs.append(run)
-
-    modules[name] = ".class", modifiers, name.title(), params, *(vs + fs)
-
-
-# check which functions are represented as classes
-classes = set()
-
-
-def f(a):
-    match a:
-        case ".class", modifiers, name, *_:
-            classes.add(name)
-
-
-for name, body in modules.items():
-    eachr(f, body)
-
-
-# they need to be called with a different syntax
-def f(a):
-    match a:
-        case f, *args:
-            if isinstance(f, str) and f.split(".")[-1] in classes:
-                return ".run", ("new " + f, *args)
-
-
-for name, body in modules.items():
-    modules[name] = mapr(f, body)
-
-
-# output
-sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
+    return list(vs)
 
 
 def separate(f, s, separator):
@@ -951,22 +722,10 @@ def emit(a, separator=" "):
     sys.stdout.write(a)
 
 
-def fcast(params):
-    if not isinstance(params, int):
-        params = len(params)
-    match params:
-        case 0:
-            emit("(Supplier<Object>)")
-        case 1:
-            emit("(UnaryOperator<Object>)")
-        case 2:
-            emit("(BinaryOperator<Object>)")
-
-
 globals1 = set()
 for a in modules["global"]:
     match a:
-        case "fn", modifiers, typ, name, params, *body:
+        case "fn", name, params, *body:
             globals1.add(name)
 
 
@@ -1123,6 +882,17 @@ def expr(a):
             raise Exception(a)
 
 
+def var(x):
+    match x:
+        case "i" | "j" | "k":
+            emit("int")
+        case _:
+            emit("Object")
+    emit(" ")
+    emit(x)
+    emit("= 0;\n")
+
+
 def stmt(a):
     match a:
         case "for", x, s, *body:
@@ -1163,48 +933,6 @@ def stmt(a):
             emit("assert ")
             expr(x)
             emit(";\n")
-        case ".var", modifiers, name:
-            emit(modifiers)
-            emit(" ")
-            match name:
-                case "i" | "j" | "k":
-                    emit("int")
-                case _:
-                    emit("Object")
-            emit(" ")
-            emit(name)
-            emit("= 0;\n")
-        case ".class", modifiers, name, params, *decls:
-            emit(modifiers)
-            emit(" class ")
-            emit(name)
-            emit("{\n")
-            each(stmt, decls)
-            emit("}\n")
-        case "fn", modifiers, typ, name, params, *body:
-            emit(modifiers)
-            emit(" ")
-            emit(typ)
-            emit(" ")
-            emit(name)
-            emit("(")
-            if params and params[-1][0] == "Object...":
-                emit("Object...args_) {\n")
-                for i in range(0, len(params) - 1):
-                    emit(params[i])
-                    emit("= args_[")
-                    emit(i)
-                    emit("];\n")
-                emit("var ")
-                emit(params[-1][1])
-                emit("= List.of(Arrays.copyOfRange(args_, ")
-                emit(len(params) - 1)
-                emit(", args_.length));\n")
-            else:
-                emit(params, ",")
-                emit(") {\n")
-            each(stmt, body)
-            emit("}\n")
         case "{", *s:
             emit("{\n")
             each(stmt, s)
@@ -1218,12 +946,144 @@ def stmt(a):
             emit(label)
             emit(":")
             stmt(loop)
+        case "case", x, *cases:
+            outerLabel = gensym("outer")
+            innerLabel = gensym("inner")
+            x1 = gensym("x")
+
+            q = ["dowhile", "false", ("=", x1, ir(x))]
+            for pattern, *body in cases:
+                body = list(map(ir, body))
+                r = ["dowhile", "false"]
+
+                def assign(pattern, x):
+                    if isinstance(pattern, int):
+                        r.append(("if", ("!=", x, pattern), [("break", innerLabel)]))
+                        return
+                    match pattern:
+                        case "intern", ("List.of", *_):
+                            r.append(
+                                ("if", ("!=", x, pattern), [("break", innerLabel)])
+                            )
+                        case "List.of", *params:
+                            args = gensym("x")
+                            r.append(("=", args, x))
+                            r.append(
+                                ("if", ("!", ("islist", args)), [("break", innerLabel)])
+                            )
+                            r.append(
+                                (
+                                    "if",
+                                    ("<", ("len", args), len(params)),
+                                    [("break", innerLabel)],
+                                )
+                            )
+                            for i in range(len(params)):
+                                match params[i]:
+                                    case "Object...", y:
+                                        assign(y, ("from", args, i))
+                                    case y:
+                                        assign(y, ("Etc.subscript", args, i))
+                        case "_":
+                            pass
+                        case _:
+                            r.append(("=", pattern, x))
+
+                assign(pattern, x1)
+                r.extend(body)
+                r.append(("break", outerLabel))
+                q.append((":", innerLabel, r))
+            return ":", outerLabel, q
+        case "=", pattern, x:
+            x = ir(x)
+            if isinstance(pattern, str):
+                return "=", pattern, x
+
+            r = ["{"]
+
+            def assign(pattern, x):
+                match pattern:
+                    case "List.of", *params:
+                        args = gensym("x")
+                        r.append(("=", args, x))
+                        for i in range(len(params)):
+                            match params[i]:
+                                case "Object...", y:
+                                    assign(y, ("from", args, i))
+                                case y:
+                                    assign(y, ("Etc.subscript", args, i))
+                    case _:
+                        r.append(("=", pattern, x))
+
+            assign(pattern, x)
+            return r
+        case "nonlocal", _:
+            pass
         case _:
             expr(a)
             emit(";\n")
 
 
+def fn(name, params, body):
+    print(f"class {name} implements Function<List<Object>, Object> {{")
+
+    # local functions
+    r = []
+    for a in body:
+        match a:
+            case "fn", name, params, *body1:
+                fn(name, params, body1)
+            case _:
+                r.append(a)
+    body = r
+
+    # local variables
+    each(var, localvars(params, body))
+
+    # if the trailing return is implicit, make it explicit
+    if not body:
+        body = [0]
+    a = body[-1]
+    match a:
+        case ("assert", _) | ("for", *_):
+            body.append(("return", 0))
+        case "return", _:
+            pass
+        case _:
+            body[-1] = "return", a
+
+    # body
+    print("Object apply(List<Object> args) {")
+    for i in range(len(params)):
+        print(f"{params[i]} = args.get({i});")
+    each(stmt, body)
+    print("}")
+
+    print("}")
+
+
 for moduleName, module in modules.items():
-    moduleName = moduleName.title()
-    emit('@SuppressWarnings("unchecked")\n')
-    stmt(module)
+    print('@SuppressWarnings("unchecked")')
+    print(f"class {moduleName} {{")
+
+    # local functions
+    r = []
+    for a in body:
+        match a:
+            case "fn", name, params, *body:
+                fn(name, params, body)
+            case _:
+                r.append(a)
+    body = r
+
+    # local variables
+    for x in localvars(params, module):
+        print("static")
+        var(x)
+
+    # body
+    print("static void run() {")
+    each(stmt, module)
+    print("}")
+
+    print("}")

@@ -35,8 +35,8 @@ fn filter f,s
 fn tail s
 	from s,1
 
-fn fmt(s,*args)
-	i = 0
+fn fmt(s)
+	i = 1
 	j = 0
 	r = ""
 	while i < len(s)
@@ -54,25 +54,25 @@ fn fmt(s,*args)
 				r@= c,
 	r
 
-fn printf *args
+fn printf
 	print(apply(fmt, args))
 
-fn eprintf *args
+fn eprintf
 	eprint(apply(fmt, args))
 
-fn println *args
+fn println
 	apply print,args
 	print"\n"
 
-fn eprintln *args
+fn eprintln
 	apply eprint,args
 	eprint"\n"
 
-fn print *args
+fn print
 	for a :args
 		printstream stdout,a
 
-fn eprint *args
+fn eprint
 	for a :args
 		printstream stderr,a
 
