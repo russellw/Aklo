@@ -724,6 +724,18 @@ def emit(a, separator=" "):
     sys.stdout.write(a)
 
 
+def args(s):
+    print("(")
+    separate(expr, s, ",")
+    print(")")
+
+
+def truth(a):
+    print("Etc.truth(")
+    expr(a)
+    print(")")
+
+
 globals1 = set()
 for a in modules["global"]:
     match a:
@@ -735,9 +747,10 @@ def expr(a):
     match a:
         case "argv":
             print("Etc.argv")
+        case ("++", x) | ("--", x):
+            print(a[0] + x)
         case ("post++", x) | ("post--", x):
-            expr(x)
-            print(a[0][4:])
+            print(x + a[0][4:])
         case "\\", params, *body:
             print("(Function<List<Object>, Object>)")
             print("(")
@@ -755,56 +768,83 @@ def expr(a):
             expr(y)
         case "range", x:
             expr(("range", 0, x))
-        case "<", x, y:
-            expr(("Etc.lt", x, y))
-        case "<=", x, y:
-            expr(("Etc.le", x, y))
+        case "<", *s:
+            print("Etc.lt")
+            args(s)
+        case "<=", *s:
+            print("Etc.le")
+            args(s)
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
-        case "~", x:
-            expr(("Etc.not", x))
-        case "&", x, y:
-            expr(("Etc.and", x, y))
-        case "|", x, y:
-            expr(("Etc.or", x, y))
-        case "^", x, y:
-            expr(("Etc.xor", x, y))
-        case "<<", x, y:
-            expr(("Etc.shl", x, y))
-        case ">>", x, y:
-            expr(("Etc.shr", x, y))
-        case ">>>", x, y:
-            expr(("Etc.ushr", x, y))
-        case "+", x, y:
-            expr(("Etc.add", x, y))
-        case "*", x, y:
-            expr(("Etc.mul", x, y))
-        case "-", x, y:
-            expr(("Etc.sub", x, y))
-        case "==", x, y:
-            expr(("Objects.equals", x, y))
-        case "@", x, y:
-            expr(("Etc.cat", x, y))
-        case "!=", x, y:
-            expr(("!", ("==", x, y)))
-        case "intern", x:
-            expr(("Sym.intern", x))
+        case ("||", x, y) | ("&&", x, y):
+            truth(x)
+            print(a[0])
+            truth(y)
+        case "!", x:
+            print("!")
+            truth(x)
+        case "~", *s:
+            print("Etc.not")
+            args(s)
+        case "&", *s:
+            print("Etc.and")
+            args(s)
+        case "|", *s:
+            print("Etc.or")
+            args(s)
+        case "%", *s:
+            print("Etc.rem")
+            args(s)
+        case "^", *s:
+            print("Etc.xor")
+            args(s)
+        case "<<", *s:
+            print("Etc.shl")
+            args(s)
+        case ">>", *s:
+            print("Etc.shr")
+            args(s)
+        case ">>>", *s:
+            print("Etc.ushr")
+            args(s)
+        case "+", *s:
+            print("Etc.add")
+            args(s)
+        case "*", *s:
+            print("Etc.mul")
+            args(s)
+        case "-", *s:
+            print("Etc.sub")
+            args(s)
+        case "==", *s:
+            print("Objects.equals")
+            args(s)
+        case "!=", *s:
+            print("!Objects.equals")
+            args(s)
+        case "@", *s:
+            print("Etc.cat")
+            args(s)
+        case "intern", *s:
+            print("Sym.intern")
+            args(s)
         case "gensym",:
-            expr(("new Sym",))
+            print("new Sym()")
         case (
-            ("len", *args)
-            | ("get", *args)
-            | ("exit", *args)
-            | ("slice", *args)
-            | ("range", *args)
-            | ("writestream", *args)
-            | ("readfile", *args)
-            | ("isnum", *args)
-            | ("issym", *args)
-            | ("islist", *args)
-            | ("str", *args)
+            ("len", *s)
+            | ("get", *s)
+            | ("exit", *s)
+            | ("slice", *s)
+            | ("range", *s)
+            | ("writestream", *s)
+            | ("readfile", *s)
+            | ("isnum", *s)
+            | ("issym", *s)
+            | ("islist", *s)
+            | ("str", *s)
         ):
-            expr(("Etc." + a[0], *args))
+            print("Etc." + a[0])
+            args(s)
         case ("map", f, s) | ("filter", f, s):
             emit("Global.")
             emit(a[0])
@@ -827,6 +867,9 @@ def expr(a):
             emit("(")
             expr(s)
             emit(".toArray())")
+        case "=", x, y:
+            print(x + "=")
+            expr(y)
         case "stdout":
             emit("System.out")
         case "stderr":
@@ -834,45 +877,33 @@ def expr(a):
         case ".run", x:
             expr(x)
             emit(".run()")
-        case "List.of", *args:
-            if args:
-                match args[-1]:
-                    case "...", s:
+        case "List.of", *s:
+            if s:
+                match s[-1]:
+                    case "...", t:
                         emit("Etc.cons(")
-                        for x in args[:-1]:
+                        for x in s[:-1]:
                             expr(x)
                             emit(",")
-                        expr(s)
+                        expr(t)
                         emit(")")
                         return
             emit("List.of(")
-            separate(expr, args, ",")
+            separate(expr, s, ",")
             emit(")")
-        case f, *args:
-            if f[0].isalpha():
-                if len(f) == 1:
-                    print(f"((Function<List<Object>, Object>){f})")
-                elif f in globals1:
-                    print(f"new global.{f}().apply")
-                else:
-                    print(f"new {f}().apply")
-                emit(".apply(List.of(")
-                separate(expr, args, ",")
-                emit("))")
-                return
-            match args:
-                case x,:
-                    emit(f)
-                    expr(x)
-                case x, y:
-                    expr(x)
-                    emit(f)
-                    expr(y)
-                case _:
-                    raise Exception(a)
+        case f, *s:
+            if len(f) == 1:
+                print(f"((Function<List<Object>, Object>){f})")
+            elif f in globals1:
+                print(f"new global.{f}().apply")
+            else:
+                print(f"new {f}().apply")
+            emit(".apply(List.of(")
+            separate(expr, s, ",")
+            emit("))")
         case _:
             if isinstance(a, str) or isinstance(a, int):
-                emit(a)
+                print(a)
                 return
             raise Exception(a)
 
@@ -1025,7 +1056,7 @@ def fn(name, params, body):
             body[-1] = "return", a
 
     # body
-    print("Object apply(List<Object> args) {")
+    print("public Object apply(List<Object> args) {")
     for i in range(len(params)):
         print(f"{params[i]} = args.get({i});")
     each(stmt, body)
