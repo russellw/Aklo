@@ -995,28 +995,23 @@ def stmt(a):
                 q.append((":", innerLabel, r))
             return ":", outerLabel, q
         case "=", pattern, x:
-            x = ir(x)
-            if isinstance(pattern, str):
-                return "=", pattern, x
-
-            r = ["{"]
 
             def assign(pattern, x):
                 match pattern:
                     case "List.of", *params:
-                        args = gensym("x")
-                        r.append(("=", args, x))
+                        x1 = gensym("x")
+                        stmt(("=", x1, x))
                         for i in range(len(params)):
                             match params[i]:
                                 case "...", y:
-                                    assign(y, ("from", args, i))
+                                    assign(y, ("from", x1, i))
                                 case y:
-                                    assign(y, ("Etc.subscript", args, i))
+                                    assign(y, ("Etc.subscript", x1, i))
                     case _:
-                        r.append(("=", pattern, x))
+                        expr(("=", pattern, x))
+                        print(";")
 
             assign(pattern, x)
-            return r
         case "nonlocal", _:
             pass
         case _:
