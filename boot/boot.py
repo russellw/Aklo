@@ -45,10 +45,7 @@ syms = {}
 
 def gensym(s):
     s = "_" + s
-    if s not in syms:
-        syms[s] = 0
-        return s
-    i = syms[s] + 1
+    i = syms.get(s, 0) + 1
     syms[s] = i
     return s + str(i)
 
@@ -901,11 +898,17 @@ def tmp(a):
 
 def assign(pattern, x):
     if isinstance(pattern, int):
-        print(f"if (!Etc.eq({x}, {pattern})) break assign_;")
+        print("if (!Etc.eq(")
+        expr(x)
+        print(f", {pattern})) break assign_;")
         return
     match pattern:
         case "intern", ("List.of", *_):
-            print(f"if (!Etc.eq({x}, {pattern})) break assign_;")
+            print("if (!Etc.eq(")
+            expr(x)
+            print(",")
+            expr(pattern)
+            print(")) break assign_;")
         case "List.of", *s:
             x = tmp(x)
             print(f"if (!({x} instanceof List)) break assign_;")
@@ -919,7 +922,9 @@ def assign(pattern, x):
         case "_":
             pass
         case _:
-            print(f"{pattern} = {x};")
+            print(pattern + "=")
+            expr(x)
+            print(";")
 
 
 def stmt(a):
@@ -975,7 +980,7 @@ def stmt(a):
             stmt(loop)
         case "case", x, *cases:
             label = gensym("case")
-            print(f"{label}: do {{")
+            print(label + ": do {")
             x = tmp(x)
             for pattern, *body in cases:
                 print("assign_: do {")
