@@ -735,6 +735,7 @@ for a in modules["global"]:
 
 
 def expr(a):
+    show(a)
     match a:
         case "argv":
             emit("Etc.argv")
@@ -892,6 +893,7 @@ def var(x):
 
 
 def stmt(a):
+    show(a)
     match a:
         case "for", x, s, *body:
             emit("for (var ")
@@ -1029,8 +1031,8 @@ def fn(name, params, body):
     r = []
     for a in body:
         match a:
-            case "fn", name, params, *body1:
-                fn(name, params, body1)
+            case "fn", name1, params1, *body1:
+                fn(name1, params1, body1)
             case _:
                 r.append(a)
     body = r
@@ -1066,16 +1068,16 @@ for moduleName, module in modules.items():
 
     # local functions
     r = []
-    for a in body:
+    for a in module:
         match a:
             case "fn", name, params, *body:
                 fn(name, params, body)
             case _:
                 r.append(a)
-    body = r
+    module = r
 
     # local variables
-    for x in localvars(params, module):
+    for x in localvars([], module):
         print("static")
         var(x)
 
