@@ -452,7 +452,7 @@ def parse(name, fil):
                 return "Etc.neg", prefix()
             case "*":
                 lex()
-                return "Object...", prefix()
+                return "...", prefix()
             case "\\":
                 s = [lex1(), params()]
                 eat(":")
@@ -680,7 +680,15 @@ def localvars(params, a):
     nonlocals = set()
 
     # dict keeps deterministic order
-    vs = {x: 1 for x in params}
+    r = {x: 1 for x in params}
+
+    def lhs(a):
+        match a:
+            case "..." | "List.of":
+                pass
+            case _:
+                if isinstance(a, str) and a not in nonlocals:
+                    r[a] = 1
 
     def f(a):
         match a:
@@ -695,13 +703,10 @@ def localvars(params, a):
                 | ("=", x, _)
                 | ("-=", x, _)
             ):
-                if not isinstance(x, str):
-                    raise Exception(a)
-                if x not in nonlocals:
-                    vs[x] = 1
+                eachr(lhs, x)
 
     eachr(f, a)
-    return list(vs)
+    return list(r)
 
 
 def separate(f, s, separator):
@@ -835,7 +840,7 @@ def expr(a):
         case "List.of", *args:
             if args:
                 match args[-1]:
-                    case "Object...", s:
+                    case "...", s:
                         emit("Etc.cons(")
                         for x in args[:-1]:
                             expr(x)
@@ -849,21 +854,14 @@ def expr(a):
         case f, *args:
             if f[0].isalpha():
                 if len(f) == 1:
-                    emit("(")
-                    fcast(args)
-                    emit(f)
-                    emit(")")
-                    if len(args):
-                        emit(".apply")
-                    else:
-                        emit(".get")
+                    print(f"((Function<List<Object>, Object>){f})")
+                elif f in globals1:
+                    print(f"new global.{f}().apply")
                 else:
-                    if f in globals1:
-                        emit("Global.")
-                    emit(f)
-                emit("(")
+                    print(f"new {f}().apply")
+                emit(".apply(List.of(")
                 separate(expr, args, ",")
-                emit(")")
+                emit("))")
                 return
             match args:
                 case x,:
@@ -980,7 +978,7 @@ def stmt(a):
                             )
                             for i in range(len(params)):
                                 match params[i]:
-                                    case "Object...", y:
+                                    case "...", y:
                                         assign(y, ("from", args, i))
                                     case y:
                                         assign(y, ("Etc.subscript", args, i))
@@ -1008,7 +1006,7 @@ def stmt(a):
                         r.append(("=", args, x))
                         for i in range(len(params)):
                             match params[i]:
-                                case "Object...", y:
+                                case "...", y:
                                     assign(y, ("from", args, i))
                                 case y:
                                     assign(y, ("Etc.subscript", args, i))
