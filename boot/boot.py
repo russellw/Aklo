@@ -40,14 +40,13 @@ def show(a):
 
 
 # in the bootstrap compiler, strings substitute for symbols
-syms = {}
+syms = 0
 
 
-def gensym(s):
-    s = "_" + s
-    i = syms.get(s, 0) + 1
-    syms[s] = i
-    return s + str(i)
+def gensym():
+    global syms
+    syms += 1
+    return f"_{syms}"
 
 
 # library files need to be read from where the compiler is
@@ -446,7 +445,7 @@ def parse(name, fil):
                 return lex1(), prefix()
             case "-":
                 lex()
-                return "Etc.neg", prefix()
+                return "neg", prefix()
             case "*":
                 lex()
                 return "...", prefix()
@@ -530,7 +529,7 @@ def parse(name, fil):
             b = infix(prec1 + left1)
             match op:
                 case "!":
-                    a = "Etc.subscript", a, b
+                    a = "subscript", a, b
                 case ">":
                     a = "<", b, a
                 case ">=":
@@ -749,7 +748,7 @@ def fref(a):
             print("(Function<List<Object>, Object>)(args) -> {")
             for i in range(len(params)):
                 print(f"{params[i]} = args.get({i});")
-            each(stmt, body)
+            stmts(body)
             print("}")
         case [*_]:
             raise Exception(a)
@@ -845,7 +844,9 @@ def expr(a):
             ("len", *s)
             | ("get", *s)
             | ("exit", *s)
+            | ("neg", *s)
             | ("slice", *s)
+            | ("subscript", *s)
             | ("range", *s)
             | ("writestream", *s)
             | ("readfile", *s)
@@ -857,13 +858,12 @@ def expr(a):
             print("Etc." + a[0])
             args(s)
         case ("map", f, s) | ("filter", f, s):
-            emit("global.")
-            emit(a[0])
-            emit("(")
+            fref(a[0])
+            print(".apply(List.of(")
             fref(f)
             emit(",")
             expr(s)
-            emit(")")
+            emit("))")
         case "apply", f, s:
             expr(f)
             emit("(")
@@ -912,36 +912,36 @@ def var(x):
 
 
 def tmp(a):
-    r = gensym("")
-    print(f"var {r} = ")
+    r = gensym()
+    print(f"Object {r} = ")
     expr(a)
     print(";")
     return r
 
 
-def assign(pattern, x):
+def assign(label, pattern, x):
     if isinstance(pattern, int):
-        print("if (!Etc.eq(")
+        print("if (!Objects.equals(")
         expr(x)
-        print(f", {pattern})) break assign_;")
+        print(f", {pattern})) break {label};")
         return
     match pattern:
         case "intern", ("List.of", *_):
-            print("if (!Etc.eq(")
+            print("if (!Objects.equals(")
             expr(x)
             print(",")
             expr(pattern)
-            print(")) break assign_;")
+            print(f")) break {label};")
         case "List.of", *s:
             x = tmp(x)
-            print(f"if (!({x} instanceof List)) break assign_;")
-            print(f"if (((List<Object>){x}).size() < {len(s)}) break assign_;")
+            print(f"if (!({x} instanceof List)) break {label};")
+            print(f"if (((List<Object>){x}).size() < {len(s)}) break {label};")
             for i in range(len(s)):
                 match s[i]:
                     case "...", y:
-                        assign(y, ("from", x, i))
+                        assign(label, y, ("from", x, i))
                     case y:
-                        assign(y, ("Etc.subscript", x, i))
+                        assign(label, y, ("subscript", x, i))
         case "_":
             pass
         case _:
@@ -960,7 +960,7 @@ def stmt(a):
             print("}")
         case "while", test, *body:
             print("while (")
-            expr(test)
+            truth(test)
             print(") {")
             each(stmt, body)
             print("}")
@@ -968,11 +968,11 @@ def stmt(a):
             print("do {")
             each(stmt, body)
             print("} while (")
-            expr(test)
+            truth(test)
             print(");")
         case "if", test, yes, no:
             print("if (")
-            expr(test)
+            truth(test)
             print(") {")
             each(stmt, yes)
             print("} else {")
@@ -980,13 +980,13 @@ def stmt(a):
             print("}")
         case "if", test, yes:
             print("if (")
-            expr(test)
+            truth(test)
             print(") {")
             each(stmt, yes)
             print("}")
         case "assert", x:
-            print("assert ")
-            expr(x)
+            print("assert")
+            truth(x)
             print(";")
         case "{", *s:
             print("{")
@@ -1000,25 +1000,38 @@ def stmt(a):
             print(label + ":")
             stmt(loop)
         case "case", x, *cases:
-            label = gensym("case")
-            print(label + ": do {")
+            outerLabel = gensym()
+            print(outerLabel + ": do {")
             x = tmp(x)
             for pattern, *body in cases:
-                print("assign_: do {")
-                assign(pattern, x)
+                innerLabel = gensym()
+                print(innerLabel + ": do {")
+                assign(innerLabel, pattern, x)
                 each(stmt, body)
-                print(f"break {label};")
+                print(f"break {outerLabel};")
                 print("} while (false);")
             print("} while (false);")
         case "=", pattern, x:
-            print("assign_: do {")
-            assign(pattern, x)
+            label = gensym()
+            print(label + ": do {")
+            assign(label, pattern, x)
             print("} while (false);")
         case "nonlocal", _:
             pass
         case _:
             expr(a)
             print(";")
+
+
+def stmts(s):
+    for a in s[:-1]:
+        stmt(a)
+    a = s[-1]
+    match a:
+        case "return", _:
+            stmt(a)
+        case _:
+            stmt(("return", a))
 
 
 def fn(name, params, body):
@@ -1053,7 +1066,7 @@ def fn(name, params, body):
     print("public Object apply(List<Object> args) {")
     for i in range(len(params)):
         print(f"{params[i]} = args.get({i});")
-    each(stmt, body)
+    stmts(body)
     print("}")
 
     print("}")

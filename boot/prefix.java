@@ -54,6 +54,10 @@ final class Etc {
     return (int) a + (int) b;
   }
 
+  static int rem(Object a, Object b) {
+    return (int) a % (int) b;
+  }
+
   static int and(Object a, Object b) {
     return (int) a & (int) b;
   }
