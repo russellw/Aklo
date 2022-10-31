@@ -892,6 +892,14 @@ def var(x):
     emit("= 0;\n")
 
 
+def tmp(a):
+    r = gensym("")
+    print(f"var {r} = ")
+    expr(a)
+    print(";")
+    return r
+
+
 def stmt(a):
     show(a)
     match a:
@@ -938,23 +946,17 @@ def stmt(a):
             each(stmt, s)
             emit("}\n")
         case ("break", label) | ("continue", label):
-            emit(a[0])
-            emit(" ")
-            emit(label)
-            emit(";\n")
+            print(f"{a[0]} {label};")
         case ":", label, loop:
-            emit(label)
-            emit(":")
+            print(label + ":")
             stmt(loop)
         case "case", x, *cases:
             outerLabel = gensym("outer")
+            print(f"{outerLabel}: do {{")
+            x = tmp(x)
             innerLabel = gensym("inner")
-            x1 = gensym("x")
-
-            q = ["dowhile", "false", ("=", x1, ir(x))]
             for pattern, *body in cases:
-                body = list(map(ir, body))
-                r = ["dowhile", "false"]
+                print(f"{innerLabel}: do {{")
 
                 def assign(pattern, x):
                     if isinstance(pattern, int):
@@ -990,23 +992,22 @@ def stmt(a):
                             r.append(("=", pattern, x))
 
                 assign(pattern, x1)
-                r.extend(body)
-                r.append(("break", outerLabel))
-                q.append((":", innerLabel, r))
-            return ":", outerLabel, q
+                each(stmt, body)
+                print(f"break {outerLabel};")
+                print("} while (false);")
+            print("} while (false);")
         case "=", pattern, x:
 
             def assign(pattern, x):
                 match pattern:
-                    case "List.of", *params:
-                        x1 = gensym("x")
-                        stmt(("=", x1, x))
-                        for i in range(len(params)):
-                            match params[i]:
+                    case "List.of", *s:
+                        x = tmp(x)
+                        for i in range(len(s)):
+                            match s[i]:
                                 case "...", y:
-                                    assign(y, ("from", x1, i))
+                                    assign(y, ("from", x, i))
                                 case y:
-                                    assign(y, ("Etc.subscript", x1, i))
+                                    assign(y, ("Etc.subscript", x, i))
                     case _:
                         expr(("=", pattern, x))
                         print(";")
