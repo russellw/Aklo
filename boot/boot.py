@@ -735,7 +735,6 @@ for a in modules["global"]:
 
 
 def expr(a):
-    show(a)
     match a:
         case "argv":
             emit("Etc.argv")
@@ -743,7 +742,7 @@ def expr(a):
             expr(x)
             emit(a[0][4:])
         case "\\", params, *body:
-            fcast(params)
+            print("(Function<List<Object>, Object>)")
             emit("(")
             emit(params, ",")
             emit(") ->")
@@ -816,7 +815,7 @@ def expr(a):
             if f[0] == "\\":
                 expr(f)
             else:
-                fcast(1)
+                print("(Function<List<Object>, Object>)")
                 if f in globals1:
                     emit("Global")
                 else:
@@ -900,8 +899,30 @@ def tmp(a):
     return r
 
 
+def assign(pattern, x):
+    if isinstance(pattern, int):
+        print(f"if (!Etc.eq({x}, {pattern})) break assign_;")
+        return
+    match pattern:
+        case "intern", ("List.of", *_):
+            print(f"if (!Etc.eq({x}, {pattern})) break assign_;")
+        case "List.of", *s:
+            x = tmp(x)
+            print(f"if (!({x} instanceof List)) break assign_;")
+            print(f"if (((List<Object>){x}).size() < {len(s)}) break assign_;")
+            for i in range(len(s)):
+                match s[i]:
+                    case "...", y:
+                        assign(y, ("from", x, i))
+                    case y:
+                        assign(y, ("Etc.subscript", x, i))
+        case "_":
+            pass
+        case _:
+            print(f"{pattern} = {x};")
+
+
 def stmt(a):
-    show(a)
     match a:
         case "for", x, s, *body:
             emit("for (var ")
@@ -945,74 +966,28 @@ def stmt(a):
             emit("{\n")
             each(stmt, s)
             emit("}\n")
-        case ("break", label) | ("continue", label):
-            print(f"{a[0]} {label};")
+        case ("return", x) | ("break", x) | ("continue", x):
+            print(a[0])
+            expr(x)
+            emit(";\n")
         case ":", label, loop:
             print(label + ":")
             stmt(loop)
         case "case", x, *cases:
-            outerLabel = gensym("outer")
-            print(f"{outerLabel}: do {{")
+            label = gensym("case")
+            print(f"{label}: do {{")
             x = tmp(x)
-            innerLabel = gensym("inner")
             for pattern, *body in cases:
-                print(f"{innerLabel}: do {{")
-
-                def assign(pattern, x):
-                    if isinstance(pattern, int):
-                        r.append(("if", ("!=", x, pattern), [("break", innerLabel)]))
-                        return
-                    match pattern:
-                        case "intern", ("List.of", *_):
-                            r.append(
-                                ("if", ("!=", x, pattern), [("break", innerLabel)])
-                            )
-                        case "List.of", *params:
-                            args = gensym("x")
-                            r.append(("=", args, x))
-                            r.append(
-                                ("if", ("!", ("islist", args)), [("break", innerLabel)])
-                            )
-                            r.append(
-                                (
-                                    "if",
-                                    ("<", ("len", args), len(params)),
-                                    [("break", innerLabel)],
-                                )
-                            )
-                            for i in range(len(params)):
-                                match params[i]:
-                                    case "...", y:
-                                        assign(y, ("from", args, i))
-                                    case y:
-                                        assign(y, ("Etc.subscript", args, i))
-                        case "_":
-                            pass
-                        case _:
-                            r.append(("=", pattern, x))
-
-                assign(pattern, x1)
+                print("assign_: do {")
+                assign(pattern, x)
                 each(stmt, body)
-                print(f"break {outerLabel};")
+                print(f"break {label};")
                 print("} while (false);")
             print("} while (false);")
         case "=", pattern, x:
-
-            def assign(pattern, x):
-                match pattern:
-                    case "List.of", *s:
-                        x = tmp(x)
-                        for i in range(len(s)):
-                            match s[i]:
-                                case "...", y:
-                                    assign(y, ("from", x, i))
-                                case y:
-                                    assign(y, ("Etc.subscript", x, i))
-                    case _:
-                        expr(("=", pattern, x))
-                        print(";")
-
+            print("assign_: do {")
             assign(pattern, x)
+            print("} while (false);")
         case "nonlocal", _:
             pass
         case _:
