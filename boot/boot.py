@@ -710,7 +710,7 @@ def separate(f, s, separator):
     more = 0
     for a in s:
         if more:
-            emit(separator)
+            print(separator)
         more = 1
         f(a)
 
@@ -734,21 +734,21 @@ for a in modules["global"]:
 def expr(a):
     match a:
         case "argv":
-            emit("Etc.argv")
+            print("Etc.argv")
         case ("post++", x) | ("post--", x):
             expr(x)
-            emit(a[0][4:])
+            print(a[0][4:])
         case "\\", params, *body:
             print("(Function<List<Object>, Object>)")
-            emit("(")
+            print("(")
             emit(params, ",")
-            emit(") ->")
+            print(") ->")
             if len(body) == 1:
                 expr(body[0])
                 return
-            emit("{\n")
+            print("{")
             each(stmt, body)
-            emit("}")
+            print("}")
         case "//", x, y:
             expr(x)
             emit("/")
@@ -880,12 +880,10 @@ def expr(a):
 def var(x):
     match x:
         case "i" | "j" | "k":
-            emit("int")
+            print("int")
         case _:
-            emit("Object")
-    emit(" ")
-    emit(x)
-    emit("= 0;\n")
+            print("Object")
+    print(x + "= 0;")
 
 
 def tmp(a):
@@ -930,51 +928,49 @@ def assign(pattern, x):
 def stmt(a):
     match a:
         case "for", x, s, *body:
-            emit("for (var ")
-            expr(x)
-            emit(": (List)")
+            print(f"for (var {x}: (List)")
             expr(s)
-            emit(") {\n")
+            print(") {")
             each(stmt, body)
-            emit("}\n")
+            print("}")
         case "while", test, *body:
-            emit("while (")
+            print("while (")
             expr(test)
-            emit(") {\n")
+            print(") {")
             each(stmt, body)
-            emit("}\n")
+            print("}")
         case "dowhile", test, *body:
-            emit("do {\n")
+            print("do {")
             each(stmt, body)
-            emit("} while (")
+            print("} while (")
             expr(test)
-            emit(");\n")
+            print(");")
         case "if", test, yes, no:
-            emit("if (")
+            print("if (")
             expr(test)
-            emit(") {\n")
+            print(") {")
             each(stmt, yes)
-            emit("} else {\n")
+            print("} else {")
             each(stmt, no)
-            emit("}\n")
+            print("}")
         case "if", test, yes:
-            emit("if (")
+            print("if (")
             expr(test)
-            emit(") {\n")
+            print(") {")
             each(stmt, yes)
-            emit("}\n")
+            print("}")
         case "assert", x:
-            emit("assert ")
+            print("assert ")
             expr(x)
-            emit(";\n")
+            print(";")
         case "{", *s:
-            emit("{\n")
+            print("{")
             each(stmt, s)
-            emit("}\n")
+            print("}")
         case ("return", x) | ("break", x) | ("continue", x):
             print(a[0])
             expr(x)
-            emit(";\n")
+            print(";")
         case ":", label, loop:
             print(label + ":")
             stmt(loop)
@@ -997,7 +993,7 @@ def stmt(a):
             pass
         case _:
             expr(a)
-            emit(";\n")
+            print(";")
 
 
 def fn(name, params, body):
