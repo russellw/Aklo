@@ -399,7 +399,7 @@ def parse(name, fil):
                     lex()
                     field = word()
                     if a in modules:
-                        a = a.title() + "." + field
+                        a += "." + field
                     else:
                         a = "get", a, quotesym(field)
                     continue
@@ -846,7 +846,7 @@ def expr(a):
             print("Etc." + a[0])
             args(s)
         case ("map", f, s) | ("filter", f, s):
-            emit("Global.")
+            emit("global.")
             emit(a[0])
             emit("(")
             if f[0] == "\\":
@@ -854,7 +854,7 @@ def expr(a):
             else:
                 print("(Function<List<Object>, Object>)")
                 if f in globals1:
-                    emit("Global")
+                    emit("global")
                 else:
                     emit(moduleName)
                 emit("::")
@@ -895,17 +895,14 @@ def expr(a):
             if len(f) == 1:
                 print(f"((Function<List<Object>, Object>){f})")
             elif f in globals1:
-                print(f"new global.{f}().apply")
+                print(f"new global.{f}()")
             else:
-                print(f"new {f}().apply")
-            emit(".apply(List.of(")
-            separate(expr, s, ",")
-            emit("))")
+                print(f"new {f}()")
+            emit(".apply(List.of")
+            args(s)
+            emit(")")
         case _:
-            if isinstance(a, str) or isinstance(a, int):
-                print(a)
-                return
-            raise Exception(a)
+            print(a)
 
 
 def var(x):
@@ -1074,6 +1071,7 @@ for moduleName, module in modules.items():
     for a in module:
         match a:
             case "fn", name, params, *body:
+                print("static")
                 fn(name, params, body)
             case _:
                 r.append(a)
