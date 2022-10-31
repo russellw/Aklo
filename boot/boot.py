@@ -743,6 +743,26 @@ for a in modules["global"]:
             globals1.add(name)
 
 
+def fref(a):
+    match a:
+        case "\\", params, *body:
+            print("(Function<List<Object>, Object>)(args) -> {")
+            for i in range(len(params)):
+                print(f"{params[i]} = args.get({i});")
+            each(stmt, body)
+            print("}")
+        case [*_]:
+            raise Exception(a)
+        case _:
+            if len(a) == 1:
+                print(f"((Function<List<Object>, Object>){a})")
+                return
+            if a in globals1:
+                print(f"new global.{a}()")
+                return
+            print(f"new {a}()")
+
+
 def expr(a):
     match a:
         case "argv":
@@ -752,16 +772,7 @@ def expr(a):
         case ("post++", x) | ("post--", x):
             print(x + a[0][4:])
         case "\\", params, *body:
-            print("(Function<List<Object>, Object>)")
-            print("(")
-            emit(params, ",")
-            print(") ->")
-            if len(body) == 1:
-                expr(body[0])
-                return
-            print("{")
-            each(stmt, body)
-            print("}")
+            fref(a)
         case "//", x, y:
             expr(x)
             emit("/")
@@ -849,16 +860,7 @@ def expr(a):
             emit("global.")
             emit(a[0])
             emit("(")
-            if f[0] == "\\":
-                expr(f)
-            else:
-                print("(Function<List<Object>, Object>)")
-                if f in globals1:
-                    emit("global")
-                else:
-                    emit(moduleName)
-                emit("::")
-                expr(f)
+            fref(f)
             emit(",")
             expr(s)
             emit(")")
@@ -892,12 +894,7 @@ def expr(a):
             separate(expr, s, ",")
             emit(")")
         case f, *s:
-            if len(f) == 1:
-                print(f"((Function<List<Object>, Object>){f})")
-            elif f in globals1:
-                print(f"new global.{f}()")
-            else:
-                print(f"new {f}()")
+            fref(f)
             emit(".apply(List.of")
             args(s)
             emit(")")
