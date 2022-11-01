@@ -708,18 +708,14 @@ def localvars(params, a):
     return list(r)
 
 
-def separate(f, s, separator):
+def args(s):
+    print("(")
     more = 0
     for a in s:
         if more:
-            print(separator)
+            print(",")
         more = 1
-        f(a)
-
-
-def args(s):
-    print("(")
-    separate(expr, s, ",")
+        expr(a)
     print(")")
 
 
@@ -877,16 +873,11 @@ def expr(a):
             if s:
                 match s[-1]:
                     case "...", t:
-                        print("Etc.cons(")
-                        for x in s[:-1]:
-                            expr(x)
-                            print(",")
-                        expr(t)
-                        print(")")
+                        print("Etc.cons")
+                        args(s[:-1] + [t])
                         return
-            print("List.of(")
-            separate(expr, s, ",")
-            print(")")
+            print("List.of")
+            args(s)
         case f, *s:
             fref(f)
             print(".apply(List.of")
