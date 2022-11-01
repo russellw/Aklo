@@ -78,7 +78,7 @@ def parse(name, fil):
         return
 
     text = open(fil).read()
-    ti = 0
+    i = 0
     line = 1
 
     dentc = 0
@@ -101,7 +101,7 @@ def parse(name, fil):
         nonlocal dedents
         nonlocal dentc
         nonlocal line
-        nonlocal ti
+        nonlocal i
         nonlocal tok
 
         if dedents:
@@ -109,29 +109,29 @@ def parse(name, fil):
             tok = ".dedent"
             return
 
-        while ti < len(text):
-            i = ti
-            tok = text[ti]
+        while i < len(text):
+            j = i
+            tok = text[i]
 
             # newline
-            if text[ti] == "\n":
+            if text[i] == "\n":
                 # next line
-                ti += 1
-                if ti == len(text):
+                i += 1
+                if i == len(text):
                     return
                 line += 1
 
                 # measure indent
                 col = 0
-                while text[ti] in ("\t", " "):
-                    if text[ti] != dentc and dentc:
+                while text[i] in ("\t", " "):
+                    if text[i] != dentc and dentc:
                         err("indented with tabs and spaces in same file")
-                    dentc = text[ti]
-                    ti += 1
+                    dentc = text[i]
+                    i += 1
                     col += 1
 
                 # nothing important on this line, keep going
-                if text[ti] in ("\n", ";") or text[ti : ti + 2] == "/*":
+                if text[i] in ("\n", ";") or text[i : i + 2] == "/*":
                     continue
 
                 # one indent
@@ -149,93 +149,93 @@ def parse(name, fil):
                 return
 
             # space
-            if text[ti].isspace():
-                ti += 1
+            if text[i].isspace():
+                i += 1
                 continue
 
             # comment
-            if text[ti] == ";":
-                while text[ti] != "\n":
-                    ti += 1
+            if text[i] == ";":
+                while text[i] != "\n":
+                    i += 1
                 continue
-            if text[ti : ti + 2] == "/*":
-                ti += 2
+            if text[i : i + 2] == "/*":
+                i += 2
                 line1 = line
-                while text[ti : ti + 2] != "*/":
-                    if ti == len(text):
+                while text[i : i + 2] != "*/":
+                    if i == len(text):
                         line = line1
                         err("unclosed block comment")
-                    if text[ti] == "\n":
+                    if text[i] == "\n":
                         line += 1
-                    ti += 1
-                ti += 2
+                    i += 1
+                i += 2
                 continue
 
             # word
-            if isidstart(text[ti]):
-                while isidpart(text[ti]):
-                    ti += 1
-                tok = text[i:ti]
+            if isidstart(text[i]):
+                while isidpart(text[i]):
+                    i += 1
+                tok = text[j:i]
                 return
 
             # hexadecimal numbers are a separate case because they may contain 'e'
-            if text[ti : ti + 2].lower() == "0x":
-                while isidpart(text[ti]):
-                    ti += 1
-                tok = text[i:ti]
+            if text[i : i + 2].lower() == "0x":
+                while isidpart(text[i]):
+                    i += 1
+                tok = text[j:i]
                 return
 
             # other number
-            if text[ti].isdigit() or text[ti] == "." and text[ti + 1].isdigit():
-                while isidpart(text[ti]):
-                    ti += 1
-                if text[ti] == ".":
-                    ti += 1
-                    while isidpart(text[ti]):
-                        ti += 1
-                    if text[ti - 1].lower() == "e" and text[ti] in ("+", "-"):
-                        ti += 1
-                        while isidpart(text[ti]):
-                            ti += 1
-                tok = text[i:ti]
+            if text[i].isdigit() or text[i] == "." and text[i + 1].isdigit():
+                while isidpart(text[i]):
+                    i += 1
+                if text[i] == ".":
+                    i += 1
+                    while isidpart(text[i]):
+                        i += 1
+                    if text[i - 1].lower() == "e" and text[i] in ("+", "-"):
+                        i += 1
+                        while isidpart(text[i]):
+                            i += 1
+                tok = text[j:i]
                 return
 
             # multiline string
-            if text[ti : ti + 3] == '"""':
-                ti += 3
-                while text[ti : ti + 3] != '"""':
-                    if text[ti] == "\n":
+            if text[i : i + 3] == '"""':
+                i += 3
+                while text[i : i + 3] != '"""':
+                    if text[i] == "\n":
                         line += 1
-                    ti += 1
-                ti += 3
-                tok = text[i:ti]
+                    i += 1
+                i += 3
+                tok = text[j:i]
                 tok = '"""' + textwrap.dedent(tok[3:-3]) + '"""'
                 return
 
             # symbol or string
-            match text[ti]:
+            match text[i]:
                 case "'" | '"':
-                    q = text[ti]
-                    ti += 1
-                    while text[ti] != q:
-                        if text[ti] == "\\":
-                            ti += 1
-                        if text[ti] == "\n":
+                    q = text[i]
+                    i += 1
+                    while text[i] != q:
+                        if text[i] == "\\":
+                            i += 1
+                        if text[i] == "\n":
                             err("unclosed quote")
-                        ti += 1
-                    ti += 1
-                    tok = text[i:ti]
+                        i += 1
+                    i += 1
+                    tok = text[j:i]
                     return
 
             # raw string
-            if text[ti : ti + 2] == '#"':
-                ti += 2
-                while text[ti] != '"':
-                    if text[ti] == "\n":
+            if text[i : i + 2] == '#"':
+                i += 2
+                while text[i] != '"':
+                    if text[i] == "\n":
                         err("unclosed quote")
-                    ti += 1
-                ti += 1
-                tok = text[i:ti]
+                    i += 1
+                i += 1
+                tok = text[j:i]
                 return
 
             # punctuation
@@ -272,8 +272,8 @@ def parse(name, fil):
                 "||",
             )
             for s in punct:
-                if text[ti : ti + len(s)] == s:
-                    ti += len(s)
+                if text[i : i + len(s)] == s:
+                    i += len(s)
                     tok = s
                     return
 
@@ -281,7 +281,7 @@ def parse(name, fil):
                 tok = "("
             if tok == "]":
                 tok = ")"
-            ti += 1
+            i += 1
             return
 
         # end of file
