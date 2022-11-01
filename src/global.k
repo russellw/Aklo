@@ -36,8 +36,7 @@ fn tail s
 	from s,1
 
 fn fmt(s)
-	i = 1
-	j = 0
+	j = 1
 	r = ""
 	while i < len(s)
 		c = s!i++
@@ -115,7 +114,6 @@ fn upper a
 	a
 
 fn intstr s,base
-	n=0
 	while s
 		c,*s=s
 		n=n*base+intdigit c
