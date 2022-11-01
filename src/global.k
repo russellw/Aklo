@@ -111,13 +111,15 @@ fn upper a
 		return a-32
 	a
 
-fn intstr s,base
+fn parseint s,base
+	if!base
+		base=10
 	while s
 		c,*s=s
-		n=n*base+intdigit c
+		n=n*base+parsedigit c
 	n
 
-fn intdigit c
+fn parsedigit c
 	if "0"!0<=c&&c<="9"!0
 		return c-"0"!0
 	if islower c
@@ -129,7 +131,7 @@ fn intdigit c
 fn isdigit c,base
 	if!base
 		base=10
-	n=intdigit c
+	n=parsedigit c
 	0<=n&&n<base
 
 fn unesc s
@@ -141,7 +143,7 @@ fn unesc s
 				if !isdigit( s!(i+j),base)
 					break
 				j++
-			r@=utf8(intstr (slice (s,i,i+j),base))
+			r@=utf8(parseint (slice (s,i,i+j),base))
 			i+=j
 
 	while i<len s

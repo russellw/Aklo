@@ -140,9 +140,10 @@ assert utf8 0x20ac==(0xe2,0x82,0xac)
 assert utf8 0xd55c==(0xed,0x95,0x9c)
 assert utf8 0x10348==(0xf0,0x90,0x8d,0x88)
 
-assert intstr "123",10==123
-assert intstr "ff",16==255
-assert intstr "FFFF",16==65535
+assert parseint "123",10==123
+assert parseint "123"==123
+assert parseint "ff",16==255
+assert parseint "FFFF",16==65535
 
 assert isdigit ("9"!0,10)
 assert isdigit ("9"!0,16)
