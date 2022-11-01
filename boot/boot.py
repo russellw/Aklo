@@ -1059,7 +1059,7 @@ def fn(name, params, body):
         body = [0]
     a = body[-1]
     match a:
-        case ("assert", _) | ("for", *_):
+        case ("assert", _) | ("for", *_) | ("if", *_) | ("case", *_) | ("while", *_):
             body.append(("return", 0))
         case "return", _:
             pass
