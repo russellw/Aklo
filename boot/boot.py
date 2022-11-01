@@ -586,8 +586,10 @@ def parse(name, fil):
         s = [tok]
         match tok:
             case "assert":
+                msg = f"{fil}:{line}: assert failed"
                 lex()
                 s.append(expr())
+                s.append(msg)
                 expect("\n")
                 return s
             case "case":
@@ -972,10 +974,11 @@ def stmt(a):
             print(") {")
             each(stmt, yes)
             print("}")
-        case "assert", x:
-            print("assert")
-            truth(x)
-            print(";")
+        case "assert", test, msg:
+            print("if (!")
+            truth(test)
+            msg = msg.replace("\\", "\\\\")
+            print(f') throw new IllegalStateException("{msg}");')
         case "{", *s:
             print("{")
             each(stmt, s)
