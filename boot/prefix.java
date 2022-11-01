@@ -13,7 +13,7 @@ final class Main {
 
 @SuppressWarnings("unchecked")
 final class Etc {
-  static List<Object> argv = new ArrayList();
+  static List<Object> argv = new ArrayList<>();
 
   static Object writestream(Object stream, Object s) {
     var stream1 = (PrintStream) stream;
@@ -106,14 +106,14 @@ final class Etc {
 
   static List<Object> str(Object a) {
     var s = a.toString();
-    var r = new ArrayList<Object>();
+    var r = new ArrayList<>();
     for (var i = 0; i < s.length(); i++) r.add((int) s.charAt(i));
     return r;
   }
 
   static List<Object> cons(Object... s) {
-    var r = new ArrayList<Object>();
-    for (var i = 0; i < s.length - 1; i++) r.add(s[i]);
+    var r = new ArrayList<>();
+    r.addAll(Arrays.asList(s).subList(0, s.length - 1));
     r.addAll((List<Object>) s[s.length - 1]);
     return r;
   }
