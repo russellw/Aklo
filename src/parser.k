@@ -1,4 +1,8 @@
+modules=()
+
 fn parse  file,text
+	nonlocal modules
+
 	;TODO: cr
 	ti = 0
 	line = 1
@@ -591,11 +595,13 @@ fn parse  file,text
 	; imports
 	while eat("import"):
 		name1 = word()
-		parse(name1, os.path.join(here, "..", "src", name1 + ".k"))
+		;TODO: path
+		;TODO: check for already parsed
+		parse(name1, name1 @ ".k")
 		expect("\n")
 
 	; module
 	s = []
 	while tok != 'dedent':
-		s.append(stmt())
-	modules[name] = s
+		s@=stmt(),
+	modules@=(name,s),
