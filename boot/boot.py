@@ -868,10 +868,10 @@ def expr(a):
             expr(s)
             emit("))")
         case "apply", f, s:
-            expr(f)
-            emit("(")
+            fref(f)
+            emit(".apply(")
             expr(s)
-            emit(".toArray())")
+            emit(")")
         case "=", x, y:
             print(x + "=")
             expr(y)
