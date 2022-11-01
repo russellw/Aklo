@@ -177,7 +177,8 @@ assert i == 7
 i -= 1
 assert i == 6
 i=32
-j = i += 10
+i += 10
+j = i
 assert i == 42
 assert j == 42
 

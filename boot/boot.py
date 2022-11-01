@@ -947,6 +947,10 @@ def assign(label, pattern, x):
                         assign(label, y, ("subscript", x, i))
         case "_":
             pass
+        case "i" | "j" | "k":
+            print(pattern + "= (int)")
+            expr(x)
+            print(";")
         case _:
             print(pattern + "=")
             expr(x)
@@ -1068,7 +1072,7 @@ def fn(name, params, body):
     # body
     print("public Object apply(List<Object> args) {")
     for i in range(len(params)):
-        print(f"{params[i]} = args.get({i});")
+        stmt(("=", params[i], ("subscript", "args", i)))
     stmts(body)
     print("}")
 
