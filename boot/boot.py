@@ -717,15 +717,6 @@ def separate(f, s, separator):
         f(a)
 
 
-def emit(a, separator=" "):
-    if isinstance(a, int):
-        a = str(a)
-    if not isinstance(a, str):
-        separate(emit, a, separator)
-        return
-    sys.stdout.write(a)
-
-
 def args(s):
     print("(")
     separate(expr, s, ",")
@@ -777,7 +768,7 @@ def expr(a):
             fref(a)
         case "//", x, y:
             expr(x)
-            emit("/")
+            print("/")
             expr(y)
         case "range", x:
             expr(("range", 0, x))
@@ -864,43 +855,43 @@ def expr(a):
             fref(a[0])
             print(".apply(List.of(")
             fref(f)
-            emit(",")
+            print(",")
             expr(s)
-            emit("))")
+            print("))")
         case "apply", f, s:
             fref(f)
-            emit(".apply(")
+            print(".apply(")
             expr(s)
-            emit(")")
+            print(")")
         case "=", x, y:
             print(x + "=")
             expr(y)
         case "stdout":
-            emit("System.out")
+            print("System.out")
         case "stderr":
-            emit("System.err")
+            print("System.err")
         case ".run", x:
             expr(x)
-            emit(".run()")
+            print(".run()")
         case "List.of", *s:
             if s:
                 match s[-1]:
                     case "...", t:
-                        emit("Etc.cons(")
+                        print("Etc.cons(")
                         for x in s[:-1]:
                             expr(x)
-                            emit(",")
+                            print(",")
                         expr(t)
-                        emit(")")
+                        print(")")
                         return
-            emit("List.of(")
+            print("List.of(")
             separate(expr, s, ",")
-            emit(")")
+            print(")")
         case f, *s:
             fref(f)
-            emit(".apply(List.of")
+            print(".apply(List.of")
             args(s)
-            emit(")")
+            print(")")
         case _:
             print(a)
 
