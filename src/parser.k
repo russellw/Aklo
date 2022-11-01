@@ -362,7 +362,7 @@ fn parse  file,text
 						expect(",")
 			'indent'
 			":"
-				pass
+				0
 			_
 				while 1:
 					s@=word(),
@@ -391,7 +391,7 @@ fn parse  file,text
 					return s
 				if eat('indent'):
 					while ! eat('dedent'):
-						s.append(stmt())
+						s@=stmt(),
 					expect(")")
 					return s
 				if tok != ")":
@@ -486,14 +486,14 @@ fn parse  file,text
 
 	fn assignment():
 		a = commas()
-		if tok.endswith("="):
+		if endswith(tok,"="):
 			return intern(lex1()), a, assignment()
 		return a
 
 	fn block(s):
 		expect('indent')
 		while ! eat('dedent'):
-			s.append(stmt())
+			s@=stmt(),
 
 	fn block1():
 		s = []
@@ -505,14 +505,14 @@ fn parse  file,text
 		lex()
 		s = ["if", expr()]
 		eat(":")
-		s.append(block1())
+		s@=block1(),
 		case tok:
 			"elif"
-				s.append(if1())
+				s@=if1(),
 			"else"
 				lex()
 				eat(":")
-				s.append(block1())
+				s@=block1(),
 		return s
 
 	fn stmt():
@@ -522,7 +522,7 @@ fn parse  file,text
 				msg = f"{file}:{line}: assert failed"
 				lex()
 				s@=expr(),
-				s.append(msg)
+				s@=msg,
 				expect("\n")
 				return s
 			"case"
@@ -536,7 +536,7 @@ fn parse  file,text
 						patterns@=commas(),
 					body = block1()
 					for pattern in patterns:
-						s.append((pattern, *body))
+						s@=(pattern, *body),
 				return s
 			"dowhile"
 			"while"
@@ -556,7 +556,7 @@ fn parse  file,text
 			"fn"
 				lex()
 				s@=word(),
-				s.append(params())
+				s@=params(),
 				eat(":")
 				block(s)
 				return s
@@ -578,8 +578,8 @@ fn parse  file,text
 				line1 = line
 				lex()
 				x = commas()
-				s.append(f"{file}:{line1}: {x}: ")
-				s.append(x)
+				s@=fmt("%s:%d: %s: ",file,line,str(x))
+				s@=x,
 				expect("\n")
 				return s
 		a = assignment()
