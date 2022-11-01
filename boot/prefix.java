@@ -88,6 +88,7 @@ class Etc {
   }
 
   static List<Object> slice(Object s, Object i, Object j) {
+    if (!(s instanceof List)) return List.of(s);
     return ((List<Object>) s).subList((int) i, (int) j);
   }
 
@@ -119,8 +120,10 @@ class Etc {
   }
 
   static List<Object> cat(Object s, Object t) {
-    var r = new ArrayList<Object>((List<Object>) s);
-    r.addAll((List<Object>) t);
+    var s1 = s instanceof List ? (List<Object>) s : List.of(s);
+    var r = new ArrayList<Object>(s1);
+    var t1 = t instanceof List ? (List<Object>) t : List.of(t);
+    r.addAll((List<Object>) t1);
     return r;
   }
 
@@ -154,6 +157,7 @@ class Etc {
   }
 
   static Object subscript(Object s, Object i) {
+    if (!(s instanceof List)) return s;
     var s1 = (List<Object>) s;
     var i1 = (int) i;
     if (!(0 <= i1 && i1 < s1.size())) return 0;

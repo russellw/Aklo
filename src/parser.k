@@ -324,7 +324,6 @@ fn parse  file,text
 						if eat(")"):
 							break
 						expect(",")
-					continue
 				"++"
 				"--"
 					return intern("post" @ lex1()), a
@@ -336,12 +335,12 @@ fn parse  file,text
 						a += "." + field
 					;else:
 					;	a = "get", a, quotesym(field)
-					continue
-			if isprimary():
-				a = [a, prefix()]
-				while eat(","):
-					a@=prefix(),
-			return a
+				_
+					if isprimary():
+						a = [a, prefix()]
+						while eat(","):
+							a@=prefix(),
+					return a
 
 	fn params():
 		s = []

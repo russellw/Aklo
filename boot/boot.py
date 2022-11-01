@@ -1012,7 +1012,16 @@ def stmt(a):
                 print(innerLabel + ": do {")
                 assign(innerLabel, pattern, x)
                 each(stmt, body)
-                print(f"break {outerLabel};")
+                match body[-1]:
+                    # unadorned break or continue will cause the Java compiler
+                    # to generate an unreachable statement error
+                    # this is useful because the bootstrap compiler
+                    # does not actually support these within a case
+                    # workaround: use a labeled loop
+                    case ("break", _) | ("continue", _) | ("return", _):
+                        pass
+                    case _:
+                        print(f"break {outerLabel};")
                 print("} while (false);")
             print("} while (false);")
         case "=", pattern, x:
