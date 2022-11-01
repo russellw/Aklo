@@ -4,7 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
 
-final class Main {
+class Main {
   public static void main(String[] args) {
     for (var s : args) Etc.argv.add(Etc.encode(s));
     program.run();
@@ -12,7 +12,7 @@ final class Main {
 }
 
 @SuppressWarnings("unchecked")
-final class Etc {
+class Etc {
   static List<Object> argv = new ArrayList<>();
 
   static Object writestream(Object stream, Object s) {
@@ -192,7 +192,8 @@ final class Etc {
   }
 }
 
-final class Sym {
+@SuppressWarnings("unchecked")
+class Sym {
   static final Map<String, Sym> syms = new HashMap<>();
   static final Map<String, Integer> suffixes = new HashMap<>();
   final String stem;
@@ -216,9 +217,9 @@ final class Sym {
     return a;
   }
 
-  static Sym intern(List<Object> name) {
+  static Sym intern(Object name) {
     var sb = new StringBuilder();
-    for (var c : name) sb.append((char) (int) c);
+    for (var c : (List<Object>) name) sb.append((char) (int) c);
     return intern(sb.toString());
   }
 

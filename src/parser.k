@@ -265,7 +265,7 @@ fn parse  file,text
 		if startswith(tok,"'"):
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
-			return quotesym(s)
+			return 'intern',('.list',*s)
 
 		; multiline string
 		if startswith(tok,"\"\"\""):
@@ -334,8 +334,8 @@ fn parse  file,text
 					;TODO
 					if a in modules:
 						a += "." + field
-					else:
-						a = "get", a, quotesym(field)
+					;else:
+					;	a = "get", a, quotesym(field)
 					continue
 			if isprimary():
 				a = [a, prefix()]
@@ -501,7 +501,7 @@ fn parse  file,text
 		return s
 
 	fn if1():
-		assert tok in ("if", "elif")
+		assert  in(tok, ("if", "elif"))
 		lex()
 		s = ["if", expr()]
 		eat(":")
@@ -519,7 +519,7 @@ fn parse  file,text
 		s = [tok]
 		case tok:
 			"assert"
-				msg = f"{file}:{line}: assert failed"
+				msg = fmt("%s:%d: assert failed",file,line)
 				lex()
 				s@=expr(),
 				s@=msg,
@@ -604,4 +604,4 @@ fn parse  file,text
 	s = []
 	while tok != 'dedent':
 		s@=stmt(),
-	modules@=(name,s),
+	modules@=(file,s),
