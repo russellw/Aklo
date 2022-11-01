@@ -640,6 +640,14 @@ def parse(name, fil):
                 s.append(commas())
                 expect("\n")
                 return s
+            case "show":
+                line1 = line
+                lex()
+                x = commas()
+                s.append(f"{fil}:{line1}: {x}: ")
+                s.append(x)
+                expect("\n")
+                return s
         a = assignment()
         if eat(":"):
             return ":", a, stmt()
@@ -974,6 +982,12 @@ def stmt(a):
             print(") {")
             each(stmt, yes)
             print("}")
+        case "show", msg, x:
+            msg = msg.replace("\\", "\\\\")
+            print(f'System.out.print("{msg}");')
+            print("System.out.println(")
+            expr(x)
+            print(");")
         case "assert", test, msg:
             print("if (!")
             truth(test)
