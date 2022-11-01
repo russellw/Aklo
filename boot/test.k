@@ -154,11 +154,9 @@ assert isdigit ("f"!0,16)
 assert !isdigit ("*"!0,10)
 assert !isdigit ("*"!0,16)
 
-/*
 assert unesc "abc"=="abc"
 assert unesc #"\tabc\n"=="\tabc\n"
 assert unesc #"\x41\x42"=="AB"
-*/
 
 ;variables
 x = 5
