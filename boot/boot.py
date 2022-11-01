@@ -79,7 +79,6 @@ def parse(name, fil):
 
     text = open(fil).read()
     i = 0
-    # TODO: try calculating as needed
     line = 1
 
     dentc = 0
@@ -557,6 +556,7 @@ def parse(name, fil):
     def block(s):
         expect(".indent")
         while not eat(".dedent"):
+            s.append((".line", fil, line))
             s.append(stmt())
 
     def block1():
@@ -998,6 +998,8 @@ def stmt(a):
             print(a[0])
             expr(x)
             print(";")
+        case ".line", fil, line:
+            print(f"// {fil}:{line}")
         case ":", label, loop:
             print(label + ":")
             stmt(loop)
