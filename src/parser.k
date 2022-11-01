@@ -4,7 +4,7 @@ fn parse  file,text
 	nonlocal modules
 
 	;TODO: cr
-	ti = 0
+	i = 0
 	line = 1
 
 	dentc = 0
@@ -230,7 +230,7 @@ fn parse  file,text
 
 	fn expect(s):
 		if ! eat(s):
-			errtok(f"expected {repr(s)}")
+			errtok(fmt("expected %s",repr s))
 
 	fn word():
 		if isidstart(tok!0):
