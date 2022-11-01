@@ -79,6 +79,7 @@ def parse(name, fil):
 
     text = open(fil).read()
     i = 0
+    # TODO: try calculating as needed
     line = 1
 
     dentc = 0
@@ -209,7 +210,6 @@ def parse(name, fil):
                     i += 1
                 i += 3
                 tok = text[j:i]
-                tok = '"""' + textwrap.dedent(tok[3:-3]) + '"""'
                 return
 
             # symbol or string
@@ -544,11 +544,8 @@ def parse(name, fil):
             return a
         s = ["List.of", a]
         while eat(","):
-            match tok:
-                case ")" | ".indent" | "\n":
-                    pass
-                case _:
-                    s.append(expr())
+            if tok not in (")", ".indent", "\n"):
+                s.append(expr())
         return s
 
     def assignment():
@@ -614,7 +611,7 @@ def parse(name, fil):
             case "for":
                 lex()
                 s.append(word())
-                expect(":")
+                eat(":")
                 s.append(commas())
                 eat(":")
                 block(s)
@@ -1023,6 +1020,8 @@ def stmt(a):
             print("} while (false);")
         case "nonlocal", _:
             pass
+        case 0:
+            print(";")
         case _:
             expr(a)
             print(";")

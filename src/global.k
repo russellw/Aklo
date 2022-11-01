@@ -77,6 +77,8 @@ fn printstream stream,		a
 	writestream(stream,a)
 
 fn to s,i
+	if i<0
+		i+=len s
 	slice s,0,i
 
 fn from s,i
@@ -114,7 +116,7 @@ fn upper a
 fn parseint s,base
 	if!base
 		base=10
-	while s
+	while isdigit(s!0,base)
 		c,*s=s
 		n=n*base+parsedigit c
 	n
@@ -153,6 +155,8 @@ fn unesc s
 			continue
 		c=s!i++
 		case c,
+			"\n"
+				0
 			"a"
 				r@="\a"
 			"b "
@@ -171,6 +175,10 @@ fn unesc s
 				r@=27,
 			"x"
 				seq 2,16
+			"u"
+				seq 4,16
+			"U"
+				seq 8,16
 			_
 				r@=c,
 	r
@@ -195,3 +203,16 @@ fn utf8 c
 		0b10000000|(c>>6)&0b111111
 		0b10000000|c&0b111111
 	)
+
+fn repr s
+	s
+
+fn last s
+	s!(len (s)-1)
+
+fn isspace c
+	in c," \f\n\r\t\v"
+
+fn dedent s
+	;TODO: like textwrap.dedent
+	s
