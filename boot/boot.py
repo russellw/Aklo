@@ -680,7 +680,7 @@ def localvars(params, a):
 
     def lhs(a):
         match a:
-            case "..." | "List.of":
+            case "..." | "List.of" | "_":
                 pass
             case _:
                 if isinstance(a, str) and a not in nonlocals:
@@ -690,6 +690,9 @@ def localvars(params, a):
         match a:
             case "nonlocal", x:
                 nonlocals.add(x)
+            case "case", x, *cases:
+                for pattern, *body in cases:
+                    eachr(lhs, pattern)
             case (
                 ("++", x)
                 | ("--", x)
