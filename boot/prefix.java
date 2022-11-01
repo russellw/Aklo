@@ -111,10 +111,10 @@ final class Etc {
     return r;
   }
 
-  static List<Object> cons(Object... args) {
+  static List<Object> cons(Object... s) {
     var r = new ArrayList<Object>();
-    for (var i = 0; i < args.length - 1; i++) r.add(args[i]);
-    r.addAll((List<Object>) args[args.length - 1]);
+    for (var i = 0; i < s.length - 1; i++) r.add(s[i]);
+    r.addAll((List<Object>) s[s.length - 1]);
     return r;
   }
 
