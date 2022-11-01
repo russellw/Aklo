@@ -100,8 +100,8 @@ def parse(name, fil):
     def lex():
         nonlocal dedents
         nonlocal dentc
-        nonlocal line
         nonlocal i
+        nonlocal line
         nonlocal tok
 
         if dedents:
@@ -319,12 +319,12 @@ def parse(name, fil):
         # number
         if tok[0].isdigit():
             match tok[:2].lower():
-                case "0x":
-                    a = int(tok[2:], 16)
-                case "0o":
-                    a = int(tok[2:], 8)
                 case "0b":
                     a = int(tok[2:], 2)
+                case "0o":
+                    a = int(tok[2:], 8)
+                case "0x":
+                    a = int(tok[2:], 16)
                 case _:
                     a = int(tok)
             lex()
@@ -394,6 +394,8 @@ def parse(name, fil):
                             break
                         expect(",")
                     continue
+                case "++" | "--":
+                    return "post" + lex1(), a
                 case ".":
                     lex()
                     field = word()
@@ -402,53 +404,48 @@ def parse(name, fil):
                     else:
                         a = "get", a, quotesym(field)
                     continue
-                case "++" | "--":
-                    return "post" + lex1(), a
             if isprimary():
                 a = [a, prefix()]
                 while eat(","):
                     a.append(prefix())
             return a
 
-    def param():
-        return word()
-
     def params():
         s = []
         match tok:
-            case ":" | ".indent":
-                pass
             case "(":
                 lex()
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        s.append(param())
+                        s.append(word())
                         eat(",")
                         expect("\n")
                     expect(")")
                 else:
                     while not eat(")"):
-                        s.append(param())
+                        s.append(word())
                         if eat(")"):
                             break
                         expect(",")
+            case ".indent" | ":":
+                pass
             case _:
                 while 1:
-                    s.append(param())
+                    s.append(word())
                     if not eat(","):
                         break
         return s
 
     def prefix():
         match tok:
-            case "!" | "~" | "++" | "--":
+            case "!" | "++" | "--" | "~":
                 return lex1(), prefix()
-            case "-":
-                lex()
-                return "neg", prefix()
             case "*":
                 lex()
                 return "...", prefix()
+            case "-":
+                lex()
+                return "neg", prefix()
             case "\\":
                 s = [lex1(), params()]
                 eat(":")
@@ -481,8 +478,8 @@ def parse(name, fil):
     prec -= 1
     init("%", 1)
     init("*", 1)
-    init("//", 1)
     init("/", 1)
+    init("//", 1)
 
     prec -= 1
     init("+", 1)
@@ -548,7 +545,7 @@ def parse(name, fil):
         s = ["List.of", a]
         while eat(","):
             match tok:
-                case ")" | "\n" | ".indent":
+                case ")" | ".indent" | "\n":
                     pass
                 case _:
                     s.append(expr())
@@ -588,6 +585,11 @@ def parse(name, fil):
     def stmt():
         s = [tok]
         match tok:
+            case "assert":
+                lex()
+                s.append(expr())
+                expect("\n")
+                return s
             case "case":
                 lex()
                 s.append(commas())
@@ -600,11 +602,6 @@ def parse(name, fil):
                     body = block1()
                     for pattern in patterns:
                         s.append((pattern, *body))
-                return s
-            case "assert":
-                lex()
-                s.append(expr())
-                expect("\n")
                 return s
             case "dowhile" | "while":
                 lex()
