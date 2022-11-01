@@ -398,11 +398,11 @@ fn parse  file,text
 
 	; operator precedence parser
 	prec = 99
-	;TODO
-	ops = {}
+	ops = ()
 
 	fn init(op, left):
-		ops[op] = prec, left
+		nonlocal ops
+		ops@=(op,( prec, left)),
 
 	init("!", 1)
 
@@ -451,10 +451,7 @@ fn parse  file,text
 	fn infix(prec):
 		a = prefix()
 		while 1:
-			;TODO
-			if tok not in ops:
-				return a
-			prec1, left1 = ops[tok]
+			prec1, left1 = get ops,tok
 			if prec1 < prec:
 				return a
 			op = lex1()
@@ -466,11 +463,11 @@ fn parse  file,text
 					a ='<', b, a
 				">="
 					a ='<=', b, a
-				_:
+				_
 					a = op, a, b
 
 	fn expr():
-		return infix(0)
+		return infix(1)
 
 	; statements
 	fn commas():
