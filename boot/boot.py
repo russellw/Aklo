@@ -938,7 +938,12 @@ def assign(label, pattern, x):
         case "List.of", *s:
             x = tmp(x)
             print(f"if (!({x} instanceof List)) break {label};")
-            print(f"if (((List<Object>){x}).size() < {len(s)}) break {label};")
+            n = len(s)
+            if s:
+                match s[-1]:
+                    case "...", _:
+                        n -= 1
+            print(f"if (((List<Object>){x}).size() < {n}) break {label};")
             for i in range(len(s)):
                 match s[i]:
                     case "...", y:
