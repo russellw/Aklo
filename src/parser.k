@@ -8,7 +8,7 @@ fn parse  file,text
 	line = 1
 
 	dentc = 0
-	cols = [0]
+	cols = [0,]
 	dedents = 0
 
 	tok = 0
@@ -492,6 +492,7 @@ fn parse  file,text
 
 	fn block(s):
 		expect('indent')
+		;TODO
 		while ! eat('dedent'):
 			s@=stmt(),
 
@@ -516,7 +517,7 @@ fn parse  file,text
 		return s
 
 	fn stmt():
-		s = [tok]
+		s = [tok,]
 		case tok:
 			"assert"
 				msg = fmt("%s:%d: assert failed",file,line)
@@ -531,7 +532,7 @@ fn parse  file,text
 				eat(":")
 				expect('indent')
 				while ! eat('dedent'):
-					patterns = [commas()]
+					patterns = [commas(),]
 					while eat("\n"):
 						patterns@=commas(),
 					body = block1()
