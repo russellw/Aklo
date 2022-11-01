@@ -154,7 +154,10 @@ final class Etc {
   }
 
   static Object subscript(Object s, Object i) {
-    return ((List<Object>) s).get((int) i);
+    var s1 = (List<Object>) s;
+    var i1 = (int) i;
+    if (!(0 <= i1 && i1 < s1.size())) return 0;
+    return s1.get(i1);
   }
 
   static boolean truth(boolean a) {

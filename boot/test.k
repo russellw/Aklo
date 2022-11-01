@@ -144,14 +144,14 @@ assert intstr "123",10==123
 assert intstr "ff",16==255
 assert intstr "FFFF",16==65535
 
-assert isdigitb ("9"!0,10)
-assert isdigitb ("9"!0,16)
+assert isdigit ("9"!0,10)
+assert isdigit ("9"!0,16)
 
-assert !isdigitb ("f"!0,10)
-assert isdigitb ("f"!0,16)
+assert !isdigit ("f"!0,10)
+assert isdigit ("f"!0,16)
 
-assert !isdigitb ("*"!0,10)
-assert !isdigitb ("*"!0,16)
+assert !isdigit ("*"!0,10)
+assert !isdigit ("*"!0,16)
 
 /*
 assert unesc "abc"=="abc"

@@ -4,8 +4,6 @@ fn isupper c
 fn islower c
 	"a"!0<=c&&c<="z"!0
 
-fn isdigit c
-	"0"!0<=c&&c<="9"!0
 
 fn isalpha c
 	islower c||isupper c
@@ -120,7 +118,7 @@ fn intstr s,base
 	n
 
 fn intdigit c
-	if isdigit c
+	if "0"!0<=c&&c<="9"!0
 		return c-"0"!0
 	if islower c
 		return 10+c-"a"!0
@@ -128,7 +126,9 @@ fn intdigit c
 		return 10+c-"A"!0
 	-1
 
-fn isdigitb c,base
+fn isdigit c,base
+	if!base
+		base=10
 	n=intdigit c
 	0<=n&&n<base
 
@@ -138,7 +138,7 @@ fn unesc s
 	fn seq n,base
 			nonlocal i
 			while j<n
-				if !isdigitb( s!(i+j),base)
+				if !isdigit( s!(i+j),base)
 					break
 				j++
 			r@=utf8(intstr (slice (s,i,i+j),base))
