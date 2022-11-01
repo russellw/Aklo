@@ -866,9 +866,6 @@ def expr(a):
             print("System.out")
         case "stderr":
             print("System.err")
-        case ".run", x:
-            expr(x)
-            print(".run()")
         case "List.of", *s:
             if s:
                 match s[-1]:
