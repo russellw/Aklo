@@ -641,7 +641,7 @@ def parse(name, fil):
                 line1 = line
                 lex()
                 x = commas()
-                s.append(f"{fil}:{line1}: {x}: ")
+                s.append(f"{fil}:{line1}: {x}")
                 s.append(x)
                 expect("\n")
                 return s
@@ -981,8 +981,7 @@ def stmt(a):
             print("}")
         case "show", msg, x:
             msg = msg.replace("\\", "\\\\")
-            print(f'System.out.print("{msg}");')
-            print("System.out.println(")
+            print(f'Etc.show("{msg}",')
             expr(x)
             print(");")
         case "assert", test, msg:

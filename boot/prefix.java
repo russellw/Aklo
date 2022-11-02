@@ -13,6 +13,8 @@ class Main {
 
 @SuppressWarnings("unchecked")
 class Etc {
+  static class OverrunException extends RuntimeException {}
+
   static List<Object> argv = new ArrayList<>();
 
   static Object writestream(Object stream, Object s) {
@@ -80,6 +82,69 @@ class Etc {
 
   static int ushr(Object a, Object b) {
     return (int) a >>> (int) b;
+  }
+
+  static boolean isstr(List<Object> a) {
+    if (a.isEmpty()) return false;
+    for (var c0 : a) {
+      if (!(c0 instanceof Integer)) return false;
+      var c = (int) c0;
+      switch (c) {
+        case '\t':
+        case '\r':
+        case '\n':
+          continue;
+      }
+      if (!(' ' <= c && c <= 126)) return false;
+    }
+    return true;
+  }
+
+  static void append(StringBuilder sb, String s) {
+    if (sb.length() >= 1000) throw new OverrunException();
+    sb.append(s);
+  }
+
+  static void repr(Object a0, StringBuilder sb) {
+    if (!(a0 instanceof List)) {
+      append(sb, a0.toString());
+      return;
+    }
+    var a = (List<Object>) a0;
+    if (isstr(a)) {
+      append(sb, "\"");
+      for (var c0 : a) {
+        var c = (int) c0;
+        switch (c) {
+          case '\t' -> append(sb, "\\t");
+          case '\r' -> append(sb, "\\r");
+          case '\n' -> append(sb, "\\n");
+          default -> append(sb, Character.toString(c));
+        }
+      }
+      append(sb, "\"");
+      return;
+    }
+    append(sb, "(");
+    for (var i = 0; i < a.size(); i++) {
+      if (i > 0) append(sb, " ");
+      repr(a, sb);
+    }
+    append(sb, ")");
+  }
+
+  static String repr(Object a) {
+    var sb = new StringBuilder();
+    try {
+      repr(a, sb);
+    } catch (OverrunException e) {
+      sb.append("...");
+    }
+    return sb.toString();
+  }
+
+  static void show(String msg, Object a) {
+    System.out.printf("%s: %s\n", msg, repr(a));
   }
 
   static void show(Object a) {
