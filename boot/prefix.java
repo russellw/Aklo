@@ -16,6 +16,28 @@ class Etc {
   static class OverrunException extends RuntimeException {}
 
   static List<Object> argv = new ArrayList<>();
+  static int depth;
+
+  static void indent() {
+    for (var i = 0; i < depth; i++) System.out.print(' ');
+  }
+
+  static void leave(String msg, Object r) {
+    depth--;
+    indent();
+    System.out.printf("<%s: %s\n", msg, repr(r));
+  }
+
+  static void enter(String msg, List<Object> args) {
+    indent();
+    depth++;
+    System.out.printf(">%s: ", msg);
+    for (var i = 0; i < args.size(); i++) {
+      if (i > 0) System.out.print(", ");
+      System.out.print(repr(args.get(i)));
+    }
+    System.out.println();
+  }
 
   static Object writestream(Object stream, Object s) {
     var stream1 = (PrintStream) stream;
