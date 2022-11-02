@@ -132,8 +132,7 @@ class Etc {
   }
 
   static Object exit(Object a) {
-    System.exit((int) a);
-    return null;
+    throw new RuntimeException(a.toString());
   }
 
   static int neg(Object a) {
