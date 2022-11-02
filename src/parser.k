@@ -468,7 +468,7 @@ fn parse  file,text
 				">="
 					a ='<=', b, a
 				_
-					a = op, a, b
+					a = intern(op), a, b
 
 	fn expr():
 		return infix(1)
