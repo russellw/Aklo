@@ -82,28 +82,31 @@ class Etc {
     return (int) a >>> (int) b;
   }
 
-  @SuppressWarnings("unused")
   static void show(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
-  static List<Object> slice(Object s, Object i, Object j) {
-    if (!(s instanceof List)) return List.of(s);
-    var s1 = (List<Object>) s;
-    var i1 = (int) i;
-    var j1 = (int) j;
-    if (i1 < 0) i1 = 0;
-    if (j1 > s1.size()) j1 = s1.size();
-    if (i1 > j1) return List.of();
-    return s1.subList(i1, j1);
+  static List<Object> aslist(Object a) {
+    if (a instanceof List) return (List<Object>) a;
+    return List.of(a);
   }
 
-  static List<Object> range(Object i, Object j) {
-    var i1 = (int) i;
+  static List<Object> slice(Object s0, Object i0, Object j0) {
+    var s = aslist(s0);
+    var i = (int) i0;
+    var j = (int) j0;
+    if (i < 0) i = 0;
+    if (j > s.size()) j = s.size();
+    if (i > j) return List.of();
+    return s.subList(i, j);
+  }
+
+  static List<Object> range(Object i0, Object j0) {
+    var i = (int) i0;
     // TODO: do the right thing when the argument is a list
-    var j1 = (int) j;
-    var r = new ArrayList<Object>();
-    while (i1 < j1) r.add(i1++);
+    var j = (int) j0;
+    var r = new ArrayList<>();
+    while (i < j) r.add(i++);
     return r;
   }
 
@@ -126,15 +129,13 @@ class Etc {
   }
 
   static List<Object> cat(Object s, Object t) {
-    var s1 = s instanceof List ? (List<Object>) s : List.of(s);
-    var r = new ArrayList<Object>(s1);
-    var t1 = t instanceof List ? (List<Object>) t : List.of(t);
-    r.addAll((List<Object>) t1);
+    var r = new ArrayList<>(aslist(s));
+    r.addAll(aslist(t));
     return r;
   }
 
   static int len(Object s) {
-    return ((List<Object>) s).size();
+    return aslist(s).size();
   }
 
   static Object exit(Object a) {
@@ -161,12 +162,11 @@ class Etc {
     return (int) a <= (int) b;
   }
 
-  static Object subscript(Object s, Object i) {
-    if (!(s instanceof List)) return s;
-    var s1 = (List<Object>) s;
-    var i1 = (int) i;
-    if (!(0 <= i1 && i1 < s1.size())) return 0;
-    return s1.get(i1);
+  static Object subscript(Object s0, Object i0) {
+    var s = aslist(s0);
+    var i = (int) i0;
+    if (!(0 <= i && i < s.size())) return 0;
+    return s.get(i);
   }
 
   static boolean truth(boolean a) {
