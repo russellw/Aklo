@@ -2,6 +2,7 @@ modules=()
 
 fn parse  file,text
 	nonlocal modules
+	;TODO: check for already parsed
 
 	;TODO: cr
 	i = 0
@@ -596,7 +597,6 @@ fn parse  file,text
 	while eat("import"):
 		name1 = word()
 		;TODO: path
-		;TODO: check for already parsed
 		parse(name1, name1 @ ".k")
 		expect("\n")
 
