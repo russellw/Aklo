@@ -989,7 +989,7 @@ def stmt(a):
             print("if (!")
             truth(test)
             msg = msg.replace("\\", "\\\\")
-            print(f') throw new IllegalStateException("{msg}");')
+            print(f') throw new RuntimeException("{msg}");')
         case "{", *s:
             print("{")
             each(stmt, s)

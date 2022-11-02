@@ -89,7 +89,13 @@ class Etc {
 
   static List<Object> slice(Object s, Object i, Object j) {
     if (!(s instanceof List)) return List.of(s);
-    return ((List<Object>) s).subList((int) i, (int) j);
+    var s1 = (List<Object>) s;
+    var i1 = (int) i;
+    var j1 = (int) j;
+    if (i1 < 0) i1 = 0;
+    if (j1 > s1.size()) j1 = s1.size();
+    if (i1 > j1) return List.of();
+    return s1.subList(i1, j1);
   }
 
   static List<Object> range(Object i, Object j) {

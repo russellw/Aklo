@@ -40,7 +40,7 @@ fn parse  file,text
 
 		while i < len(text):
 			j = i
-			tok = text!i
+			tok = text!i,
 
 			; newline
 			if text!i == "\n"!0:
