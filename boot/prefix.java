@@ -95,8 +95,8 @@ class Etc {
     var s = aslist(s0);
     var i = (int) i0;
     var j = (int) j0;
-    if (i < 0) i = 0;
-    if (j > s.size()) j = s.size();
+    i = Math.max(i, 0);
+    j = Math.min(j, s.size());
     if (i > j) return List.of();
     return s.subList(i, j);
   }
