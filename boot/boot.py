@@ -91,7 +91,7 @@ def parse(name, file):
     cols = [0]
     dedents = 0
 
-    tok = 0
+    tok = None
 
     def err(msg):
         raise Exception(f"{file}:{line}: {msg}")
@@ -744,7 +744,7 @@ def fref(a):
             print("(Function<List<Object>, Object>)(args) -> {")
             for i in range(len(params)):
                 print(f"{params[i]} = args.get({i});")
-            stmts(body)
+            fbody(body)
             print("}")
         case [*_]:
             raise Exception(a)
@@ -1045,7 +1045,7 @@ def stmt(a):
             print(";")
 
 
-def stmts(s):
+def fbody(s):
     for a in s[:-1]:
         stmt(a)
     a = s[-1]
@@ -1092,7 +1092,7 @@ def fn(name, params, body):
     print(f'Etc.enter("{file}",{line},"{name}",args);')
     for i in range(len(params)):
         stmt(("=", params[i], ("subscript", "args", i)))
-    stmts(body)
+    fbody(body)
     print("}")
 
     print("}")
