@@ -22,16 +22,16 @@ class Etc {
     for (var i = 0; i < depth; i++) System.out.print(' ');
   }
 
-  static void leave(String msg, Object r) {
+  static void leave(String file, int line, String f, Object r) {
     depth--;
     indent();
-    System.out.printf("<%s: %s\n", msg, repr(r));
+    System.out.printf("<%s:%d: %s: %s\n", file, line, f, repr(r));
   }
 
-  static void enter(String msg, List<Object> args) {
+  static void enter(String file, int line, String f, List<Object> args) {
     indent();
     depth++;
-    System.out.printf(">%s: ", msg);
+    System.out.printf(">%s:%d: %s: ", file, line, f);
     for (var i = 0; i < args.size(); i++) {
       if (i > 0) System.out.print(", ");
       System.out.print(repr(args.get(i)));
@@ -165,8 +165,8 @@ class Etc {
     return sb.toString();
   }
 
-  static void show(String msg, Object a) {
-    System.out.printf("%s: %s\n", msg, repr(a));
+  static void show(String file, int line, String name, Object val) {
+    System.out.printf("%s:%d: %s: %s\n", file, line, name, repr(val));
   }
 
   static void show(Object a) {

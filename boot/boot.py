@@ -588,11 +588,13 @@ def parse(name, file):
     def stmt():
         s = [tok]
         match tok:
-            case "assert":
-                msg = f"{file}:{line}: assert failed"
+            case "assert" | "show":
+                s.append(file)
+                s.append(line)
                 lex()
-                s.append(expr())
-                s.append(msg)
+                x = commas()
+                s.append(str(x))
+                s.append(x)
                 expect("\n")
                 return s
             case "case":
@@ -641,14 +643,6 @@ def parse(name, file):
                 if eat("\n"):
                     return "return", 0
                 s.append(commas())
-                expect("\n")
-                return s
-            case "show":
-                line1 = line
-                lex()
-                x = commas()
-                s.append(f"{file}:{line1}: {x}")
-                s.append(x)
                 expect("\n")
                 return s
         a = assignment()
@@ -985,16 +979,18 @@ def stmt(a):
             print(") {")
             each(stmt, yes)
             print("}")
-        case "show", msg, x:
-            msg = msg.replace("\\", "\\\\")
-            print(f'Etc.show("{msg}",')
-            expr(x)
+        case "show", file, line, name, val:
+            file = file.replace("\\", "\\\\")
+            print(f'Etc.show("{file}",{line},"{name}",')
+            expr(val)
             print(");")
-        case "assert", test, msg:
+        case "assert", file, line, name, test:
             print("if (!")
             truth(test)
-            msg = msg.replace("\\", "\\\\")
-            print(f') throw new RuntimeException("{msg}");')
+            file = file.replace("\\", "\\\\")
+            print(
+                f') throw new RuntimeException("{file}:{line}: {name}: assert failed");'
+            )
         case "{", *s:
             print("{")
             each(stmt, s)
