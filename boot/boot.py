@@ -625,10 +625,12 @@ def parse(name, file):
                 block(s)
                 return s
             case "fn":
+                line1 = line
                 lex()
                 s.append(word())
                 s.append(params())
                 eat(":")
+                s.append((".line", file, line1))
                 block(s)
                 return s
             case "if":
@@ -1032,6 +1034,10 @@ def stmt(a):
             print("} while (false);")
         case "nonlocal", _:
             pass
+        case "tron":
+            print("Etc.tracing = true;")
+        case "troff":
+            print("Etc.tracing = false;")
         case 0:
             print(";")
         case _:
@@ -1051,6 +1057,8 @@ def stmts(s):
 
 
 def fn(name, params, body):
+    _, file, line = body[0]
+    print(f"// {file}:{line}")
     print(f"class {name} implements Function<List<Object>, Object> {{")
 
     # local functions
@@ -1080,6 +1088,8 @@ def fn(name, params, body):
 
     # body
     print("public Object apply(List<Object> args) {")
+    file = file.replace("\\", "\\\\")
+    print(f'Etc.enter("{file}",{line},"{name}",args);')
     for i in range(len(params)):
         stmt(("=", params[i], ("subscript", "args", i)))
     stmts(body)
