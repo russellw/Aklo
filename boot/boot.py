@@ -1,8 +1,14 @@
+import argparse
 import inspect
 import os
 import subprocess
 import sys
 import textwrap
+
+
+parser = argparse.ArgumentParser(description="Aklo bootstrap compiler")
+parser.add_argument("file")
+args = parser.parse_args()
 
 
 def each(f, s):
@@ -73,11 +79,11 @@ def quotesym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
-def parse(name, fil):
+def parse(name, file):
     if name in modules:
         return
 
-    text = open(fil).read()
+    text = open(file).read()
     i = 0
     line = 1
 
@@ -88,7 +94,7 @@ def parse(name, fil):
     tok = 0
 
     def err(msg):
-        raise Exception(f"{fil}:{line}: {msg}")
+        raise Exception(f"{file}:{line}: {msg}")
 
     def errtok(msg):
         nonlocal line
@@ -556,7 +562,7 @@ def parse(name, fil):
     def block(s):
         expect(".indent")
         while not eat(".dedent"):
-            s.append((".line", fil, line))
+            s.append((".line", file, line))
             s.append(stmt())
 
     def block1():
@@ -583,7 +589,7 @@ def parse(name, fil):
         s = [tok]
         match tok:
             case "assert":
-                msg = f"{fil}:{line}: assert failed"
+                msg = f"{file}:{line}: assert failed"
                 lex()
                 s.append(expr())
                 s.append(msg)
@@ -641,7 +647,7 @@ def parse(name, fil):
                 line1 = line
                 lex()
                 x = commas()
-                s.append(f"{fil}:{line1}: {x}")
+                s.append(f"{file}:{line1}: {x}")
                 s.append(x)
                 expect("\n")
                 return s
@@ -669,7 +675,7 @@ def parse(name, fil):
 
 
 parse("global", os.path.join(here, "..", "src", "global.k"))
-parse("program", sys.argv[1])
+parse("program", args.file)
 
 
 # output
@@ -712,7 +718,7 @@ def localvars(params, a):
     return list(r)
 
 
-def args(s):
+def pargs(s):
     print("(")
     more = 0
     for a in s:
@@ -774,10 +780,10 @@ def expr(a):
             expr(("range", 0, x))
         case "<", *s:
             print("Etc.lt")
-            args(s)
+            pargs(s)
         case "<=", *s:
             print("Etc.le")
-            args(s)
+            pargs(s)
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
         case ("||", x, y) | ("&&", x, y):
@@ -789,49 +795,49 @@ def expr(a):
             truth(x)
         case "~", *s:
             print("Etc.not")
-            args(s)
+            pargs(s)
         case "&", *s:
             print("Etc.and")
-            args(s)
+            pargs(s)
         case "|", *s:
             print("Etc.or")
-            args(s)
+            pargs(s)
         case "%", *s:
             print("Etc.rem")
-            args(s)
+            pargs(s)
         case "^", *s:
             print("Etc.xor")
-            args(s)
+            pargs(s)
         case "<<", *s:
             print("Etc.shl")
-            args(s)
+            pargs(s)
         case ">>", *s:
             print("Etc.shr")
-            args(s)
+            pargs(s)
         case ">>>", *s:
             print("Etc.ushr")
-            args(s)
+            pargs(s)
         case "+", *s:
             print("Etc.add")
-            args(s)
+            pargs(s)
         case "*", *s:
             print("Etc.mul")
-            args(s)
+            pargs(s)
         case "-", *s:
             print("Etc.sub")
-            args(s)
+            pargs(s)
         case "==", *s:
             print("Objects.equals")
-            args(s)
+            pargs(s)
         case "!=", *s:
             print("!Objects.equals")
-            args(s)
+            pargs(s)
         case "@", *s:
             print("Etc.cat")
-            args(s)
+            pargs(s)
         case "intern", *s:
             print("Sym.intern")
-            args(s)
+            pargs(s)
         case "gensym",:
             print("new Sym()")
         case (
@@ -850,7 +856,7 @@ def expr(a):
             | ("str", *s)
         ):
             print("Etc." + a[0])
-            args(s)
+            pargs(s)
         case ("map", f, s) | ("filter", f, s):
             fref(a[0])
             print(".apply(List.of(")
@@ -875,14 +881,14 @@ def expr(a):
                 match s[-1]:
                     case "...", t:
                         print("Etc.cons")
-                        args(s[:-1] + [t])
+                        pargs(s[:-1] + [t])
                         return
             print("List.of")
-            args(s)
+            pargs(s)
         case f, *s:
             fref(f)
             print(".apply(List.of")
-            args(s)
+            pargs(s)
             print(")")
         case _:
             print(a)
@@ -997,8 +1003,8 @@ def stmt(a):
             print(a[0])
             expr(x)
             print(";")
-        case ".line", fil, line:
-            print(f"// {fil}:{line}")
+        case ".line", file, line:
+            print(f"// {file}:{line}")
         case ":", label, loop:
             print(label + ":")
             stmt(loop)
