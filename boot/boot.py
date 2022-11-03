@@ -947,7 +947,21 @@ def assign(label, pattern, x):
             print(";")
 
 
+currentfile = None
+currentline = None
+currentfn = None
+
+
+def ret(a):
+    file = currentfile.replace("\\", "\\\\")
+    a = tmp(a)
+    print(f'Etc.leave("{file}", {currentline}, "{currentfn}", {a});')
+    print(f"return {a};")
+
+
 def stmt(a):
+    global currentfile
+    global currentline
     match a:
         case "for", x, s, *body:
             print(f"for (var {x}: (List)")
@@ -997,11 +1011,15 @@ def stmt(a):
             print("{")
             each(stmt, s)
             print("}")
-        case ("return", x) | ("break", x) | ("continue", x):
+        case "return", x:
+            ret(x)
+        case ("break", x) | ("continue", x):
             print(a[0])
             expr(x)
             print(";")
         case ".line", file, line:
+            currentfile = file
+            currentline = line
             print(f"// {file}:{line}")
         case ":", label, loop:
             print(label + ":")
@@ -1033,8 +1051,10 @@ def stmt(a):
             assign(label, pattern, x)
             print("} while (false);")
         case "nonlocal", _:
+            # TODO: shorter syntax?
             pass
         case "tron":
+            print("Etc.depth = 0;")
             print("Etc.tracing = true;")
         case "troff":
             print("Etc.tracing = false;")
@@ -1050,13 +1070,14 @@ def fbody(s):
         stmt(a)
     a = s[-1]
     match a:
-        case "return", _:
-            stmt(a)
+        case "return", x:
+            ret(x)
         case _:
-            stmt(("return", a))
+            ret(a)
 
 
 def fn(name, params, body):
+    global currentfn
     _, file, line = body[0]
     print(f"// {file}:{line}")
     print(f"class {name} implements Function<List<Object>, Object> {{")
@@ -1070,6 +1091,7 @@ def fn(name, params, body):
             case _:
                 r.append(a)
     body = r
+    currentfn = name
 
     # local variables
     each(var, localvars(params, body))
