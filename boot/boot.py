@@ -1053,11 +1053,16 @@ def stmt(a):
         case "nonlocal", _:
             # TODO: shorter syntax?
             pass
+        case "tron", *s:
+            print("Etc.depth = 0;")
+            print("Etc.tracing = Set.of")
+            pargs(f'"{x}"' for x in s)
+            print(";")
         case "tron":
             print("Etc.depth = 0;")
-            print("Etc.tracing = true;")
+            print("Etc.tracing = Set.of();")
         case "troff":
-            print("Etc.tracing = false;")
+            print("Etc.tracing = null;")
         case 0:
             print(";")
         case _:

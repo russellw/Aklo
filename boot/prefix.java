@@ -17,21 +17,27 @@ class Etc {
 
   static List<Object> argv = new ArrayList<>();
   static int depth;
-  static boolean tracing;
+  static Set<String> tracing;
 
   static void indent() {
     for (var i = 0; i < depth; i++) System.out.print(' ');
   }
 
   static void leave(String file, int line, String f, Object r) {
-    if (!tracing) return;
+    if (!tracing(f)) return;
     depth--;
     indent();
     System.out.printf("<%s:%d: %s: %s\n", file, line, f, repr(r));
   }
 
+  private static boolean tracing(String f) {
+    if (tracing == null) return false;
+    if (tracing.isEmpty()) return true;
+    return tracing.contains(f);
+  }
+
   static void enter(String file, int line, String f, List<Object> args) {
-    if (!tracing) return;
+    if (!tracing(f)) return;
     indent();
     depth++;
     System.out.printf(">%s:%d: %s: ", file, line, f);
