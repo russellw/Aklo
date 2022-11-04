@@ -907,7 +907,7 @@ def tmp(a):
     return r
 
 
-def assign(label, pattern, x):
+def checkassign(label, pattern, x):
     if isinstance(pattern, int):
         print("if (!Objects.equals(")
         expr(x)
@@ -932,9 +932,30 @@ def assign(label, pattern, x):
             for i in range(len(s)):
                 match s[i]:
                     case "...", y:
-                        assign(label, y, ("from", x, i))
+                        checkassign(label, y, ("from", x, i))
                     case y:
-                        assign(label, y, ("subscript", x, i))
+                        checkassign(label, y, ("subscript", x, i))
+
+
+def assign(pattern, x):
+    if isinstance(pattern, int):
+        return
+    match pattern:
+        case "intern", ("List.of", *_):
+            pass
+        case "List.of", *s:
+            x = tmp(x)
+            n = len(s)
+            if s:
+                match s[-1]:
+                    case "...", _:
+                        n -= 1
+            for i in range(len(s)):
+                match s[i]:
+                    case "...", y:
+                        assign(y, ("from", x, i))
+                    case y:
+                        assign(y, ("subscript", x, i))
         case "_":
             pass
         case "i" | "j" | "k":
@@ -1031,7 +1052,8 @@ def stmt(a):
             for pattern, *body in cases:
                 innerLabel = gensym()
                 print(innerLabel + ": do {")
-                assign(innerLabel, pattern, x)
+                checkassign(innerLabel, pattern, x)
+                assign(pattern, x)
                 each(stmt, body)
                 match body[-1]:
                     # unadorned break or continue will cause the Java compiler
@@ -1046,10 +1068,7 @@ def stmt(a):
                 print("} while (false);")
             print("} while (false);")
         case "=", pattern, x:
-            label = gensym()
-            print(label + ": do {")
-            assign(label, pattern, x)
-            print("} while (false);")
+            assign(pattern, x)
         case "nonlocal", _:
             # TODO: shorter syntax?
             pass
