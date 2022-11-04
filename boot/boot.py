@@ -935,7 +935,7 @@ def checkcase(label, pattern, x):
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
                     checkcase(label, s[i], ("subscript", x, i))
-                checkcase(label, s[n][1], ("from", x, i))
+                checkcase(label, s[n][1], ("from", x, n))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
@@ -951,17 +951,15 @@ def assign(pattern, x):
             pass
         case "List.of", *s:
             x = tmp(x)
+            if isrest(s):
+                n = len(s) - 1
+                for i in range(n):
+                    assign(s[i], ("subscript", x, i))
+                assign(s[n][1], ("from", x, n))
+                return
             n = len(s)
-            if s:
-                match s[-1]:
-                    case "...", _:
-                        n -= 1
-            for i in range(len(s)):
-                match s[i]:
-                    case "...", y:
-                        assign(y, ("from", x, i))
-                    case y:
-                        assign(y, ("subscript", x, i))
+            for i in range(n):
+                assign(s[i], ("subscript", x, i))
         case "_":
             pass
         case "i" | "j" | "k":
