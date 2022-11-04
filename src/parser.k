@@ -35,7 +35,7 @@ fn parse  file,text
 
 		if dedents:
 			dedents -= 1
-			tok = 'dedent'
+			tok = ".dedent"
 			return
 
 		while i < len(text):
@@ -68,7 +68,7 @@ fn parse  file,text
 				; one indent
 				if col > last(cols):
 					cols@=col,
-					tok = 'indent'
+					tok = ".indent"
 					return
 
 				; zero or more dedents
@@ -216,7 +216,7 @@ fn parse  file,text
 			return
 
 		; end of file
-		tok = 'dedent'
+		tok = ".dedent"
 
 	fn lex1():
 		s = tok
@@ -289,9 +289,9 @@ fn parse  file,text
 
 		; bracketed expression or list
 		if eat("("):
-			if eat('indent'):
+			if eat(".indent"):
 				s =  '.list',
-				while ! eat('dedent'):
+				while ! eat(".dedent"):
 					s@=expr(),
 					eat(",")
 					expect("\n")
@@ -313,8 +313,8 @@ fn parse  file,text
 				"("
 					lex()
 					a = a,
-					if eat('indent'):
-						while ! eat('dedent'):
+					if eat(".indent"):
+						while ! eat(".dedent"):
 							a@=expr(),
 							eat(",")
 							expect("\n")
@@ -348,8 +348,8 @@ fn parse  file,text
 		case tok:
 			"("
 				lex()
-				if eat('indent'):
-					while ! eat('dedent'):
+				if eat(".indent"):
+					while ! eat(".dedent"):
 						s@=word(),
 						eat(",")
 						expect("\n")
@@ -360,7 +360,7 @@ fn parse  file,text
 						if eat(")"):
 							break
 						expect(",")
-			'indent'
+			".indent"
 			":"
 				0
 			_
@@ -389,8 +389,8 @@ fn parse  file,text
 				if ! eat("("):
 					s@=expr(),
 					return s
-				if eat('indent'):
-					while ! eat('dedent'):
+				if eat(".indent"):
+					while ! eat(".dedent"):
 						s@=stmt(),
 					expect(")")
 					return s
@@ -480,7 +480,7 @@ fn parse  file,text
 			return a
 		s = ['.list', a]
 		while eat(","):
-			if !in(tok,(				")",'indent' , "\n")):
+			if !in(tok,(				")",".indent" , "\n")):
 					s@=expr(),
 		return s
 
@@ -491,9 +491,9 @@ fn parse  file,text
 		return a
 
 	fn block(s):
-		expect('indent')
+		expect(".indent")
 		;TODO
-		while ! eat('dedent'):
+		while ! eat(".dedent"):
 			s@=stmt(),
 
 	fn block1():
@@ -530,8 +530,8 @@ fn parse  file,text
 				lex()
 				s@=commas(),
 				eat(":")
-				expect('indent')
-				while ! eat('dedent'):
+				expect(".indent")
+				while ! eat(".dedent"):
 					patterns = [commas(),]
 					while eat("\n"):
 						patterns@=commas(),
@@ -602,6 +602,6 @@ fn parse  file,text
 
 	; module
 	s = []
-	while tok != 'dedent':
+	while tok != ".dedent":
 		s@=stmt(),
 	modules@=(file,s),

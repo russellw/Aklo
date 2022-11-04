@@ -907,7 +907,14 @@ def tmp(a):
     return r
 
 
-def checkassign(label, pattern, x):
+def isrest(s):
+    if s:
+        match s[-1]:
+            case "...", _:
+                return 1
+
+
+def checkcase(label, pattern, x):
     if isinstance(pattern, int):
         print("if (!Objects.equals(")
         expr(x)
@@ -923,18 +930,17 @@ def checkassign(label, pattern, x):
         case "List.of", *s:
             x = tmp(x)
             print(f"if (!({x} instanceof List)) break {label};")
+            if isrest(s):
+                n = len(s) - 1
+                print(f"if (((List<Object>){x}).size() < {n}) break {label};")
+                for i in range(n):
+                    checkcase(label, s[i], ("subscript", x, i))
+                checkcase(label, s[n][1], ("from", x, i))
+                return
             n = len(s)
-            if s:
-                match s[-1]:
-                    case "...", _:
-                        n -= 1
-            print(f"if (((List<Object>){x}).size() < {n}) break {label};")
-            for i in range(len(s)):
-                match s[i]:
-                    case "...", y:
-                        checkassign(label, y, ("from", x, i))
-                    case y:
-                        checkassign(label, y, ("subscript", x, i))
+            print(f"if (((List<Object>){x}).size() != {n}) break {label};")
+            for i in range(n):
+                checkcase(label, s[i], ("subscript", x, i))
 
 
 def assign(pattern, x):
@@ -1052,7 +1058,7 @@ def stmt(a):
             for pattern, *body in cases:
                 innerLabel = gensym()
                 print(innerLabel + ": do {")
-                checkassign(innerLabel, pattern, x)
+                checkcase(innerLabel, pattern, x)
                 assign(pattern, x)
                 each(stmt, body)
                 match body[-1]:
