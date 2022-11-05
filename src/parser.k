@@ -332,10 +332,10 @@ fn parse  file,text
 					lex()
 					field = word()
 					;TODO
-					if a in modules:
-						a += "." + field
-					;else:
-					;	a = "get", a, quotesym(field)
+					if in(a,keys modules)
+						a='.',a,field
+					else:
+						a = "get", a, ('.quote',field)
 				_
 					if isprimary():
 						a = [a, prefix()]

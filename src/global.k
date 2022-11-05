@@ -216,3 +216,15 @@ fn isspace c
 fn dedent s
 	;TODO: like textwrap.dedent
 	s
+
+fn first s
+	s!0
+
+fn second s
+	s!1
+
+fn keys m
+		map (first,m)
+
+fn vals m
+		map (second,m)
