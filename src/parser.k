@@ -266,7 +266,7 @@ fn parse  file,text
 		if startswith(tok,"'"):
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
-			return 'intern',('.list',*s)
+			return '.quote',intern(s)
 
 		; multiline string
 		if startswith(tok,"\"\"\""):
@@ -331,7 +331,6 @@ fn parse  file,text
 				"."
 					lex()
 					field = word()
-					;TODO
 					if in(a,keys modules)
 						a='.',a,field
 					else:
@@ -411,7 +410,7 @@ fn parse  file,text
 	init("!", 1)
 
 	prec -= 1
-	init("**", 0)
+	init("**")
 
 	prec -= 1
 	init("%", 1)

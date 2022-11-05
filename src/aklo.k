@@ -31,3 +31,4 @@ while i<len argv
 if !file
 	usage()
 parser.parse(file,readfile(file))
+show parser.modules

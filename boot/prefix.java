@@ -132,7 +132,7 @@ class Etc {
   }
 
   static void append(StringBuilder sb, String s) {
-    if (sb.length() >= 1000) throw new OverrunException();
+    if (sb.length() >= 4096) throw new OverrunException();
     sb.append(s);
   }
 
