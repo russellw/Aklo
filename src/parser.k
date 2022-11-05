@@ -512,13 +512,16 @@ fn parse  file,text
 		return s
 
 	fn stmt():
-		s = [tok,]
+		s = [intern (tok),]
 		case tok:
 			"assert"
-				msg = fmt("%s:%d: assert failed",file,line)
+			"show"
+				s@=file,
+				s@=line,
 				lex()
-				s@=expr(),
-				s@=msg,
+				x = commas()
+				s@=str(x),
+				s@=x,
 				expect("\n")
 				return s
 			"case"
@@ -550,10 +553,12 @@ fn parse  file,text
 				s@=block()
 				return s
 			"fn"
+				line1=line
 				lex()
 				s@=word(),
 				s@=params(),
 				eat(":")
+				s@=('.line',file,line1),
 				s@=block()
 				return s
 			"if"
@@ -568,14 +573,6 @@ fn parse  file,text
 				if eat("\n"):
 					return "return", 0
 				s@=commas(),
-				expect("\n")
-				return s
-			"show"
-				line1 = line
-				lex()
-				x = commas()
-				s@=fmt("%s:%d: %s: ",file,line,str(x))
-				s@=x,
 				expect("\n")
 				return s
 		a = assignment()
