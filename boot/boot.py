@@ -632,7 +632,7 @@ def parse(name, file):
                 return s
             case "if":
                 return if1()
-            case "nonlocal":
+            case "^":
                 lex()
                 s.append(word())
                 expect("\n")
@@ -691,7 +691,7 @@ def localvars(params, a):
 
     def f(a):
         match a:
-            case "nonlocal", x:
+            case "^", x:
                 nonlocals.add(x)
             case "case", x, *cases:
                 for pattern, *body in cases:
@@ -1070,8 +1070,7 @@ def stmt(a):
             print("} while (false);")
         case "=", pattern, x:
             assign(pattern, x)
-        case "nonlocal", _:
-            # TODO: shorter syntax?
+        case "^", _:
             pass
         case "tron", *s:
             print("Etc.depth = 0;")

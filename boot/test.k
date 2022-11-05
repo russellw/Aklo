@@ -388,11 +388,11 @@ fn f10
 f10()
 assert a==1
 
-;nonlocal
+;nonlocal variables
 a=1
 
 fn f11
-	nonlocal a
+	^ a
 	a=2
 
 f11()

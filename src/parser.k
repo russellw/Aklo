@@ -1,7 +1,7 @@
 modules=()
 
 fn parse  file,text
-	nonlocal modules
+	^ modules
 	;TODO: check for already parsed
 
 	;TODO: cr
@@ -19,19 +19,19 @@ fn parse  file,text
 		exit 1
 
 	fn errtok(msg):
-		nonlocal line
+		^ line
 		if tok == "\n":
 			line -= 1
 		err(fmt("%s: %s",repr(tok),msg))
 
 	; tokenizer
 	fn lex():
-		nonlocal cols
-		nonlocal dedents
-		nonlocal dentc
-		nonlocal i
-		nonlocal line
-		nonlocal tok
+		^ cols
+		^ dedents
+		^ dentc
+		^ i
+		^ line
+		^ tok
 
 		if dedents:
 			dedents -= 1
@@ -404,7 +404,7 @@ fn parse  file,text
 	ops = ()
 
 	fn init(op, left):
-		nonlocal ops
+		^ ops
 		ops@=(op,( prec, left)),
 
 	init("!", 1)
@@ -563,7 +563,7 @@ fn parse  file,text
 				return s
 			"if"
 				return if1()
-			"nonlocal"
+			"^"
 				lex()
 				s@=word(),
 				expect("\n")

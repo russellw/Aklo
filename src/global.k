@@ -140,7 +140,7 @@ fn unesc s
 	r=""
 
 	fn seq n,base
-			nonlocal i
+			^ i
 			while j<n
 				if !isdigit( s!(i+j),base)
 					break
