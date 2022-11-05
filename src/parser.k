@@ -491,28 +491,24 @@ fn parse  file,text
 
 	fn block(s):
 		expect(".indent")
-		;TODO
+		s=()
 		while ! eat(".dedent"):
 			s@=stmt(),
-
-	fn block1():
-		s = []
-		block(s)
-		return s
+		s
 
 	fn if1():
 		assert  in(tok, ("if", "elif"))
 		lex()
 		s = ["if", expr()]
 		eat(":")
-		s@=block1(),
+		s@=block(),
 		case tok:
 			"elif"
 				s@=if1(),
 			"else"
 				lex()
 				eat(":")
-				s@=block1(),
+				s@=block(),
 		return s
 
 	fn stmt():
@@ -534,7 +530,7 @@ fn parse  file,text
 					patterns = [commas(),]
 					while eat("\n"):
 						patterns@=commas(),
-					body = block1()
+					body = block()
 					for pattern  patterns:
 						s@=(pattern, *body),
 				return s
@@ -543,7 +539,7 @@ fn parse  file,text
 				lex()
 				s@=expr(),
 				eat(":")
-				block(s)
+				s@=block()
 				return s
 			"for"
 				lex()
@@ -551,14 +547,14 @@ fn parse  file,text
 				expect(":")
 				s@=commas(),
 				eat(":")
-				block(s)
+				s@=block()
 				return s
 			"fn"
 				lex()
 				s@=word(),
 				s@=params(),
 				eat(":")
-				block(s)
+				s@=block()
 				return s
 			"if"
 				return if1()
