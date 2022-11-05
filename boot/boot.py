@@ -850,7 +850,7 @@ def expr(a):
         ):
             print("Etc." + a[0])
             pargs(s)
-        case ("map", f, s) | ("filter", f, s):
+        case ("map", f, s) | ("filter", f, s) | ("every", f, s) | ("any", f, s):
             fref(a[0])
             print(".apply(List.of(")
             fref(f)

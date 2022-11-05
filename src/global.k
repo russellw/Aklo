@@ -17,6 +17,17 @@ fn isidstart c
 fn isidpart c
 	isidstart c||isdigit c
 
+fn every f,s
+	for a s
+		if!f a
+			return
+	1
+
+fn any f,s
+	for a s
+		if f a
+			return 1
+
 fn map f,s
 	r=[]
 	for a :s
@@ -228,3 +239,14 @@ fn keys m
 
 fn vals m
 		map (second,m)
+
+fn commonprefix ss
+	s=ss!0
+	i=1
+	while  i<len s
+		t=to s,i
+		if !every(\s startswith(s,t),ss)
+			i--
+			break
+		i++
+	i

@@ -405,6 +405,8 @@ assert str('xyz')=="xyz"
 assert fmt"abc"=="abc"
 assert fmt"ab%scd","xy"=="abxycd"
 
+assert commonprefix("a","ab","abc")=="a"
+
 ;characters
 assert isupper 65
 assert !isupper 97
@@ -416,6 +418,15 @@ assert map( square,[1,2,3])==[1,4,9]
 assert filter( even,[1,2,3])==[2,]
 assert filter( odd,[1,2,3])==[1,3]
 assert filter( isdigit,"abc123")=="123"
+
+assert every isupper,""
+assert every isupper,"ABC"
+assert !every isupper,"ABC."
+
+assert !any isupper,""
+assert any isupper,"ABC"
+assert any isupper,"ABC."
+assert !any isupper,"."
 
 ;pattern matching assignment
 a=1,2,3
