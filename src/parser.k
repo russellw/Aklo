@@ -536,7 +536,7 @@ fn parse  file,text
 					while eat("\n"):
 						patterns@=commas(),
 					body = block1()
-					for pattern in patterns:
+					for pattern  patterns:
 						s@=(pattern, *body),
 				return s
 			"dowhile"

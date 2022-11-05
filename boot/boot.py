@@ -1148,17 +1148,17 @@ def fn(name, params, body):
     print("}")
 
 
-for moduleName, module in modules.items():
+for name, module in modules.items():
     print('@SuppressWarnings("unchecked")')
-    print(f"class {moduleName} {{")
+    print(f"class {name} {{")
 
     # local functions
     r = []
     for a in module:
         match a:
-            case "fn", name, params, *body:
+            case "fn", name1, params, *body:
                 print("static")
-                fn(name, params, body)
+                fn(name1, params, body)
             case _:
                 r.append(a)
     module = r
@@ -1170,6 +1170,10 @@ for moduleName, module in modules.items():
 
     # body
     print("static void run() {")
+    if name == "program":
+        for name1 in modules:
+            if name1 != "program":
+                print(name1 + ".run();")
     each(stmt, module)
     print("}")
 
