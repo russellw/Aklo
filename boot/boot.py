@@ -559,15 +559,12 @@ def parse(name, file):
             return lex1(), a, assignment()
         return a
 
-    def block(s):
+    def block():
         expect(".indent")
+        s = []
         while not eat(".dedent"):
             s.append((".line", file, line))
             s.append(stmt())
-
-    def block1():
-        s = []
-        block(s)
         return s
 
     def if1():
@@ -575,14 +572,14 @@ def parse(name, file):
         lex()
         s = ["if", expr()]
         eat(":")
-        s.append(block1())
+        s.append(block())
         match tok:
             case "elif":
                 s.append(if1())
             case "else":
                 lex()
                 eat(":")
-                s.append(block1())
+                s.append(block())
         return s
 
     def stmt():
@@ -606,7 +603,7 @@ def parse(name, file):
                     patterns = [commas()]
                     while eat("\n"):
                         patterns.append(commas())
-                    body = block1()
+                    body = block()
                     for pattern in patterns:
                         s.append((pattern, *body))
                 return s
@@ -614,7 +611,7 @@ def parse(name, file):
                 lex()
                 s.append(expr())
                 eat(":")
-                block(s)
+                s.extend(block())
                 return s
             case "for":
                 lex()
@@ -622,7 +619,7 @@ def parse(name, file):
                 eat(":")
                 s.append(commas())
                 eat(":")
-                block(s)
+                s.extend(block())
                 return s
             case "fn":
                 line1 = line
@@ -631,7 +628,7 @@ def parse(name, file):
                 s.append(params())
                 eat(":")
                 s.append((".line", file, line1))
-                block(s)
+                s.extend(block())
                 return s
             case "if":
                 return if1()
