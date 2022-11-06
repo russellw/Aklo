@@ -434,6 +434,9 @@ assert commonprefix(("a","ab","abc"))=="a"
 assert commonprefix(("ab","ab","ab"))=="ab"
 assert commonprefix(("ab","ab","az"))=="a"
 assert commonprefix(("ab","ab","b"))==""
+assert commonprefix(("ab",))=="ab"
+;TODO: what should be the common prefix of the empty list of lists?
+;assert commonprefix(())==""
 
 ;pattern matching assignment
 a=1,2,3
