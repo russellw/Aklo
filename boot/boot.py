@@ -80,6 +80,7 @@ def quotesym(s):
 
 
 def parse(name, file):
+    # TODO: enforce initialization of local variables?
     if name in modules:
         return
     file = file.replace("\\", "/")
@@ -1004,6 +1005,10 @@ def stmt(a):
             assign(pattern, x)
         case "^", _:
             0
+        case "++", x:
+            print(f"{x} = Etc.add({x}, 1);")
+        case "--", x:
+            print(f"{x} = Etc.sub({x}, 1);")
         case "tron", *s:
             print("Etc.depth = 0;")
             print("Etc.tracing = Set.of")
@@ -1028,18 +1033,6 @@ def nonlocalvars(body):
     def f(a):
         match a:
             case "^", x:
-                r.add(x)
-
-    eachr(f, body)
-    return r
-
-
-def postopvars(body):
-    r = set()
-
-    def f(a):
-        match a:
-            case ("post++", x) | ("post--", x):
                 r.add(x)
 
     eachr(f, body)
@@ -1078,15 +1071,14 @@ def assignedvars(params, body):
     return r.keys()
 
 
-def plocals(params, body, static=0):
+def localvars(params, body, static=0):
     nonlocals = nonlocalvars(body)
-    postop = postopvars(body)
     for a in assignedvars(params, body):
         if a in nonlocals:
             continue
         if static:
             print("static")
-        if a in postop:
+        if a in ("i", "j", "k"):
             print("int")
         else:
             print("Object")
@@ -1132,7 +1124,7 @@ def lam(params, body):
     print("new Function<List<Object>, Object>() {")
 
     # local variables
-    plocals(params, body)
+    localvars(params, body)
 
     # body
     print("public Object apply(List<Object> args) {")
@@ -1161,7 +1153,7 @@ def fn(fname, params, body):
     body = r
 
     # local variables
-    plocals(params, body)
+    localvars(params, body)
 
     # if the trailing return is implicit, make it explicit
     if not body:
@@ -1210,7 +1202,7 @@ for name, module in modules.items():
     module = r
 
     # local variables
-    plocals([], module, 1)
+    localvars([], module, 1)
 
     # body
     print("static void run() {")

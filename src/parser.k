@@ -21,7 +21,7 @@ fn parse  file,text
 	fn errtok(msg):
 		^ line
 		if tok == "\n":
-			line -= 1
+			--line
 		err(fmt("%s: %s",repr(tok),msg))
 
 	; tokenizer
@@ -34,7 +34,7 @@ fn parse  file,text
 		^ tok
 
 		if dedents:
-			dedents -= 1
+			--dedents
 			tok = ".dedent"
 			return
 
@@ -45,21 +45,19 @@ fn parse  file,text
 			; newline
 			if text!i == "\n"!0:
 				; next line
-				i += 1
+				i++
 				;TODO: necessary?
 				if i == len(text):
 					return
-				line += 1
+				++line
 
 				; measure indent
 				col = 0
 				while in (text!i ,"\t "):
 					if text!i != dentc && dentc:
 						err("indented with tabs and spaces in same file")
-					dentc = text!i
-					;TODO: i++
-					i += 1
-					col ++
+					dentc = text!i++
+					++col
 
 				; nothing important on this line, keep going
 				if in (text!i ,"\n;") || slice(text,i , i + 2) == "/*":
@@ -74,20 +72,20 @@ fn parse  file,text
 				; zero or more dedents
 				while col < last(cols):
 					cols=take(-1,cols)
-					dedents += 1
+					++dedents
 				if col != last(cols):
 					err("inconsistent indent")
 				return
 
 			; space
 			if isspace(text!i):
-				i += 1
+				i++
 				continue
 
 			; comment
 			if text!i == ";"!0:
 				while text!i != "\n"!0:
-					i += 1
+					i++
 				continue
 			if slice(text,i,i+2) == "/*":
 				i += 2
@@ -97,37 +95,37 @@ fn parse  file,text
 						line = line1
 						err("unclosed block comment")
 					if text!i == "\n"!0:
-						line += 1
-					i += 1
+						++line
+					i++
 				i += 2
 				continue
 
 			; word
 			if isidstart(text!i):
 				while isidpart(text!i):
-					i += 1
+					i++
 				tok = slice(text,j,i)
 				return
 
 			; hexadecimal numbers are a separate because they may contain 'e'
 			if lower(slice(text,i,i+2)) == "0x":
 				while isidpart(text!i):
-					i += 1
+					i++
 				tok = slice(text,j,i)
 				return
 
 			; other number
 			if isdigit(text!i) || text!i == "."!0 && isdigit(text![i + 1]):
 				while isidpart(text!i):
-					i += 1
+					i++
 				if text!i == "."!0:
-					i += 1
+					i++
 					while isidpart(text!i):
-						i += 1
+						i++
 					if lower(text![i - 1]) == "e"!0 && in(text!i ,"+-"):
-						i += 1
+						i++
 						while isidpart(text!i):
-							i += 1
+							i++
 				tok = slice(text,j,i)
 				return
 
@@ -136,8 +134,8 @@ fn parse  file,text
 				i += 3
 				while slice(text,i,i+3) != "\"\"\"":
 					if text!i == "\n"!0:
-						line += 1
-					i += 1
+						++line
+					i++
 				i += 3
 				tok = slice(text,j,i)
 				return
@@ -146,15 +144,14 @@ fn parse  file,text
 			case text!i,
 				"'"
 				"\""
-					q = text!i
-					i += 1
+					q = text!i++
 					while text!i != q:
 						if text!i == "\\"!0:
-							i += 1
+							i++
 						if text!i == "\n"!0:
 							err("unclosed quote")
-						i += 1
-					i += 1
+						i++
+					i++
 					tok = slice(text,j,i)
 					return
 
@@ -164,8 +161,8 @@ fn parse  file,text
 				while text!i != "\""!0:
 					if text!i == "\n"!0:
 						err("unclosed quote")
-					i += 1
-				i += 1
+					i++
+				i++
 				tok = slice(text,j,i)
 				return
 
@@ -212,7 +209,7 @@ fn parse  file,text
 				tok = "("
 			if tok == "]":
 				tok = ")"
-			i += 1
+			i++
 			return
 
 		; end of file
@@ -409,35 +406,35 @@ fn parse  file,text
 
 	init("!", 1)
 
-	prec -= 1
+	--prec
 	init("**")
 
-	prec -= 1
+	--prec
 	init("%", 1)
 	init("*", 1)
 	init("/", 1)
 	init("//", 1)
 
-	prec -= 1
+	--prec
 	init("+", 1)
 	init("-", 1)
 	init("@", 1)
 
-	prec -= 1
+	--prec
 	init("<<", 1)
 	init(">>", 1)
 	init(">>>", 1)
 
-	prec -= 1
+	--prec
 	init("&", 1)
 
-	prec -= 1
+	--prec
 	init("^", 1)
 
-	prec -= 1
+	--prec
 	init("|", 1)
 
-	prec -= 1
+	--prec
 	init("!=", 1)
 	init("<", 1)
 	init("<=", 1)
@@ -445,10 +442,10 @@ fn parse  file,text
 	init(">", 1)
 	init(">=", 1)
 
-	prec -= 1
+	--prec
 	init("&&", 1)
 
-	prec -= 1
+	--prec
 	init("||", 1)
 
 	fn infix(prec):
