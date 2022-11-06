@@ -700,6 +700,14 @@ def truth(a):
     print(")")
 
 
+hofs = set()
+for name, module in modules.items():
+    for a in module:
+        match a:
+            case "fn", fname, ["f", *_], *_:
+                hofs.add(fname)
+
+
 def expr(a):
     match a:
         case "argv":
@@ -795,14 +803,6 @@ def expr(a):
         ):
             print("Etc." + a[0])
             pargs(s)
-        case ("map", f, s) | ("filter", f, s) | ("every", f, s) | ("any", f, s):
-            # TODO: better check for higher order functions
-            fref(a[0])
-            print(".apply(List.of(")
-            fref(f)
-            print(",")
-            expr(s)
-            print("))")
         case "apply", f, s:
             fref(f)
             print(".apply(")
@@ -824,6 +824,17 @@ def expr(a):
                         return
             print("List.of")
             pargs(s)
+        case f, g, *s:
+            fref(f)
+            print(".apply(List.of(")
+            if f in hofs:
+                fref(g)
+            else:
+                expr(g)
+            for x in s:
+                print(",")
+                expr(x)
+            print("))")
         case f, *s:
             fref(f)
             print(".apply(List.of")
