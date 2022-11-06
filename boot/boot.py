@@ -455,14 +455,17 @@ def parse(name, file):
                 s = [lex1(), params()]
                 eat(":")
                 if not eat("("):
+                    s.append((".loc", file, line, "\\"))
                     s.append(expr())
                     return s
                 if eat(".indent"):
                     while not eat(".dedent"):
+                        s.append((".loc", file, line, "\\"))
                         s.append(stmt("\\"))
                     expect(")")
                     return s
                 if tok != ")":
+                    s.append((".loc", file, line, "\\"))
                     s.append(commas())
                 expect(")")
                 return s
