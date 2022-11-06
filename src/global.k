@@ -268,3 +268,9 @@ fn signum a
 		return -1
 	if a>0
 		return 1
+
+fn even n
+	n%2==0
+
+fn odd  n
+	n%2

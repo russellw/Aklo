@@ -95,6 +95,11 @@ assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
 
+assert even 0
+assert odd 1
+assert even 2
+assert odd 3
+
 ;lists and strings
 assert "ABC"==[65,66,67]
 assert "A"==[65,]
@@ -377,22 +382,22 @@ fn foo bar
 assert foo 3==4
 
 ;mutual recursion
-fn even n
+fn evenrec n
 	assert n>=0
 	if n==0
 		return  1
-	odd(n-1)
+	oddrec(n-1)
 
-fn odd n
+fn oddrec n
 	assert n>=0
 	if n==0
 		return
-	even(n-1)
+	evenrec(n-1)
 
-assert even 0
-assert odd 1
-assert even 2
-assert odd 3
+assert evenrec 0
+assert oddrec 1
+assert evenrec 2
+assert oddrec 3
 
 ;lexical scope
 a=1
