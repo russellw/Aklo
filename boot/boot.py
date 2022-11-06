@@ -675,42 +675,7 @@ parse("program", args.file)
 sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
 
 
-def localvars(params, a):
-    nonlocals = set()
-
-    # dict keeps deterministic order
-    r = {x: 1 for x in params}
-
-    def lhs(a):
-        match a:
-            case "..." | "List.of" | "_":
-                pass
-            case _:
-                if isinstance(a, str) and a not in nonlocals:
-                    r[a] = 1
-
-    def f(a):
-        match a:
-            case "^", x:
-                nonlocals.add(x)
-            case "case", x, *cases:
-                for pattern, *body in cases:
-                    eachr(lhs, pattern)
-            case (
-                ("++", x)
-                | ("--", x)
-                | ("post++", x)
-                | ("post--", x)
-                | ("+=", x, _)
-                | ("=", x, _)
-                | ("-=", x, _)
-            ):
-                eachr(lhs, x)
-
-    eachr(f, a)
-    return list(r)
-
-
+# expressions
 def pargs(s):
     print("(")
     more = 0
@@ -726,33 +691,6 @@ def truth(a):
     print("Etc.truth(")
     expr(a)
     print(")")
-
-
-globals1 = set()
-for a in modules["global"]:
-    match a:
-        case "fn", name, params, *body:
-            globals1.add(name)
-
-
-def fref(a):
-    match a:
-        case "\\", params, *body:
-            print("(Function<List<Object>, Object>)(args) -> {")
-            for i in range(len(params)):
-                print(f"{params[i]} = args.get({i});")
-            fbody(body)
-            print("}")
-        case [*_]:
-            raise Exception(a)
-        case _:
-            if len(a) == 1:
-                print(f"((Function<List<Object>, Object>){a})")
-                return
-            if a in globals1:
-                print(f"new global.{a}()")
-                return
-            print(f"new {a}()")
 
 
 def expr(a):
@@ -851,6 +789,7 @@ def expr(a):
             print("Etc." + a[0])
             pargs(s)
         case ("map", f, s) | ("filter", f, s) | ("every", f, s) | ("any", f, s):
+            # TODO: better check for higher order functions
             fref(a[0])
             print(".apply(List.of(")
             fref(f)
@@ -887,13 +826,12 @@ def expr(a):
             print(a)
 
 
-def var(x):
-    match x:
-        case "i" | "j" | "k":
-            print("int")
-        case _:
-            print("Object")
-    print(x + "= 0;")
+# statements
+def isrest(s):
+    if s:
+        match s[-1]:
+            case "...", _:
+                return 1
 
 
 def tmp(a):
@@ -902,13 +840,6 @@ def tmp(a):
     expr(a)
     print(";")
     return r
-
-
-def isrest(s):
-    if s:
-        match s[-1]:
-            case "...", _:
-                return 1
 
 
 def checkcase(label, pattern, x):
@@ -972,13 +903,6 @@ def assign(pattern, x):
 currentfile = None
 currentline = None
 currentfn = None
-
-
-def ret(a):
-    file = currentfile.replace("\\", "\\\\")
-    a = tmp(a)
-    print(f'Etc.leave("{file}", {currentline}, "{currentfn}", {a});')
-    print(f"return {a};")
 
 
 def stmt(a):
@@ -1089,6 +1013,76 @@ def stmt(a):
             print(";")
 
 
+# functions
+globals1 = set()
+for a in modules["global"]:
+    match a:
+        case "fn", name, params, *body:
+            globals1.add(name)
+
+
+def localvars(params, a):
+    nonlocals = set()
+
+    # dict keeps deterministic order
+    r = {x: 1 for x in params}
+
+    def lhs(a):
+        match a:
+            case "..." | "List.of" | "_":
+                pass
+            case _:
+                if isinstance(a, str) and a not in nonlocals:
+                    r[a] = 1
+
+    def f(a):
+        match a:
+            case "^", x:
+                nonlocals.add(x)
+            case "case", x, *cases:
+                for pattern, *body in cases:
+                    eachr(lhs, pattern)
+            case (
+                ("++", x)
+                | ("--", x)
+                | ("post++", x)
+                | ("post--", x)
+                | ("+=", x, _)
+                | ("=", x, _)
+                | ("-=", x, _)
+            ):
+                eachr(lhs, x)
+
+    eachr(f, a)
+    return list(r)
+
+
+def var(x):
+    # TODO: check for other post++ variables
+    match x:
+        case "i" | "j" | "k":
+            print("int")
+        case _:
+            print("Object")
+    print(x + "= 0;")
+
+
+def fref(a):
+    match a:
+        case "\\", params, *body:
+            lam(params, body)
+        case [*_]:
+            raise Exception(a)
+        case _:
+            if len(a) == 1:
+                print(f"((Function<List<Object>, Object>){a})")
+                return
+            if a in globals1:
+                print(f"new global.{a}()")
+                return
+            print(f"new {a}()")
+
+
 def fbody(s):
     for a in s[:-1]:
         stmt(a)
@@ -1098,6 +1092,21 @@ def fbody(s):
             ret(x)
         case _:
             ret(a)
+
+
+def lam(params, body):
+    print("new Function<List<Object>, Object>() {")
+    each(var, localvars(params, body))
+    print("public Object apply(List<Object> args) {")
+    file = currentfile.replace("\\", "\\\\")
+    name = currentfn + r"\\"
+    # TODO: correct name for return
+    print(f'Etc.enter("{file}",{currentline},"{name}",args);')
+    for i in range(len(params)):
+        print(f"{params[i]} = args.get({i});")
+    fbody(body)
+    print("}")
+    print("}")
 
 
 def fn(name, params, body):
@@ -1144,6 +1153,14 @@ def fn(name, params, body):
     print("}")
 
 
+def ret(a):
+    file = currentfile.replace("\\", "\\\\")
+    a = tmp(a)
+    print(f'Etc.leave("{file}", {currentline}, "{currentfn}", {a});')
+    print(f"return {a};")
+
+
+# modules
 for name, module in modules.items():
     print('@SuppressWarnings("unchecked")')
     print(f"class {name} {{")

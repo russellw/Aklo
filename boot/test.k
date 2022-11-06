@@ -118,6 +118,7 @@ assert s=="a\nb\nc\n"
 
 assert startswith "qwerty","qwe"
 assert !startswith "qwerty","qwz"
+assert !startswith "qw","qwer"
 
 assert endswith "qwerty","rty"
 assert !endswith "ty","rty"
@@ -405,8 +406,6 @@ assert str('xyz')=="xyz"
 assert fmt"abc"=="abc"
 assert fmt"ab%scd","xy"=="abxycd"
 
-assert commonprefix("a","ab","abc")=="a"
-
 ;characters
 assert isupper 65
 assert !isupper 97
@@ -422,11 +421,19 @@ assert filter( isdigit,"abc123")=="123"
 assert every isupper,""
 assert every isupper,"ABC"
 assert !every isupper,"ABC."
+assert every (\a a<10,(1,2,3))
+assert! every (\a a<10,(1,2,13))
 
 assert !any isupper,""
 assert any isupper,"ABC"
 assert any isupper,"ABC."
 assert !any isupper,"."
+
+;commonprefix
+assert commonprefix(("a","ab","abc"))=="a"
+assert commonprefix(("ab","ab","ab"))=="ab"
+assert commonprefix(("ab","ab","az"))=="a"
+assert commonprefix(("ab","ab","b"))==""
 
 ;pattern matching assignment
 a=1,2,3

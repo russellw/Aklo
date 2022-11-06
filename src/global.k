@@ -242,11 +242,9 @@ fn vals m
 
 fn commonprefix ss
 	s=ss!0
-	i=1
-	while  i<len s
+	for i range(1,len(s)+1)
+		;TODO: change to Haskell style take/drop?
 		t=to s,i
-		if !every(\s startswith(s,t),ss)
-			i--
-			break
-		i++
-	i
+		if !every(\s( startswith(s,t)),ss)
+			return to (s,i-1)
+	s

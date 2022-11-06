@@ -199,8 +199,7 @@ class Etc {
 
   static List<Object> range(Object i0, Object j0) {
     var i = (int) i0;
-    // TODO: do the right thing when the argument is a list
-    var j = (int) j0;
+    var j = j0 instanceof Integer ? (int) j0 : len(j0);
     var r = new ArrayList<>();
     while (i < j) r.add(i++);
     return r;
