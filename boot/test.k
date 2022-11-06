@@ -79,6 +79,10 @@ assert abs 10==10
 assert abs 0==0
 assert abs (-20)==20
 
+assert signum 10==1
+assert signum 0==0
+assert signum (-20)==-1
+
 ;arithmetic
 assert 1 + 2 == 3
 assert 10 - 1 == 9

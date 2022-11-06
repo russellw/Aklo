@@ -262,3 +262,9 @@ fn abs a
 	if a<0
 		return -a
 	a
+
+fn signum a
+	if a<0
+		return -1
+	if a>0
+		return 1
