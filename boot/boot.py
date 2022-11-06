@@ -1005,9 +1005,9 @@ def stmt(a):
             assign(pattern, x)
         case "^", _:
             0
-        case "++", x:
+        case ("++", x) | ("post++", x):
             print(f"{x} = Etc.add({x}, 1);")
-        case "--", x:
+        case ("--", x) | ("post--", x):
             print(f"{x} = Etc.sub({x}, 1);")
         case "tron", *s:
             print("Etc.depth = 0;")

@@ -21,7 +21,7 @@ fn parse  file,text
 	fn errtok(msg):
 		^ line
 		if tok == "\n":
-			--line
+			line--
 		err(fmt("%s: %s",repr(tok),msg))
 
 	; tokenizer
@@ -34,7 +34,7 @@ fn parse  file,text
 		^ tok
 
 		if dedents:
-			--dedents
+			dedents--
 			tok = ".dedent"
 			return
 
@@ -49,7 +49,7 @@ fn parse  file,text
 				;TODO: necessary?
 				if i == len(text):
 					return
-				++line
+				line++
 
 				; measure indent
 				col = 0
@@ -57,7 +57,7 @@ fn parse  file,text
 					if text!i != dentc && dentc:
 						err("indented with tabs and spaces in same file")
 					dentc = text!i++
-					++col
+					col++
 
 				; nothing important on this line, keep going
 				if in (text!i ,"\n;") || slice(text,i , i + 2) == "/*":
@@ -72,7 +72,7 @@ fn parse  file,text
 				; zero or more dedents
 				while col < last(cols):
 					cols=take(-1,cols)
-					++dedents
+					dedents++
 				if col != last(cols):
 					err("inconsistent indent")
 				return
@@ -95,7 +95,7 @@ fn parse  file,text
 						line = line1
 						err("unclosed block comment")
 					if text!i == "\n"!0:
-						++line
+						line++
 					i++
 				i += 2
 				continue
@@ -134,7 +134,7 @@ fn parse  file,text
 				i += 3
 				while slice(text,i,i+3) != "\"\"\"":
 					if text!i == "\n"!0:
-						++line
+						line++
 					i++
 				i += 3
 				tok = slice(text,j,i)
@@ -406,35 +406,35 @@ fn parse  file,text
 
 	init("!", 1)
 
-	--prec
+	prec--
 	init("**")
 
-	--prec
+	prec--
 	init("%", 1)
 	init("*", 1)
 	init("/", 1)
 	init("//", 1)
 
-	--prec
+	prec--
 	init("+", 1)
 	init("-", 1)
 	init("@", 1)
 
-	--prec
+	prec--
 	init("<<", 1)
 	init(">>", 1)
 	init(">>>", 1)
 
-	--prec
+	prec--
 	init("&", 1)
 
-	--prec
+	prec--
 	init("^", 1)
 
-	--prec
+	prec--
 	init("|", 1)
 
-	--prec
+	prec--
 	init("!=", 1)
 	init("<", 1)
 	init("<=", 1)
@@ -442,10 +442,10 @@ fn parse  file,text
 	init(">", 1)
 	init(">=", 1)
 
-	--prec
+	prec--
 	init("&&", 1)
 
-	--prec
+	prec--
 	init("||", 1)
 
 	fn infix(prec):
