@@ -247,3 +247,13 @@ fn commonprefix ss
 		if !every(\s( startswith(s,t)),ss)
 			return take (i-1,s)
 	s
+
+fn max a,b
+	if a>b
+		return a
+	b
+
+fn min a,b
+	if a<b
+		return a
+	b

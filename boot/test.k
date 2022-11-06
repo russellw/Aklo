@@ -69,6 +69,12 @@ assert 2>=1
 assert 1>=1
 assert !(1>=2)
 
+assert max 2,3==3
+assert max 3,2==3
+
+assert min 2,3==2
+assert min 3,2==2
+
 ;arithmetic
 assert 1 + 2 == 3
 assert 10 - 1 == 9
