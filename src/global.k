@@ -228,17 +228,17 @@ fn dedent s
 	;TODO: like textwrap.dedent
 	s
 
-fn first s
+fn fst s
 	s!0
 
-fn second s
+fn snd s
 	s!1
 
 fn keys m
-		map (first,m)
+		map (fst,m)
 
 fn vals m
-		map (second,m)
+		map (snd,m)
 
 fn commonprefix ss
 	s=ss!0
