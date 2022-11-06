@@ -592,6 +592,7 @@ def parse(name, file):
             case "assert" | "show":
                 s.append(file)
                 s.append(line)
+                s.append(fname)
                 lex()
                 x = commas()
                 s.append(str(x))
@@ -947,15 +948,17 @@ def stmt(a):
             print(") {")
             each(stmt, yes)
             print("}")
-        case "show", file, line, name, val:
-            print(f'Etc.show("{file}",{line},"{name}",')
+        case "show", file, line, fname, name, val:
+            fname = fname.replace("\\", "\\\\")
+            print(f'Etc.show("{file}", {line}, "{fname}", "{name}",')
             expr(val)
             print(");")
-        case "assert", file, line, name, test:
+        case "assert", file, line, fname, name, test:
+            fname = fname.replace("\\", "\\\\")
             print("if (!")
             truth(test)
             print(
-                f') throw new RuntimeException("{file}:{line}: {name}: assert failed");'
+                f') throw new RuntimeException("{file}:{line}: {fname}: {name}: assert failed");'
             )
         case "{", *s:
             print("{")
