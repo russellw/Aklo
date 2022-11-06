@@ -1021,32 +1021,45 @@ def stmt(a):
             print(";")
 
 
-# functions
-globals1 = set()
-for a in modules["global"]:
-    match a:
-        case "fn", name, params, *body:
-            globals1.add(name)
-
-
-def localvars(params, a):
-    nonlocals = set()
-
-    # dict keeps deterministic order
-    r = {x: 1 for x in params}
-
-    def lhs(a):
-        match a:
-            case "..." | "List.of" | "_":
-                0
-            case _:
-                if isinstance(a, str) and a not in nonlocals:
-                    r[a] = 1
+# variables
+def nonlocalvars(body):
+    r = set()
 
     def f(a):
         match a:
             case "^", x:
-                nonlocals.add(x)
+                r.add(x)
+
+    eachr(f, body)
+    return r
+
+
+def postopvars(body):
+    r = set()
+
+    def f(a):
+        match a:
+            case ("post++", x) | ("post--", x):
+                r.add(x)
+
+    eachr(f, body)
+    return r
+
+
+def assignedvars(params, body):
+    # dict keeps deterministic order
+    r = {x: 1 for x in params}
+
+    def lhs(a):
+        if isinstance(a, str):
+            match a:
+                case "..." | "List.of" | "_":
+                    0
+                case _:
+                    r[a] = 1
+
+    def f(a):
+        match a:
             case "case", x, *cases:
                 for pattern, *body in cases:
                     eachr(lhs, pattern)
@@ -1061,18 +1074,31 @@ def localvars(params, a):
             ):
                 eachr(lhs, x)
 
-    eachr(f, a)
-    return list(r)
+    eachr(f, body)
+    return r.keys()
 
 
-def var(x):
-    # TODO: check for other post++ variables
-    match x:
-        case "i" | "j" | "k":
+def plocals(params, body, static=0):
+    nonlocals = nonlocalvars(body)
+    postop = postopvars(body)
+    for a in assignedvars(params, body):
+        if a in nonlocals:
+            continue
+        if static:
+            print("static")
+        if a in postop:
             print("int")
-        case _:
+        else:
             print("Object")
-    print(x + "= 0;")
+        print(a + "= 0;")
+
+
+# functions
+globals1 = set()
+for a in modules["global"]:
+    match a:
+        case "fn", name, params, *body:
+            globals1.add(name)
 
 
 def fref(a):
@@ -1106,7 +1132,7 @@ def lam(params, body):
     print("new Function<List<Object>, Object>() {")
 
     # local variables
-    each(var, localvars(params, body))
+    plocals(params, body)
 
     # body
     print("public Object apply(List<Object> args) {")
@@ -1135,7 +1161,7 @@ def fn(fname, params, body):
     body = r
 
     # local variables
-    each(var, localvars(params, body))
+    plocals(params, body)
 
     # if the trailing return is implicit, make it explicit
     if not body:
@@ -1184,9 +1210,7 @@ for name, module in modules.items():
     module = r
 
     # local variables
-    for x in localvars([], module):
-        print("static")
-        var(x)
+    plocals([], module, 1)
 
     # body
     print("static void run() {")

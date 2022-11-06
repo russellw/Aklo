@@ -59,7 +59,7 @@ fn parse  file,text
 					dentc = text!i
 					;TODO: i++
 					i += 1
-					col += 1
+					col ++
 
 				; nothing important on this line, keep going
 				if in (text!i ,"\n;") || slice(text,i , i + 2) == "/*":
