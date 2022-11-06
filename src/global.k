@@ -274,3 +274,9 @@ fn even n
 
 fn odd  n
 	n%2
+
+fn succ a
+	a+1
+
+fn pred a
+	a-1

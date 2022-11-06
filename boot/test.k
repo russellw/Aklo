@@ -430,6 +430,7 @@ assert isupper 65
 assert !isupper 97
 
 ;higher-order functions
+assert map( succ,[1,2,3])==[2,3,4]
 assert map( \x:x*x,[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
