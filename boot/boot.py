@@ -863,7 +863,7 @@ def checkcase(label, pattern, x):
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
                     checkcase(label, s[i], ("subscript", x, i))
-                checkcase(label, s[n][1], ("from", x, n))
+                checkcase(label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
@@ -883,7 +883,7 @@ def assign(pattern, x):
                 n = len(s) - 1
                 for i in range(n):
                     assign(s[i], ("subscript", x, i))
-                assign(s[n][1], ("from", x, n))
+                assign(s[n][1], ("drop", n, x))
                 return
             n = len(s)
             for i in range(n):

@@ -42,7 +42,7 @@ fn filter f,s
 	r
 
 fn tail s
-	from s,1
+	drop  1, s
 
 fn fmt(s)
 	j = 1
@@ -87,12 +87,12 @@ fn eprint
 fn printstream stream,		a
 	writestream(stream,a)
 
-fn to s,i
+fn take i,s
 	if i<0
 		i+=len s
 	slice s,0,i
 
-fn from s,i
+fn drop i,s
 	if i<0
 		i+=len s
 	slice s,i,len s
@@ -105,10 +105,10 @@ fn in a,s
 fn endswith s,t
 	if len s<len t
 		return
-	from s,-len t==t
+	drop (-len( t),s)==t
 
 fn startswith s,t
-	to s,len t==t
+	take (len( t),s)==t
 
 fn lower a
 	if islist a
@@ -243,8 +243,7 @@ fn vals m
 fn commonprefix ss
 	s=ss!0
 	for i range(1,len(s)+1)
-		;TODO: change to Haskell style take/drop?
-		t=to s,i
+		t=take i,s
 		if !every(\s( startswith(s,t)),ss)
-			return to (s,i-1)
+			return take (i-1,s)
 	s

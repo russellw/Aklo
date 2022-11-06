@@ -73,7 +73,7 @@ fn parse  file,text
 
 				; zero or more dedents
 				while col < last(cols):
-					cols=to(cols,-1)
+					cols=take(-1,cols)
 					dedents += 1
 				if col != last(cols):
 					err("inconsistent indent")
@@ -250,13 +250,13 @@ fn parse  file,text
 
 		; number
 		if isdigit(tok!0):
-			case lower(to(tok,2)):
+			case lower(take(2,tok)):
 				"0b"
-					a = parseint(from(tok,2), 2)
+					a = parseint(drop(2,tok), 2)
 				"0o"
-					a = parseint(from(tok,2), 8)
+					a = parseint(drop(2,tok), 8)
 				"0x"
-					a = parseint(from(tok,2), 16)
+					a = parseint(drop(2,tok), 16)
 				_
 					a = parseint(tok)
 			lex()

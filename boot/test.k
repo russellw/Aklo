@@ -101,8 +101,8 @@ assert (1,2,3)==[1,2,3]
 
 assert slice "abcd",1,3=="bc"
 
-assert from"abcde",1=="bcde"
-assert from"abcde",-1=="e"
+assert drop 1,"abcde"=="bcde"
+assert drop( -1,"abcde")=="e"
 
 assert in 8,[6,7,8]
 assert! in 9,[6,7,8]
