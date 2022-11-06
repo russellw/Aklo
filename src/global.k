@@ -257,3 +257,8 @@ fn min a,b
 	if a<b
 		return a
 	b
+
+fn abs a
+	if a<0
+		return -a
+	a
