@@ -91,7 +91,7 @@ def parse(name, file):
     cols = [0]
     dedents = 0
 
-    tok = None
+    tok = 0
 
     def err(msg):
         raise Exception(f"{file}:{line}: {msg}")
@@ -433,7 +433,7 @@ def parse(name, file):
                             break
                         expect(",")
             case ".indent" | ":":
-                pass
+                0
             case _:
                 while 1:
                     s.append(word())
@@ -877,7 +877,7 @@ def assign(pattern, x):
         return
     match pattern:
         case "intern", ("List.of", *_):
-            pass
+            0
         case "List.of", *s:
             x = tmp(x)
             if isrest(s):
@@ -890,7 +890,7 @@ def assign(pattern, x):
             for i in range(n):
                 assign(s[i], ("subscript", x, i))
         case "_":
-            pass
+            0
         case "i" | "j" | "k":
             print(pattern + "= (int)")
             expr(x)
@@ -901,10 +901,9 @@ def assign(pattern, x):
             print(";")
 
 
-currentfile = None
-currentline = None
-currentfname = None
-currentfn = None
+currentfile = 0
+currentline = 0
+currentfname = 0
 
 
 def stmt(a):
@@ -985,13 +984,13 @@ def stmt(a):
                 assign(pattern, x)
                 each(stmt, body)
                 match body[-1]:
-                    # unadorned break or continue will cause the Java compiler
+                    # unadorned continue will cause the Java compiler
                     # to generate an unreachable statement error
                     # this is useful because the bootstrap compiler
-                    # does not actually support these within a case
+                    # does not actually support this within a case
                     # workaround: use a labeled loop
                     case ("break", _) | ("continue", _) | ("return", _):
-                        pass
+                        0
                     case _:
                         print(f"break {outerLabel};")
                 print("} while (false);")
@@ -999,7 +998,7 @@ def stmt(a):
         case "=", pattern, x:
             assign(pattern, x)
         case "^", _:
-            pass
+            0
         case "tron", *s:
             print("Etc.depth = 0;")
             print("Etc.tracing = Set.of")
@@ -1034,7 +1033,7 @@ def localvars(params, a):
     def lhs(a):
         match a:
             case "..." | "List.of" | "_":
-                pass
+                0
             case _:
                 if isinstance(a, str) and a not in nonlocals:
                     r[a] = 1
@@ -1100,35 +1099,36 @@ def fbody(s):
 
 def lam(params, body):
     print("new Function<List<Object>, Object>() {")
+
+    # local variables
     each(var, localvars(params, body))
+
+    # body
     print("public Object apply(List<Object> args) {")
     file = currentfile.replace("\\", "\\\\")
-    name = currentfn + r"\\"
-    # TODO: correct name for return
-    print(f'Etc.enter("{file}", {currentline}, "{name}", args);')
+    print(f'Etc.enter("{file}", {currentline}, "\\\\", args);')
     for i in range(len(params)):
         print(f"{params[i]} = args.get({i});")
     fbody(body)
     print("}")
+
     print("}")
 
 
-def fn(name, params, body):
-    global currentfn
-    _, file, line, _ = body[0]
+def fn(fname, params, body):
+    (_, file, line, _), *body = body
     print(f"// {file}:{line}")
-    print(f"class {name} implements Function<List<Object>, Object> {{")
+    print(f"class {fname} implements Function<List<Object>, Object> {{")
 
     # local functions
     r = []
     for a in body:
         match a:
-            case "fn", name1, params1, *body1:
-                fn(name1, params1, body1)
+            case "fn", fname1, params1, *body1:
+                fn(fname1, params1, body1)
             case _:
                 r.append(a)
     body = r
-    currentfn = name
 
     # local variables
     each(var, localvars(params, body))
@@ -1141,14 +1141,14 @@ def fn(name, params, body):
         case ("assert", _) | ("for", *_) | ("if", *_) | ("case", *_) | ("while", *_):
             body.append(("return", 0))
         case "return", _:
-            pass
+            0
         case _:
             body[-1] = "return", a
 
     # body
     print("public Object apply(List<Object> args) {")
     file = file.replace("\\", "\\\\")
-    print(f'Etc.enter("{file}", {line}, "{name}", args);')
+    print(f'Etc.enter("{file}", {line}, "{fname}", args);')
     for i in range(len(params)):
         stmt(("=", params[i], ("subscript", "args", i)))
     fbody(body)
@@ -1174,9 +1174,9 @@ for name, module in modules.items():
     r = []
     for a in module:
         match a:
-            case "fn", name1, params, *body:
+            case "fn", fname, params, *body:
                 print("static")
-                fn(name1, params, body)
+                fn(fname, params, body)
             case _:
                 r.append(a)
     module = r

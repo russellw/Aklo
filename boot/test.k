@@ -450,7 +450,9 @@ assert any isupper,"ABC."
 assert !any isupper,"."
 
 ;commonprefix
+tron
 assert commonprefix(("a","ab","abc"))=="a"
+troff
 assert commonprefix(("ab","ab","ab"))=="ab"
 assert commonprefix(("ab","ab","az"))=="a"
 assert commonprefix(("ab","ab","b"))==""
