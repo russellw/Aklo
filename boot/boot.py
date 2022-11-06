@@ -82,6 +82,7 @@ def quotesym(s):
 def parse(name, file):
     if name in modules:
         return
+    file = file.replace("\\", "/")
 
     text = open(file).read()
     i = 0
@@ -661,7 +662,7 @@ def parse(name, file):
     # imports
     while eat("import"):
         name1 = word()
-        parse(name1, os.path.join(here, "..", "src", name1 + ".k"))
+        parse(name1, f"{here}/../src/{name1}.k")
         expect("\n")
 
     # module
@@ -671,12 +672,12 @@ def parse(name, file):
     modules[name] = s
 
 
-parse("global", os.path.join(here, "..", "src", "global.k"))
+parse("global", f"{here}/../src/global.k")
 parse("program", args.file)
 
 
 # output
-sys.stdout.write(open(os.path.join(here, "prefix.java")).read())
+sys.stdout.write(open(here + "/prefix.java").read())
 
 
 # expressions
@@ -947,14 +948,12 @@ def stmt(a):
             each(stmt, yes)
             print("}")
         case "show", file, line, name, val:
-            file = file.replace("\\", "\\\\")
             print(f'Etc.show("{file}",{line},"{name}",')
             expr(val)
             print(");")
         case "assert", file, line, name, test:
             print("if (!")
             truth(test)
-            file = file.replace("\\", "\\\\")
             print(
                 f') throw new RuntimeException("{file}:{line}: {name}: assert failed");'
             )
@@ -1108,8 +1107,7 @@ def lam(params, body):
 
     # body
     print("public Object apply(List<Object> args) {")
-    file = currentfile.replace("\\", "\\\\")
-    print(f'Etc.enter("{file}", {currentline}, "\\\\", args);')
+    print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", args);')
     for i in range(len(params)):
         print(f"{params[i]} = args.get({i});")
     fbody(body)
@@ -1150,7 +1148,6 @@ def fn(fname, params, body):
 
     # body
     print("public Object apply(List<Object> args) {")
-    file = file.replace("\\", "\\\\")
     print(f'Etc.enter("{file}", {line}, "{fname}", args);')
     for i in range(len(params)):
         stmt(("=", params[i], ("subscript", "args", i)))
@@ -1161,10 +1158,9 @@ def fn(fname, params, body):
 
 
 def ret(a):
-    file = currentfile.replace("\\", "\\\\")
     fname = currentfname.replace("\\", "\\\\")
     a = tmp(a)
-    print(f'Etc.leave("{file}", {currentline}, "{fname}", {a});')
+    print(f'Etc.leave("{currentfile}", {currentline}, "{fname}", {a});')
     print(f"return {a};")
 
 
