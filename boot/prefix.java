@@ -23,24 +23,24 @@ class Etc {
     for (var i = 0; i < depth; i++) System.out.print(' ');
   }
 
-  static void leave(String file, int line, String f, Object r) {
-    if (!tracing(f)) return;
+  static void leave(String file, int line, String fname, Object r) {
+    if (!tracing(fname)) return;
     depth--;
     indent();
-    System.out.printf("<%s:%d: %s: %s\n", file, line, f, repr(r));
+    System.out.printf("<%s:%d: %s: %s\n", file, line, fname, repr(r));
   }
 
-  private static boolean tracing(String f) {
+  private static boolean tracing(String fname) {
     if (tracing == null) return false;
     if (tracing.isEmpty()) return true;
-    return tracing.contains(f);
+    return tracing.contains(fname);
   }
 
-  static void enter(String file, int line, String f, List<Object> args) {
-    if (!tracing(f)) return;
+  static void enter(String file, int line, String fname, List<Object> args) {
+    if (!tracing(fname)) return;
     indent();
     depth++;
-    System.out.printf(">%s:%d: %s: ", file, line, f);
+    System.out.printf(">%s:%d: %s: ", file, line, fname);
     for (var i = 0; i < args.size(); i++) {
       if (i > 0) System.out.print(", ");
       System.out.print(repr(args.get(i)));

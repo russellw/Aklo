@@ -459,7 +459,7 @@ def parse(name, file):
                     return s
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        s.append(stmt())
+                        s.append(stmt("\\"))
                     expect(")")
                     return s
                 if tok != ")":
@@ -559,30 +559,30 @@ def parse(name, file):
             return lex1(), a, assignment()
         return a
 
-    def block():
+    def block(fname):
         expect(".indent")
         s = []
         while not eat(".dedent"):
-            s.append((".line", file, line))
-            s.append(stmt())
+            s.append((".loc", file, line, fname))
+            s.append(stmt(fname))
         return s
 
-    def if1():
+    def if1(fname):
         assert tok in ("if", "elif")
         lex()
         s = ["if", expr()]
         eat(":")
-        s.append(block())
+        s.append(block(fname))
         match tok:
             case "elif":
-                s.append(if1())
+                s.append(if1(fname))
             case "else":
                 lex()
                 eat(":")
-                s.append(block())
+                s.append(block(fname))
         return s
 
-    def stmt():
+    def stmt(fname):
         s = [tok]
         match tok:
             case "assert" | "show":
@@ -603,7 +603,7 @@ def parse(name, file):
                     patterns = [commas()]
                     while eat("\n"):
                         patterns.append(commas())
-                    body = block()
+                    body = block(fname)
                     for pattern in patterns:
                         s.append((pattern, *body))
                 return s
@@ -611,7 +611,7 @@ def parse(name, file):
                 lex()
                 s.append(expr())
                 eat(":")
-                s.extend(block())
+                s.extend(block(fname))
                 return s
             case "for":
                 lex()
@@ -619,19 +619,20 @@ def parse(name, file):
                 eat(":")
                 s.append(commas())
                 eat(":")
-                s.extend(block())
+                s.extend(block(fname))
                 return s
             case "fn":
                 line1 = line
                 lex()
-                s.append(word())
+                fname = word()
+                s.append(fname)
                 s.append(params())
                 eat(":")
-                s.append((".line", file, line1))
-                s.extend(block())
+                s.append((".loc", file, line1, fname))
+                s.extend(block(fname))
                 return s
             case "if":
-                return if1()
+                return if1(fname)
             case "^":
                 lex()
                 s.append(word())
@@ -646,7 +647,7 @@ def parse(name, file):
                 return s
         a = assignment()
         if eat(":"):
-            return ":", a, stmt()
+            return ":", a, stmt(fname)
         expect("\n")
         return a
 
@@ -663,7 +664,7 @@ def parse(name, file):
     # module
     s = []
     while tok != ".dedent":
-        s.append(stmt())
+        s.append(stmt(name))
     modules[name] = s
 
 
@@ -902,12 +903,14 @@ def assign(pattern, x):
 
 currentfile = None
 currentline = None
+currentfname = None
 currentfn = None
 
 
 def stmt(a):
     global currentfile
     global currentline
+    global currentfname
     match a:
         case "for", x, s, *body:
             print(f"for (var {x}: (List)")
@@ -963,10 +966,11 @@ def stmt(a):
             print(a[0])
             expr(x)
             print(";")
-        case ".line", file, line:
+        case ".loc", file, line, fname:
             currentfile = file
             currentline = line
-            print(f"// {file}:{line}")
+            currentfname = fname
+            print(f"// {file}:{line}: {fname}")
         case ":", label, loop:
             print(label + ":")
             stmt(loop)
@@ -1101,7 +1105,7 @@ def lam(params, body):
     file = currentfile.replace("\\", "\\\\")
     name = currentfn + r"\\"
     # TODO: correct name for return
-    print(f'Etc.enter("{file}",{currentline},"{name}",args);')
+    print(f'Etc.enter("{file}", {currentline}, "{name}", args);')
     for i in range(len(params)):
         print(f"{params[i]} = args.get({i});")
     fbody(body)
@@ -1111,7 +1115,7 @@ def lam(params, body):
 
 def fn(name, params, body):
     global currentfn
-    _, file, line = body[0]
+    _, file, line, _ = body[0]
     print(f"// {file}:{line}")
     print(f"class {name} implements Function<List<Object>, Object> {{")
 
@@ -1144,7 +1148,7 @@ def fn(name, params, body):
     # body
     print("public Object apply(List<Object> args) {")
     file = file.replace("\\", "\\\\")
-    print(f'Etc.enter("{file}",{line},"{name}",args);')
+    print(f'Etc.enter("{file}", {line}, "{name}", args);')
     for i in range(len(params)):
         stmt(("=", params[i], ("subscript", "args", i)))
     fbody(body)
@@ -1155,8 +1159,9 @@ def fn(name, params, body):
 
 def ret(a):
     file = currentfile.replace("\\", "\\\\")
+    fname = currentfname.replace("\\", "\\\\")
     a = tmp(a)
-    print(f'Etc.leave("{file}", {currentline}, "{currentfn}", {a});')
+    print(f'Etc.leave("{file}", {currentline}, "{fname}", {a});')
     print(f"return {a};")
 
 
