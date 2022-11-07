@@ -325,6 +325,7 @@ def parse(name, file):
             return lex1()
 
         # number
+        # TODO: allow _
         if tok[0].isdigit():
             match tok[:2].lower():
                 case "0b":
