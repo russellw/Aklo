@@ -43,7 +43,7 @@ fn parse  file,text
 			tok = text!i,
 
 			; newline
-			if text!i == "\n"!0:
+			if tok == "\n":
 				; next line
 				i++
 				;TODO: necessary?
@@ -83,11 +83,11 @@ fn parse  file,text
 				continue
 
 			; comment
-			if text!i == ";"!0:
+			if tok == ";":
 				while text!i != "\n"!0:
 					i++
 				continue
-			if text!i == "{"!0:
+			if tok == "{":
 				i ++
 				line1 = line
 				while text!i != "}"!0:
@@ -115,7 +115,7 @@ fn parse  file,text
 				return
 
 			; other number
-			if isdigit(text!i) || text!i == "."!0 && isdigit(text![i + 1]):
+			if isdigit(text!i) || tok == "." && isdigit(text![i + 1]):
 				while isidpart(text!i):
 					i++
 				if text!i == "."!0:
@@ -141,7 +141,7 @@ fn parse  file,text
 				return
 
 			; symbol or string
-			case text!i,
+			case tok
 				"'"
 				"\""
 					q = text!i++
@@ -240,6 +240,7 @@ fn parse  file,text
 		return isidpart(tok!0) || in(tok!0 ,"'\"#")
 
 	fn primary():
+		;TODO: true, false
 		;TODO: lex() just once at the start?
 		; word
 		if isidstart(tok!0):

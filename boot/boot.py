@@ -119,11 +119,10 @@ def parse(name, file):
 
         while i < len(text):
             j = i
-            # TODO: simplify
             tok = text[i]
 
             # newline
-            if text[i] == "\n":
+            if tok == "\n":
                 # next line
                 i += 1
                 if i == len(text):
@@ -158,16 +157,16 @@ def parse(name, file):
                 return
 
             # space
-            if text[i].isspace():
+            if tok.isspace():
                 i += 1
                 continue
 
             # comment
-            if text[i] == ";":
+            if tok == ";":
                 while text[i] != "\n":
                     i += 1
                 continue
-            if text[i] == "{":
+            if tok == "{":
                 i += 1
                 line1 = line
                 while text[i] != "}":
@@ -181,7 +180,7 @@ def parse(name, file):
                 continue
 
             # word
-            if isidstart(text[i]):
+            if isidstart(tok):
                 while isidpart(text[i]):
                     i += 1
                 tok = text[j:i]
@@ -195,7 +194,7 @@ def parse(name, file):
                 return
 
             # other number
-            if text[i].isdigit() or text[i] == "." and text[i + 1].isdigit():
+            if tok.isdigit() or tok == "." and text[i + 1].isdigit():
                 while isidpart(text[i]):
                     i += 1
                 if text[i] == ".":
@@ -221,11 +220,10 @@ def parse(name, file):
                 return
 
             # symbol or string
-            match text[i]:
+            match tok:
                 case "'" | '"':
-                    q = text[i]
                     i += 1
-                    while text[i] != q:
+                    while text[i] != tok:
                         if text[i] == "\\":
                             i += 1
                         if text[i] == "\n":
@@ -317,10 +315,9 @@ def parse(name, file):
 
     # expressions
     def isprimary():
-        return isidpart(tok[0]) or tok[0] in ("'", '"', "#")
+        return isidpart(tok[0]) or tok[0] in "'\"#"
 
     def primary():
-        # TODO: true, false
         # word
         if isidstart(tok[0]):
             return lex1()

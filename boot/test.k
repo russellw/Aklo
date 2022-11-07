@@ -19,6 +19,11 @@ assert !(0 && 1)
 assert !(1 && 0)
 assert 1 && 1
 
+assert !(false && false)
+assert !(false && true)
+assert !(true && false)
+assert true && true
+
 ;bitwise
 assert !(0 & 0)
 assert !(0 & 1)
