@@ -2,12 +2,14 @@ modules=()
 
 fn parse  file,text
 	^ modules
+
 	;TODO: repr
 	;TODO: check for already parsed
+	text=replace("\r\n","\n",text)
+	text=replace("\r","\n",text)
 	if!endswith(text,"\n")
 		text@="\n"
 
-	;TODO: cr
 	i = 0
 	line = 1
 

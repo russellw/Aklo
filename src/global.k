@@ -416,3 +416,15 @@ fn unlines ss
 	for s ss
 		r@=s@"\n"
 	r
+
+fn replace from,to,s
+	assert from
+	r=""
+	while s
+		if startswith s,from
+			s=drop len(from),s
+			r@=to
+			continue
+		a,*s=s
+		r@=a,
+	r

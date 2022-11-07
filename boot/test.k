@@ -532,6 +532,8 @@ assert sum(())==0
 assert product((1,2,3,4))==24
 assert product(())==1
 
+assert replace "a","aa","aaa"=="aaaaaa"
+
 ;commonprefix
 assert commonprefix(("a","ab","abc"))=="a"
 assert commonprefix(("ab","ab","ab"))=="ab"
