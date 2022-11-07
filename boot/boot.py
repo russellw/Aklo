@@ -477,52 +477,52 @@ def parse(name, file):
     prec = 99
     ops = {}
 
-    def init(op, left):
+    def mkop(op, left):
         ops[op] = prec, left
 
-    init("!", 1)
+    mkop("!", 1)
 
     prec -= 1
-    init("**", 0)
+    mkop("**", 0)
 
     prec -= 1
-    init("%", 1)
-    init("*", 1)
-    init("/", 1)
-    init("//", 1)
+    mkop("%", 1)
+    mkop("*", 1)
+    mkop("/", 1)
+    mkop("//", 1)
 
     prec -= 1
-    init("+", 1)
-    init("-", 1)
-    init("@", 1)
+    mkop("+", 1)
+    mkop("-", 1)
+    mkop("@", 1)
 
     prec -= 1
-    init("<<", 1)
-    init(">>", 1)
-    init(">>>", 1)
+    mkop("<<", 1)
+    mkop(">>", 1)
+    mkop(">>>", 1)
 
     prec -= 1
-    init("&", 1)
+    mkop("&", 1)
 
     prec -= 1
-    init("^", 1)
+    mkop("^", 1)
 
     prec -= 1
-    init("|", 1)
+    mkop("|", 1)
 
     prec -= 1
-    init("!=", 1)
-    init("<", 1)
-    init("<=", 1)
-    init("==", 1)
-    init(">", 1)
-    init(">=", 1)
+    mkop("!=", 1)
+    mkop("<", 1)
+    mkop("<=", 1)
+    mkop("==", 1)
+    mkop(">", 1)
+    mkop(">=", 1)
 
     prec -= 1
-    init("&&", 1)
+    mkop("&&", 1)
 
     prec -= 1
-    init("||", 1)
+    mkop("||", 1)
 
     def infix(prec):
         a = prefix()

@@ -88,13 +88,9 @@ fn printstream stream,		a
 	writestream(stream,a)
 
 fn take i,s
-	if i<0
-		i+=len s
 	slice s,0,i
 
 fn drop i,s
-	if i<0
-		i+=len s
 	slice s,i,len s
 
 fn in a,s
@@ -103,9 +99,7 @@ fn in a,s
 			return 1
 
 fn endswith s,t
-	if len s<len t
-		return
-	drop (-len( t),s)==t
+	drop (len(s)-len( t),s)==t
 
 fn startswith s,t
 	take (len( t),s)==t
@@ -312,3 +306,6 @@ fn product s
 
 fn id a
 	a
+
+fn init s
+	take (len(s)-1,s)

@@ -71,7 +71,7 @@ fn parse  file,text
 
 				; zero or more dedents
 				while col < last(cols):
-					cols=take(-1,cols)
+					cols=init(cols)
 					dedents++
 				if col != last(cols):
 					err("inconsistent indent")
@@ -400,53 +400,53 @@ fn parse  file,text
 	prec = 99
 	ops = ()
 
-	fn init(op, left):
+	fn mkop(op, left):
 		^ ops
 		ops@=(op,( prec, left)),
 
-	init("!", 1)
+	mkop("!", 1)
 
 	prec--
-	init("**")
+	mkop("**")
 
 	prec--
-	init("%", 1)
-	init("*", 1)
-	init("/", 1)
-	init("//", 1)
+	mkop("%", 1)
+	mkop("*", 1)
+	mkop("/", 1)
+	mkop("//", 1)
 
 	prec--
-	init("+", 1)
-	init("-", 1)
-	init("@", 1)
+	mkop("+", 1)
+	mkop("-", 1)
+	mkop("@", 1)
 
 	prec--
-	init("<<", 1)
-	init(">>", 1)
-	init(">>>", 1)
+	mkop("<<", 1)
+	mkop(">>", 1)
+	mkop(">>>", 1)
 
 	prec--
-	init("&", 1)
+	mkop("&", 1)
 
 	prec--
-	init("^", 1)
+	mkop("^", 1)
 
 	prec--
-	init("|", 1)
+	mkop("|", 1)
 
 	prec--
-	init("!=", 1)
-	init("<", 1)
-	init("<=", 1)
-	init("==", 1)
-	init(">", 1)
-	init(">=", 1)
+	mkop("!=", 1)
+	mkop("<", 1)
+	mkop("<=", 1)
+	mkop("==", 1)
+	mkop(">", 1)
+	mkop(">=", 1)
 
 	prec--
-	init("&&", 1)
+	mkop("&&", 1)
 
 	prec--
-	init("||", 1)
+	mkop("||", 1)
 
 	fn infix(prec):
 		a = prefix()

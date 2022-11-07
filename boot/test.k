@@ -124,7 +124,9 @@ assert (1,2,3)==[1,2,3]
 assert slice "abcd",1,3=="bc"
 
 assert drop 1,"abcde"=="bcde"
-assert drop( -1,"abcde")=="e"
+
+assert init"abcde"=="abcd"
+assert init""==""
 
 assert in 8,[6,7,8]
 assert! in 9,[6,7,8]
