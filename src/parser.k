@@ -2,7 +2,10 @@ modules=()
 
 fn parse  file,text
 	^ modules
+	;TODO: repr
 	;TODO: check for already parsed
+	if!endswith(text,"\n")
+		text@="\n"
 
 	;TODO: cr
 	i = 0
