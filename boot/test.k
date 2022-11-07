@@ -1,3 +1,6 @@
+;the identity function
+assert id 12345==12345
+
 ;logic
 assert 1
 assert !0
@@ -450,6 +453,33 @@ assert !any isupper,""
 assert any isupper,"ABC"
 assert any isupper,"ABC."
 assert !any isupper,"."
+
+fn add a,b
+	a+b
+
+assert fold(add,0,(1,2,3,4))==10
+assert fold(add,0,(1))==1
+assert fold(add,0,())==0
+
+assert fold(\(s,t)(s@t),"",("abc","def","gh"))=="abcdefgh"
+
+assert reduce(add,(1,2,3,4))==10
+assert reduce(add,(1))==1
+assert reduce(add,())==0
+
+assert reduce(\(s,t)(s@t),("abc","def","gh"))=="abcdefgh"
+
+assert maximum "abc"=="c"!0
+assert maximum "cba"=="c"!0
+
+assert minimum "abc"=="a"!0
+assert minimum "cba"=="a"!0
+
+assert sum((1,2,3,4))==10
+assert sum(())==0
+
+assert product((1,2,3,4))==24
+assert product(())==1
 
 ;commonprefix
 assert commonprefix(("a","ab","abc"))=="a"

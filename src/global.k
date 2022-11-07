@@ -228,17 +228,17 @@ fn dedent s
 	;TODO: like textwrap.dedent
 	s
 
-fn fst s
+fn first s
 	s!0
 
-fn snd s
+fn second s
 	s!1
 
 fn keys m
-		map (fst,m)
+		map (first,m)
 
 fn vals m
-		map (snd,m)
+		map (second,m)
 
 fn commonprefix ss
 	s=ss!0
@@ -287,3 +287,28 @@ fn reverse s
 	while i--
 		r@=s!i,
 	r
+
+fn reduce f , s
+	a,*s=s
+	fold (f,a,s)
+
+fn fold f ,a, s
+	if !s
+		return a
+	b,*s=s
+	fold(f,f(a,b),s)
+
+fn maximum s
+	reduce max,s
+
+fn minimum s
+	reduce min,s
+
+fn sum s
+	reduce (\(a,b)(a+b),s)
+
+fn product s
+	fold (\(a,b)(a*b),1,s)
+
+fn id a
+	a
