@@ -185,6 +185,50 @@ assert unesc #"\x41\x42"=="AB"
 
 assert reverse"abc"=="cba"
 
+assert concat(("zxc","vb"))=="zxcvb"
+
+assert replicate 4,9==(9,9,9,9)
+assert replicate (-1,9)==()
+
+assert takewhile isdigit,"123abc"=="123"
+assert takewhile isdigit,"123"=="123"
+assert takewhile isdigit,"abc"==""
+
+assert dropwhile isdigit,"123abc"=="abc"
+assert dropwhile isdigit,"123"==""
+assert dropwhile isdigit,"abc"=="abc"
+
+assert span isdigit,"123abc"==("123","abc")
+
+assert splitat(2,"abcde")==("ab","cde")
+assert splitat(-1,"abcde")==("","abcde")
+assert splitat(20,"abcde")==("abcde","")
+
+assert zip ("abc","12")==("a1","b2")
+assert zip3 ("abc","12","xyz")==("a1x","b2y")
+assert zipwith(\(a,b)(a+b),(10,20),(1,2))==(11,22)
+assert zipwith3(\(a,b,c)(a+b+c),(10,20),(1,2),(100,100))==(111,122)
+assert unzip (("a1","b2","c3"))==("abc","123")
+assert unzip3 (("a1x","b2y","c3z"))==("abc","123","xyz")
+
+assert split(isdigit,"a1b")==("a","b")
+assert split(isdigit,"")==("",)
+assert split(isdigit,"1")==("","")
+assert split(isdigit,"1zzz")==("","zzz")
+assert split(isdigit,"...9")==("...","")
+
+assert spliton("."!0,"123.456.")==("123","456","")
+
+assert lines("a\nb\nc\n\n")==("a","b","c","")
+assert lines("a\nb\nc\n")==("a","b","c")
+assert lines("a\nb\nc")==("a","b","c")
+assert lines("\n")==("",)
+;the empty string is considered to consist of a single blank line
+;unlike the Haskell lines function
+assert lines("")==("",)
+
+assert unlines(("ab","cd"))=="ab\ncd\n"
+
 ;variables
 x = 5
 assert x == 5

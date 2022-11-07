@@ -545,7 +545,7 @@ def parse(name, file):
                     a = op, a, b
 
     def expr():
-        return infix(0)
+        return infix(1)
 
     # statements
     def commas():
@@ -590,7 +590,17 @@ def parse(name, file):
     def stmt(fname):
         s = [tok]
         match tok:
-            case "assert" | "show":
+            case "assert":
+                s.append(file)
+                s.append(line)
+                s.append(fname)
+                lex()
+                x = expr()
+                s.append(str(x))
+                s.append(x)
+                expect("\n")
+                return s
+            case "show":
                 s.append(file)
                 s.append(line)
                 s.append(fname)

@@ -309,3 +309,110 @@ fn id a
 
 fn init s
 	take (len(s)-1,s)
+
+fn concat ss
+	fold (\(s,t)(s@t),"",ss)
+
+fn replicate n ,a
+	s=[]
+	for i range n
+		s@=a,
+	s
+
+fn takewhile f,s
+	r=""
+	while s &&(f(s!0))
+		a,*s=s
+		r@=a,
+	r
+
+fn dropwhile f,s
+	while s &&(f(s!0))
+		s=tail s
+	s
+
+fn span f ,s
+	takewhile (f,s),dropwhile(f,s)
+
+fn splitat n,s
+	take(n,s),drop(n,s)
+
+fn zip s,t
+	r=()
+	while s&&t
+		a,*s=s
+		b,*t=t
+		r@=(a,b),
+	r
+
+fn zip3 s,t,u
+	r=()
+	while s&&t&&u
+		a,*s=s
+		b,*t=t
+		c,*u=u
+		r@=(a,b,c),
+	r
+
+fn zipwith f,s,t
+	r=()
+	while s&&t
+		a,*s=s
+		b,*t=t
+		r@=f(a,b),
+	r
+
+fn zipwith3 f,s,t,u
+	r=()
+	while s&&t&&u
+		a,*s=s
+		b,*t=t
+		c,*u=u
+		r@=f(a,b,c),
+	r
+
+fn unzip s
+	q=()
+	r=()
+	while s
+		(a,b),*s=s
+		q@=a,
+		r@=b,
+	q,r
+
+fn unzip3 s
+	p=()
+	q=()
+	r=()
+	while s
+		(a,b,c),*s=s
+		p@=a,
+		q@=b,
+		r@=c,
+	p,q,r
+
+fn split f,s
+	r=()
+	rs=()
+	for a s
+		if f a
+			rs@=r,
+			r=()
+		else
+			r@=a,
+	rs@=r,
+	rs
+
+fn spliton a,s
+	split (\(b)(a==b),s)
+
+fn lines s
+	if endswith(s,"\n")
+		s=init s
+	spliton("\n"!0,s)
+
+fn unlines ss
+	r=""
+	for s ss
+		r@=s@"\n"
+	r

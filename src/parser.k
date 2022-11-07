@@ -510,8 +510,17 @@ fn parse  file,text
 
 	fn stmt():
 		s = [intern (tok),]
+		;TODO: fname
 		case tok:
 			"assert"
+				s@=file,
+				s@=line,
+				lex()
+				x = expr()
+				s@=str(x),
+				s@=x,
+				expect("\n")
+				return s
 			"show"
 				s@=file,
 				s@=line,
