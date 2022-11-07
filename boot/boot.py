@@ -167,6 +167,7 @@ def parse(name, file):
                     i += 1
                 continue
             if text[i : i + 2] == "/*":
+                # TODO: {} ?
                 i += 2
                 line1 = line
                 while text[i : i + 2] != "*/":
@@ -588,6 +589,7 @@ def parse(name, file):
         return s
 
     def stmt(fname):
+        # TODO: error check loose break/continue?
         s = [tok]
         match tok:
             case "assert":
