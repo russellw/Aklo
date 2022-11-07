@@ -46,9 +46,6 @@ fn parse  file,text
 			if tok == "\n":
 				; next line
 				i++
-				;TODO: necessary?
-				if i == len(text):
-					return
 				line++
 
 				; measure indent
