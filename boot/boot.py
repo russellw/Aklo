@@ -64,7 +64,7 @@ modules = {}
 
 
 def isidstart(c):
-    return c.isalpha() or c in ("_", "$")
+    return c.isalpha() or c in "_$"
 
 
 def isidpart(c):
@@ -119,6 +119,7 @@ def parse(name, file):
 
         while i < len(text):
             j = i
+            # TODO: simplify
             tok = text[i]
 
             # newline
@@ -131,7 +132,7 @@ def parse(name, file):
 
                 # measure indent
                 col = 0
-                while text[i] in ("\t", " "):
+                while text[i] in "\t ":
                     if text[i] != dentc and dentc:
                         err("indented with tabs and spaces in same file")
                     dentc = text[i]
@@ -139,7 +140,7 @@ def parse(name, file):
                     col += 1
 
                 # nothing important on this line, keep going
-                if text[i] in ("\n", ";") or text[i : i + 2] == "/*":
+                if text[i] in "\n;{":
                     continue
 
                 # one indent
@@ -166,18 +167,17 @@ def parse(name, file):
                 while text[i] != "\n":
                     i += 1
                 continue
-            if text[i : i + 2] == "/*":
-                # TODO: {} ?
-                i += 2
+            if text[i] == "{":
+                i += 1
                 line1 = line
-                while text[i : i + 2] != "*/":
+                while text[i] != "}":
                     if i == len(text):
                         line = line1
                         err("unclosed block comment")
                     if text[i] == "\n":
                         line += 1
                     i += 1
-                i += 2
+                i += 1
                 continue
 
             # word
@@ -202,7 +202,7 @@ def parse(name, file):
                     i += 1
                     while isidpart(text[i]):
                         i += 1
-                    if text[i - 1].lower() == "e" and text[i] in ("+", "-"):
+                    if text[i - 1].lower() == "e" and text[i] in "+-":
                         i += 1
                         while isidpart(text[i]):
                             i += 1
@@ -320,6 +320,7 @@ def parse(name, file):
         return isidpart(tok[0]) or tok[0] in ("'", '"', "#")
 
     def primary():
+        # TODO: true, false
         # word
         if isidstart(tok[0]):
             return lex1()

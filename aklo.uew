@@ -1,8 +1,8 @@
-/L13"Aklo" Line Comment = ; Block Comment On = /* Block Comment Off = */ Escape Char = \ String Chars = "' File Extensions = K
+/L13"Aklo" Line Comment = ; Block Comment On = { Block Comment Off = } Escape Char = \ String Chars = "' File Extensions = K
 /Delimiters = ~!@%^&*()-+=|\/{}[]:;"'<> ,	.?
 /Indent Strings = "case" "dowhile" "elif" "else" "fn" "for" "if" "while"
-/Open Brace Strings =  "(" "[" "{"
-/Close Brace Strings = ")" "]" "}"
+/Open Brace Strings =  "(" "["
+/Close Brace Strings = ")" "]"
 /C1"blue"
 assert
 case

@@ -60,7 +60,7 @@ fn parse  file,text
 					col++
 
 				; nothing important on this line, keep going
-				if in (text!i ,"\n;") || slice(text,i , i + 2) == "/*":
+				if in (text!i ,"\n;{")
 					continue
 
 				; one indent
@@ -87,17 +87,17 @@ fn parse  file,text
 				while text!i != "\n"!0:
 					i++
 				continue
-			if slice(text,i,i+2) == "/*":
-				i += 2
+			if text!i == "{"!0:
+				i ++
 				line1 = line
-				while slice(text,i,i+2) != "*/":
+				while text!i != "}"!0:
 					if i == len(text):
 						line = line1
 						err("unclosed block comment")
 					if text!i == "\n"!0:
 						line++
 					i++
-				i += 2
+				i ++
 				continue
 
 			; word

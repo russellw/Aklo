@@ -41,7 +41,6 @@ fn filter f,s
 			r@=a,
 	r
 
-;TODO: merge with drop?
 fn tail s
 	drop  1, s
 

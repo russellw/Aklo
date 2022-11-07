@@ -618,5 +618,5 @@ case 2
 		a="two"
 assert a=="two"
 
-/* signal that tests actually completed */
+{signal that tests actually completed}
 printf("%s\n","ok")
