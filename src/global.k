@@ -280,3 +280,10 @@ fn succ a
 
 fn pred a
 	a-1
+
+fn reverse s
+	i=len s
+	r=()
+	while i--
+		r@=s!i,
+	r

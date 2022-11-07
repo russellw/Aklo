@@ -178,6 +178,8 @@ assert unesc "abc"=="abc"
 assert unesc #"\tabc\n"=="\tabc\n"
 assert unesc #"\x41\x42"=="AB"
 
+assert reverse"abc"=="cba"
+
 ;variables
 x = 5
 assert x == 5
