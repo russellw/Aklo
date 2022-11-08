@@ -242,9 +242,14 @@ fn parse  file,text
 		return isidpart(tok!0) || in(tok!0 ,"'\"#")
 
 	fn primary():
-		;TODO: true, false
-		;TODO: lex() just once at the start?
 		; word
+		case tok
+			"false"
+				lex()
+				return 0
+			"true"
+				lex()
+				return 1
 		if isidstart(tok!0):
 			return lex1()
 
