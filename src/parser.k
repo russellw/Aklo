@@ -250,15 +250,16 @@ fn parse  file,text
 
 		; number
 		if isdigit(tok!0):
-			case lower(take(2,tok)):
+			s=replace("_","",tok)
+			case lower(take(2,s)):
 				"0b"
-					a = parseint(drop(2,tok), 2)
+					a = parseint(drop(2,s), 2)
 				"0o"
-					a = parseint(drop(2,tok), 8)
+					a = parseint(drop(2,s), 8)
 				"0x"
-					a = parseint(drop(2,tok), 16)
+					a = parseint(drop(2,s), 16)
 				_
-					a = parseint(tok)
+					a = parseint(s)
 			lex()
 			return a
 

@@ -323,17 +323,17 @@ def parse(name, file):
             return lex1()
 
         # number
-        # TODO: allow _
         if tok[0].isdigit():
-            match tok[:2].lower():
+            s = tok.replace("_", "")
+            match s[:2].lower():
                 case "0b":
-                    a = int(tok[2:], 2)
+                    a = int(s[2:], 2)
                 case "0o":
-                    a = int(tok[2:], 8)
+                    a = int(s[2:], 8)
                 case "0x":
-                    a = int(tok[2:], 16)
+                    a = int(s[2:], 16)
                 case _:
-                    a = int(tok)
+                    a = int(s)
             lex()
             return a
 
