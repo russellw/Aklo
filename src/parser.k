@@ -131,17 +131,6 @@ fn parse  file,text
 				tok = slice(text,j,i)
 				return
 
-			; multiline string
-			if slice(text,i,i+3) == "\"\"\"":
-				i += 3
-				while slice(text,i,i+3) != "\"\"\"":
-					if text!i == "\n"!0:
-						line++
-					i++
-				i += 3
-				tok = slice(text,j,i)
-				return
-
 			; symbol or string
 			case tok
 				"'"
@@ -273,13 +262,6 @@ fn parse  file,text
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
 			return '.quote',intern(s)
-
-		; multiline string
-		if startswith(tok,"\"\"\""):
-			s = unesc(slice(tok,3,len(tok)-3))
-			lex()
-			s = dedent(s)
-			return'.list',*s
 
 		; string
 		if startswith(tok,"\""):

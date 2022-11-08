@@ -137,15 +137,6 @@ assert init""==""
 assert in 8,[6,7,8]
 assert! in 9,[6,7,8]
 
-assert"""abc"""=="abc"
-
-s="""\
-	a
-	b
-	c
-"""
-assert s=="a\nb\nc\n"
-
 assert startswith "qwerty","qwe"
 assert !startswith "qwerty","qwz"
 assert !startswith "qw","qwer"

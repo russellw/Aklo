@@ -3,7 +3,6 @@ import inspect
 import os
 import subprocess
 import sys
-import textwrap
 
 
 parser = argparse.ArgumentParser(description="Aklo bootstrap compiler")
@@ -208,17 +207,6 @@ def parse(name, file):
                 tok = text[j:i]
                 return
 
-            # multiline string
-            if text[i : i + 3] == '"""':
-                i += 3
-                while text[i : i + 3] != '"""':
-                    if text[i] == "\n":
-                        line += 1
-                    i += 1
-                i += 3
-                tok = text[j:i]
-                return
-
             # symbol or string
             match tok:
                 case "'" | '"':
@@ -342,13 +330,6 @@ def parse(name, file):
             s = unesc(tok[1:-1])
             lex()
             return quotesym(s)
-
-        # multiline string
-        if tok.startswith('"""'):
-            s = unesc(tok[3:-3])
-            lex()
-            s = textwrap.dedent(s)
-            return ["List.of"] + [ord(c) for c in s]
 
         # string
         if tok.startswith('"'):

@@ -218,10 +218,6 @@ fn last s
 fn isspace c
 	in c," \f\n\r\t\v"
 
-fn dedent s
-	;TODO: like textwrap.dedent
-	s
-
 fn first s
 	s!0
 
