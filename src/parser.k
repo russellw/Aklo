@@ -230,346 +230,367 @@ fn parse  file,text
 	fn isprimary()
 		return isidpart(tok!0) || in(tok!0 ,"'\"#")
 
-	fn primary()
-		; word
-		case tok
-			"false"
-				lex()
-				return 0
-			"true"
-				lex()
-				return 1
-		if isidstart(tok!0)
-			return lex1()
-
-		; number
-		if isdigit(tok!0)
-			s=replace("_","",tok)
-			case lower(take(2,s))
-				"0b"
-					a = parseint(drop(2,s), 2)
-				"0o"
-					a = parseint(drop(2,s), 8)
-				"0x"
-					a = parseint(drop(2,s), 16)
-				_
-					a = parseint(s)
-			lex()
-			return a
-
-		; symbol
-		if startswith(tok,"'")
-			s = unesc(slice(tok,1,len(tok)-1))
-			lex()
-			return '.quote',intern(s)
-
-		; string
-		if startswith(tok,"\"")
-			s = unesc(slice(tok,1,len(tok)-1))
-			lex()
-			return'.list',*s
-
-		; raw string
-		if startswith(tok,"#\"")
-			s = slice(tok,2,len(tok)-1)
-			lex()
-			return'.list',*s
-
-		; bracketed expression or list
-		if eat("(")
-			if eat(".indent")
-				s =  '.list',
-				while ! eat(".dedent")
-					s@=expr(),
-					eat(",")
-					expect("\n")
-				expect(")")
-				return s
-			if eat(")")
-				return '.list',
-			a = commas()
-			expect(")")
-			return a
-
-		; none of the above
-		errtok("expected expression")
-
-	fn postfix()
-		a = primary()
-		while 1
+	fn fbody(fname,fparams)
+		fn primary()
+			; word
 			case tok
-				"("
+				"false"
 					lex()
-					a = a,
-					if eat(".indent")
-						while ! eat(".dedent")
-							a@=expr(),
-							eat(",")
-							expect("\n")
-						expect(")")
-						continue
-					while ! eat(")")
-						a@=expr(),
-						if eat(")")
-							break
-						expect(",")
-				"++"
-				"--"
-					return intern("post" @ lex1()), a
-				"."
+					return 0
+				"true"
 					lex()
-					field = word()
-					if in(a,keys modules)
-						a='.',a,field
-					else
-						a = "get", a, ('.quote',field)
-				_
-					if isprimary()
-						a = [a, prefix()]
-						while eat(",")
-							a@=prefix(),
-					return a
+					return 1
+			if isidstart(tok!0)
+				return lex1()
 
-	fn params()
-		s = []
-		case tok
-			"("
+			; number
+			if isdigit(tok!0)
+				s=replace("_","",tok)
+				case lower(take(2,s))
+					"0b"
+						a = parseint(drop(2,s), 2)
+					"0o"
+						a = parseint(drop(2,s), 8)
+					"0x"
+						a = parseint(drop(2,s), 16)
+					_
+						a = parseint(s)
 				lex()
+				return a
+
+			; symbol
+			if startswith(tok,"'")
+				s = unesc(slice(tok,1,len(tok)-1))
+				lex()
+				return '.quote',intern(s)
+
+			; string
+			if startswith(tok,"\"")
+				s = unesc(slice(tok,1,len(tok)-1))
+				lex()
+				return'.list',*s
+
+			; raw string
+			if startswith(tok,"#\"")
+				s = slice(tok,2,len(tok)-1)
+				lex()
+				return'.list',*s
+
+			; bracketed expression or list
+			if eat("(")
 				if eat(".indent")
+					s =  '.list',
 					while ! eat(".dedent")
-						s@=word(),
+						s@=expr(),
 						eat(",")
 						expect("\n")
 					expect(")")
-				else
-					while ! eat(")")
-						s@=word(),
-						if eat(")")
-							break
-						expect(",")
-			".indent"
-			":"
-				0
-			_
-				while 1
-					s@=word(),
-					if ! eat(",")
-						break
-		return s
-
-	fn prefix()
-		case tok
-			"!"
-			"++"
-			"--"
-			"~"
-				return intern(lex1()), prefix()
-			"*"
-				lex()
-				return '...', prefix()
-			"-"
-				lex()
-				return 'neg', prefix()
-			"\\"
-				s = [intern(lex1()), params()]
-				if ! eat("(")
-					s@=expr(),
 					return s
-				if eat(".indent")
-					while ! eat(".dedent")
-						s@=stmt(),
+				if eat(")")
+					return '.list',
+				a = commas()
+				expect(")")
+				return a
+
+			; none of the above
+			errtok("expected expression")
+
+		fn postfix()
+			a = primary()
+			while 1
+				case tok
+					"("
+						lex()
+						a = a,
+						if eat(".indent")
+							while ! eat(".dedent")
+								a@=expr(),
+								eat(",")
+								expect("\n")
+							expect(")")
+							continue
+						while ! eat(")")
+							a@=expr(),
+							if eat(")")
+								break
+							expect(",")
+					"++"
+					"--"
+						return intern("post" @ lex1()), a
+					"."
+						lex()
+						field = word()
+						if in(a,keys modules)
+							a='.',a,field
+						else
+							a = "get", a, ('.quote',field)
+					_
+						if isprimary()
+							a = [a, prefix()]
+							while eat(",")
+								a@=prefix(),
+						return a
+
+		fn params()
+			s = []
+			case tok
+				"("
+					lex()
+					if eat(".indent")
+						while ! eat(".dedent")
+							s@=word(),
+							eat(",")
+							expect("\n")
+						expect(")")
+					else
+						while ! eat(")")
+							s@=word(),
+							if eat(")")
+								break
+							expect(",")
+				".indent"
+				":"
+					0
+				_
+					while 1
+						s@=word(),
+						if ! eat(",")
+							break
+			return s
+
+		fn prefix()
+			case tok
+				"!"
+				"++"
+				"--"
+				"~"
+					return intern(lex1()), prefix()
+				"*"
+					lex()
+					return '...', prefix()
+				"-"
+					lex()
+					return 'neg', prefix()
+				"\\"
+					line1=line
+					s = [intern(lex1()),]
+
+					fparams1=params()
+					s@=fparams1,
+
+					expect"("
+					s@=('.loc',file,line1,'\\'),
+					if eat(".indent")
+						s@=fbody('\\',fparams1)
+						expect(".dedent")
+						return s
+					else
+						s@=commas(),
 					expect(")")
 					return s
-				if tok != ")"
-					s@=commas(),
-				expect(")")
-				return s
-		return postfix()
+			return postfix()
 
-	; operator precedence parser
-	prec = 99
-	ops = ()
+		; operator precedence parser
+		prec = 99
+		ops = ()
 
-	fn mkop(op, left)
-		^ ops
-		ops@=(op,( prec, left)),
+		fn mkop(op, left)
+			^ ops
+			ops@=(op,( prec, left)),
 
-	mkop("!", 1)
+		mkop("!", 1)
 
-	prec--
-	mkop("**")
+		prec--
+		mkop("**")
 
-	prec--
-	mkop("%", 1)
-	mkop("*", 1)
-	mkop("/", 1)
-	mkop("//", 1)
+		prec--
+		mkop("%", 1)
+		mkop("*", 1)
+		mkop("/", 1)
+		mkop("//", 1)
 
-	prec--
-	mkop("+", 1)
-	mkop("-", 1)
-	mkop("@", 1)
+		prec--
+		mkop("+", 1)
+		mkop("-", 1)
+		mkop("@", 1)
 
-	prec--
-	mkop("<<", 1)
-	mkop(">>", 1)
-	mkop(">>>", 1)
+		prec--
+		mkop("<<", 1)
+		mkop(">>", 1)
+		mkop(">>>", 1)
 
-	prec--
-	mkop("&", 1)
+		prec--
+		mkop("&", 1)
 
-	prec--
-	mkop("^", 1)
+		prec--
+		mkop("^", 1)
 
-	prec--
-	mkop("|", 1)
+		prec--
+		mkop("|", 1)
 
-	prec--
-	mkop("!=", 1)
-	mkop("<", 1)
-	mkop("<=", 1)
-	mkop("==", 1)
-	mkop(">", 1)
-	mkop(">=", 1)
+		prec--
+		mkop("!=", 1)
+		mkop("<", 1)
+		mkop("<=", 1)
+		mkop("==", 1)
+		mkop(">", 1)
+		mkop(">=", 1)
 
-	prec--
-	mkop("&&", 1)
+		prec--
+		mkop("&&", 1)
 
-	prec--
-	mkop("||", 1)
+		prec--
+		mkop("||", 1)
 
-	fn infix(prec)
-		a = prefix()
-		while 1
-			prec1, left1 = get ops,tok
-			if prec1 < prec
+		fn infix(prec)
+			a = prefix()
+			while 1
+				prec1, left1 = get ops,tok
+				if prec1 < prec
+					return a
+				op = lex1()
+				b = infix(prec1 + left1)
+				case op
+					"!"
+						a ='.subscript', a, b
+					">"
+						a ='<', b, a
+					">="
+						a ='<=', b, a
+					_
+						a = intern(op), a, b
+
+		fn expr()
+			return infix(1)
+
+		; statements
+		fn commas()
+			a = expr()
+			if tok != ","
 				return a
-			op = lex1()
-			b = infix(prec1 + left1)
-			case op
-				"!"
-					a ='.subscript', a, b
-				">"
-					a ='<', b, a
-				">="
-					a ='<=', b, a
-				_
-					a = intern(op), a, b
+			s = ['.list', a]
+			while eat(",")
+				if !in(tok,(				")",".indent" , "\n"))
+						s@=expr(),
+			return s
 
-	fn expr()
-		return infix(1)
-
-	; statements
-	fn commas()
-		a = expr()
-		if tok != ","
+		fn assignment()
+			;TODO clear error message if the left-hand side is not assignable
+			a = commas()
+			if endswith(tok,"=")
+				return intern(lex1()), a, assignment()
 			return a
-		s = ['.list', a]
-		while eat(",")
-			if !in(tok,(				")",".indent" , "\n"))
+
+		fn block(s)
+			expect(".indent")
+			s=()
+			while ! eat(".dedent")
+				s@=('.loc',file,line,fname),
+				s@=stmt(),
+			s
+
+		fn if1()
+			assert  in(tok, ("if", "elif"))
+			lex()
+			s = ["if", expr()]
+			s@=block(),
+			case tok
+				"elif"
+					s@=if1(),
+				"else"
+					lex()
+					s@=block(),
+			return s
+
+		fn stmt()
+			s = [intern (tok),]
+			;TODO: fname
+			case tok
+				"assert"
+					s@=file,
+					s@=line,
+					s@=fname,
+					lex()
+					x = expr()
+					s@=str(x),
+					s@=x,
+					expect("\n")
+					return s
+				"show"
+					s@=file,
+					s@=line,
+					s@=fname,
+					lex()
+					x = commas()
+					s@=str(x),
+					s@=x,
+					expect("\n")
+					return s
+				"case"
+					lex()
+					s@=commas(),
+					expect(".indent")
+					while ! eat(".dedent")
+						patterns = [commas(),]
+						while eat("\n")
+							patterns@=commas(),
+						body = block()
+						for pattern  patterns
+							s@=(pattern, *body),
+					return s
+				"dowhile"
+				"while"
+					lex()
 					s@=expr(),
-		return s
+					s@=block()
+					return s
+				"for"
+					lex()
+					s@=word(),
+					s@=commas(),
+					s@=block()
+					return s
+				"fn"
+					line1=line
+					lex()
 
-	fn assignment()
-		;TODO clear error message if the left-hand side is not assignable
-		a = commas()
-		if endswith(tok,"=")
-			return intern(lex1()), a, assignment()
-		return a
+					fname1=word()
+					s@=fname1,
 
-	fn block(s)
-		expect(".indent")
-		s=()
-		while ! eat(".dedent")
+					fparams1=params()
+					s@=fparams1,
+
+					expect".indent"
+					s@=('.loc',file,line1,fname1),
+					s@=fbody(fname1,fparams1)
+					expect".dedent"
+					return s
+				"if"
+					return if1()
+				"^"
+					lex()
+					s@=word(),
+					expect("\n")
+					return s
+				"return"
+					lex()
+					if eat("\n")
+						return "return", 0
+					s@=commas(),
+					expect("\n")
+					return s
+			a = assignment()
+			if eat(":")
+				return ":", a, stmt()
+			expect("\n")
+			return a
+
+		; function/module body
+		s = []
+		while tok != ".dedent"
+			s@=('.loc',file,line,fname),
 			s@=stmt(),
 		s
-
-	fn if1()
-		assert  in(tok, ("if", "elif"))
-		lex()
-		s = ["if", expr()]
-		s@=block(),
-		case tok
-			"elif"
-				s@=if1(),
-			"else"
-				lex()
-				s@=block(),
-		return s
-
-	fn stmt()
-		s = [intern (tok),]
-		;TODO: fname
-		case tok
-			"assert"
-				s@=file,
-				s@=line,
-				lex()
-				x = expr()
-				s@=str(x),
-				s@=x,
-				expect("\n")
-				return s
-			"show"
-				s@=file,
-				s@=line,
-				lex()
-				x = commas()
-				s@=str(x),
-				s@=x,
-				expect("\n")
-				return s
-			"case"
-				lex()
-				s@=commas(),
-				expect(".indent")
-				while ! eat(".dedent")
-					patterns = [commas(),]
-					while eat("\n")
-						patterns@=commas(),
-					body = block()
-					for pattern  patterns
-						s@=(pattern, *body),
-				return s
-			"dowhile"
-			"while"
-				lex()
-				s@=expr(),
-				s@=block()
-				return s
-			"for"
-				lex()
-				s@=word(),
-				s@=commas(),
-				s@=block()
-				return s
-			"fn"
-				line1=line
-				lex()
-				s@=word(),
-				s@=params(),
-				s@=('.line',file,line1),
-				s@=block()
-				return s
-			"if"
-				return if1()
-			"^"
-				lex()
-				s@=word(),
-				expect("\n")
-				return s
-			"return"
-				lex()
-				if eat("\n")
-					return "return", 0
-				s@=commas(),
-				expect("\n")
-				return s
-		a = assignment()
-		if eat(":")
-			return ":", a, stmt()
-		expect("\n")
-		return a
 
 	; top level
 	lex()
@@ -583,7 +604,5 @@ fn parse  file,text
 		expect("\n")
 
 	; module
-	s = []
-	while tok != ".dedent"
-		s@=stmt(),
-	modules@=(file,s),
+	;TODO: module name?
+	modules@=(file,fbody(name,())),
