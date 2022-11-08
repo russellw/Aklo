@@ -305,349 +305,370 @@ def parse(name, file):
     def isprimary():
         return isidpart(tok[0]) or tok[0] in "'\"#"
 
-    def primary():
-        # word
-        if isidstart(tok[0]):
-            return lex1()
+    def fbody(fname, fparams):
+        def primary():
+            # word
+            if isidstart(tok[0]):
+                return lex1()
 
-        # number
-        if tok[0].isdigit():
-            s = tok.replace("_", "")
-            match s[:2].lower():
-                case "0b":
-                    a = int(s[2:], 2)
-                case "0o":
-                    a = int(s[2:], 8)
-                case "0x":
-                    a = int(s[2:], 16)
-                case _:
-                    a = int(s)
-            lex()
-            return a
-
-        # symbol
-        if tok.startswith("'"):
-            s = unesc(tok[1:-1])
-            lex()
-            return quotesym(s)
-
-        # string
-        if tok.startswith('"'):
-            s = unesc(tok[1:-1])
-            lex()
-            return ["List.of"] + [ord(c) for c in s]
-
-        # raw string
-        if tok.startswith('#"'):
-            s = tok[2:-1]
-            lex()
-            return ["List.of"] + [ord(c) for c in s]
-
-        # bracketed expression or list
-        if eat("("):
-            if eat(".indent"):
-                s = ["List.of"]
-                while not eat(".dedent"):
-                    s.append(expr())
-                    eat(",")
-                    expect("\n")
-                expect(")")
-                return s
-            if eat(")"):
-                return ["List.of"]
-            a = commas()
-            expect(")")
-            return a
-
-        # none of the above
-        errtok("expected expression")
-
-    def postfix():
-        a = primary()
-        while 1:
-            match tok:
-                case "(":
-                    lex()
-                    a = [a]
-                    if eat(".indent"):
-                        while not eat(".dedent"):
-                            a.append(expr())
-                            eat(",")
-                            expect("\n")
-                        expect(")")
-                        continue
-                    while not eat(")"):
-                        a.append(expr())
-                        if eat(")"):
-                            break
-                        expect(",")
-                    continue
-                case "++" | "--":
-                    return "post" + lex1(), a
-                case ".":
-                    lex()
-                    field = word()
-                    if a in modules:
-                        a += "." + field
-                    else:
-                        a = "get", a, quotesym(field)
-                    continue
-            if isprimary():
-                a = [a, prefix()]
-                while eat(","):
-                    a.append(prefix())
-            return a
-
-    def params():
-        s = []
-        match tok:
-            case "(":
+            # number
+            if tok[0].isdigit():
+                s = tok.replace("_", "")
+                match s[:2].lower():
+                    case "0b":
+                        a = int(s[2:], 2)
+                    case "0o":
+                        a = int(s[2:], 8)
+                    case "0x":
+                        a = int(s[2:], 16)
+                    case _:
+                        a = int(s)
                 lex()
+                return a
+
+            # symbol
+            if tok.startswith("'"):
+                s = unesc(tok[1:-1])
+                lex()
+                return quotesym(s)
+
+            # string
+            if tok.startswith('"'):
+                s = unesc(tok[1:-1])
+                lex()
+                return ["List.of"] + [ord(c) for c in s]
+
+            # raw string
+            if tok.startswith('#"'):
+                s = tok[2:-1]
+                lex()
+                return ["List.of"] + [ord(c) for c in s]
+
+            # bracketed expression or list
+            if eat("("):
                 if eat(".indent"):
+                    s = ["List.of"]
                     while not eat(".dedent"):
-                        s.append(word())
+                        s.append(expr())
                         eat(",")
                         expect("\n")
                     expect(")")
-                else:
-                    while not eat(")"):
-                        s.append(word())
-                        if eat(")"):
-                            break
-                        expect(",")
-            case ".indent" | ":":
-                0
-            case _:
-                while 1:
-                    s.append(word())
-                    if not eat(","):
-                        break
-        return s
-
-    def prefix():
-        match tok:
-            case "!" | "++" | "--" | "~":
-                return lex1(), prefix()
-            case "*":
-                lex()
-                return "...", prefix()
-            case "-":
-                lex()
-                return "neg", prefix()
-            case "\\":
-                s = [lex1(), params()]
-                eat(":")
-                if not eat("("):
-                    s.append((".loc", file, line, "\\"))
-                    s.append(expr())
                     return s
-                if eat(".indent"):
-                    while not eat(".dedent"):
+                if eat(")"):
+                    return ["List.of"]
+                a = commas()
+                expect(")")
+                return a
+
+            # none of the above
+            errtok("expected expression")
+
+        def postfix():
+            a = primary()
+            while 1:
+                match tok:
+                    case "(":
+                        lex()
+                        a = [a]
+                        if eat(".indent"):
+                            while not eat(".dedent"):
+                                a.append(expr())
+                                eat(",")
+                                expect("\n")
+                            expect(")")
+                            continue
+                        while not eat(")"):
+                            a.append(expr())
+                            if eat(")"):
+                                break
+                            expect(",")
+                        continue
+                    case "++" | "--":
+                        return "post" + lex1(), a
+                    case ".":
+                        lex()
+                        field = word()
+                        if a in modules:
+                            a += "." + field
+                        else:
+                            a = "get", a, quotesym(field)
+                        continue
+                if isprimary():
+                    a = [a, prefix()]
+                    while eat(","):
+                        a.append(prefix())
+                return a
+
+        def params():
+            s = []
+            match tok:
+                case "(":
+                    lex()
+                    if eat(".indent"):
+                        while not eat(".dedent"):
+                            s.append(word())
+                            eat(",")
+                            expect("\n")
+                        expect(")")
+                    else:
+                        while not eat(")"):
+                            s.append(word())
+                            if eat(")"):
+                                break
+                            expect(",")
+                case ".indent" | ":":
+                    0
+                case _:
+                    while 1:
+                        s.append(word())
+                        if not eat(","):
+                            break
+            return s
+
+        def prefix():
+            match tok:
+                case "!" | "++" | "--" | "~":
+                    return lex1(), prefix()
+                case "*":
+                    lex()
+                    return "...", prefix()
+                case "-":
+                    lex()
+                    return "neg", prefix()
+                case "\\":
+                    line1 = line
+                    s = [lex1()]
+
+                    fparams1 = params()
+                    s.append(fparams1)
+
+                    eat(":")
+                    if not eat("("):
                         s.append((".loc", file, line, "\\"))
-                        s.append(stmt("\\"))
+                        s.append(expr())
+                        return s
+
+                    if eat(".indent"):
+                        s.append((".loc", file, line1, "\\"))
+                        s.extend(fbody("\\", fparams1))
+                        expect(".dedent")
+                        expect(")")
+                        return s
+
+                    if tok != ")":
+                        s.append((".loc", file, line, "\\"))
+                        s.append(commas())
                     expect(")")
                     return s
-                if tok != ")":
-                    s.append((".loc", file, line, "\\"))
-                    s.append(commas())
-                expect(")")
-                return s
-        return postfix()
+            return postfix()
 
-    # operator precedence parser
-    prec = 99
-    ops = {}
+        # operator precedence parser
+        prec = 99
+        ops = {}
 
-    def mkop(op, left):
-        ops[op] = prec, left
+        def mkop(op, left):
+            ops[op] = prec, left
 
-    mkop("!", 1)
+        mkop("!", 1)
 
-    prec -= 1
-    mkop("**", 0)
+        prec -= 1
+        mkop("**", 0)
 
-    prec -= 1
-    mkop("%", 1)
-    mkop("*", 1)
-    mkop("/", 1)
-    mkop("//", 1)
+        prec -= 1
+        mkop("%", 1)
+        mkop("*", 1)
+        mkop("/", 1)
+        mkop("//", 1)
 
-    prec -= 1
-    mkop("+", 1)
-    mkop("-", 1)
-    mkop("@", 1)
+        prec -= 1
+        mkop("+", 1)
+        mkop("-", 1)
+        mkop("@", 1)
 
-    prec -= 1
-    mkop("<<", 1)
-    mkop(">>", 1)
-    mkop(">>>", 1)
+        prec -= 1
+        mkop("<<", 1)
+        mkop(">>", 1)
+        mkop(">>>", 1)
 
-    prec -= 1
-    mkop("&", 1)
+        prec -= 1
+        mkop("&", 1)
 
-    prec -= 1
-    mkop("^", 1)
+        prec -= 1
+        mkop("^", 1)
 
-    prec -= 1
-    mkop("|", 1)
+        prec -= 1
+        mkop("|", 1)
 
-    prec -= 1
-    mkop("!=", 1)
-    mkop("<", 1)
-    mkop("<=", 1)
-    mkop("==", 1)
-    mkop(">", 1)
-    mkop(">=", 1)
+        prec -= 1
+        mkop("!=", 1)
+        mkop("<", 1)
+        mkop("<=", 1)
+        mkop("==", 1)
+        mkop(">", 1)
+        mkop(">=", 1)
 
-    prec -= 1
-    mkop("&&", 1)
+        prec -= 1
+        mkop("&&", 1)
 
-    prec -= 1
-    mkop("||", 1)
+        prec -= 1
+        mkop("||", 1)
 
-    def infix(prec):
-        a = prefix()
-        while 1:
-            if tok not in ops:
+        def infix(prec):
+            a = prefix()
+            while 1:
+                if tok not in ops:
+                    return a
+                prec1, left1 = ops[tok]
+                if prec1 < prec:
+                    return a
+                op = lex1()
+                b = infix(prec1 + left1)
+                match op:
+                    case "!":
+                        a = "subscript", a, b
+                    case ">":
+                        a = "<", b, a
+                    case ">=":
+                        a = "<=", b, a
+                    case _:
+                        a = op, a, b
+
+        def expr():
+            return infix(1)
+
+        # statements
+        def commas():
+            a = expr()
+            if tok != ",":
                 return a
-            prec1, left1 = ops[tok]
-            if prec1 < prec:
-                return a
-            op = lex1()
-            b = infix(prec1 + left1)
-            match op:
-                case "!":
-                    a = "subscript", a, b
-                case ">":
-                    a = "<", b, a
-                case ">=":
-                    a = "<=", b, a
-                case _:
-                    a = op, a, b
+            s = ["List.of", a]
+            while eat(","):
+                if tok not in (")", ".indent", "\n"):
+                    s.append(expr())
+            return s
 
-    def expr():
-        return infix(1)
-
-    # statements
-    def commas():
-        a = expr()
-        if tok != ",":
+        def assignment():
+            a = commas()
+            if tok.endswith("="):
+                return lex1(), a, assignment()
             return a
-        s = ["List.of", a]
-        while eat(","):
-            if tok not in (")", ".indent", "\n"):
-                s.append(expr())
-        return s
 
-    def assignment():
-        a = commas()
-        if tok.endswith("="):
-            return lex1(), a, assignment()
-        return a
+        def block():
+            expect(".indent")
+            s = []
+            while not eat(".dedent"):
+                s.append((".loc", file, line, fname))
+                s.append(stmt())
+            return s
 
-    def block(fname):
-        expect(".indent")
+        def if1():
+            assert tok in ("if", "elif")
+            lex()
+            s = ["if", expr()]
+            eat(":")
+            s.append(block())
+            match tok:
+                case "elif":
+                    s.append(if1())
+                case "else":
+                    lex()
+                    eat(":")
+                    s.append(block())
+            return s
+
+        def stmt():
+            # TODO: error check loose break/continue?
+            s = [tok]
+            match tok:
+                case "assert":
+                    s.append(file)
+                    s.append(line)
+                    s.append(fname)
+                    lex()
+                    x = expr()
+                    s.append(str(x))
+                    s.append(x)
+                    expect("\n")
+                    return s
+                case "show":
+                    s.append(file)
+                    s.append(line)
+                    s.append(fname)
+                    lex()
+                    x = commas()
+                    s.append(str(x))
+                    s.append(x)
+                    expect("\n")
+                    return s
+                case "case":
+                    lex()
+                    s.append(commas())
+                    eat(":")
+                    expect(".indent")
+                    while not eat(".dedent"):
+                        patterns = [commas()]
+                        while eat("\n"):
+                            patterns.append(commas())
+                        body = block()
+                        for pattern in patterns:
+                            s.append((pattern, *body))
+                    return s
+                case "dowhile" | "while":
+                    lex()
+                    s.append(expr())
+                    eat(":")
+                    s.extend(block())
+                    return s
+                case "for":
+                    lex()
+                    s.append(word())
+                    eat(":")
+                    s.append(commas())
+                    eat(":")
+                    s.extend(block())
+                    return s
+                case "fn":
+                    line1 = line
+                    lex()
+
+                    fname1 = word()
+                    s.append(fname1)
+
+                    fparams1 = params()
+                    s.append(fparams1)
+
+                    eat(":")
+                    expect(".indent")
+                    s.append((".loc", file, line1, fname1))
+                    s.extend(fbody(fname1, fparams1))
+                    expect(".dedent")
+                    return s
+                case "if":
+                    return if1()
+                case "^":
+                    lex()
+                    s.append(word())
+                    expect("\n")
+                    return s
+                case "return":
+                    lex()
+                    if eat("\n"):
+                        return "return", 0
+                    s.append(commas())
+                    expect("\n")
+                    return s
+            a = assignment()
+            if eat(":"):
+                return ":", a, stmt()
+            expect("\n")
+            return a
+
+        # function/module body
         s = []
-        while not eat(".dedent"):
+        while tok != ".dedent":
             s.append((".loc", file, line, fname))
-            s.append(stmt(fname))
+            s.append(stmt())
         return s
-
-    def if1(fname):
-        assert tok in ("if", "elif")
-        lex()
-        s = ["if", expr()]
-        eat(":")
-        s.append(block(fname))
-        match tok:
-            case "elif":
-                s.append(if1(fname))
-            case "else":
-                lex()
-                eat(":")
-                s.append(block(fname))
-        return s
-
-    def stmt(fname):
-        # TODO: error check loose break/continue?
-        s = [tok]
-        match tok:
-            case "assert":
-                s.append(file)
-                s.append(line)
-                s.append(fname)
-                lex()
-                x = expr()
-                s.append(str(x))
-                s.append(x)
-                expect("\n")
-                return s
-            case "show":
-                s.append(file)
-                s.append(line)
-                s.append(fname)
-                lex()
-                x = commas()
-                s.append(str(x))
-                s.append(x)
-                expect("\n")
-                return s
-            case "case":
-                lex()
-                s.append(commas())
-                eat(":")
-                expect(".indent")
-                while not eat(".dedent"):
-                    patterns = [commas()]
-                    while eat("\n"):
-                        patterns.append(commas())
-                    body = block(fname)
-                    for pattern in patterns:
-                        s.append((pattern, *body))
-                return s
-            case "dowhile" | "while":
-                lex()
-                s.append(expr())
-                eat(":")
-                s.extend(block(fname))
-                return s
-            case "for":
-                lex()
-                s.append(word())
-                eat(":")
-                s.append(commas())
-                eat(":")
-                s.extend(block(fname))
-                return s
-            case "fn":
-                line1 = line
-                lex()
-                fname = word()
-                s.append(fname)
-                s.append(params())
-                eat(":")
-                s.append((".loc", file, line1, fname))
-                s.extend(block(fname))
-                return s
-            case "if":
-                return if1(fname)
-            case "^":
-                lex()
-                s.append(word())
-                expect("\n")
-                return s
-            case "return":
-                lex()
-                if eat("\n"):
-                    return "return", 0
-                s.append(commas())
-                expect("\n")
-                return s
-        a = assignment()
-        if eat(":"):
-            return ":", a, stmt(fname)
-        expect("\n")
-        return a
 
     # top level
     lex()
@@ -660,10 +681,7 @@ def parse(name, file):
         expect("\n")
 
     # module
-    s = []
-    while tok != ".dedent":
-        s.append(stmt(name))
-    modules[name] = s
+    modules[name] = fbody(name, [])
 
 
 parse("global", f"{here}/../src/global.k")
