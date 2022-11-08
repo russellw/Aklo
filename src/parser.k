@@ -472,6 +472,7 @@ fn parse  file,text
 		return s
 
 	fn assignment():
+		;TODO clear error message if the left-hand side is not assignable
 		a = commas()
 		if endswith(tok,"="):
 			return intern(lex1()), a, assignment()
