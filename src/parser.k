@@ -546,6 +546,7 @@ fn parse  file,text
 					return s
 				"for"
 					lex()
+					;TODO: use another operator for append?
 					s@=word(),
 					s@=commas(),
 					s@=block()
