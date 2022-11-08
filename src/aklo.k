@@ -30,5 +30,6 @@ while i<len argv
 	file=s
 if !file
 	usage()
-parser.parse(file,readfile(file))
+;TODO modname?
+parser.parse('program',file,readfile(file))
 show parser.modules

@@ -1,6 +1,6 @@
 modules=()
 
-fn parse  file,text
+fn parse modname, file,text
 	^ modules
 
 	;TODO: repr
@@ -383,7 +383,6 @@ fn parse  file,text
 					if eat(".indent")
 						s@=fbody('\\',fparams1)
 						expect(".dedent")
-						return s
 					else
 						s@=commas(),
 					expect(")")
@@ -599,11 +598,12 @@ fn parse  file,text
 
 	; imports
 	while eat("import")
-		name1 = word()
+		name = word()
 		;TODO: path
-		parse(name1, name1 @ ".k")
+		file1= name @ ".k"
+		parse(intern(name),file1,readfile  file1)
 		expect("\n")
 
 	; module
 	;TODO: module name?
-	modules@=(file,fbody(name,())),
+	modules@=(modname,(file,fbody(modname,()))),

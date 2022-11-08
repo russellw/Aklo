@@ -78,9 +78,9 @@ def quotesym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
-def parse(name, file):
+def parse(modname, file):
     # TODO: enforce initialization of local variables?
-    if name in modules:
+    if modname in modules:
         return
     file = file.replace("\\", "/")
 
@@ -660,12 +660,12 @@ def parse(name, file):
 
     # imports
     while eat("import"):
-        name1 = word()
-        parse(name1, f"{here}/../src/{name1}.k")
+        name = word()
+        parse(name, f"{here}/../src/{name}.k")
         expect("\n")
 
     # module
-    modules[name] = fbody(name, [])
+    modules[modname] = fbody(modname, [])
 
 
 parse("global", f"{here}/../src/global.k")
@@ -1191,9 +1191,9 @@ def ret(a):
 
 
 # modules
-for name, module in modules.items():
+for modname, module in modules.items():
     print('@SuppressWarnings("unchecked")')
-    print(f"class {name} {{")
+    print(f"class {modname} {{")
 
     # local functions
     r = []
@@ -1211,10 +1211,10 @@ for name, module in modules.items():
 
     # body
     print("static void run() {")
-    if name == "program":
-        for name1 in modules:
-            if name1 != "program":
-                print(name1 + ".run();")
+    if modname == "program":
+        for name in modules:
+            if name != "program":
+                print(name + ".run();")
     each(stmt, module)
     print("}")
 
