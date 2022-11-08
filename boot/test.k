@@ -363,7 +363,7 @@ assert a=="AAAAA"
 
 i=0
 m=0
-for c: "ABC"
+for c "ABC"
 	i++
 	m+=c
 assert i==3
@@ -388,7 +388,7 @@ assert  a.y==2
 assert  a.z==0
 
 ;lambda
-f=\x,y:x+y
+f=\x,y(x+y)
 assert f(2,3)==5
 
 f=\x,y(
@@ -397,7 +397,7 @@ f=\x,y(
 )
 assert f(2,3)==5
 
-f=\():77
+f=\()(77)
 assert f()==77
 
 ;functions
@@ -479,7 +479,7 @@ assert !isupper 97
 
 ;higher-order functions
 assert map( succ,[1,2,3])==[2,3,4]
-assert map( \x:x*x,[1,2,3])==[1,4,9]
+assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
 assert filter( even,[1,2,3])==[2,]

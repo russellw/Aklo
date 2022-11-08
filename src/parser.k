@@ -23,14 +23,14 @@ fn parse  file,text
 		eprintf("%s:%d: %s\n",file,line,msg)
 		exit 1
 
-	fn errtok(msg):
+	fn errtok(msg)
 		^ line
-		if tok == "\n":
+		if tok == "\n"
 			line--
 		err(fmt("%s: %s",repr(tok),msg))
 
 	; tokenizer
-	fn lex():
+	fn lex()
 		^ cols
 		^ dedents
 		^ dentc
@@ -38,25 +38,25 @@ fn parse  file,text
 		^ line
 		^ tok
 
-		if dedents:
+		if dedents
 			dedents--
 			tok = ".dedent"
 			return
 
-		while i < len(text):
+		while i < len(text)
 			j = i
 			tok = text!i,
 
 			; newline
-			if tok == "\n":
+			if tok == "\n"
 				; next line
 				i++
 				line++
 
 				; measure indent
 				col = 0
-				while in (text!i ,"\t "):
-					if text!i != dentc && dentc:
+				while in (text!i ,"\t ")
+					if text!i != dentc && dentc
 						err("indented with tabs and spaces in same file")
 					dentc = text!i++
 					col++
@@ -66,67 +66,67 @@ fn parse  file,text
 					continue
 
 				; one indent
-				if col > last(cols):
+				if col > last(cols)
 					cols@=col,
 					tok = ".indent"
 					return
 
 				; zero or more dedents
-				while col < last(cols):
+				while col < last(cols)
 					cols=init(cols)
 					dedents++
-				if col != last(cols):
+				if col != last(cols)
 					err("inconsistent indent")
 				return
 
 			; space
-			if isspace(text!i):
+			if isspace(text!i)
 				i++
 				continue
 
 			; comment
-			if tok == ";":
-				while text!i != "\n"!0:
+			if tok == ";"
+				while text!i != "\n"!0
 					i++
 				continue
-			if tok == "{":
+			if tok == "{"
 				i ++
 				line1 = line
-				while text!i != "}"!0:
-					if i == len(text):
+				while text!i != "}"!0
+					if i == len(text)
 						line = line1
 						err("unclosed block comment")
-					if text!i == "\n"!0:
+					if text!i == "\n"!0
 						line++
 					i++
 				i ++
 				continue
 
 			; word
-			if isidstart(text!i):
-				while isidpart(text!i):
+			if isidstart(text!i)
+				while isidpart(text!i)
 					i++
 				tok = slice(text,j,i)
 				return
 
 			; hexadecimal numbers are a separate because they may contain 'e'
-			if lower(slice(text,i,i+2)) == "0x":
-				while isidpart(text!i):
+			if lower(slice(text,i,i+2)) == "0x"
+				while isidpart(text!i)
 					i++
 				tok = slice(text,j,i)
 				return
 
 			; other number
-			if isdigit(text!i) || tok == "." && isdigit(text![i + 1]):
-				while isidpart(text!i):
+			if isdigit(text!i) || tok == "." && isdigit(text![i + 1])
+				while isidpart(text!i)
 					i++
-				if text!i == "."!0:
+				if text!i == "."!0
 					i++
-					while isidpart(text!i):
+					while isidpart(text!i)
 						i++
-					if lower(text![i - 1]) == "e"!0 && in(text!i ,"+-"):
+					if lower(text![i - 1]) == "e"!0 && in(text!i ,"+-")
 						i++
-						while isidpart(text!i):
+						while isidpart(text!i)
 							i++
 				tok = slice(text,j,i)
 				return
@@ -136,10 +136,10 @@ fn parse  file,text
 				"'"
 				"\""
 					q = text!i++
-					while text!i != q:
-						if text!i == "\\"!0:
+					while text!i != q
+						if text!i == "\\"!0
 							i++
-						if text!i == "\n"!0:
+						if text!i == "\n"!0
 							err("unclosed quote")
 						i++
 					i++
@@ -147,10 +147,10 @@ fn parse  file,text
 					return
 
 			; raw string
-			if slice(text,i,i+2) == "#\"":
+			if slice(text,i,i+2) == "#\""
 				i += 2
-				while text!i != "\""!0:
-					if text!i == "\n"!0:
+				while text!i != "\""!0
+					if text!i == "\n"!0
 						err("unclosed quote")
 					i++
 				i++
@@ -190,15 +190,15 @@ fn parse  file,text
 				"|=",
 				"||",
 			)
-			for s  punct:
-				if slice(text,i , i + len(s)) == s:
+			for s  punct
+				if slice(text,i , i + len(s)) == s
 					i += len(s)
 					tok = s
 					return
 
-			if tok == "[":
+			if tok == "["
 				tok = "("
-			if tok == "]":
+			if tok == "]"
 				tok = ")"
 			i++
 			return
@@ -206,31 +206,31 @@ fn parse  file,text
 		; end of file
 		tok = ".dedent"
 
-	fn lex1():
+	fn lex1()
 		s = tok
 		lex()
 		return s
 
 	; parser
-	fn eat(s):
-		if tok == s:
+	fn eat(s)
+		if tok == s
 			lex()
 			return 1
 
-	fn expect(s):
-		if ! eat(s):
+	fn expect(s)
+		if ! eat(s)
 			errtok(fmt("expected %s",repr s))
 
-	fn word():
-		if isidstart(tok!0):
+	fn word()
+		if isidstart(tok!0)
 			return intern(lex1())
 		errtok("expected word")
 
 	; expressions
-	fn isprimary():
+	fn isprimary()
 		return isidpart(tok!0) || in(tok!0 ,"'\"#")
 
-	fn primary():
+	fn primary()
 		; word
 		case tok
 			"false"
@@ -239,13 +239,13 @@ fn parse  file,text
 			"true"
 				lex()
 				return 1
-		if isidstart(tok!0):
+		if isidstart(tok!0)
 			return lex1()
 
 		; number
-		if isdigit(tok!0):
+		if isdigit(tok!0)
 			s=replace("_","",tok)
-			case lower(take(2,s)):
+			case lower(take(2,s))
 				"0b"
 					a = parseint(drop(2,s), 2)
 				"0o"
@@ -258,34 +258,34 @@ fn parse  file,text
 			return a
 
 		; symbol
-		if startswith(tok,"'"):
+		if startswith(tok,"'")
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
 			return '.quote',intern(s)
 
 		; string
-		if startswith(tok,"\""):
+		if startswith(tok,"\"")
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
 			return'.list',*s
 
 		; raw string
-		if startswith(tok,"#\""):
+		if startswith(tok,"#\"")
 			s = slice(tok,2,len(tok)-1)
 			lex()
 			return'.list',*s
 
 		; bracketed expression or list
-		if eat("("):
-			if eat(".indent"):
+		if eat("(")
+			if eat(".indent")
 				s =  '.list',
-				while ! eat(".dedent"):
+				while ! eat(".dedent")
 					s@=expr(),
 					eat(",")
 					expect("\n")
 				expect(")")
 				return s
-			if eat(")"):
+			if eat(")")
 				return '.list',
 			a = commas()
 			expect(")")
@@ -294,23 +294,23 @@ fn parse  file,text
 		; none of the above
 		errtok("expected expression")
 
-	fn postfix():
+	fn postfix()
 		a = primary()
-		while 1:
-			case tok:
+		while 1
+			case tok
 				"("
 					lex()
 					a = a,
-					if eat(".indent"):
-						while ! eat(".dedent"):
+					if eat(".indent")
+						while ! eat(".dedent")
 							a@=expr(),
 							eat(",")
 							expect("\n")
 						expect(")")
 						continue
-					while ! eat(")"):
+					while ! eat(")")
 						a@=expr(),
-						if eat(")"):
+						if eat(")")
 							break
 						expect(",")
 				"++"
@@ -321,44 +321,44 @@ fn parse  file,text
 					field = word()
 					if in(a,keys modules)
 						a='.',a,field
-					else:
+					else
 						a = "get", a, ('.quote',field)
 				_
-					if isprimary():
+					if isprimary()
 						a = [a, prefix()]
-						while eat(","):
+						while eat(",")
 							a@=prefix(),
 					return a
 
-	fn params():
+	fn params()
 		s = []
-		case tok:
+		case tok
 			"("
 				lex()
-				if eat(".indent"):
-					while ! eat(".dedent"):
+				if eat(".indent")
+					while ! eat(".dedent")
 						s@=word(),
 						eat(",")
 						expect("\n")
 					expect(")")
-				else:
-					while ! eat(")"):
+				else
+					while ! eat(")")
 						s@=word(),
-						if eat(")"):
+						if eat(")")
 							break
 						expect(",")
 			".indent"
 			":"
 				0
 			_
-				while 1:
+				while 1
 					s@=word(),
-					if ! eat(","):
+					if ! eat(",")
 						break
 		return s
 
-	fn prefix():
-		case tok:
+	fn prefix()
+		case tok
 			"!"
 			"++"
 			"--"
@@ -372,16 +372,15 @@ fn parse  file,text
 				return 'neg', prefix()
 			"\\"
 				s = [intern(lex1()), params()]
-				eat(":")
-				if ! eat("("):
+				if ! eat("(")
 					s@=expr(),
 					return s
-				if eat(".indent"):
-					while ! eat(".dedent"):
+				if eat(".indent")
+					while ! eat(".dedent")
 						s@=stmt(),
 					expect(")")
 					return s
-				if tok != ")":
+				if tok != ")"
 					s@=commas(),
 				expect(")")
 				return s
@@ -391,7 +390,7 @@ fn parse  file,text
 	prec = 99
 	ops = ()
 
-	fn mkop(op, left):
+	fn mkop(op, left)
 		^ ops
 		ops@=(op,( prec, left)),
 
@@ -439,15 +438,15 @@ fn parse  file,text
 	prec--
 	mkop("||", 1)
 
-	fn infix(prec):
+	fn infix(prec)
 		a = prefix()
-		while 1:
+		while 1
 			prec1, left1 = get ops,tok
-			if prec1 < prec:
+			if prec1 < prec
 				return a
 			op = lex1()
 			b = infix(prec1 + left1)
-			case op:
+			case op
 				"!"
 					a ='.subscript', a, b
 				">"
@@ -457,53 +456,51 @@ fn parse  file,text
 				_
 					a = intern(op), a, b
 
-	fn expr():
+	fn expr()
 		return infix(1)
 
 	; statements
-	fn commas():
+	fn commas()
 		a = expr()
-		if tok != ",":
+		if tok != ","
 			return a
 		s = ['.list', a]
-		while eat(","):
-			if !in(tok,(				")",".indent" , "\n")):
+		while eat(",")
+			if !in(tok,(				")",".indent" , "\n"))
 					s@=expr(),
 		return s
 
-	fn assignment():
+	fn assignment()
 		;TODO clear error message if the left-hand side is not assignable
 		a = commas()
-		if endswith(tok,"="):
+		if endswith(tok,"=")
 			return intern(lex1()), a, assignment()
 		return a
 
-	fn block(s):
+	fn block(s)
 		expect(".indent")
 		s=()
-		while ! eat(".dedent"):
+		while ! eat(".dedent")
 			s@=stmt(),
 		s
 
-	fn if1():
+	fn if1()
 		assert  in(tok, ("if", "elif"))
 		lex()
 		s = ["if", expr()]
-		eat(":")
 		s@=block(),
-		case tok:
+		case tok
 			"elif"
 				s@=if1(),
 			"else"
 				lex()
-				eat(":")
 				s@=block(),
 		return s
 
-	fn stmt():
+	fn stmt()
 		s = [intern (tok),]
 		;TODO: fname
-		case tok:
+		case tok
 			"assert"
 				s@=file,
 				s@=line,
@@ -525,29 +522,25 @@ fn parse  file,text
 			"case"
 				lex()
 				s@=commas(),
-				eat(":")
 				expect(".indent")
-				while ! eat(".dedent"):
+				while ! eat(".dedent")
 					patterns = [commas(),]
-					while eat("\n"):
+					while eat("\n")
 						patterns@=commas(),
 					body = block()
-					for pattern  patterns:
+					for pattern  patterns
 						s@=(pattern, *body),
 				return s
 			"dowhile"
 			"while"
 				lex()
 				s@=expr(),
-				eat(":")
 				s@=block()
 				return s
 			"for"
 				lex()
 				s@=word(),
-				expect(":")
 				s@=commas(),
-				eat(":")
 				s@=block()
 				return s
 			"fn"
@@ -555,7 +548,6 @@ fn parse  file,text
 				lex()
 				s@=word(),
 				s@=params(),
-				eat(":")
 				s@=('.line',file,line1),
 				s@=block()
 				return s
@@ -568,13 +560,13 @@ fn parse  file,text
 				return s
 			"return"
 				lex()
-				if eat("\n"):
+				if eat("\n")
 					return "return", 0
 				s@=commas(),
 				expect("\n")
 				return s
 		a = assignment()
-		if eat(":"):
+		if eat(":")
 			return ":", a, stmt()
 		expect("\n")
 		return a
@@ -584,7 +576,7 @@ fn parse  file,text
 	eat("\n")
 
 	; imports
-	while eat("import"):
+	while eat("import")
 		name1 = word()
 		;TODO: path
 		parse(name1, name1 @ ".k")
@@ -592,6 +584,6 @@ fn parse  file,text
 
 	; module
 	s = []
-	while tok != ".dedent":
+	while tok != ".dedent"
 		s@=stmt(),
 	modules@=(file,s),

@@ -30,13 +30,13 @@ fn any f,s
 
 fn map f,s
 	r=[]
-	for a :s
+	for a s
 		r@=f(  a),
 	r
 
 fn filter f,s
 	r=[]
-	for a :s
+	for a s
 		if f a
 			r@=a,
 	r
@@ -77,11 +77,11 @@ fn eprintln
 	eprint"\n"
 
 fn print
-	for a :args
+	for a args
 		printstream stdout,a
 
 fn eprint
-	for a :args
+	for a args
 		printstream stderr,a
 
 fn printstream stream,		a
@@ -94,7 +94,7 @@ fn drop i,s
 	slice s,i,len s
 
 fn in a,s
-	for b :s
+	for b s
 		if a==b
 			return 1
 

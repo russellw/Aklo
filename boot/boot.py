@@ -442,7 +442,6 @@ def parse(name, file):
                     fparams1 = params()
                     s.append(fparams1)
 
-                    eat(":")
                     if not eat("("):
                         s.append((".loc", file, line, "\\"))
                         s.append(expr())
@@ -565,14 +564,12 @@ def parse(name, file):
             assert tok in ("if", "elif")
             lex()
             s = ["if", expr()]
-            eat(":")
             s.append(block())
             match tok:
                 case "elif":
                     s.append(if1())
                 case "else":
                     lex()
-                    eat(":")
                     s.append(block())
             return s
 
@@ -603,7 +600,6 @@ def parse(name, file):
                 case "case":
                     lex()
                     s.append(commas())
-                    eat(":")
                     expect(".indent")
                     while not eat(".dedent"):
                         patterns = [commas()]
@@ -616,15 +612,12 @@ def parse(name, file):
                 case "dowhile" | "while":
                     lex()
                     s.append(expr())
-                    eat(":")
                     s.extend(block())
                     return s
                 case "for":
                     lex()
                     s.append(word())
-                    eat(":")
                     s.append(commas())
-                    eat(":")
                     s.extend(block())
                     return s
                 case "fn":
@@ -637,7 +630,6 @@ def parse(name, file):
                     fparams1 = params()
                     s.append(fparams1)
 
-                    eat(":")
                     expect(".indent")
                     s.append((".loc", file, line1, fname1))
                     s.extend(fbody(fname1, fparams1))
