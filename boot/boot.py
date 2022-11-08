@@ -442,20 +442,12 @@ def parse(name, file):
                     fparams1 = params()
                     s.append(fparams1)
 
-                    if not eat("("):
-                        s.append((".loc", file, line, "\\"))
-                        s.append(expr())
-                        return s
-
+                    expect("(")
+                    s.append((".loc", file, line1, "\\"))
                     if eat(".indent"):
-                        s.append((".loc", file, line1, "\\"))
                         s.extend(fbody("\\", fparams1))
                         expect(".dedent")
-                        expect(")")
-                        return s
-
-                    if tok != ")":
-                        s.append((".loc", file, line, "\\"))
+                    else:
                         s.append(commas())
                     expect(")")
                     return s

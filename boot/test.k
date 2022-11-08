@@ -489,8 +489,8 @@ assert filter( isdigit,"abc123")=="123"
 assert every isupper,""
 assert every isupper,"ABC"
 assert !every isupper,"ABC."
-assert every (\a a<10,(1,2,3))
-assert! every (\a a<10,(1,2,13))
+assert every (\a (a<10),(1,2,3))
+assert! every (\a( a<10),(1,2,13))
 
 assert !any isupper,""
 assert any isupper,"ABC"
