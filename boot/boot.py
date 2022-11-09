@@ -240,7 +240,6 @@ def parse(modname, file):
                 # 2 characters
                 "!=",
                 "%=",
-                "&&",
                 "**",
                 "*=",
                 "++",
@@ -254,7 +253,6 @@ def parse(modname, file):
                 ">=",
                 "@=",
                 "^=",
-                "||",
             )
             for s in punct:
                 if text[i : i + len(s)] == s:
@@ -476,10 +474,10 @@ def parse(modname, file):
         mkop(">=", 1)
 
         prec -= 1
-        mkop("&&", 1)
+        mkop("&", 1)
 
         prec -= 1
-        mkop("||", 1)
+        mkop("|", 1)
 
         def infix(prec):
             a = prefix()
@@ -703,9 +701,9 @@ def expr(a):
             pargs(s)
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
-        case ("||", x, y) | ("&&", x, y):
+        case ("|", x, y) | ("&", x, y):
             truth(x)
-            print(a[0])
+            print(a[0] * 2)
             truth(y)
         case "!", x:
             print("!")

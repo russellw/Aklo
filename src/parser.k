@@ -56,7 +56,7 @@ fn parse modname, file,text
 				; measure indent
 				col = 0
 				while in (text!i ,"\t ")
-					if text!i != dentc && dentc
+					if text!i != dentc & dentc
 						err("indented with tabs and spaces in same file")
 					dentc = text!i++
 					col++
@@ -117,14 +117,14 @@ fn parse modname, file,text
 				return
 
 			; other number
-			if isdigit(text!i) || tok == "." && isdigit(text![i + 1])
+			if isdigit(text!i) | tok == "." & isdigit(text![i + 1])
 				while isidpart(text!i)
 					i++
 				if text!i == "."!0
 					i++
 					while isidpart(text!i)
 						i++
-					if lower(text![i - 1]) == "e"!0 && in(text!i ,"+-")
+					if lower(text![i - 1]) == "e"!0 & in(text!i ,"+-")
 						i++
 						while isidpart(text!i)
 							i++
@@ -165,7 +165,6 @@ fn parse modname, file,text
 				; 2 characters
 				"!=",
 				"%=",
-				"&&",
 				"**",
 				"*=",
 				"++",
@@ -179,7 +178,6 @@ fn parse modname, file,text
 				">=",
 				"@=",
 				"^=",
-				"||",
 			)
 			for s  punct
 				if slice(text,i , i + len(s)) == s
@@ -219,7 +217,7 @@ fn parse modname, file,text
 
 	; expressions
 	fn isprimary()
-		return isidpart(tok!0) || in(tok!0 ,"'\"#")
+		return isidpart(tok!0) | in(tok!0 ,"'\"#")
 
 	fn fbody(fname,fparams)
 		fn primary()
@@ -412,10 +410,10 @@ fn parse modname, file,text
 		mkop(">=", 1)
 
 		prec--
-		mkop("&&", 1)
+		mkop("&", 1)
 
 		prec--
-		mkop("||", 1)
+		mkop("|", 1)
 
 		fn infix(prec)
 			a = prefix()

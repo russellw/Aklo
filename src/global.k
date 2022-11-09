@@ -1,21 +1,21 @@
 fn isupper c
-	"A"!0<=c&&c<="Z"!0
+	"A"!0<=c&c<="Z"!0
 
 fn islower c
-	"a"!0<=c&&c<="z"!0
+	"a"!0<=c&c<="z"!0
 
 
 fn isalpha c
-	islower c||isupper c
+	islower c|isupper c
 
 fn isalnum c
-	isalpha c||isdigit c
+	isalpha c|isdigit c
 
 fn isidstart c
-	isalpha c||in c,"_$"
+	isalpha c|in c,"_$"
 
 fn isidpart c
-	isidstart c||isdigit c
+	isidstart c|isdigit c
 
 fn every f,s
 	for a s
@@ -127,7 +127,7 @@ fn parseint s,base
 	n
 
 fn parsedigit c
-	if "0"!0<=c&&c<="9"!0
+	if "0"!0<=c&c<="9"!0
 		return c-"0"!0
 	if islower c
 		return 10+c-"a"!0
@@ -139,7 +139,7 @@ fn isdigit c,base
 	if!base
 		base=10
 	n=parsedigit c
-	0<=n&&n<base
+	0<=n&n<base
 
 fn unesc s
 	r=""
@@ -317,13 +317,13 @@ fn replicate n ,a
 
 fn takewhile f,s
 	r=""
-	while s &&(f(s!0))
+	while s &(f(s!0))
 		a,*s=s
 		r@=a,
 	r
 
 fn dropwhile f,s
-	while s &&(f(s!0))
+	while s &(f(s!0))
 		s=tail s
 	s
 
@@ -335,7 +335,7 @@ fn splitat n,s
 
 fn zip s,t
 	r=()
-	while s&&t
+	while s&t
 		a,*s=s
 		b,*t=t
 		r@=(a,b),
@@ -343,7 +343,7 @@ fn zip s,t
 
 fn zip3 s,t,u
 	r=()
-	while s&&t&&u
+	while s&t&u
 		a,*s=s
 		b,*t=t
 		c,*u=u
@@ -352,7 +352,7 @@ fn zip3 s,t,u
 
 fn zipwith f,s,t
 	r=()
-	while s&&t
+	while s&t
 		a,*s=s
 		b,*t=t
 		r@=f(a,b),
@@ -360,7 +360,7 @@ fn zipwith f,s,t
 
 fn zipwith3 f,s,t,u
 	r=()
-	while s&&t&&u
+	while s&t&u
 		a,*s=s
 		b,*t=t
 		c,*u=u
