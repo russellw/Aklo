@@ -162,20 +162,13 @@ fn parse modname, file,text
 
 			; punctuation
 			punct = (
-				; 3 characters
-				"**=",
-				"//=",
-				; 2 characters
 				"!=",
-				"%=",
 				"**",
-				"*=",
 				"++",
 				"+=",
 				"--",
 				"-=",
 				"//",
-				"/=",
 				"<=",
 				"==",
 				">=",
@@ -454,9 +447,13 @@ fn parse modname, file,text
 		fn assignment()
 			;TODO clear error message if the left-hand side is not assignable
 			a = commas()
-			;TODO explicitly specify the allowed compound assignment operators
-			if endswith(tok,"=")
-				return intern(lex1()), a, assignment()
+			case tok
+				"="
+				"+="
+				"-="
+				"@="
+				"^="
+					return intern(lex1()), a, assignment()
 			return a
 
 		fn block(s)

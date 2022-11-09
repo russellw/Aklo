@@ -237,20 +237,13 @@ def parse(modname, file):
 
             # punctuation
             punct = (
-                # 3 characters
-                "**=",
-                "//=",
-                # 2 characters
                 "!=",
-                "%=",
                 "**",
-                "*=",
                 "++",
                 "+=",
                 "--",
                 "-=",
                 "//",
-                "/=",
                 "<=",
                 "==",
                 ">=",
@@ -519,8 +512,9 @@ def parse(modname, file):
 
         def assignment():
             a = commas()
-            if tok.endswith("="):
-                return lex1(), a, assignment()
+            match tok:
+                case "=" | "+=" | "-=" | "@=" | "^=":
+                    return lex1(), a, assignment()
             return a
 
         def block():
