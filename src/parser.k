@@ -38,6 +38,7 @@ fn parse modname, file,text
 		^ line
 		^ tok
 
+		;a single newline can produce multiple dedent tokens
 		if dedents
 			dedents--
 			tok = ".dedent"
@@ -45,6 +46,8 @@ fn parse modname, file,text
 
 		while i < len(text)
 			j = i
+
+			;the simplest tokens are just one character
 			tok = text!i,
 
 			; newline
@@ -67,7 +70,7 @@ fn parse modname, file,text
 
 				; one indent
 				if col > last(cols)
-					cols@=col,
+					cols^=col
 					tok = ".indent"
 					return
 
@@ -270,7 +273,7 @@ fn parse modname, file,text
 				if eat(".indent")
 					s =  '.list',
 					while ! eat(".dedent")
-						s@=expr(),
+						s^=expr()
 						eat(",")
 						expect("\n")
 					expect(")")
@@ -293,13 +296,13 @@ fn parse modname, file,text
 						a = a,
 						if eat(".indent")
 							while ! eat(".dedent")
-								a@=expr(),
+								a^=expr()
 								eat(",")
 								expect("\n")
 							expect(")")
 							continue
 						while ! eat(")")
-							a@=expr(),
+							a^=expr()
 							if eat(")")
 								break
 							expect(",")
@@ -317,7 +320,7 @@ fn parse modname, file,text
 						if isprimary()
 							a = [a, prefix()]
 							while eat(",")
-								a@=prefix(),
+								a^=prefix()
 						return a
 
 		fn params()
@@ -327,13 +330,13 @@ fn parse modname, file,text
 					lex()
 					if eat(".indent")
 						while ! eat(".dedent")
-							s@=word(),
+							s^=word()
 							eat(",")
 							expect("\n")
 						expect(")")
 					else
 						while ! eat(")")
-							s@=word(),
+							s^=word()
 							if eat(")")
 								break
 							expect(",")
@@ -342,7 +345,7 @@ fn parse modname, file,text
 					0
 				_
 					while 1
-						s@=word(),
+						s^=word()
 						if ! eat(",")
 							break
 			return s
@@ -364,15 +367,15 @@ fn parse modname, file,text
 					s = [intern(lex1()),]
 
 					fparams1=params()
-					s@=fparams1,
+					s^=fparams1
 
 					expect"("
-					s@=('.loc',file,line1,'\\'),
+					s^=('.loc',file,line1,'\\')
 					if eat(".indent")
 						s@=fbody('\\',fparams1)
 						expect(".dedent")
 					else
-						s@=commas(),
+						s^=commas()
 					expect(")")
 					return s
 			return postfix()
@@ -383,7 +386,7 @@ fn parse modname, file,text
 
 		fn mkop(op, left)
 			^ ops
-			ops@=(op,( prec, left)),
+			ops^=(op,( prec, left))
 
 		mkop("!", 1)
 
@@ -445,7 +448,7 @@ fn parse modname, file,text
 			s = ['.list', a]
 			while eat(",")
 				if !in(tok,(				")",".indent" , "\n"))
-						s@=expr(),
+						s^=expr()
 			return s
 
 		fn assignment()
@@ -460,21 +463,21 @@ fn parse modname, file,text
 			expect(".indent")
 			s=()
 			while ! eat(".dedent")
-				s@=('.loc',file,line,fname),
-				s@=stmt(),
+				s^=('.loc',file,line,fname)
+				s^=stmt()
 			s
 
 		fn if1()
 			assert  in(tok, ("if", "elif"))
 			lex()
 			s = ["if", expr()]
-			s@=block(),
+			s^=block()
 			case tok
 				"elif"
-					s@=if1(),
+					s^=if1()
 				"else"
 					lex()
-					s@=block(),
+					s^=block()
 			return s
 
 		fn stmt()
@@ -482,48 +485,47 @@ fn parse modname, file,text
 			;TODO: fname
 			case tok
 				"assert"
-					s@=file,
-					s@=line,
-					s@=fname,
+					s^=file
+					s^=line
+					s^=fname
 					lex()
 					x = expr()
-					s@=str(x),
-					s@=x,
+					s^=str(x)
+					s^=x
 					expect("\n")
 					return s
 				"show"
-					s@=file,
-					s@=line,
-					s@=fname,
+					s^=file
+					s^=line
+					s^=fname
 					lex()
 					x = commas()
-					s@=str(x),
-					s@=x,
+					s^=str(x)
+					s^=x
 					expect("\n")
 					return s
 				"case"
 					lex()
-					s@=commas(),
+					s^=commas()
 					expect(".indent")
 					while ! eat(".dedent")
 						patterns = [commas(),]
 						while eat("\n")
-							patterns@=commas(),
+							patterns^=commas()
 						body = block()
 						for pattern  patterns
-							s@=(pattern, *body),
+							s^=(pattern, *body)
 					return s
 				"dowhile"
 				"while"
 					lex()
-					s@=expr(),
+					s^=expr()
 					s@=block()
 					return s
 				"for"
 					lex()
-					;TODO: use another operator for append?
-					s@=word(),
-					s@=commas(),
+					s^=word()
+					s^=commas()
 					s@=block()
 					return s
 				"fn"
@@ -531,13 +533,13 @@ fn parse modname, file,text
 					lex()
 
 					fname1=word()
-					s@=fname1,
+					s^=fname1
 
 					fparams1=params()
-					s@=fparams1,
+					s^=fparams1
 
 					expect".indent"
-					s@=('.loc',file,line1,fname1),
+					s^=('.loc',file,line1,fname1)
 					s@=fbody(fname1,fparams1)
 					expect".dedent"
 					return s
@@ -545,14 +547,14 @@ fn parse modname, file,text
 					return if1()
 				"^"
 					lex()
-					s@=word(),
+					s^=word()
 					expect("\n")
 					return s
 				"return"
 					lex()
 					if eat("\n")
 						return "return", 0
-					s@=commas(),
+					s^=commas()
 					expect("\n")
 					return s
 			a = assignment()
@@ -564,8 +566,8 @@ fn parse modname, file,text
 		; function/module body
 		s = []
 		while tok != ".dedent"
-			s@=('.loc',file,line,fname),
-			s@=stmt(),
+			s^=('.loc',file,line,fname)
+			s^=stmt()
 		s
 
 	; top level
@@ -582,4 +584,4 @@ fn parse modname, file,text
 
 	; module
 	;TODO: module name?
-	modules@=(modname,(file,fbody(modname,()))),
+	modules^=(modname,(file,fbody(modname,())))

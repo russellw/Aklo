@@ -111,6 +111,7 @@ def parse(modname, file):
         nonlocal line
         nonlocal tok
 
+        # a single newline can produce multiple dedent tokens
         if dedents:
             dedents -= 1
             tok = ".dedent"
@@ -118,6 +119,8 @@ def parse(modname, file):
 
         while i < len(text):
             j = i
+
+            # the simplest tokens are just one character
             tok = text[i]
 
             # newline
