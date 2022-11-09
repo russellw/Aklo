@@ -234,19 +234,13 @@ def parse(modname, file):
 
             # punctuation
             punct = (
-                # 4 characters
-                ">>>=",
                 # 3 characters
                 "**=",
                 "//=",
-                "<<=",
-                ">>=",
-                ">>>",
                 # 2 characters
                 "!=",
                 "%=",
                 "&&",
-                "&=",
                 "**",
                 "*=",
                 "++",
@@ -255,14 +249,11 @@ def parse(modname, file):
                 "-=",
                 "//",
                 "/=",
-                "<<",
                 "<=",
                 "==",
                 ">=",
-                ">>",
                 "@=",
                 "^=",
-                "|=",
                 "||",
             )
             for s in punct:
@@ -427,7 +418,7 @@ def parse(modname, file):
 
         def prefix():
             match tok:
-                case "!" | "++" | "--" | "~":
+                case "!" | "++" | "--":
                     return lex1(), prefix()
                 case "*":
                     lex()
@@ -475,20 +466,6 @@ def parse(modname, file):
         mkop("+", 1)
         mkop("-", 1)
         mkop("@", 1)
-
-        prec -= 1
-        mkop("<<", 1)
-        mkop(">>", 1)
-        mkop(">>>", 1)
-
-        prec -= 1
-        mkop("&", 1)
-
-        prec -= 1
-        mkop("^", 1)
-
-        prec -= 1
-        mkop("|", 1)
 
         prec -= 1
         mkop("!=", 1)
@@ -733,29 +710,8 @@ def expr(a):
         case "!", x:
             print("!")
             truth(x)
-        case "~", *s:
-            print("Etc.not")
-            pargs(s)
-        case "&", *s:
-            print("Etc.and")
-            pargs(s)
-        case "|", *s:
-            print("Etc.or")
-            pargs(s)
         case "%", *s:
             print("Etc.rem")
-            pargs(s)
-        case "^", *s:
-            print("Etc.xor")
-            pargs(s)
-        case "<<", *s:
-            print("Etc.shl")
-            pargs(s)
-        case ">>", *s:
-            print("Etc.shr")
-            pargs(s)
-        case ">>>", *s:
-            print("Etc.ushr")
             pargs(s)
         case "+", *s:
             print("Etc.add")
@@ -794,6 +750,12 @@ def expr(a):
             | ("issym", *s)
             | ("islist", *s)
             | ("str", *s)
+            | ("shl", *s)
+            | ("shr", *s)
+            | ("bitnot", *s)
+            | ("bitand", *s)
+            | ("bitor", *s)
+            | ("bitxor", *s)
         ):
             print("Etc." + a[0])
             pargs(s)

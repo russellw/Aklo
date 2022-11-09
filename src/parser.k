@@ -159,19 +159,13 @@ fn parse modname, file,text
 
 			; punctuation
 			punct = (
-				; 4 characters
-				">>>=",
 				; 3 characters
 				"**=",
 				"//=",
-				"<<=",
-				">>=",
-				">>>",
 				; 2 characters
 				"!=",
 				"%=",
 				"&&",
-				"&=",
 				"**",
 				"*=",
 				"++",
@@ -180,14 +174,11 @@ fn parse modname, file,text
 				"-=",
 				"//",
 				"/=",
-				"<<",
 				"<=",
 				"==",
 				">=",
-				">>",
 				"@=",
 				"^=",
-				"|=",
 				"||",
 			)
 			for s  punct
@@ -363,7 +354,6 @@ fn parse modname, file,text
 				"!"
 				"++"
 				"--"
-				"~"
 					return intern(lex1()), prefix()
 				"*"
 					lex()
@@ -412,20 +402,6 @@ fn parse modname, file,text
 		mkop("+", 1)
 		mkop("-", 1)
 		mkop("@", 1)
-
-		prec--
-		mkop("<<", 1)
-		mkop(">>", 1)
-		mkop(">>>", 1)
-
-		prec--
-		mkop("&", 1)
-
-		prec--
-		mkop("^", 1)
-
-		prec--
-		mkop("|", 1)
 
 		prec--
 		mkop("!=", 1)

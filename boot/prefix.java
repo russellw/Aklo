@@ -91,15 +91,15 @@ class Etc {
     return (int) a % (int) b;
   }
 
-  static int and(Object a, Object b) {
+  static int bitand(Object a, Object b) {
     return (int) a & (int) b;
   }
 
-  static int or(Object a, Object b) {
+  static int bitor(Object a, Object b) {
     return (int) a | (int) b;
   }
 
-  static int xor(Object a, Object b) {
+  static int bitxor(Object a, Object b) {
     return (int) a ^ (int) b;
   }
 
@@ -109,10 +109,6 @@ class Etc {
 
   static int shr(Object a, Object b) {
     return (int) a >> (int) b;
-  }
-
-  static int ushr(Object a, Object b) {
-    return (int) a >>> (int) b;
   }
 
   static boolean isstr(List<Object> a) {
@@ -241,7 +237,7 @@ class Etc {
     return -(int) a;
   }
 
-  static int not(Object a) {
+  static int bitnot(Object a) {
     return ~(int) a;
   }
 

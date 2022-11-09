@@ -193,20 +193,20 @@ fn utf8 c
 		return c,
 	if c<0x800
 		return(
-			0b11000000|c>>6
-			0b10000000|c&0b111111
+			bitor 0b11000000,shr(c,6)
+			bitor 0b10000000,bitand(c,0b111111)
 		)
 	if c<0x10000
 		return(
-			0b11100000|c>>12
-			0b10000000|(c>>6)&0b111111
-			0b10000000|c&0b111111
+			bitor 0b11100000,shr(c,12)
+			bitor 0b10000000,bitand(shr(c,6),0b111111)
+			bitor 0b10000000,bitand(c,0b111111)
 		)
 	(
-		0b11110000|c>>18
-		0b10000000|(c>>12)&0b111111
-		0b10000000|(c>>6)&0b111111
-		0b10000000|c&0b111111
+		bitor 0b11110000,shr(c,18)
+		bitor 0b10000000,bitand(shr(c,12),0b111111)
+		bitor 0b10000000,bitand(shr(c,6),0b111111)
+		bitor 0b10000000,bitand(c,0b111111)
 	)
 
 fn repr s
