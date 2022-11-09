@@ -464,6 +464,7 @@ def parse(modname, file):
         mkop("+", 1)
         mkop("-", 1)
         mkop("@", 1)
+        mkop("^", 1)
 
         prec -= 1
         mkop("!=", 1)
@@ -728,6 +729,9 @@ def expr(a):
             pargs(s)
         case "@", *s:
             print("Etc.cat")
+            pargs(s)
+        case "^", *s:
+            print("Etc.cat1")
             pargs(s)
         case "intern", *s:
             print("Sym.intern")

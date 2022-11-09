@@ -117,6 +117,8 @@ assert "ABC"!0==65
 assert "ABC"!1==66
 assert "ABC"!2==67
 
+assert (1,2)^3==(1,2,3)
+
 assert len "ABC"==3
 assert  "ab"@"cd"=="abcd"
 assert [1+2,3+4]==[3,7]

@@ -225,6 +225,12 @@ class Etc {
     return r;
   }
 
+  static List<Object> cat1(Object s, Object a) {
+    var r = new ArrayList<>(aslist(s));
+    r.add(a);
+    return r;
+  }
+
   static int len(Object s) {
     return aslist(s).size();
   }
