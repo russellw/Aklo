@@ -31,7 +31,7 @@ fn any f,s
 fn map f,s
 	r=[]
 	for a s
-		r@=f(  a),
+		r^=f(  a)
 	r
 
 fn filter f,s

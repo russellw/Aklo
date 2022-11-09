@@ -700,7 +700,7 @@ def expr(a):
         case "<=", *s:
             print("Etc.le")
             pargs(s)
-        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
+        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y) | ("^=", x, y):
             expr(("=", x, (a[0][0], x, y)))
         case ("|", x, y) | ("&", x, y):
             truth(x)
