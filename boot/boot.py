@@ -539,7 +539,6 @@ def parse(modname, file):
             return s
 
         def stmt():
-            # TODO: error check loose break/continue?
             s = [tok]
             match tok:
                 case "assert":

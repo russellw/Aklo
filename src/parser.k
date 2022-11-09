@@ -456,30 +456,30 @@ fn parse modname, file,text
 					return intern(lex1()), a, assignment()
 			return a
 
-		fn block(s)
+		fn block(loop)
 			expect(".indent")
 			s=()
 			while ! eat(".dedent")
 				s^=('.loc',file,line,fname)
-				s^=stmt()
+				s^=stmt(loop)
 			s
 
-		fn if1()
+		fn if1(loop)
 			assert  in(tok, ("if", "elif"))
 			lex()
 			s = ["if", expr()]
-			s^=block()
+			s^=block(loop)
 			case tok
 				"elif"
-					s^=if1()
+					s^=if1(loop)
 				"else"
 					lex()
-					s^=block()
+					s^=block(loop)
 			return s
 
-		fn stmt()
+		fn stmt(loop)
+			continueok,breakok=loop
 			s = [intern (tok),]
-			;TODO: fname
 			case tok
 				"assert"
 					s^=file
@@ -509,7 +509,7 @@ fn parse modname, file,text
 						patterns = [commas(),]
 						while eat("\n")
 							patterns^=commas()
-						body = block()
+						body = block((continueok,1))
 						for pattern  patterns
 							s^=(pattern, *body)
 					return s
@@ -517,13 +517,13 @@ fn parse modname, file,text
 				"while"
 					lex()
 					s^=expr()
-					s@=block()
+					s@=block((1,1))
 					return s
 				"for"
 					lex()
 					s^=word()
 					s^=commas()
-					s@=block()
+					s@=block((1,1))
 					return s
 				"fn"
 					line1=line
@@ -541,7 +541,7 @@ fn parse modname, file,text
 					expect".dedent"
 					return s
 				"if"
-					return if1()
+					return if1(loop)
 				"^"
 					lex()
 					s^=word()
@@ -550,13 +550,31 @@ fn parse modname, file,text
 				"return"
 					lex()
 					if eat("\n")
-						return "return", 0
+						return 'return', 0
 					s^=commas()
+					expect("\n")
+					return s
+				"break"
+					if!breakok
+						err"break without case or loop"
+					lex()
+					if eat"\n"
+						return'break'
+					s^=word()
+					expect("\n")
+					return s
+				"continue"
+					if!continueok
+						err"continue without loop"
+					lex()
+					if eat"\n"
+						return'continue'
+					s^=word()
 					expect("\n")
 					return s
 			a = assignment()
 			if eat(":")
-				return ":", a, stmt()
+				return ":", a, stmt(loop)
 			expect("\n")
 			return a
 
