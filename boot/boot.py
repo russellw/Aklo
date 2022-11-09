@@ -291,6 +291,7 @@ def parse(modname, file):
         return isidpart(tok[0]) or tok[0] in "'\"#"
 
     def fbody(fname, fparams):
+        # TODO implement parameters purely as local variables?
         def primary():
             # word
             if isidstart(tok[0]):
@@ -419,6 +420,7 @@ def parse(modname, file):
                     return "...", prefix()
                 case "-":
                     lex()
+                    # TODO can we overload operators by arity in the internal representation?
                     return "neg", prefix()
                 case "\\":
                     line1 = line
@@ -488,6 +490,7 @@ def parse(modname, file):
                 b = infix(prec1 + left1)
                 match op:
                     case "!":
+                        # TODO can we overload operators by arity in the internal representation?
                         a = "subscript", a, b
                     case ">":
                         a = "<", b, a
