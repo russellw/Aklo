@@ -416,6 +416,8 @@ def parse(modname, file):
                 case "!" | "++" | "--":
                     return lex1(), prefix()
                 case "*":
+                    # TODO we need to free up unary * for pointer dereference?
+                    # if so, use @ or .. for 'rest'?
                     lex()
                     return "...", prefix()
                 case "-":
@@ -588,6 +590,8 @@ def parse(modname, file):
                     s.extend(block())
                     return s
                 case "fn":
+                    # TODO optional types?
+                    # fn f(x int, y int) int
                     line1 = line
                     lex()
 
@@ -996,6 +1000,7 @@ def stmt(a):
 
 # variables
 def nonlocalvars(body):
+    # TODO alternatively maybe use := to assign an outer variable
     r = set()
 
     def f(a):
