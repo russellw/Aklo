@@ -157,18 +157,17 @@ assert utf8 0xd55c==(0xed,0x95,0x9c)
 assert utf8 0x10348==(0xf0,0x90,0x8d,0x88)
 
 assert parseint "123",10==123
-assert parseint "123"==123
 assert parseint "ff",16==255
 assert parseint "FFFF",16==65535
 
-assert isdigit ("9"!0,10)
-assert isdigit ("9"!0,16)
+assert isdigitb ("9"!0,10)
+assert isdigitb ("9"!0,16)
 
-assert !isdigit ("f"!0,10)
-assert isdigit ("f"!0,16)
+assert !isdigitb ("f"!0,10)
+assert isdigitb ("f"!0,16)
 
-assert !isdigit ("*"!0,10)
-assert !isdigit ("*"!0,16)
+assert !isdigitb ("*"!0,10)
+assert !isdigitb ("*"!0,16)
 
 assert unesc "abc"=="abc"
 assert unesc r"\tabc\n"=="\tabc\n"

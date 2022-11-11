@@ -4,6 +4,8 @@ fn isupper c
 fn islower c
 	"a"!0<=c&c<="z"!0
 
+fn isdigit c
+	"0"!0<=c&c<="9"!0
 
 fn isalpha c
 	islower c|isupper c
@@ -88,15 +90,13 @@ fn upper a
 	a
 
 fn parseint s,base
-	if!base
-		base=10
-	while isdigit(s!0,base)
+	while isdigitb(s!0,base)
 		c,@s=s
 		n=n*base+parsedigit c
 	n
 
 fn parsedigit c
-	if "0"!0<=c&c<="9"!0
+	if isdigit c!0
 		return c-"0"!0
 	if islower c
 		return 10+c-"a"!0
@@ -104,9 +104,7 @@ fn parsedigit c
 		return 10+c-"A"!0
 	-1
 
-fn isdigit c,base
-	if!base
-		base=10
+fn isdigitb c,base
 	n=parsedigit c
 	0<=n&n<base
 
@@ -116,7 +114,7 @@ fn unesc s
 	fn seq n,base
 			^ i
 			while j<n
-				if !isdigit( s!(i+j),base)
+				if !isdigitb( s!(i+j),base)
 					break
 				j++
 			r@=utf8(parseint (slice (s,i,i+j),base))

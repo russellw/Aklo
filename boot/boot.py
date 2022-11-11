@@ -213,7 +213,7 @@ def parse(modname, file):
                 tok = text[j:i]
                 return
 
-            # hexadecimal numbers are a separate case because they may contain 'e'
+            # hexadecimal numbers are separate because they may contain 'e'
             if text[i : i + 2].lower() == "0x":
                 while isidpart(text[i]):
                     i += 1
@@ -1095,7 +1095,7 @@ def lam(params, body):
     print("public Object apply(List<Object> args) {")
     print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", args);')
     for i in range(len(params)):
-        print(f"{params[i]} = args.get({i});")
+        assign(params[i], f"args.get({i})")
     fbody(body)
     print("}")
 
@@ -1136,7 +1136,7 @@ def fn(fname, params, body):
     print("public Object apply(List<Object> args) {")
     print(f'Etc.enter("{file}", {line}, "{fname}", args);')
     for i in range(len(params)):
-        stmt(("=", params[i], ("!", "args", i)))
+        assign(params[i], f"args.get({i})")
     fbody(body)
     print("}")
 

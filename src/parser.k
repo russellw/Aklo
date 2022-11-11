@@ -138,7 +138,7 @@ fn parse modname, file,text
 				tok = slice(text,j,i)
 				return
 
-			; hexadecimal numbers are a separate because they may contain 'e'
+			; hexadecimal numbers are separate because they may contain 'e'
 			if lower(slice(text,i,i+2)) == "0x"
 				while isidpart(text!i)
 					i++
@@ -257,7 +257,7 @@ fn parse modname, file,text
 					"0x"
 						a = parseint(drop(2,s), 16)
 					_
-						a = parseint(s)
+						a = parseint(s,10)
 				lex()
 				return a
 
@@ -380,7 +380,7 @@ fn parse modname, file,text
 		mkop("!", 1)
 
 		prec--
-		mkop("**")
+		mkop("**",0)
 
 		prec--
 		mkop("%", 1)
@@ -576,7 +576,7 @@ fn parse modname, file,text
 		s = []
 		while tok != ".dedent"
 			s^=('.loc',file,line,fname)
-			s^=stmt()
+			s^=stmt((0,0))
 		s
 
 	; top level
