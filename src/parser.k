@@ -105,6 +105,32 @@ fn parse modname, file,text
 				i ++
 				continue
 
+			; symbol or string
+			case tok
+				"'"
+				"\""
+					q = text!i++
+					while text!i != q
+						if text!i == "\\"!0
+							i++
+						if text!i == "\n"!0
+							err("unclosed quote")
+						i++
+					i++
+					tok = slice(text,j,i)
+					return
+
+			; raw string
+			if slice(text,i,i+2) == "r\""
+				i += 2
+				while text!i != "\""!0
+					if text!i == "\n"!0
+						err("unclosed quote")
+					i++
+				i++
+				tok = slice(text,j,i)
+				return
+
 			; word
 			if isidstart(text!i)
 				while isidpart(text!i)
@@ -131,32 +157,6 @@ fn parse modname, file,text
 						i++
 						while isidpart(text!i)
 							i++
-				tok = slice(text,j,i)
-				return
-
-			; symbol or string
-			case tok
-				"'"
-				"\""
-					q = text!i++
-					while text!i != q
-						if text!i == "\\"!0
-							i++
-						if text!i == "\n"!0
-							err("unclosed quote")
-						i++
-					i++
-					tok = slice(text,j,i)
-					return
-
-			; raw string
-			if slice(text,i,i+2) == "#\""
-				i += 2
-				while text!i != "\""!0
-					if text!i == "\n"!0
-						err("unclosed quote")
-					i++
-				i++
 				tok = slice(text,j,i)
 				return
 
@@ -213,10 +213,28 @@ fn parse modname, file,text
 
 	; expressions
 	fn isprimary()
-		return isidpart(tok!0) | in(tok!0 ,"'\"#")
+		return isidpart(tok!0) | in(tok!0 ,"'\"")
 
 	fn fbody(fname,fparams)
 		fn primary()
+			; symbol
+			if startswith(tok,"'")
+				s = unesc(slice(tok,1,len(tok)-1))
+				lex()
+				return '.quote',intern(s)
+
+			; string
+			if startswith(tok,"\"")
+				s = unesc(slice(tok,1,len(tok)-1))
+				lex()
+				return'.list',@s
+
+			; raw string
+			if startswith(tok,"r\"")
+				s = slice(tok,2,len(tok)-1)
+				lex()
+				return'.list',@s
+
 			; word
 			case tok
 				"false"
@@ -242,24 +260,6 @@ fn parse modname, file,text
 						a = parseint(s)
 				lex()
 				return a
-
-			; symbol
-			if startswith(tok,"'")
-				s = unesc(slice(tok,1,len(tok)-1))
-				lex()
-				return '.quote',intern(s)
-
-			; string
-			if startswith(tok,"\"")
-				s = unesc(slice(tok,1,len(tok)-1))
-				lex()
-				return'.list',@s
-
-			; raw string
-			if startswith(tok,"#\"")
-				s = slice(tok,2,len(tok)-1)
-				lex()
-				return'.list',@s
 
 			; bracketed expression or list
 			if eat("(")

@@ -181,6 +181,31 @@ def parse(modname, file):
                 i += 1
                 continue
 
+            # symbol or string
+            match tok:
+                case "'" | '"':
+                    i += 1
+                    while text[i] != tok:
+                        if text[i] == "\\":
+                            i += 1
+                        if text[i] == "\n":
+                            err("unclosed quote")
+                        i += 1
+                    i += 1
+                    tok = text[j:i]
+                    return
+
+            # raw string
+            if text[i : i + 2] == 'r"':
+                i += 2
+                while text[i] != '"':
+                    if text[i] == "\n":
+                        err("unclosed quote")
+                    i += 1
+                i += 1
+                tok = text[j:i]
+                return
+
             # word
             if isidstart(tok):
                 while isidpart(text[i]):
@@ -207,31 +232,6 @@ def parse(modname, file):
                         i += 1
                         while isidpart(text[i]):
                             i += 1
-                tok = text[j:i]
-                return
-
-            # symbol or string
-            match tok:
-                case "'" | '"':
-                    i += 1
-                    while text[i] != tok:
-                        if text[i] == "\\":
-                            i += 1
-                        if text[i] == "\n":
-                            err("unclosed quote")
-                        i += 1
-                    i += 1
-                    tok = text[j:i]
-                    return
-
-            # raw string
-            if text[i : i + 2] == '#"':
-                i += 2
-                while text[i] != '"':
-                    if text[i] == "\n":
-                        err("unclosed quote")
-                    i += 1
-                i += 1
                 tok = text[j:i]
                 return
 
@@ -288,11 +288,29 @@ def parse(modname, file):
 
     # expressions
     def isprimary():
-        return isidpart(tok[0]) or tok[0] in "'\"#"
+        return isidpart(tok[0]) or tok[0] in "'\""
 
     def fbody(fname, fparams):
         # TODO implement parameters purely as local variables?
         def primary():
+            # symbol
+            if tok.startswith("'"):
+                s = unesc(tok[1:-1])
+                lex()
+                return quotesym(s)
+
+            # string
+            if tok.startswith('"'):
+                s = unesc(tok[1:-1])
+                lex()
+                return ["List.of"] + [ord(c) for c in s]
+
+            # raw string
+            if tok.startswith('r"'):
+                s = tok[2:-1]
+                lex()
+                return ["List.of"] + [ord(c) for c in s]
+
             # word
             if isidstart(tok[0]):
                 return lex1()
@@ -311,24 +329,6 @@ def parse(modname, file):
                         a = int(s)
                 lex()
                 return a
-
-            # symbol
-            if tok.startswith("'"):
-                s = unesc(tok[1:-1])
-                lex()
-                return quotesym(s)
-
-            # string
-            if tok.startswith('"'):
-                s = unesc(tok[1:-1])
-                lex()
-                return ["List.of"] + [ord(c) for c in s]
-
-            # raw string
-            if tok.startswith('#"'):
-                s = tok[2:-1]
-                lex()
-                return ["List.of"] + [ord(c) for c in s]
 
             # bracketed expression or list
             if eat("("):

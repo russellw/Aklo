@@ -147,7 +147,7 @@ assert upper 97==65
 assert upper 65==65
 assert upper "abc..."=="ABC..."
 
-assert #"\n"=="\\n"
+assert r"\n"=="\\n"
 
 assert utf8 0x24==(0x24,)
 assert utf8 0xa3==(0xc2,0xa3)
@@ -171,8 +171,8 @@ assert !isdigit ("*"!0,10)
 assert !isdigit ("*"!0,16)
 
 assert unesc "abc"=="abc"
-assert unesc #"\tabc\n"=="\tabc\n"
-assert unesc #"\x41\x42"=="AB"
+assert unesc r"\tabc\n"=="\tabc\n"
+assert unesc r"\x41\x42"=="AB"
 
 assert reverse"abc"=="cba"
 
