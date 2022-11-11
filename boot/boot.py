@@ -1092,10 +1092,10 @@ def lam(params, body):
     localvars(params, body)
 
     # body
-    print("public Object apply(List<Object> args) {")
-    print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", args);')
+    print("public Object apply(List<Object> _args) {")
+    print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", _args);')
     for i in range(len(params)):
-        assign(params[i], f"args.get({i})")
+        assign(params[i], f"_args.get({i})")
     fbody(body)
     print("}")
 
@@ -1133,10 +1133,10 @@ def fn(fname, params, body):
             body[-1] = "return", a
 
     # body
-    print("public Object apply(List<Object> args) {")
-    print(f'Etc.enter("{file}", {line}, "{fname}", args);')
+    print("public Object apply(List<Object> _args) {")
+    print(f'Etc.enter("{file}", {line}, "{fname}", _args);')
     for i in range(len(params)):
-        assign(params[i], f"args.get({i})")
+        assign(params[i], f"_args.get({i})")
     fbody(body)
     print("}")
 
