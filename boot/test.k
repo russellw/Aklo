@@ -1,6 +1,3 @@
-;the identity function
-assert id 12345==12345
-
 ;logic
 assert 1
 assert !0
@@ -103,11 +100,6 @@ assert 10//3==3
 assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
-
-assert even 0
-assert odd 1
-assert even 2
-assert odd 3
 
 ;lists and strings
 assert "ABC"==[65,66,67]
@@ -480,12 +472,9 @@ assert isupper 65
 assert !isupper 97
 
 ;higher-order functions
-assert map( succ,[1,2,3])==[2,3,4]
 assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
-assert filter( even,[1,2,3])==[2,]
-assert filter( odd,[1,2,3])==[1,3]
 assert filter( isdigit,"abc123")=="123"
 
 assert every isupper,""

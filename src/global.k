@@ -259,18 +259,6 @@ fn signum a
 	if a>0
 		return 1
 
-fn even n
-	n%2==0
-
-fn odd  n
-	n%2
-
-fn succ a
-	a+1
-
-fn pred a
-	a-1
-
 fn reverse s
 	i=len s
 	r=()
@@ -299,9 +287,6 @@ fn sum s
 
 fn product s
 	fold (\(a,b)(a*b),1,s)
-
-fn id a
-	a
 
 fn init s
 	take (len(s)-1,s)
