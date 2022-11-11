@@ -44,30 +44,6 @@ fn filter f,s
 fn tail s
 	drop  1, s
 
-fn fmt(s)
-	j = 1
-	r = ""
-	while i < len(s)
-		c = s!i++
-		if [c,] != "%"
-			r^= c
-			continue
-		c = s!i++
-		case c ,
-			"s"
-				r@= args!j++
-			"d"
-				r@= str(args!j++)
-			_
-				r^= c
-	r
-
-fn printf
-	print(apply(fmt, args))
-
-fn eprintf
-	eprint(apply(fmt, args))
-
 fn println
 	apply print,args
 	print"\n"

@@ -464,9 +464,6 @@ assert a==2
 assert str(123)=="123"
 assert str('xyz')=="xyz"
 
-assert fmt"abc"=="abc"
-assert fmt"ab%scd","xy"=="abxycd"
-
 ;characters
 assert isupper 65
 assert !isupper 97
@@ -607,4 +604,4 @@ case 2
 assert a=="two"
 
 {signal that tests actually completed}
-printf("%s\n","ok")
+println("ok")

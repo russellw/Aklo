@@ -20,14 +20,14 @@ fn parse modname, file,text
 	tok = 0
 
 	fn err msg
-		eprintf("%s:%d: %s\n",file,line,msg)
+		eprintln(file @ ":" @ str(line) @ ": " @ msg)
 		exit 1
 
 	fn errtok(msg)
 		^ line
 		if tok == "\n"
 			line--
-		err(fmt("%s: %s",repr(tok),msg))
+		err(repr(tok)@": "@msg)
 
 	; tokenizer
 	fn lex()
@@ -204,7 +204,7 @@ fn parse modname, file,text
 
 	fn expect(s)
 		if ! eat(s)
-			errtok(fmt("expected %s",repr s))
+			errtok("expected "@repr s)
 
 	fn word()
 		if isidstart(tok!0)

@@ -23,7 +23,7 @@ while i<len argv
 				println"Aklo version 0"
 				exit 0
 			_
-				eprintf"%s: unknown option\n",s
+				eprintln (s@": unknown option")
 				exit 1
 	if file
 		usage()
