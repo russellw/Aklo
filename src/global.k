@@ -44,16 +44,16 @@ fn filter f,s
 fn tail s
 	drop  1, s
 
-fn println s
-	print (s@"\n")
+fn prn s
+	pr (s@"\n")
 
-fn eprintln s
-	eprint (s@"\n")
+fn eprn s
+	epr (s@"\n")
 
-fn print s
+fn pr s
 		writestream stdout,s
 
-fn eprint s
+fn epr s
 		writestream stderr,s
 
 fn take i,s

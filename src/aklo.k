@@ -1,7 +1,7 @@
 import parser
 
 fn usage
-	eprintln"Usage: aklo [options] file"
+	eprn"Usage: aklo [options] file"
 	exit 1
 
 file=0
@@ -15,15 +15,15 @@ while i<len argv
 		case o
 			"h"
 			"help"
-				println"-h  Show help"
-				println"-V  Show version"
+				prn"-h  Show help"
+				prn"-V  Show version"
 				exit 0
 			"V"
 			"version"
-				println"Aklo version 0"
+				prn"Aklo version 0"
 				exit 0
 			_
-				eprintln (s@": unknown option")
+				eprn (s@": unknown option")
 				exit 1
 	if file
 		usage()

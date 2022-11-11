@@ -604,4 +604,4 @@ case 2
 assert a=="two"
 
 {signal that tests actually completed}
-println("ok")
+prn("ok")

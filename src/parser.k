@@ -20,7 +20,7 @@ fn parse modname, file,text
 	tok = 0
 
 	fn err msg
-		eprintln(file @ ":" @ str(line) @ ": " @ msg)
+		eprn(file @ ":" @ str(line) @ ": " @ msg)
 		exit 1
 
 	fn errtok(msg)
