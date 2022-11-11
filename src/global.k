@@ -44,24 +44,17 @@ fn filter f,s
 fn tail s
 	drop  1, s
 
-fn println
-	apply print,args
-	print"\n"
+fn println s
+	print (s@"\n")
 
-fn eprintln
-	apply eprint,args
-	eprint"\n"
+fn eprintln s
+	eprint (s@"\n")
 
-fn print
-	for a args
-		printstream stdout,a
+fn print s
+		writestream stdout,s
 
-fn eprint
-	for a args
-		printstream stderr,a
-
-fn printstream stream,		a
-	writestream(stream,a)
+fn eprint s
+		writestream stderr,s
 
 fn take i,s
 	slice s,0,i
