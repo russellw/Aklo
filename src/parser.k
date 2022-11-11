@@ -253,13 +253,13 @@ fn parse modname, file,text
 			if startswith(tok,"\"")
 				s = unesc(slice(tok,1,len(tok)-1))
 				lex()
-				return'.list',*s
+				return'.list',@s
 
 			; raw string
 			if startswith(tok,"#\"")
 				s = slice(tok,2,len(tok)-1)
 				lex()
-				return'.list',*s
+				return'.list',@s
 
 			; bracketed expression or list
 			if eat("(")
@@ -350,7 +350,7 @@ fn parse modname, file,text
 				"--"
 				"-"
 					return intern(lex1()), prefix()
-				"*"
+				"@"
 					lex()
 					return '...', prefix()
 				"\\"
@@ -507,7 +507,7 @@ fn parse modname, file,text
 							patterns^=commas()
 						body = block((continueok,1))
 						for pattern  patterns
-							s^=(pattern, *body)
+							s^=(pattern, @body)
 					return s
 				"dowhile"
 				"while"

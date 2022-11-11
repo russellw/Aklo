@@ -415,9 +415,8 @@ def parse(modname, file):
             match tok:
                 case "!" | "++" | "-" | "--":
                     return lex1(), prefix()
-                case "*":
-                    # TODO we need to free up unary * for pointer dereference?
-                    # if so, use @ or .. for 'rest'?
+                case "@":
+                    # TODO use @ directly?
                     lex()
                     return "...", prefix()
                 case "\\":

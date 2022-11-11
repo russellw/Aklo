@@ -539,11 +539,11 @@ assert b==2
 assert c==3
 assert d==4
 
-a,*s=1,2,3
+a,@s=1,2,3
 assert a==1
 assert s==[2,3]
 
-b=a,*s
+b=a,@s
 assert b==[1,2,3]
 
 a=(
@@ -595,7 +595,7 @@ case [1,[2,3],[4,5]]
 assert r==15
 
 case 1,2,3,4
-	a,*s
+	a,@s
 		r=s
 assert r==[2,3,4]
 

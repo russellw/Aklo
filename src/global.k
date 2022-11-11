@@ -122,7 +122,7 @@ fn parseint s,base
 	if!base
 		base=10
 	while isdigit(s!0,base)
-		c,*s=s
+		c,@s=s
 		n=n*base+parsedigit c
 	n
 
@@ -267,13 +267,13 @@ fn reverse s
 	r
 
 fn reduce f , s
-	a,*s=s
+	a,@s=s
 	fold (f,a,s)
 
 fn fold f ,a, s
 	if !s
 		return a
-	b,*s=s
+	b,@s=s
 	fold(f,f(a,b),s)
 
 fn maximum s
@@ -303,7 +303,7 @@ fn replicate n ,a
 fn takewhile f,s
 	r=""
 	while s &(f(s!0))
-		a,*s=s
+		a,@s=s
 		r^=a
 	r
 
@@ -321,34 +321,34 @@ fn splitat n,s
 fn zip s,t
 	r=()
 	while s&t
-		a,*s=s
-		b,*t=t
+		a,@s=s
+		b,@t=t
 		r^=(a,b)
 	r
 
 fn zip3 s,t,u
 	r=()
 	while s&t&u
-		a,*s=s
-		b,*t=t
-		c,*u=u
+		a,@s=s
+		b,@t=t
+		c,@u=u
 		r^=(a,b,c)
 	r
 
 fn zipwith f,s,t
 	r=()
 	while s&t
-		a,*s=s
-		b,*t=t
+		a,@s=s
+		b,@t=t
 		r^=f(a,b)
 	r
 
 fn zipwith3 f,s,t,u
 	r=()
 	while s&t&u
-		a,*s=s
-		b,*t=t
-		c,*u=u
+		a,@s=s
+		b,@t=t
+		c,@u=u
 		r^=f(a,b,c)
 	r
 
@@ -356,7 +356,7 @@ fn unzip s
 	q=()
 	r=()
 	while s
-		(a,b),*s=s
+		(a,b),@s=s
 		q^=a
 		r^=b
 	q,r
@@ -366,7 +366,7 @@ fn unzip3 s
 	q=()
 	r=()
 	while s
-		(a,b,c),*s=s
+		(a,b,c),@s=s
 		p^=a
 		q^=b
 		r^=c
@@ -405,6 +405,6 @@ fn replace from,to,s
 			s=drop len(from),s
 			r@=to
 			continue
-		a,*s=s
+		a,@s=s
 		r^=a
 	r
