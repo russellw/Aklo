@@ -6,7 +6,7 @@ import java.util.function.*;
 
 class Main {
   public static void main(String[] args) {
-    for (var s : args) Etc.argv.add(Etc.encode(s));
+    for (var s : args) Etc.args.add(Etc.encode(s));
     program.run();
   }
 }
@@ -15,7 +15,7 @@ class Main {
 class Etc {
   static class OverrunException extends RuntimeException {}
 
-  static List<Object> argv = new ArrayList<>();
+  static List<Object> args = new ArrayList<>();
   static int depth;
   static Set<String> tracing;
 

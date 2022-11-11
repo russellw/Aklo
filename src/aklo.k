@@ -6,8 +6,8 @@ fn usage
 
 file=0
 i=0
-while i<len argv
-	s=argv!i++
+while i<len args
+	s=args!i++
 	if s!0=='-'
 		o=s
 		while o!0=='-'
