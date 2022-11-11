@@ -348,13 +348,11 @@ fn parse modname, file,text
 				"!"
 				"++"
 				"--"
+				"-"
 					return intern(lex1()), prefix()
 				"*"
 					lex()
 					return '...', prefix()
-				"-"
-					lex()
-					return 'neg', prefix()
 				"\\"
 					line1=line
 					s = [intern(lex1()),]
@@ -421,8 +419,6 @@ fn parse modname, file,text
 				op = lex1()
 				b = infix(prec1 + left1)
 				case op
-					"!"
-						a ='.subscript', a, b
 					">"
 						a ='<', b, a
 					">="

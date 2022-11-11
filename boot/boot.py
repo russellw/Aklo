@@ -413,17 +413,13 @@ def parse(modname, file):
 
         def prefix():
             match tok:
-                case "!" | "++" | "--":
+                case "!" | "++" | "-" | "--":
                     return lex1(), prefix()
                 case "*":
                     # TODO we need to free up unary * for pointer dereference?
                     # if so, use @ or .. for 'rest'?
                     lex()
                     return "...", prefix()
-                case "-":
-                    lex()
-                    # TODO can we overload operators by arity in the internal representation?
-                    return "neg", prefix()
                 case "\\":
                     line1 = line
                     s = [lex1()]
@@ -491,9 +487,6 @@ def parse(modname, file):
                 op = lex1()
                 b = infix(prec1 + left1)
                 match op:
-                    case "!":
-                        # TODO can we overload operators by arity in the internal representation?
-                        a = "subscript", a, b
                     case ">":
                         a = "<", b, a
                     case ">=":
@@ -712,6 +705,15 @@ def expr(a):
         case "!", x:
             print("!")
             truth(x)
+        case "!", x, y:
+            print("Etc.subscript")
+            pargs((x, y))
+        case "-", x:
+            print("Etc.neg")
+            pargs([x])
+        case "-", x, y:
+            print("Etc.sub")
+            pargs((x, y))
         case "%", *s:
             print("Etc.rem")
             pargs(s)
@@ -720,9 +722,6 @@ def expr(a):
             pargs(s)
         case "*", *s:
             print("Etc.mul")
-            pargs(s)
-        case "-", *s:
-            print("Etc.sub")
             pargs(s)
         case "==", *s:
             print("Objects.equals")
@@ -745,9 +744,7 @@ def expr(a):
             ("len", *s)
             | ("get", *s)
             | ("exit", *s)
-            | ("neg", *s)
             | ("slice", *s)
-            | ("subscript", *s)
             | ("range", *s)
             | ("writestream", *s)
             | ("readfile", *s)
@@ -841,13 +838,13 @@ def checkcase(label, pattern, x):
                 n = len(s) - 1
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
-                    checkcase(label, s[i], ("subscript", x, i))
+                    checkcase(label, s[i], ("!", x, i))
                 checkcase(label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
             for i in range(n):
-                checkcase(label, s[i], ("subscript", x, i))
+                checkcase(label, s[i], ("!", x, i))
 
 
 def assign(pattern, x):
@@ -861,12 +858,12 @@ def assign(pattern, x):
             if isrest(s):
                 n = len(s) - 1
                 for i in range(n):
-                    assign(s[i], ("subscript", x, i))
+                    assign(s[i], ("!", x, i))
                 assign(s[n][1], ("drop", n, x))
                 return
             n = len(s)
             for i in range(n):
-                assign(s[i], ("subscript", x, i))
+                assign(s[i], ("!", x, i))
         case "_":
             0
         case "i" | "j" | "k":
@@ -1144,7 +1141,7 @@ def fn(fname, params, body):
     print("public Object apply(List<Object> args) {")
     print(f'Etc.enter("{file}", {line}, "{fname}", args);')
     for i in range(len(params)):
-        stmt(("=", params[i], ("subscript", "args", i)))
+        stmt(("=", params[i], ("!", "args", i)))
     fbody(body)
     print("}")
 
