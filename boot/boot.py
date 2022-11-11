@@ -291,7 +291,6 @@ def parse(modname, file):
         return isidpart(tok[0]) or tok[0] in "'\""
 
     def fbody(fname, fparams):
-        # TODO implement parameters purely as local variables?
         def primary():
             # symbol
             if tok.startswith("'"):
@@ -1094,6 +1093,7 @@ def lam(params, body):
     # body
     print("public Object apply(List<Object> _args) {")
     print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", _args);')
+    print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(params[i], f"_args.get({i})")
     fbody(body)
@@ -1135,6 +1135,7 @@ def fn(fname, params, body):
     # body
     print("public Object apply(List<Object> _args) {")
     print(f'Etc.enter("{file}", {line}, "{fname}", _args);')
+    print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(params[i], f"_args.get({i})")
     fbody(body)
