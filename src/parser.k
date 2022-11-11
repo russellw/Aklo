@@ -349,10 +349,8 @@ fn parse modname, file,text
 				"++"
 				"--"
 				"-"
-					return intern(lex1()), prefix()
 				"@"
-					lex()
-					return '...', prefix()
+					return intern(lex1()), prefix()
 				"\\"
 					line1=line
 					s = [intern(lex1()),]

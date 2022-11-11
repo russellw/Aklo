@@ -413,12 +413,8 @@ def parse(modname, file):
 
         def prefix():
             match tok:
-                case "!" | "++" | "-" | "--":
+                case "!" | "++" | "-" | "--" | "@":
                     return lex1(), prefix()
-                case "@":
-                    # TODO use @ directly?
-                    lex()
-                    return "...", prefix()
                 case "\\":
                     line1 = line
                     s = [lex1()]
@@ -775,7 +771,7 @@ def expr(a):
         case "List.of", *s:
             if s:
                 match s[-1]:
-                    case "...", t:
+                    case "@", t:
                         print("Etc.cons")
                         pargs(s[:-1] + [t])
                         return
@@ -805,7 +801,7 @@ def expr(a):
 def isrest(s):
     if s:
         match s[-1]:
-            case "...", _:
+            case "@", _:
                 return 1
 
 
@@ -1015,7 +1011,7 @@ def assignedvars(params, body):
     def lhs(a):
         if isinstance(a, str):
             match a:
-                case "..." | "List.of" | "_":
+                case "@" | "List.of" | "_":
                     0
                 case _:
                     r[a] = 1
