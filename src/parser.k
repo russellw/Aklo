@@ -19,7 +19,7 @@ fn parse modname, file,text
 
 	fn err msg
 		eprn(file @ ":" @ str(line) @ ": " @ msg)
-		exit 1
+		exit (1)
 
 	fn errtok(msg)
 		if tok == "\n"
@@ -195,7 +195,7 @@ fn parse modname, file,text
 
 	fn expect(s)
 		if ! eat(s)
-			errtok("expected "@repr s)
+			errtok("expected "@repr (s))
 
 	fn word()
 		if isidstart(tok!0)
@@ -210,7 +210,7 @@ fn parse modname, file,text
 
 	fn ptype
 		if!istype()
-			errtok"expected type"
+			errtok("expected type")
 		if tok=="&"
 			^lex1(),ptype()
 		^word()
@@ -221,9 +221,6 @@ fn parse modname, file,text
 		^ptype()
 
 	; expressions
-	fn isprimary()
-		^ isidpart(tok!0) | in(tok!0 ,"'\"")
-
 	fn fbody(fname,fparams)
 		fn primary()
 			; symbol
@@ -314,16 +311,11 @@ fn parse modname, file,text
 					"."
 						lex()
 						field = word()
-						if in(a,keys modules)
+						if in(a,keys (modules))
 							a='.',a,field
 						else
 							a = "get", a, ('.quote',field)
 					_
-						;TODO is this useful enough to be worth keeping?
-						if isprimary()
-							a = [a, prefix()]
-							while eat(",")
-								a<<prefix()
 						^ a
 
 		fn param()
@@ -373,7 +365,7 @@ fn parse modname, file,text
 					fparams1=params()
 					s<<fparams1
 
-					expect"("
+					expect("(")
 					s<<('.loc',file,line1,'\\')
 					if eat(".indent")
 						s@=fbody('\\',fparams1)
@@ -424,7 +416,7 @@ fn parse modname, file,text
 		fn infix(prec)
 			a = prefix()
 			while 1
-				prec1, left1 = get ops,tok
+				prec1, left1 = get (ops,tok)
 				if prec1 < prec
 					^ a
 				op = lex1()
@@ -545,10 +537,10 @@ fn parse modname, file,text
 
 					s<<otype()
 
-					expect".indent"
+					expect(".indent")
 					s<<('.loc',file,line1,fname1)
 					s@=fbody(fname1,fparams1)
-					expect".dedent"
+					expect(".dedent")
 					^ s
 				"if"
 					^ if1(loop)
@@ -561,18 +553,18 @@ fn parse modname, file,text
 					^ s
 				"break"
 					if!breakok
-						err"break without case or loop"
+						err("break without case or loop")
 					lex()
-					if eat"\n"
+					if eat("\n")
 						^'break'
 					s<<word()
 					expect("\n")
 					^ s
 				"continue"
 					if!continueok
-						err"continue without loop"
+						err("continue without loop")
 					lex()
-					if eat"\n"
+					if eat("\n")
 						^'continue'
 					s<<word()
 					expect("\n")
@@ -599,7 +591,7 @@ fn parse modname, file,text
 		name = word()
 		;TODO: path
 		file1= name @ ".k"
-		parse(intern(name),file1,readfile  file1)
+		parse(intern(name),file1,readfile  (file1))
 		expect("\n")
 
 	; module

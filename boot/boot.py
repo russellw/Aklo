@@ -288,9 +288,6 @@ def parse(modname, file):
         errtok("expected word")
 
     # expressions
-    def isprimary():
-        return isidpart(tok[0]) or tok[0] in "'\""
-
     def fbody(fname, fparams):
         def primary():
             # symbol
@@ -379,10 +376,6 @@ def parse(modname, file):
                         else:
                             a = "get", a, quotesym(field)
                         continue
-                if isprimary():
-                    a = [a, prefix()]
-                    while eat(","):
-                        a.append(prefix())
                 return a
 
         def params():
@@ -595,6 +588,13 @@ def parse(modname, file):
                     return s
                 case "if":
                     return if1()
+                case "break" | "continue":
+                    lex()
+                    if eat("\n"):
+                        return s[0]
+                    s.append(word())
+                    expect("\n")
+                    return s
                 case "^":
                     lex()
                     if eat("\n"):

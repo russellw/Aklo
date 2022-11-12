@@ -8,26 +8,26 @@ fn isdigit c
 	^ "0"!0<=c&c<="9"!0
 
 fn isalpha c
-	^ islower c|isupper c
+	^ islower (c)|isupper (c)
 
 fn isalnum c
-	^ isalpha c|isdigit c
+	^ isalpha (c)|isdigit (c)
 
 fn isidstart c
-	^ isalpha c|in c,"_$"
+	^ isalpha (c)|in (c,"_$")
 
 fn isidpart c
-	^ isidstart c|isdigit c
+	^ isidstart (c)|isdigit (c)
 
 fn every f,s
 	for a s
-		if!f a
+		if!f (a)
 			^
 	^ 1
 
 fn any f,s
 	for a s
-		if f a
+		if f (a)
 			^ 1
 
 fn map f,s
@@ -39,12 +39,12 @@ fn map f,s
 fn filter f,s
 	r=[]
 	for a s
-		if f a
+		if f (a)
 			r<<a
 	^ r
 
 fn tail s
-	^ drop  1, s
+	^ drop ( 1, s)
 
 fn prn s
 	pr (s@"\n")
@@ -53,16 +53,16 @@ fn eprn s
 	epr (s@"\n")
 
 fn pr s
-		writestream stdout,s
+		writestream( stdout,s)
 
 fn epr s
-		writestream stderr,s
+		writestream( stderr,s)
 
 fn take i,s
-	^ slice s,0,i
+	^ slice( s,0,i)
 
 fn drop i,s
-	^ slice s,i,len s
+	^ slice (s,i,len( s))
 
 fn in a,s
 	for b s
@@ -76,36 +76,36 @@ fn startswith s,t
 	^ take (len( t),s)==t
 
 fn lower a
-	if islist a
-		^ map lower,a
-	if isupper a
+	if islist( a)
+		^ map (lower,a)
+	if isupper (a)
 		^ a+32
 	^ a
 
 fn upper a
-	if islist a
-		^ map upper,a
-	if islower a
+	if islist (a)
+		^ map (upper,a)
+	if islower (a)
 		^ a-32
 	^ a
 
 fn parseint s,base
 	while isdigitb(s!0,base)
 		c,@s=s
-		n=n*base+parsedigit c
+		n=n*base+parsedigit (c)
 	^ n
 
 fn parsedigit c
-	if isdigit c!0
+	if isdigit (c)
 		^ c-"0"!0
-	if islower c
+	if islower (c)
 		^ 10+c-"a"!0
-	if isupper c
+	if isupper (c)
 		^ 10+c-"A"!0
 	^ -1
 
 fn isdigitb c,base
-	n=parsedigit c
+	n=parsedigit (c)
 	^ 0<=n&n<base
 
 fn unesc s
@@ -121,7 +121,7 @@ fn unesc s
 			r@=utf8(parseint (slice (s,i,i+j),base))
 			i+=j
 
-	while i<len s
+	while i<len (s)
 		c=s!i++
 		if (c,)!="\\"
 			r<<c
@@ -147,11 +147,11 @@ fn unesc s
 			"e"
 				r<<27
 			"x"
-				seq 2,16
+				seq (2,16)
 			"u"
-				seq 4,16
+				seq (4,16)
 			"U"
-				seq 8,16
+				seq (8,16)
 			_
 				r<<c
 	^ r
@@ -161,20 +161,20 @@ fn utf8 c
 		^ c,
 	if c<0x800
 		^(
-			bitor 0b11000000,shr(c,6)
-			bitor 0b10000000,bitand(c,0b111111)
+			bitor( 0b11000000,shr(c,6))
+			bitor( 0b10000000,bitand(c,0b111111))
 		)
 	if c<0x10000
 		^(
-			bitor 0b11100000,shr(c,12)
-			bitor 0b10000000,bitand(shr(c,6),0b111111)
-			bitor 0b10000000,bitand(c,0b111111)
+			bitor( 0b11100000,shr(c,12))
+			bitor( 0b10000000,bitand(shr(c,6),0b111111))
+			bitor( 0b10000000,bitand(c,0b111111))
 		)
 	^ (
-		bitor 0b11110000,shr(c,18)
-		bitor 0b10000000,bitand(shr(c,12),0b111111)
-		bitor 0b10000000,bitand(shr(c,6),0b111111)
-		bitor 0b10000000,bitand(c,0b111111)
+		bitor( 0b11110000,shr(c,18))
+		bitor( 0b10000000,bitand(shr(c,12),0b111111))
+		bitor( 0b10000000,bitand(shr(c,6),0b111111))
+		bitor( 0b10000000,bitand(c,0b111111))
 	)
 
 fn repr s
@@ -184,7 +184,7 @@ fn last s
 	^ s!(len (s)-1)
 
 fn isspace c
-	^ in c," \f\n\r\t\v"
+	^ in( c," \f\n\r\t\v")
 
 fn first s
 	^ s!0
@@ -201,7 +201,7 @@ fn vals m
 fn commonprefix ss
 	s=ss!0
 	for i range(1,len(s)+1)
-		t=take i,s
+		t=take( i,s)
 		if !every(\s( startswith(s,t)),ss)
 			^ take (i-1,s)
 	^ s
@@ -228,7 +228,7 @@ fn signum a
 		^ 1
 
 fn reverse s
-	i=len s
+	i=len (s)
 	r=()
 	while i--
 		r<<s!i
@@ -245,10 +245,10 @@ fn fold f ,a, s
 	^ fold(f,f(a,b),s)
 
 fn maximum s
-	^ reduce max,s
+	^ reduce (max,s)
 
 fn minimum s
-	^ reduce min,s
+	^ reduce( min,s)
 
 fn sum s
 	^ reduce (\(a,b)(a+b),s)
@@ -264,7 +264,7 @@ fn concat ss
 
 fn replicate n ,a
 	s=[]
-	for i range n
+	for i range (n)
 		s<<a
 	^ s
 
@@ -277,7 +277,7 @@ fn takewhile f,s
 
 fn dropwhile f,s
 	while s &(f(s!0))
-		s=tail s
+		s=tail (s)
 	^ s
 
 fn span f ,s
@@ -344,7 +344,7 @@ fn split f,s
 	r=()
 	rs=()
 	for a s
-		if f a
+		if f (a)
 			rs<<r
 			r=()
 		else
@@ -357,7 +357,7 @@ fn spliton a,s
 
 fn lines s
 	if endswith(s,"\n")
-		s=init s
+		s=init (s)
 	^ spliton("\n"!0,s)
 
 fn unlines ss
@@ -370,8 +370,8 @@ fn replace from,to,s
 	assert from
 	r=""
 	while s
-		if startswith s,from
-			s=drop len(from),s
+		if startswith( s,from)
+			s=drop (len(from),s)
 			r@=to
 			continue
 		a,@s=s

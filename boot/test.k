@@ -25,25 +25,25 @@ assert true & true
 assert !bitand(0 , 0)
 assert !bitand(0 , 1)
 assert !bitand(1 , 0)
-assert bitand 1 , 1
+assert bitand( 1 , 1)
 
 assert !bitor(0 , 0)
-assert bitor 0 , 1
-assert bitor 1 , 0
-assert bitor 1 , 1
+assert bitor( 0 , 1)
+assert bitor( 1 , 0)
+assert bitor( 1 , 1)
 
 assert !bitxor(0 , 0)
-assert bitxor 0 , 1
-assert bitxor 1 , 0
+assert bitxor (0 , 1)
+assert bitxor (1 , 0)
 assert !bitxor(1 , 1)
 
-assert shl 1,8==256
-assert shr 256,8==1
+assert shl( 1,8)==256
+assert shr (256,8)==1
 
-assert bitnot 0==-1
+assert bitnot (0)==-1
 
 a=1
-assert bitnot a==-2
+assert bitnot (a)==-2
 
 ;numbers
 assert 0xff==255
@@ -75,18 +75,18 @@ assert 2>=1
 assert 1>=1
 assert !(1>=2)
 
-assert max 2,3==3
-assert max 3,2==3
+assert max( 2,3 )==3
+assert max( 3,2 )==3
 
-assert min 2,3==2
-assert min 3,2==2
+assert min (2,3)==2
+assert min (3,2)==2
 
-assert abs 10==10
-assert abs 0==0
+assert abs  (10)==10
+assert abs  (0)==0
 assert abs (-20)==20
 
-assert signum 10==1
-assert signum 0==0
+assert signum (10)==1
+assert signum (0)==0
 assert signum (-20)==-1
 
 ;arithmetic
@@ -109,54 +109,54 @@ assert "ABC"!0==65
 assert "ABC"!1==66
 assert "ABC"!2==67
 
-assert len "ABC"==3
+assert len( "ABC")==3
 assert  "ab"@"cd"=="abcd"
 assert [1+2,3+4]==[3,7]
 
-assert range 1,5==[1,2,3,4]
-assert range 5,1==[]
-assert range 5==[0,1,2,3,4]
+assert range( 1,5)==[1,2,3,4]
+assert range( 5,1)==[]
+assert range( 5)==[0,1,2,3,4]
 
 assert (1,2,3)==[1,2,3]
 
-assert slice "abcd",1,3=="bc"
+assert slice ("abcd",1,3)=="bc"
 
-assert drop 1,"abcde"=="bcde"
+assert drop (1,"abcde")=="bcde"
 
-assert init"abcde"=="abcd"
-assert init""==""
+assert init("abcde")=="abcd"
+assert init("")==""
 
-assert in 8,[6,7,8]
-assert! in 9,[6,7,8]
+assert in (8,[6,7,8])
+assert! in (9,[6,7,8])
 
-assert startswith "qwerty","qwe"
-assert !startswith "qwerty","qwz"
-assert !startswith "qw","qwer"
+assert startswith ("qwerty","qwe")
+assert !startswith ("qwerty","qwz")
+assert !startswith ("qw","qwer")
 
-assert endswith "qwerty","rty"
-assert !endswith "ty","rty"
-assert !endswith "qwerty","ety"
+assert endswith( "qwerty","rty")
+assert !endswith( "ty","rty")
+assert !endswith ("qwerty","ety")
 
-assert lower 97==97
-assert lower 65==97
-assert lower "ABC..."=="abc..."
+assert lower (97)==97
+assert lower (65)==97
+assert lower ("ABC...")=="abc..."
 
-assert upper 97==65
-assert upper 65==65
-assert upper "abc..."=="ABC..."
+assert upper (97)==65
+assert upper (65)==65
+assert upper ("abc...")=="ABC..."
 
 assert r"\n"=="\\n"
 
-assert utf8 0x24==(0x24,)
-assert utf8 0xa3==(0xc2,0xa3)
-assert utf8 0x939==(0xe0,0xa4,0xb9)
-assert utf8 0x20ac==(0xe2,0x82,0xac)
-assert utf8 0xd55c==(0xed,0x95,0x9c)
-assert utf8 0x10348==(0xf0,0x90,0x8d,0x88)
+assert utf8 (0x24)==(0x24,)
+assert utf8 (0xa3)==(0xc2,0xa3)
+assert utf8 (0x939)==(0xe0,0xa4,0xb9)
+assert utf8 (0x20ac)==(0xe2,0x82,0xac)
+assert utf8 (0xd55c)==(0xed,0x95,0x9c)
+assert utf8 (0x10348)==(0xf0,0x90,0x8d,0x88)
 
-assert parseint "123",10==123
-assert parseint "ff",16==255
-assert parseint "FFFF",16==65535
+assert parseint( "123",10)==123
+assert parseint ("ff",16)==255
+assert parseint ("FFFF",16)==65535
 
 assert isdigitb ("9"!0,10)
 assert isdigitb ("9"!0,16)
@@ -167,26 +167,26 @@ assert isdigitb ("f"!0,16)
 assert !isdigitb ("*"!0,10)
 assert !isdigitb ("*"!0,16)
 
-assert unesc "abc"=="abc"
-assert unesc r"\tabc\n"=="\tabc\n"
-assert unesc r"\x41\x42"=="AB"
+assert unesc( "abc")=="abc"
+assert unesc (r"\tabc\n")=="\tabc\n"
+assert unesc (r"\x41\x42")=="AB"
 
-assert reverse"abc"=="cba"
+assert reverse("abc")=="cba"
 
 assert concat(("zxc","vb"))=="zxcvb"
 
-assert replicate 4,9==(9,9,9,9)
+assert replicate( 4,9)==(9,9,9,9)
 assert replicate (-1,9)==()
 
-assert takewhile isdigit,"123abc"=="123"
-assert takewhile isdigit,"123"=="123"
-assert takewhile isdigit,"abc"==""
+assert takewhile (isdigit,"123abc")=="123"
+assert takewhile (isdigit,"123")=="123"
+assert takewhile (isdigit,"abc")==""
 
-assert dropwhile isdigit,"123abc"=="abc"
-assert dropwhile isdigit,"123"==""
-assert dropwhile isdigit,"abc"=="abc"
+assert dropwhile (isdigit,"123abc")=="abc"
+assert dropwhile (isdigit,"123")==""
+assert dropwhile (isdigit,"abc")=="abc"
 
-assert span isdigit,"123abc"==("123","abc")
+assert span (isdigit,"123abc")==("123","abc")
 
 assert splitat(2,"abcde")==("ab","cde")
 assert splitat(-1,"abcde")==("","abcde")
@@ -260,7 +260,7 @@ assert j == 1
 assert 'a'=='a'
 assert 'a'!='b'
 
-assert 'a'==intern"a"
+assert 'a'==intern("a")
 
 a=gensym()
 b=gensym()
@@ -367,9 +367,9 @@ assert i==1
 ;records
 a=[['x',1],['y',2]]
 
-assert get a,'x'==1
-assert get a,'y'==2
-assert get a,'z'==0
+assert get( a,'x')==1
+assert get (a,'y')==2
+assert get (a,'z')==0
 
 assert  a.x==1
 assert  a.y==2
@@ -392,14 +392,14 @@ assert f()==77
 fn square a
 		^ a*a
 
-assert square 7==49
+assert square (7)==49
 
 fn factorial n
 	if n<=1
 		^ 1
 	^ n*factorial(n-1)
 
-assert factorial 5==120
+assert factorial (5)==120
 
 fn zero
 	^
@@ -410,7 +410,7 @@ fn foo bar
 	bar=4
 	^ bar
 
-assert foo 3==4
+assert foo (3)==4
 
 ;mutual recursion
 fn evenrec n
@@ -425,10 +425,10 @@ fn oddrec n
 		^
 	^ evenrec(n-1)
 
-assert evenrec 0
-assert oddrec 1
-assert evenrec 2
-assert oddrec 3
+assert evenrec( 0)
+assert oddrec (1)
+assert evenrec (2)
+assert oddrec (3)
 
 ;lexical scope
 a=1
@@ -453,8 +453,8 @@ assert str(123)=="123"
 assert str('xyz')=="xyz"
 
 ;characters
-assert isupper 65
-assert !isupper 97
+assert isupper( 65)
+assert !isupper( 97)
 
 ;higher-order functions
 assert map( \x(x*x),[1,2,3])==[1,4,9]
@@ -462,16 +462,16 @@ assert map( square,[1,2,3])==[1,4,9]
 
 assert filter( isdigit,"abc123")=="123"
 
-assert every isupper,""
-assert every isupper,"ABC"
-assert !every isupper,"ABC."
+assert every( isupper,"")
+assert every (isupper,"ABC")
+assert !every (isupper,"ABC.")
 assert every (\a (a<10),(1,2,3))
 assert! every (\a( a<10),(1,2,13))
 
-assert !any isupper,""
-assert any isupper,"ABC"
-assert any isupper,"ABC."
-assert !any isupper,"."
+assert !any( isupper,"")
+assert any (isupper,"ABC")
+assert any (isupper,"ABC.")
+assert !any (isupper,".")
 
 fn add a,b
 	^ a+b
@@ -488,11 +488,11 @@ assert reduce(add,())==0
 
 assert reduce(\(s,t)(s@t),("abc","def","gh"))=="abcdefgh"
 
-assert maximum "abc"=="c"!0
-assert maximum "cba"=="c"!0
+assert maximum( "abc")=="c"!0
+assert maximum ("cba")=="c"!0
 
-assert minimum "abc"=="a"!0
-assert minimum "cba"=="a"!0
+assert minimum ("abc")=="a"!0
+assert minimum ("cba")=="a"!0
 
 assert sum((1,2,3,4))==10
 assert sum(())==0
@@ -500,7 +500,7 @@ assert sum(())==0
 assert product((1,2,3,4))==24
 assert product(())==1
 
-assert replace "a","aa","aaa"=="aaaaaa"
+assert replace( "a","aa","aaa")=="aaaaaa"
 
 ;commonprefix
 assert commonprefix(("a","ab","abc"))=="a"
