@@ -437,7 +437,7 @@ fn parse modname, file,text
 				"-="
 				"@="
 				"<<"
-					return intern(lex1()), a, assignment()
+					return intern(lex1()), a, commas()
 			return a
 
 		fn block(loop)

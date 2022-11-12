@@ -224,9 +224,6 @@ x = 6
 assert x == 6
 y = 7
 assert y == 7
-a = b = 9
-assert a == 9
-assert b == 9
 
 ;augmented assignment
 i = 3

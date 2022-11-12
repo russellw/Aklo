@@ -506,8 +506,7 @@ def parse(modname, file):
             a = commas()
             match tok:
                 case "=" | "+=" | "-=" | "@=" | "<<" | ":=":
-                    # TODO allow a=b=c?
-                    return lex1(), a, assignment()
+                    return lex1(), a, commas()
             return a
 
         def block():
@@ -688,6 +687,7 @@ def expr(a):
             print("Etc.le")
             pargs(s)
         case "<<", x, y:
+            # TODO should be stmt?
             print(x + "=")
             print("Etc.cat1")
             pargs((x, y))
