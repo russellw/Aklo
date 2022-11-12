@@ -601,6 +601,7 @@ def parse(modname, file):
                     expect("\n")
                     return s
                 case "return":
+                    # TODO abbreviate?
                     lex()
                     if eat("\n"):
                         return "return", 0
@@ -1121,6 +1122,7 @@ def fn(fname, params, body):
     localvars(params, body)
 
     # if the trailing return is implicit, make it explicit
+    # TODO eliminate this
     if not body:
         body = [0]
     a = body[-1]
