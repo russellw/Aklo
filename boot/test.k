@@ -453,8 +453,7 @@ assert a==1
 a=1
 
 fn f11
-	^ a
-	a=2
+	a:=2
 
 f11()
 assert a==2

@@ -1,8 +1,6 @@
 modules=()
 
 fn parse modname, file,text
-	^ modules
-
 	;TODO: repr
 	;TODO: check for already parsed
 	text=replace("\r\n","\n",text)
@@ -24,31 +22,23 @@ fn parse modname, file,text
 		exit 1
 
 	fn errtok(msg)
-		^ line
 		if tok == "\n"
 			line--
 		err(repr(tok)@": "@msg)
 
 	; tokenizer
 	fn lex()
-		^ cols
-		^ dedents
-		^ dentc
-		^ i
-		^ line
-		^ tok
-
 		;a single newline can produce multiple dedent tokens
 		if dedents
 			dedents--
-			tok = ".dedent"
+			tok:= ".dedent"
 			return
 
 		while i < len(text)
 			j = i
 
 			;the simplest tokens are just one character
-			tok = text!i,
+			tok:= text!i,
 
 			; newline
 			if tok == "\n"
@@ -61,7 +51,7 @@ fn parse modname, file,text
 				while in (text!i ,"\t ")
 					if text!i != dentc & dentc
 						err("indented with tabs and spaces in same file")
-					dentc = text!i++
+					dentc := text!i++
 					col++
 
 				; nothing important on this line, keep going
@@ -71,12 +61,12 @@ fn parse modname, file,text
 				; one indent
 				if col > last(cols)
 					cols^=col
-					tok = ".indent"
+					tok:= ".indent"
 					return
 
 				; zero or more dedents
 				while col < last(cols)
-					cols=init(cols)
+					cols:=init(cols)
 					dedents++
 				if col != last(cols)
 					err("inconsistent indent")
@@ -97,7 +87,7 @@ fn parse modname, file,text
 				line1 = line
 				while text!i != "}"!0
 					if i == len(text)
-						line = line1
+						line := line1
 						err("unclosed block comment")
 					if text!i == "\n"!0
 						line++
@@ -117,7 +107,7 @@ fn parse modname, file,text
 							err("unclosed quote")
 						i++
 					i++
-					tok = slice(text,j,i)
+					tok:= slice(text,j,i)
 					return
 
 			; raw string
@@ -128,21 +118,21 @@ fn parse modname, file,text
 						err("unclosed quote")
 					i++
 				i++
-				tok = slice(text,j,i)
+				tok:= slice(text,j,i)
 				return
 
 			; word
 			if isidstart(text!i)
 				while isidpart(text!i)
 					i++
-				tok = slice(text,j,i)
+				tok:= slice(text,j,i)
 				return
 
 			; hexadecimal numbers are separate because they may contain 'e'
 			if lower(slice(text,i,i+2)) == "0x"
 				while isidpart(text!i)
 					i++
-				tok = slice(text,j,i)
+				tok:= slice(text,j,i)
 				return
 
 			; other number
@@ -157,12 +147,13 @@ fn parse modname, file,text
 						i++
 						while isidpart(text!i)
 							i++
-				tok = slice(text,j,i)
+				tok:= slice(text,j,i)
 				return
 
 			; punctuation
 			punct = (
 				"!=",
+				":=",
 				"**",
 				"++",
 				"+=",
@@ -178,18 +169,18 @@ fn parse modname, file,text
 			for s  punct
 				if slice(text,i , i + len(s)) == s
 					i += len(s)
-					tok = s
+					tok:= s
 					return
 
 			if tok == "["
-				tok = "("
+				tok:= "("
 			if tok == "]"
-				tok = ")"
+				tok:= ")"
 			i++
 			return
 
 		; end of file
-		tok = ".dedent"
+		tok:= ".dedent"
 
 	fn lex1()
 		s = tok
@@ -374,7 +365,6 @@ fn parse modname, file,text
 		ops = ()
 
 		fn mkop(op, left)
-			^ ops
 			ops^=(op,( prec, left))
 
 		mkop("!", 1)
@@ -444,6 +434,7 @@ fn parse modname, file,text
 			case tok
 				"="
 				"+="
+				":="
 				"-="
 				"@="
 				"^="
@@ -536,11 +527,6 @@ fn parse modname, file,text
 					return s
 				"if"
 					return if1(loop)
-				"^"
-					lex()
-					s^=word()
-					expect("\n")
-					return s
 				"return"
 					lex()
 					if eat("\n")

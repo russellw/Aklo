@@ -109,10 +109,11 @@ fn isdigitb c,base
 	0<=n&n<base
 
 fn unesc s
+	i=0
+	j=0
 	r=""
 
 	fn seq n,base
-			^ i
 			while j<n
 				if !isdigitb( s!(i+j),base)
 					break

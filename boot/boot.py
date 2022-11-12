@@ -238,6 +238,7 @@ def parse(modname, file):
             # punctuation
             punct = (
                 "!=",
+                ":=",
                 "**",
                 "++",
                 "+=",
@@ -505,7 +506,7 @@ def parse(modname, file):
         def assignment():
             a = commas()
             match tok:
-                case "=" | "+=" | "-=" | "@=" | "^=":
+                case "=" | "+=" | "-=" | "@=" | "^=" | ":=":
                     return lex1(), a, assignment()
             return a
 
@@ -595,11 +596,6 @@ def parse(modname, file):
                     return s
                 case "if":
                     return if1()
-                case "^":
-                    lex()
-                    s.append(word())
-                    expect("\n")
-                    return s
                 case "return":
                     # TODO abbreviate?
                     lex()
@@ -965,10 +961,8 @@ def stmt(a):
                         print(f"break {outerLabel};")
                 print("} while (false);")
             print("} while (false);")
-        case "=", pattern, x:
+        case ("=", pattern, x) | (":=", pattern, x):
             assign(pattern, x)
-        case "^", _:
-            0
         case ("++", x) | ("post++", x):
             print(f"{x} = Etc.add({x}, 1);")
         case ("--", x) | ("post--", x):
@@ -991,19 +985,6 @@ def stmt(a):
 
 
 # variables
-def nonlocalvars(body):
-    # TODO alternatively maybe use := to assign an outer variable
-    r = set()
-
-    def f(a):
-        match a:
-            case "^", x:
-                r.add(x)
-
-    eachr(f, body)
-    return r
-
-
 def assignedvars(params, body):
     # dict keeps deterministic order
     r = {x: 1 for x in params}
@@ -1021,15 +1002,7 @@ def assignedvars(params, body):
             case "case", x, *cases:
                 for pattern, *body in cases:
                     eachr(lhs, pattern)
-            case (
-                ("++", x)
-                | ("--", x)
-                | ("post++", x)
-                | ("post--", x)
-                | ("+=", x, _)
-                | ("=", x, _)
-                | ("-=", x, _)
-            ):
+            case "=", x, _:
                 eachr(lhs, x)
 
     eachr(f, body)
@@ -1037,10 +1010,8 @@ def assignedvars(params, body):
 
 
 def localvars(params, body, static=0):
-    nonlocals = nonlocalvars(body)
+    # TODO error check for same variable assigned with = and :=
     for a in assignedvars(params, body):
-        if a in nonlocals:
-            continue
         if static:
             print("static")
         if a in ("i", "j", "k"):
@@ -1127,7 +1098,10 @@ def fn(fname, params, body):
         body = [0]
     a = body[-1]
     match a:
-        case ("assert", _) | ("for", *_) | ("if", *_) | ("case", *_) | ("while", *_):
+        case ("assert", _) | ("for", *_) | ("if", *_) | ("case", *_) | ("while", *_) | (
+            ":=",
+            *_,
+        ):
             body.append(("return", 0))
         case "return", _:
             0
