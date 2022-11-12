@@ -32,7 +32,7 @@ fn parse modname, file,text
 		if dedents
 			dedents--
 			tok:= ".dedent"
-			return
+			^
 
 		while i < len(text)
 			j = i
@@ -62,7 +62,7 @@ fn parse modname, file,text
 				if col > last(cols)
 					cols<<col
 					tok:= ".indent"
-					return
+					^
 
 				; zero or more dedents
 				while col < last(cols)
@@ -70,7 +70,7 @@ fn parse modname, file,text
 					dedents++
 				if col != last(cols)
 					err("inconsistent indent")
-				return
+				^
 
 			; space
 			if isspace(text!i)
@@ -108,7 +108,7 @@ fn parse modname, file,text
 						i++
 					i++
 					tok:= slice(text,j,i)
-					return
+					^
 
 			; raw string
 			if slice(text,i,i+2) == "r\""
@@ -119,21 +119,21 @@ fn parse modname, file,text
 					i++
 				i++
 				tok:= slice(text,j,i)
-				return
+				^
 
 			; word
 			if isidstart(text!i)
 				while isidpart(text!i)
 					i++
 				tok:= slice(text,j,i)
-				return
+				^
 
 			; hexadecimal numbers are separate because they may contain 'e'
 			if lower(slice(text,i,i+2)) == "0x"
 				while isidpart(text!i)
 					i++
 				tok:= slice(text,j,i)
-				return
+				^
 
 			; other number
 			if isdigit(text!i) | tok == "." & isdigit(text![i + 1])
@@ -148,7 +148,7 @@ fn parse modname, file,text
 						while isidpart(text!i)
 							i++
 				tok:= slice(text,j,i)
-				return
+				^
 
 			; punctuation
 			punct = (
@@ -170,14 +170,14 @@ fn parse modname, file,text
 				if slice(text,i , i + len(s)) == s
 					i += len(s)
 					tok:= s
-					return
+					^
 
 			if tok == "["
 				tok:= "("
 			if tok == "]"
 				tok:= ")"
 			i++
-			return
+			^
 
 		; end of file
 		tok:= ".dedent"
@@ -185,13 +185,13 @@ fn parse modname, file,text
 	fn lex1()
 		s = tok
 		lex()
-		return s
+		^ s
 
 	; parser
 	fn eat(s)
 		if tok == s
 			lex()
-			return 1
+			^ 1
 
 	fn expect(s)
 		if ! eat(s)
@@ -199,12 +199,12 @@ fn parse modname, file,text
 
 	fn word()
 		if isidstart(tok!0)
-			return intern(lex1())
+			^ intern(lex1())
 		errtok("expected word")
 
 	; expressions
 	fn isprimary()
-		return isidpart(tok!0) | in(tok!0 ,"'\"")
+		^ isidpart(tok!0) | in(tok!0 ,"'\"")
 
 	fn fbody(fname,fparams)
 		fn primary()
@@ -212,30 +212,30 @@ fn parse modname, file,text
 			if startswith(tok,"'")
 				s = unesc(slice(tok,1,len(tok)-1))
 				lex()
-				return '.quote',intern(s)
+				^ '.quote',intern(s)
 
 			; string
 			if startswith(tok,"\"")
 				s = unesc(slice(tok,1,len(tok)-1))
 				lex()
-				return'.list',@s
+				^'.list',@s
 
 			; raw string
 			if startswith(tok,"r\"")
 				s = slice(tok,2,len(tok)-1)
 				lex()
-				return'.list',@s
+				^'.list',@s
 
 			; word
 			case tok
 				"false"
 					lex()
-					return 0
+					^ 0
 				"true"
 					lex()
-					return 1
+					^ 1
 			if isidstart(tok!0)
-				return lex1()
+				^ lex1()
 
 			; number
 			if isdigit(tok!0)
@@ -250,7 +250,7 @@ fn parse modname, file,text
 					_
 						a = parseint(s,10)
 				lex()
-				return a
+				^ a
 
 			; bracketed expression or list
 			if eat("(")
@@ -261,12 +261,12 @@ fn parse modname, file,text
 						eat(",")
 						expect("\n")
 					expect(")")
-					return s
+					^ s
 				if eat(")")
-					return '.list',
+					^ '.list',
 				a = commas()
 				expect(")")
-				return a
+				^ a
 
 			; none of the above
 			errtok("expected expression")
@@ -292,7 +292,7 @@ fn parse modname, file,text
 							expect(",")
 					"++"
 					"--"
-						return intern("post" @ lex1()), a
+						^ intern("post" @ lex1()), a
 					"."
 						lex()
 						field = word()
@@ -305,7 +305,7 @@ fn parse modname, file,text
 							a = [a, prefix()]
 							while eat(",")
 								a<<prefix()
-						return a
+						^ a
 
 		fn params()
 			s = []
@@ -332,7 +332,7 @@ fn parse modname, file,text
 						s<<word()
 						if ! eat(",")
 							break
-			return s
+			^ s
 
 		fn prefix()
 			case tok
@@ -341,7 +341,7 @@ fn parse modname, file,text
 				"--"
 				"-"
 				"@"
-					return intern(lex1()), prefix()
+					^ intern(lex1()), prefix()
 				"\\"
 					line1=line
 					s = [intern(lex1()),]
@@ -357,8 +357,8 @@ fn parse modname, file,text
 					else
 						s<<commas()
 					expect(")")
-					return s
-			return postfix()
+					^ s
+			^ postfix()
 
 		; operator precedence parser
 		prec = 99
@@ -402,7 +402,7 @@ fn parse modname, file,text
 			while 1
 				prec1, left1 = get ops,tok
 				if prec1 < prec
-					return a
+					^ a
 				op = lex1()
 				b = infix(prec1 + left1)
 				case op
@@ -414,18 +414,18 @@ fn parse modname, file,text
 						a = intern(op), a, b
 
 		fn expr()
-			return infix(1)
+			^ infix(1)
 
 		; statements
 		fn commas()
 			a = expr()
 			if tok != ","
-				return a
+				^ a
 			s = ['.list', a]
 			while eat(",")
 				if !in(tok,(				")",".indent" , "\n"))
 						s<<expr()
-			return s
+			^ s
 
 		fn assignment()
 			;TODO clear error message if the left-hand side is not assignable
@@ -437,8 +437,8 @@ fn parse modname, file,text
 				"-="
 				"@="
 				"<<"
-					return intern(lex1()), a, commas()
-			return a
+					^ intern(lex1()), a, commas()
+			^ a
 
 		fn block(loop)
 			expect(".indent")
@@ -446,7 +446,7 @@ fn parse modname, file,text
 			while ! eat(".dedent")
 				s<<('.loc',file,line,fname)
 				s<<stmt(loop)
-			return s
+			^ s
 
 		fn if1(loop)
 			assert  in(tok, ("if", "elif"))
@@ -459,7 +459,7 @@ fn parse modname, file,text
 				"else"
 					lex()
 					s<<block(loop)
-			return s
+			^ s
 
 		fn stmt(loop)
 			continueok,breakok=loop
@@ -474,7 +474,7 @@ fn parse modname, file,text
 					s<<str(x)
 					s<<x
 					expect("\n")
-					return s
+					^ s
 				"show"
 					s<<file
 					s<<line
@@ -484,7 +484,7 @@ fn parse modname, file,text
 					s<<str(x)
 					s<<x
 					expect("\n")
-					return s
+					^ s
 				"case"
 					lex()
 					s<<commas()
@@ -496,19 +496,19 @@ fn parse modname, file,text
 						body = block((continueok,1))
 						for pattern  patterns
 							s<<(pattern, @body)
-					return s
+					^ s
 				"dowhile"
 				"while"
 					lex()
 					s<<expr()
 					s@=block((1,1))
-					return s
+					^ s
 				"for"
 					lex()
 					s<<word()
 					s<<commas()
 					s@=block((1,1))
-					return s
+					^ s
 				"fn"
 					line1=line
 					lex()
@@ -523,46 +523,46 @@ fn parse modname, file,text
 					s<<('.loc',file,line1,fname1)
 					s@=fbody(fname1,fparams1)
 					expect".dedent"
-					return s
+					^ s
 				"if"
-					return if1(loop)
-				"return"
+					^ if1(loop)
+				"^"
 					lex()
 					if eat("\n")
-						return 'return', 0
+						^ '^', 0
 					s<<commas()
 					expect("\n")
-					return s
+					^ s
 				"break"
 					if!breakok
 						err"break without case or loop"
 					lex()
 					if eat"\n"
-						return'break'
+						^'break'
 					s<<word()
 					expect("\n")
-					return s
+					^ s
 				"continue"
 					if!continueok
 						err"continue without loop"
 					lex()
 					if eat"\n"
-						return'continue'
+						^'continue'
 					s<<word()
 					expect("\n")
-					return s
+					^ s
 			a = assignment()
 			if eat(":")
-				return ":", a, stmt(loop)
+				^ ":", a, stmt(loop)
 			expect("\n")
-			return a
+			^ a
 
 		; function/module body
 		s = []
 		while tok != ".dedent"
 			s<<('.loc',file,line,fname)
 			s<<stmt((0,0))
-		return s
+		^ s
 
 	; top level
 	lex()

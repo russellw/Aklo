@@ -595,11 +595,10 @@ def parse(modname, file):
                     return s
                 case "if":
                     return if1()
-                case "return":
-                    # TODO abbreviate?
+                case "^":
                     lex()
                     if eat("\n"):
-                        return "return", 0
+                        return "^", 0
                     s.append(commas())
                     expect("\n")
                     return s
@@ -926,7 +925,7 @@ def stmt(a):
             print("{")
             each(stmt, s)
             print("}")
-        case "return", x:
+        case "^", x:
             ret(x)
         case ("break", x) | ("continue", x):
             print(a[0])
@@ -956,7 +955,7 @@ def stmt(a):
                     # this is useful because the bootstrap compiler
                     # does not actually support this within a case
                     # workaround: use a labeled loop
-                    case ("break", _) | ("continue", _) | ("return", _):
+                    case ("break", _) | ("continue", _) | ("^", _):
                         0
                     case _:
                         print(f"break {outerLabel};")
@@ -1051,7 +1050,7 @@ def fbody(s):
         stmt(a)
     a = s[-1]
     match a:
-        case "return", x:
+        case "^", x:
             ret(x)
         case _:
             ret(a)
@@ -1095,10 +1094,10 @@ def fn(fname, params, body):
 
     # falling off the end of a function means returning zero
     match body[-1]:
-        case "return", _:
+        case "^", _:
             0
         case _:
-            body.append(("return", 0))
+            body.append(("^", 0))
 
     # body
     print("public Object apply(List<Object> _args) {")

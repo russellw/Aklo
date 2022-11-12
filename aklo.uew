@@ -4,6 +4,7 @@
 /Open Brace Strings =  "(" "["
 /Close Brace Strings = ")" "]"
 /C1"blue"
+^
 assert
 case
 dowhile

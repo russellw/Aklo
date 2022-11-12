@@ -381,7 +381,7 @@ assert f(2,3)==5
 
 f=\x,y(
 	z=x+y
-	return z
+	^ z
 )
 assert f(2,3)==5
 
@@ -390,25 +390,25 @@ assert f()==77
 
 ;functions
 fn square a
-		return a*a
+		^ a*a
 
 assert square 7==49
 
 fn factorial n
 	if n<=1
-		return 1
-	return n*factorial(n-1)
+		^ 1
+	^ n*factorial(n-1)
 
 assert factorial 5==120
 
 fn zero
-	return
+	^
 
 assert zero()==0
 
 fn foo bar
 	bar=4
-	return bar
+	^ bar
 
 assert foo 3==4
 
@@ -416,14 +416,14 @@ assert foo 3==4
 fn evenrec n
 	assert n>=0
 	if n==0
-		return  1
-	return oddrec(n-1)
+		^  1
+	^ oddrec(n-1)
 
 fn oddrec n
 	assert n>=0
 	if n==0
-		return
-	return evenrec(n-1)
+		^
+	^ evenrec(n-1)
 
 assert evenrec 0
 assert oddrec 1
@@ -474,7 +474,7 @@ assert any isupper,"ABC."
 assert !any isupper,"."
 
 fn add a,b
-	return a+b
+	^ a+b
 
 assert fold(add,0,(1,2,3,4))==10
 assert fold(add,0,(1))==1
