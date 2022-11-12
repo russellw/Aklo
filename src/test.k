@@ -1,2 +1,2 @@
-fn square (a isize)isize
-	a*a
+fn square (a usize)usize
+	^a*a
