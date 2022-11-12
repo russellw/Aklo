@@ -260,7 +260,7 @@ class Etc {
   }
 
   static Object subscript(Object s0, Object i0) {
-    var s = aslist(s0);
+    var s = (List<Object>) s0;
     var i = (int) i0;
     if (!(0 <= i && i < s.size())) return 0;
     return s.get(i);

@@ -416,6 +416,8 @@ fn parse modname, file,text
 		fn infix(prec)
 			a = prefix()
 			while 1
+				if!in(tok,keys(ops))
+					^a
 				prec1, left1 = get (ops,tok)
 				if prec1 < prec
 					^ a
