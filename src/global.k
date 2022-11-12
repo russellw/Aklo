@@ -1,29 +1,29 @@
 fn isupper c
-	"A"!0<=c&c<="Z"!0
+	return "A"!0<=c&c<="Z"!0
 
 fn islower c
-	"a"!0<=c&c<="z"!0
+	return "a"!0<=c&c<="z"!0
 
 fn isdigit c
-	"0"!0<=c&c<="9"!0
+	return "0"!0<=c&c<="9"!0
 
 fn isalpha c
-	islower c|isupper c
+	return islower c|isupper c
 
 fn isalnum c
-	isalpha c|isdigit c
+	return isalpha c|isdigit c
 
 fn isidstart c
-	isalpha c|in c,"_$"
+	return isalpha c|in c,"_$"
 
 fn isidpart c
-	isidstart c|isdigit c
+	return isidstart c|isdigit c
 
 fn every f,s
 	for a s
 		if!f a
 			return
-	1
+	return 1
 
 fn any f,s
 	for a s
@@ -34,17 +34,17 @@ fn map f,s
 	r=[]
 	for a s
 		r<<f(  a)
-	r
+	return r
 
 fn filter f,s
 	r=[]
 	for a s
 		if f a
 			r<<a
-	r
+	return r
 
 fn tail s
-	drop  1, s
+	return drop  1, s
 
 fn prn s
 	pr (s@"\n")
@@ -59,10 +59,10 @@ fn epr s
 		writestream stderr,s
 
 fn take i,s
-	slice s,0,i
+	return slice s,0,i
 
 fn drop i,s
-	slice s,i,len s
+	return slice s,i,len s
 
 fn in a,s
 	for b s
@@ -70,30 +70,30 @@ fn in a,s
 			return 1
 
 fn endswith s,t
-	drop (len(s)-len( t),s)==t
+	return drop (len(s)-len( t),s)==t
 
 fn startswith s,t
-	take (len( t),s)==t
+	return take (len( t),s)==t
 
 fn lower a
 	if islist a
 		return map lower,a
 	if isupper a
 		return a+32
-	a
+	return a
 
 fn upper a
 	if islist a
 		return map upper,a
 	if islower a
 		return a-32
-	a
+	return a
 
 fn parseint s,base
 	while isdigitb(s!0,base)
 		c,@s=s
 		n=n*base+parsedigit c
-	n
+	return n
 
 fn parsedigit c
 	if isdigit c!0
@@ -102,11 +102,11 @@ fn parsedigit c
 		return 10+c-"a"!0
 	if isupper c
 		return 10+c-"A"!0
-	-1
+	return -1
 
 fn isdigitb c,base
 	n=parsedigit c
-	0<=n&n<base
+	return 0<=n&n<base
 
 fn unesc s
 	i=0
@@ -154,7 +154,7 @@ fn unesc s
 				seq 8,16
 			_
 				r<<c
-	r
+	return r
 
 fn utf8 c
 	if c<0x80
@@ -170,7 +170,7 @@ fn utf8 c
 			bitor 0b10000000,bitand(shr(c,6),0b111111)
 			bitor 0b10000000,bitand(c,0b111111)
 		)
-	(
+	return (
 		bitor 0b11110000,shr(c,18)
 		bitor 0b10000000,bitand(shr(c,12),0b111111)
 		bitor 0b10000000,bitand(shr(c,6),0b111111)
@@ -178,25 +178,25 @@ fn utf8 c
 	)
 
 fn repr s
-	s
+	return s
 
 fn last s
-	s!(len (s)-1)
+	return s!(len (s)-1)
 
 fn isspace c
-	in c," \f\n\r\t\v"
+	return in c," \f\n\r\t\v"
 
 fn first s
-	s!0
+	return s!0
 
 fn second s
-	s!1
+	return s!1
 
 fn keys m
-		map (first,m)
+		return map (first,m)
 
 fn vals m
-		map (second,m)
+		return map (second,m)
 
 fn commonprefix ss
 	s=ss!0
@@ -204,22 +204,22 @@ fn commonprefix ss
 		t=take i,s
 		if !every(\s( startswith(s,t)),ss)
 			return take (i-1,s)
-	s
+	return s
 
 fn max a,b
 	if a>b
 		return a
-	b
+	return b
 
 fn min a,b
 	if a<b
 		return a
-	b
+	return b
 
 fn abs a
 	if a<0
 		return -a
-	a
+	return a
 
 fn signum a
 	if a<0
@@ -232,59 +232,59 @@ fn reverse s
 	r=()
 	while i--
 		r<<s!i
-	r
+	return r
 
 fn reduce f , s
 	a,@s=s
-	fold (f,a,s)
+	return fold (f,a,s)
 
 fn fold f ,a, s
 	if !s
 		return a
 	b,@s=s
-	fold(f,f(a,b),s)
+	return fold(f,f(a,b),s)
 
 fn maximum s
-	reduce max,s
+	return reduce max,s
 
 fn minimum s
-	reduce min,s
+	return reduce min,s
 
 fn sum s
-	reduce (\(a,b)(a+b),s)
+	return reduce (\(a,b)(a+b),s)
 
 fn product s
-	fold (\(a,b)(a*b),1,s)
+	return fold (\(a,b)(a*b),1,s)
 
 fn init s
-	take (len(s)-1,s)
+	return take (len(s)-1,s)
 
 fn concat ss
-	fold (\(s,t)(s@t),"",ss)
+	return fold (\(s,t)(s@t),"",ss)
 
 fn replicate n ,a
 	s=[]
 	for i range n
 		s<<a
-	s
+	return s
 
 fn takewhile f,s
 	r=""
 	while s &(f(s!0))
 		a,@s=s
 		r<<a
-	r
+	return r
 
 fn dropwhile f,s
 	while s &(f(s!0))
 		s=tail s
-	s
+	return s
 
 fn span f ,s
-	takewhile (f,s),dropwhile(f,s)
+	return takewhile (f,s),dropwhile(f,s)
 
 fn splitat n,s
-	take(n,s),drop(n,s)
+	return take(n,s),drop(n,s)
 
 fn zip s,t
 	r=()
@@ -292,7 +292,7 @@ fn zip s,t
 		a,@s=s
 		b,@t=t
 		r<<(a,b)
-	r
+	return r
 
 fn zip3 s,t,u
 	r=()
@@ -301,7 +301,7 @@ fn zip3 s,t,u
 		b,@t=t
 		c,@u=u
 		r<<(a,b,c)
-	r
+	return r
 
 fn zipwith f,s,t
 	r=()
@@ -309,7 +309,7 @@ fn zipwith f,s,t
 		a,@s=s
 		b,@t=t
 		r<<f(a,b)
-	r
+	return r
 
 fn zipwith3 f,s,t,u
 	r=()
@@ -318,7 +318,7 @@ fn zipwith3 f,s,t,u
 		b,@t=t
 		c,@u=u
 		r<<f(a,b,c)
-	r
+	return r
 
 fn unzip s
 	q=()
@@ -327,7 +327,7 @@ fn unzip s
 		(a,b),@s=s
 		q<<a
 		r<<b
-	q,r
+	return q,r
 
 fn unzip3 s
 	p=()
@@ -338,7 +338,7 @@ fn unzip3 s
 		p<<a
 		q<<b
 		r<<c
-	p,q,r
+	return p,q,r
 
 fn split f,s
 	r=()
@@ -353,18 +353,18 @@ fn split f,s
 	return rs
 
 fn spliton a,s
-	split (\(b)(a==b),s)
+	return split (\(b)(a==b),s)
 
 fn lines s
 	if endswith(s,"\n")
 		s=init s
-	spliton("\n"!0,s)
+	return spliton("\n"!0,s)
 
 fn unlines ss
 	r=""
 	for s ss
 		r@=s@"\n"
-	r
+	return r
 
 fn replace from,to,s
 	assert from
@@ -376,4 +376,4 @@ fn replace from,to,s
 			continue
 		a,@s=s
 		r<<a
-	r
+	return r

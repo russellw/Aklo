@@ -390,19 +390,14 @@ assert f()==77
 
 ;functions
 fn square a
-	a*a
+		return a*a
 
 assert square 7==49
-
-fn square1 a
-	return a*a
-
-assert square1 8==64
 
 fn factorial n
 	if n<=1
 		return 1
-	n*factorial(n-1)
+	return n*factorial(n-1)
 
 assert factorial 5==120
 
@@ -413,7 +408,7 @@ assert zero()==0
 
 fn foo bar
 	bar=4
-	bar
+	return bar
 
 assert foo 3==4
 
@@ -422,13 +417,13 @@ fn evenrec n
 	assert n>=0
 	if n==0
 		return  1
-	oddrec(n-1)
+	return oddrec(n-1)
 
 fn oddrec n
 	assert n>=0
 	if n==0
 		return
-	evenrec(n-1)
+	return evenrec(n-1)
 
 assert evenrec 0
 assert oddrec 1
@@ -479,7 +474,7 @@ assert any isupper,"ABC."
 assert !any isupper,"."
 
 fn add a,b
-	a+b
+	return a+b
 
 assert fold(add,0,(1,2,3,4))==10
 assert fold(add,0,(1))==1

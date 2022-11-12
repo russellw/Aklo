@@ -1093,21 +1093,12 @@ def fn(fname, params, body):
     # local variables
     localvars(params, body)
 
-    # if the trailing return is implicit, make it explicit
-    # TODO eliminate this
-    if not body:
-        body = [0]
-    a = body[-1]
-    match a:
-        case ("assert", _) | ("for", *_) | ("if", *_) | ("case", *_) | ("while", *_) | (
-            ":=",
-            *_,
-        ):
-            body.append(("return", 0))
+    # falling off the end of a function means returning zero
+    match body[-1]:
         case "return", _:
             0
         case _:
-            body[-1] = "return", a
+            body.append(("return", 0))
 
     # body
     print("public Object apply(List<Object> _args) {")

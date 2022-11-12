@@ -446,7 +446,7 @@ fn parse modname, file,text
 			while ! eat(".dedent")
 				s<<('.loc',file,line,fname)
 				s<<stmt(loop)
-			s
+			return s
 
 		fn if1(loop)
 			assert  in(tok, ("if", "elif"))
@@ -562,7 +562,7 @@ fn parse modname, file,text
 		while tok != ".dedent"
 			s<<('.loc',file,line,fname)
 			s<<stmt((0,0))
-		s
+		return s
 
 	; top level
 	lex()
