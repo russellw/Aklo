@@ -178,11 +178,6 @@ class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
-  static List<Object> aslist(Object a) {
-    if (a instanceof List) return (List<Object>) a;
-    return List.of(a);
-  }
-
   static List<Object> slice(Object s0, Object i0, Object j0) {
     var s = (List<Object>) s0;
     var i = (int) i0;
@@ -220,19 +215,19 @@ class Etc {
   }
 
   static List<Object> cat(Object s, Object t) {
-    var r = new ArrayList<>(aslist(s));
-    r.addAll(aslist(t));
+    var r = new ArrayList<>((List<Object>) s);
+    r.addAll((List<Object>) t);
     return r;
   }
 
   static List<Object> cat1(Object s, Object a) {
-    var r = new ArrayList<>(aslist(s));
+    var r = new ArrayList<>((List<Object>) s);
     r.add(a);
     return r;
   }
 
   static int len(Object s) {
-    return aslist(s).size();
+    return ((List<Object>) s).size();
   }
 
   static Object exit(Object a) {
