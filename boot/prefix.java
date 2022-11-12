@@ -184,7 +184,7 @@ class Etc {
   }
 
   static List<Object> slice(Object s0, Object i0, Object j0) {
-    var s = aslist(s0);
+    var s = (List<Object>) s0;
     var i = (int) i0;
     var j = (int) j0;
     i = Math.max(i, 0);
@@ -259,10 +259,8 @@ class Etc {
     return (int) a <= (int) b;
   }
 
-  static Object subscript(Object s0, Object i0) {
-    var s = (List<Object>) s0;
-    var i = (int) i0;
-    return s.get(i);
+  static Object subscript(Object s, Object i) {
+    return ((List<Object>) s).get((int) i);
   }
 
   static boolean truth(boolean a) {
