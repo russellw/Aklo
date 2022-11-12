@@ -249,7 +249,7 @@ def parse(modname, file):
                 "==",
                 ">=",
                 "@=",
-                "^=",
+                "<<",
             )
             for s in punct:
                 if text[i : i + len(s)] == s:
@@ -455,7 +455,6 @@ def parse(modname, file):
         mkop("+", 1)
         mkop("-", 1)
         mkop("@", 1)
-        mkop("^", 1)
 
         prec -= 1
         mkop("!=", 1)
@@ -506,7 +505,8 @@ def parse(modname, file):
         def assignment():
             a = commas()
             match tok:
-                case "=" | "+=" | "-=" | "@=" | "^=" | ":=":
+                case "=" | "+=" | "-=" | "@=" | "<<" | ":=":
+                    # TODO allow a=b=c?
                     return lex1(), a, assignment()
             return a
 
@@ -687,7 +687,11 @@ def expr(a):
         case "<=", *s:
             print("Etc.le")
             pargs(s)
-        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y) | ("^=", x, y):
+        case "<<", x, y:
+            print(x + "=")
+            print("Etc.cat1")
+            pargs((x, y))
+        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             expr(("=", x, (a[0][0], x, y)))
         case ("|", x, y) | ("&", x, y):
             truth(x)
@@ -722,9 +726,6 @@ def expr(a):
             pargs(s)
         case "@", *s:
             print("Etc.cat")
-            pargs(s)
-        case "^", *s:
-            print("Etc.cat1")
             pargs(s)
         case "intern", *s:
             print("Sym.intern")

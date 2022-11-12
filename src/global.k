@@ -33,14 +33,14 @@ fn any f,s
 fn map f,s
 	r=[]
 	for a s
-		r^=f(  a)
+		r<<f(  a)
 	r
 
 fn filter f,s
 	r=[]
 	for a s
 		if f a
-			r^=a
+			r<<a
 	r
 
 fn tail s
@@ -124,7 +124,7 @@ fn unesc s
 	while i<len s
 		c=s!i++
 		if (c,)!="\\"
-			r^=c
+			r<<c
 			continue
 		c=s!i++
 		case c,
@@ -145,7 +145,7 @@ fn unesc s
 			"v"
 				r@="\v"
 			"e"
-				r^=27
+				r<<27
 			"x"
 				seq 2,16
 			"u"
@@ -153,7 +153,7 @@ fn unesc s
 			"U"
 				seq 8,16
 			_
-				r^=c
+				r<<c
 	r
 
 fn utf8 c
@@ -231,7 +231,7 @@ fn reverse s
 	i=len s
 	r=()
 	while i--
-		r^=s!i
+		r<<s!i
 	r
 
 fn reduce f , s
@@ -265,14 +265,14 @@ fn concat ss
 fn replicate n ,a
 	s=[]
 	for i range n
-		s^=a
+		s<<a
 	s
 
 fn takewhile f,s
 	r=""
 	while s &(f(s!0))
 		a,@s=s
-		r^=a
+		r<<a
 	r
 
 fn dropwhile f,s
@@ -291,7 +291,7 @@ fn zip s,t
 	while s&t
 		a,@s=s
 		b,@t=t
-		r^=(a,b)
+		r<<(a,b)
 	r
 
 fn zip3 s,t,u
@@ -300,7 +300,7 @@ fn zip3 s,t,u
 		a,@s=s
 		b,@t=t
 		c,@u=u
-		r^=(a,b,c)
+		r<<(a,b,c)
 	r
 
 fn zipwith f,s,t
@@ -308,7 +308,7 @@ fn zipwith f,s,t
 	while s&t
 		a,@s=s
 		b,@t=t
-		r^=f(a,b)
+		r<<f(a,b)
 	r
 
 fn zipwith3 f,s,t,u
@@ -317,7 +317,7 @@ fn zipwith3 f,s,t,u
 		a,@s=s
 		b,@t=t
 		c,@u=u
-		r^=f(a,b,c)
+		r<<f(a,b,c)
 	r
 
 fn unzip s
@@ -325,8 +325,8 @@ fn unzip s
 	r=()
 	while s
 		(a,b),@s=s
-		q^=a
-		r^=b
+		q<<a
+		r<<b
 	q,r
 
 fn unzip3 s
@@ -335,9 +335,9 @@ fn unzip3 s
 	r=()
 	while s
 		(a,b,c),@s=s
-		p^=a
-		q^=b
-		r^=c
+		p<<a
+		q<<b
+		r<<c
 	p,q,r
 
 fn split f,s
@@ -345,11 +345,12 @@ fn split f,s
 	rs=()
 	for a s
 		if f a
-			rs^=r
+			rs<<r
 			r=()
 		else
-			r^=a
-	rs^r
+			r<<a
+	rs<<r
+	return rs
 
 fn spliton a,s
 	split (\(b)(a==b),s)
@@ -374,5 +375,5 @@ fn replace from,to,s
 			r@=to
 			continue
 		a,@s=s
-		r^=a
+		r<<a
 	r
