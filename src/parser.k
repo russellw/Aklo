@@ -44,6 +44,8 @@ fn parse modname, file,text
 			if tok == "\n"
 				; next line
 				i++
+				if i == len(text)
+					^
 				line++
 
 				; measure indent

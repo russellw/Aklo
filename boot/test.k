@@ -484,7 +484,6 @@ assert fold(\(s,t)(s@t),"",("abc","def","gh"))=="abcdefgh"
 
 assert reduce(add,(1,2,3,4))==10
 assert reduce(add,(1,))==1
-assert reduce(add,())==0
 
 assert reduce(\(s,t)(s@t),("abc","def","gh"))=="abcdefgh"
 

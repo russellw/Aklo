@@ -90,7 +90,7 @@ fn upper a
 	^ a
 
 fn parseint s,base
-	while isdigitb(s!0,base)
+	while s&isdigitb(s!0,base)
 		c,@s=s
 		n=n*base+parsedigit (c)
 	^ n
@@ -251,7 +251,7 @@ fn minimum s
 	^ reduce( min,s)
 
 fn sum s
-	^ reduce (\(a,b)(a+b),s)
+	^ fold(\(a,b)(a+b),0,s)
 
 fn product s
 	^ fold (\(a,b)(a*b),1,s)
