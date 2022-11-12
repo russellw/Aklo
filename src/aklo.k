@@ -32,4 +32,3 @@ if !file
 	usage()
 ;TODO modname?
 parser.parse('program',file,readfile(file))
-show parser.modules

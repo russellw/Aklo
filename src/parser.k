@@ -202,6 +202,24 @@ fn parse modname, file,text
 			^ intern(lex1())
 		errtok("expected word")
 
+	;types
+	fn istype()
+		if tok=="&"
+			^1
+		^isidstart (tok!0)
+
+	fn ptype
+		if!istype()
+			errtok"expected type"
+		if tok=="&"
+			^lex1(),ptype()
+		^word()
+
+	fn otype
+		if !istype()
+			^'any'
+		^ptype()
+
 	; expressions
 	fn isprimary()
 		^ isidpart(tok!0) | in(tok!0 ,"'\"")
@@ -301,11 +319,15 @@ fn parse modname, file,text
 						else
 							a = "get", a, ('.quote',field)
 					_
+						;TODO is this useful enough to be worth keeping?
 						if isprimary()
 							a = [a, prefix()]
 							while eat(",")
 								a<<prefix()
 						^ a
+
+		fn param()
+			^word(),otype()
 
 		fn params()
 			s = []
@@ -314,13 +336,13 @@ fn parse modname, file,text
 					lex()
 					if eat(".indent")
 						while ! eat(".dedent")
-							s<<word()
+							s<<param()
 							eat(",")
 							expect("\n")
 						expect(")")
 					else
 						while ! eat(")")
-							s<<word()
+							s<<param()
 							if eat(")")
 								break
 							expect(",")
@@ -329,7 +351,7 @@ fn parse modname, file,text
 					0
 				_
 					while 1
-						s<<word()
+						s<<param()
 						if ! eat(",")
 							break
 			^ s
@@ -341,6 +363,8 @@ fn parse modname, file,text
 				"--"
 				"-"
 				"@"
+				"*"
+				"&"
 					^ intern(lex1()), prefix()
 				"\\"
 					line1=line
@@ -518,6 +542,8 @@ fn parse modname, file,text
 
 					fparams1=params()
 					s<<fparams1
+
+					s<<otype()
 
 					expect".indent"
 					s<<('.loc',file,line1,fname1)
