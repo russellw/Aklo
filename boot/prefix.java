@@ -290,7 +290,6 @@ class Etc {
   }
 }
 
-@SuppressWarnings("unchecked")
 class Sym {
   static final Map<String, Sym> syms = new HashMap<>();
   static final Map<String, Integer> suffixes = new HashMap<>();
@@ -316,9 +315,7 @@ class Sym {
   }
 
   static Sym intern(Object name) {
-    var sb = new StringBuilder();
-    for (var c : (List<Object>) name) sb.append((char) (int) c);
-    return intern(sb.toString());
+    return intern(Etc.decode(name));
   }
 
   @Override
