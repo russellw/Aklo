@@ -1,24 +1,29 @@
-outs=()
-
-fn emit s
-	outs@=s
+r=()
 
 fn ptype type
 	case type
 		'&',t
-			ptype t
-			emit("*")
-		'i8'
-			emit("unsigned char")
-		'i16'
-			emit("uint16_t")
-		'i32'
-			emit("uint32_t")
-		'i64'
-			emit("uint64_t")
-		'isize'
-			emit("size_t")
+			ptype (t)
+			r@="*"
+		'u8'
+			r@="unsigned char"
+		'u16'
+			r@="uint16_t"
+		'u32'
+			r@="uint32_t"
+		'u64'
+			r@="uint64_t"
+		'usize'
+			r@="size_t"
+		'f32'
+			r@="float"
+		'f64'
+			r@="double"
+		_
+			eprn(str(type))
+			exit(1)
 
 fn compose program
-	outs:=()
-	^outs
+	r:=()
+	r@="#include <stdlib.h>\n"
+	^r
