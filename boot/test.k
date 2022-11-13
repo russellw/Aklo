@@ -262,8 +262,8 @@ assert 'a'!='b'
 
 assert 'a'==intern("a")
 
-a=gensym()
-b=gensym()
+a=gensym("foo")
+b=gensym("foo")
 assert a==a
 assert a!=b
 

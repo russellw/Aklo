@@ -296,15 +296,12 @@ class Sym {
   final String stem;
   String name;
 
-  Sym() {
+  // interned symbols
+  private Sym() {
     stem = null;
   }
 
-  Sym(String stem) {
-    this.stem = stem;
-  }
-
-  static Sym intern(String name) {
+  private static Sym intern(String name) {
     var a = syms.get(name);
     if (a == null) {
       a = new Sym();
@@ -318,16 +315,17 @@ class Sym {
     return intern(Etc.decode(name));
   }
 
+  // uninterned symbols
+  Sym(Object stem) {
+    this.stem = Etc.decode(stem);
+  }
+
   @Override
   public String toString() {
     if (name == null) {
-      var i = suffixes.get(stem);
-      if (i == null) {
-        name = stem;
-        i = 1;
-      } else name = stem + i++;
+      int i = suffixes.getOrDefault(stem, 0);
+      name = '_' + stem + i++;
       suffixes.put(stem, i);
-      name = '#' + name;
     }
     return name;
   }

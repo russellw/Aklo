@@ -725,8 +725,9 @@ def expr(a):
         case "intern", *s:
             print("Sym.intern")
             pargs(s)
-        case "gensym",:
-            print("new Sym()")
+        case "gensym", *s:
+            print("new Sym")
+            pargs(s)
         case (
             ("len", *s)
             | ("get", *s)
