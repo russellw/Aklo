@@ -421,7 +421,7 @@ def parse(modname, file):
                         s.extend(fbody("\\", fparams1))
                         expect(".dedent")
                     else:
-                        s.append(commas())
+                        s.append(("^", commas()))
                     expect(")")
                     return s
             return postfix()
@@ -599,6 +599,11 @@ def parse(modname, file):
                     lex()
                     if eat("\n"):
                         return "^", 0
+                    s.append(commas())
+                    expect("\n")
+                    return s
+                case "throw":
+                    lex()
                     s.append(commas())
                     expect("\n")
                     return s
@@ -921,6 +926,10 @@ def stmt(a):
             print(
                 f') throw new RuntimeException("{file}:{line}: {fname}: {name}: assert failed");'
             )
+        case "throw", x:
+            print("throw new RuntimeException(Etc.decode(")
+            expr(x)
+            print("));")
         case "{", *s:
             print("{")
             each(stmt, s)
@@ -955,7 +964,7 @@ def stmt(a):
                     # this is useful because the bootstrap compiler
                     # does not actually support this within a case
                     # workaround: use a labeled loop
-                    case ("break", _) | ("continue", _) | ("^", _):
+                    case ("break", _) | ("continue", _) | ("^", _) | ("throw", _):
                         0
                     case _:
                         print(f"break {outerLabel};")
@@ -1045,17 +1054,6 @@ def fref(a):
             print(f"new {a}()")
 
 
-def fbody(s):
-    for a in s[:-1]:
-        stmt(a)
-    a = s[-1]
-    match a:
-        case "^", x:
-            ret(x)
-        case _:
-            ret(a)
-
-
 def lam(params, body):
     print("new Function<List<Object>, Object>() {")
 
@@ -1068,7 +1066,7 @@ def lam(params, body):
     print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(params[i], f"_args.get({i})")
-    fbody(body)
+    each(stmt, body)
     print("}")
 
     print("}")
@@ -1094,7 +1092,7 @@ def fn(fname, params, body):
 
     # falling off the end of a function means returning zero
     match body[-1]:
-        case "^", _:
+        case ("^", _) | ("throw", _):
             0
         case _:
             body.append(("^", 0))
@@ -1105,7 +1103,7 @@ def fn(fname, params, body):
     print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(params[i], f"_args.get({i})")
-    fbody(body)
+    each(stmt, body)
     print("}")
 
     print("}")

@@ -20,8 +20,7 @@ fn ptype type
 		'f64'
 			r@="double"
 		_
-			eprn(str(type))
-			exit(1)
+			throw str(type)
 
 fn compose program
 	r:=()

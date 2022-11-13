@@ -18,13 +18,12 @@ fn parse modname, file,text
 	tok = 0
 
 	fn err msg
-		eprn(file @ ":" @ str(line) @ ": " @ msg)
-		exit (1)
+		throw file @ ":" @ str(line) @ ": " @ msg
 
 	fn errtok(msg)
 		if tok == "\n"
 			line--
-		err(repr(tok)@": "@msg)
+		err( repr(tok)@": "@msg)
 
 	; tokenizer
 	fn lex()
@@ -373,7 +372,7 @@ fn parse modname, file,text
 						s@=fbody('\\',fparams1)
 						expect(".dedent")
 					else
-						s<<commas()
+						s<<'^',commas()
 					expect(")")
 					^ s
 			^ postfix()
@@ -552,6 +551,11 @@ fn parse modname, file,text
 					lex()
 					if eat("\n")
 						^ '^', 0
+					s<<commas()
+					expect("\n")
+					^ s
+				"throw"
+					lex()
 					s<<commas()
 					expect("\n")
 					^ s
