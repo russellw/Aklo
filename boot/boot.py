@@ -570,8 +570,6 @@ def parse(modname, file):
                     s.extend(block())
                     return s
                 case "fn":
-                    # TODO optional types?
-                    # fn f(x int, y int) int
                     line1 = line
                     lex()
 
@@ -690,13 +688,6 @@ def expr(a):
         case "<=", *s:
             print("Etc.le")
             pargs(s)
-        case "<<", x, y:
-            # TODO should be stmt?
-            print(x + "=")
-            print("Etc.cat1")
-            pargs((x, y))
-        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
-            expr(("=", x, (a[0][0], x, y)))
         case ("|", x, y) | ("&", x, y):
             truth(x)
             print(a[0] * 2)
@@ -882,6 +873,15 @@ def stmt(a):
     global currentline
     global currentfname
     match a:
+        case "<<", x, y:
+            print(x + "=")
+            print("Etc.cat1")
+            pargs((x, y))
+            print(";")
+        case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
+            print(x + "=")
+            expr((a[0][0], x, y))
+            print(";")
         case "for", x, s, *body:
             print(f"for (var {x}: (List)")
             expr(s)
