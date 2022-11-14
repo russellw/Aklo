@@ -395,9 +395,10 @@ def parse(modname, file):
                             if eat(")"):
                                 break
                             expect(",")
-                case ".indent" | ":":
+                case ".indent":
                     0
                 case _:
+                    # TODO should the brackets be optional?
                     while 1:
                         s.append(word())
                         if not eat(","):

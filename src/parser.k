@@ -336,7 +336,6 @@ fn parse modname, file,text
 								break
 							expect(",")
 				".indent"
-				":"
 					0
 				_
 					while 1
@@ -509,6 +508,7 @@ fn parse modname, file,text
 						while eat("\n")
 							patterns<<commas()
 						body = block((continueok,1))
+						;TODO generate more efficient form
 						for pattern  patterns
 							s<<(pattern, @body)
 					^ s
