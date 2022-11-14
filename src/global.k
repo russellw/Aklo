@@ -310,10 +310,10 @@ fn concat ss
 	^ fold (\(s,t)(s@t),"",ss)
 
 fn replicate n ,a
-	s=[]
+	r=[]
 	for i range (n)
-		s<<a
-	^ s
+		r<<a
+	^ r
 
 fn takewhile f,s
 	r=""
