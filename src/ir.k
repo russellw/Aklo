@@ -1,4 +1,34 @@
+import parser
+
+fn assignedvars params ,body
+	;TODO init w params
+	;TODO check assign match
+	locs=()
+	nonlocals=()
+	locals=params
+	parser.walk(
+		\(loc,a)(
+			case a
+				'=',y,_
+					locs<<y,loc
+					locals<<y
+				':=',y,_
+					locs<<y,loc
+					nonlocals<<y
+		)
+	)
+	conflicts=intersection(nonlocals,locals)
+	if conflicts
+		y=conflicts!0
+		file,line,fname=get (locs,y)
+		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
+	^locals
+
 fn convert modules
+	;check assignments
+
+
+	;expand
 	code=()
 	fn term (loop,a)
 		fn rec(a)

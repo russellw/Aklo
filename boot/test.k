@@ -607,5 +607,17 @@ case 2
 		a="two"
 assert a=="two"
 
+a=0
+case 5
+	@s,
+		a=s
+assert !a
+
+a=0
+case "abc"
+	@s,
+		a=s
+assert a=="abc"
+
 {signal that tests actually completed}
 prn("ok")
