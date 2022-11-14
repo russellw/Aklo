@@ -510,9 +510,7 @@ fn parse modname, file,text
 						while eat("\n")
 							patterns<<commas()
 						body = block((continueok,1))
-						;TODO generate more efficient form
-						for pattern  patterns
-							r<<(pattern, @body)
+						r<<(patterns, @body)
 					^ r
 				"dowhile"
 				"while"
