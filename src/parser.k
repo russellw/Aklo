@@ -199,6 +199,7 @@ fn parse modname, file,text
 			errtok("expected "@repr (s))
 
 	fn word()
+		;TODO reserve keywords?
 		if isidstart(tok!0)
 			^ intern(lex1())
 		errtok("expected word")
@@ -310,12 +311,7 @@ fn parse modname, file,text
 					"--"
 						^ intern("post" @ lex1()), a
 					"."
-						lex()
-						field = word()
-						if in(a,keys (modules))
-							a='.',a,field
-						else
-							a = "get", a, ('.quote',field)
+						a=intern(lex1()),a,word()
 					_
 						^ a
 
@@ -595,6 +591,7 @@ fn parse modname, file,text
 	eat("\n")
 
 	; imports
+	;TODO include these in the module
 	while eat("import")
 		name = word()
 		;TODO: path

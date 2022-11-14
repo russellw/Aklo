@@ -7,11 +7,11 @@ fn convert program
 		fn assign y,x
 			code<<'=',y,rec(x)
 
-		fn if1(test,yes,no)
-			yeslabel = gensym("ifyes")
-			nolabel = gensym("ifno")
-			afterlabel = gensym("ifafter")
-			r = gensym("ifresult")
+		fn cond(test,yes,no)
+			yeslabel = gensym("condyes")
+			nolabel = gensym("condno")
+			afterlabel = gensym("condafter")
+			r = gensym("condresult")
 
 			;test
 			code<<'label',testlabel
@@ -35,7 +35,7 @@ fn convert program
 			'^',x
 				code<<'^',rec(x)
 			'!',x
-				^if1(x,0,1)
+				^cond(x,0,1)
 			'if',test,yes,no
 				yeslabel = gensym("ifyes")
 				nolabel = gensym("ifno")
@@ -60,11 +60,11 @@ fn convert program
 			'|',x,y
 				r=gensym("or")
 				assign(r,x)
-				^if1(r,r,y)
+				^cond(r,r,y)
 			'&',x,y
 				r=gensym("and")
 				assign(r,x)
-				^if1(r,y,r)
+				^cond(r,y,r)
 			'while',test,@body
 				bodylabel = gensym("whilebody")
 				testlabel = gensym("whiletest")
