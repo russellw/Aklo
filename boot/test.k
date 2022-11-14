@@ -217,6 +217,11 @@ assert lines("")==("",)
 
 assert unlines(("ab","cd"))=="ab\ncd\n"
 
+;sets
+assert uniq("abcab")=="abc"
+assert union  ("abc","bcd")=="abcd"
+assert intersection  ("abc","bcd")=="bc"
+
 ;variables
 x = 5
 assert x == 5

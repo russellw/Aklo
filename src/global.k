@@ -424,3 +424,20 @@ fn replace from,to,s
 		a,@s=s
 		r<<a
 	^ r
+
+fn uniq s
+	r=()
+	for a s
+		if!in(a,r)
+			r<<a
+	^r
+
+fn union s,t
+	^uniq(s@t)
+
+fn intersection s,t
+	r=()
+	for a s
+		if in(a,t)
+			r<<a
+	^uniq(r)
