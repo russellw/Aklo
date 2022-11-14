@@ -496,6 +496,7 @@ def parse(modname, file):
             return s
 
         def assignment():
+            # TODO inline
             a = commas()
             match tok:
                 case "=" | "+=" | "-=" | "@=" | "<<" | ":=":

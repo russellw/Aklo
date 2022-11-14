@@ -1,9 +1,104 @@
 fn convert program
-	r=()
-	fn stmt (a)
+	code=()
+	fn term (loop,a)
+		fn rec(a)
+			^term(loop,a)
+
+		fn assign y,x
+			code<<'=',y,rec(x)
+
+		fn if1(test,yes,no)
+			yeslabel = gensym("ifyes")
+			nolabel = gensym("ifno")
+			afterlabel = gensym("ifafter")
+			r = gensym("ifresult")
+
+			;test
+			code<<'label',testlabel
+			code<<'if',term(test),yeslabel
+			code<<'go',nolabel
+
+			;yes
+			code<<'label',yeslabel
+			assign(r,yes)
+			code<<'go',afterlabel
+
+			;no
+			code<<'label',nolabel
+			assign(r,no)
+
+			;after
+			code<<'label',afterlabel
+			^r
+
 		case a
+			'^',x
+				code<<'^',rec(x)
+			'!',x
+				^if1(x,0,1)
+			'if',test,yes,no
+				yeslabel = gensym("ifyes")
+				nolabel = gensym("ifno")
+				afterlabel = gensym("ifafter")
+
+				;test
+				code<<'label',testlabel
+				code<<'if',term(test),yeslabel
+				code<<'go',nolabel
+
+				;yes
+				code<<'label',yeslabel
+				map(rec,yes)
+				code<<'go',afterlabel
+
+				;no
+				code<<'label',nolabel
+				map(rec,no)
+
+				;after
+				code<<'label',afterlabel
+			'|',x,y
+				r=gensym("or")
+				assign(r,x)
+				^if1(r,r,y)
+			'&',x,y
+				r=gensym("and")
+				assign(r,x)
+				^if1(r,y,r)
 			'while',test,@body
-				0
+				bodylabel = gensym("whilebody")
+				testlabel = gensym("whiletest")
+				afterlabel = gensym("whileafter")
+				loop = testlabel, afterlabel
+
+				code<<'go',testlabel
+
+				;body
+				code<<'label',bodylabel
+				map(rec,body)
+
+				;test
+				code<<'label',testlabel
+				code<<'if',term(test),bodylabel
+
+				;after
+				code<<'label',afterlabel
+			'dowhile',test,@body
+				bodylabel = gensym("dowhilebody")
+				testlabel = gensym("dowhiletest")
+				afterlabel = gensym("dowhileafter")
+				loop = testlabel, afterlabel
+
+				;body
+				code<<'label',bodylabel
+				map(rec,body)
+
+				;test
+				code<<'label',testlabel
+				code<<'if',term(test),bodylabel
+
+				;after
+				code<<'label',afterlabel
 			_
 				throw a
-	^r
+	^code
