@@ -100,5 +100,5 @@ fn convert modules
 				;after
 				code<<'label',afterlabel
 			_
-				throw a
+				throw repr(a)
 	^code

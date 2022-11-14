@@ -19,6 +19,19 @@ fn isidstart c
 fn isidpart c
 	^ isidstart (c)|isdigit (c)
 
+fn isprint(c)
+	^" "!0<=c&c<=126
+
+fn isascii(a)
+	if isatom(a)|!a
+		^
+	for b a
+		if !isint(b)
+			^
+		if!isprint(b)&!in(b,"\n\r\t")
+			^
+	^1
+
 fn every f,s
 	for a s
 		if!f (a)
@@ -177,8 +190,42 @@ fn utf8 c
 		bitor( 0b10000000,bitand(c,0b111111))
 	)
 
-fn repr s
-	^ s
+fn isatom a
+	^!islist(a)
+
+fn isnum  a
+	^isint(a)|isfloat(a)
+
+fn repr a
+	r=()
+	fn rec a
+		if isatom(a)
+			r@=str(a)
+			^
+		if isascii(a)
+			r@="\""
+			for c a
+				case c,
+					"\n"
+						r@="\\n"
+					"\r"
+						r@="\\r"
+					"\t"
+						r@="\\t"
+					_
+						r<<c
+			r@="\""
+			^
+		r@="("
+		for i range(a)
+			rec (a!i)
+			if i+1<len(a)
+				r@=", "
+			if len(a)==1
+				r@=","
+		r@=")"
+	rec(a)
+	^ r
 
 fn last s
 	^ s!(len (s)-1)

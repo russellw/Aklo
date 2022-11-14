@@ -20,7 +20,7 @@ fn ptype type
 		'f64'
 			r@="double"
 		_
-			throw str(type)
+			throw repr(type)
 
 fn compose program
 	r:=()

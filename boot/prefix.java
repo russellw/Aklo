@@ -269,7 +269,7 @@ class Etc {
     return true;
   }
 
-  static boolean isnum(Object a) {
+  static boolean isint(Object a) {
     return a instanceof Integer;
   }
 

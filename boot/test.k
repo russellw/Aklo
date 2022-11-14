@@ -268,14 +268,17 @@ assert a==a
 assert a!=b
 
 ;types
+assert isint(0)
 assert isnum(0)
 assert !issym(0)
 assert !islist(0)
 
+assert !isint('a')
 assert !isnum('a')
 assert issym('a')
 assert !islist('a')
 
+assert !isint([])
 assert !isnum([])
 assert !issym([])
 assert islist([])
@@ -455,6 +458,15 @@ assert str('xyz')=="xyz"
 ;characters
 assert isupper( 65)
 assert !isupper( 97)
+
+assert isprint(65)
+assert !isprint(10)
+
+assert isascii("abc")
+assert !isascii("abc\0")
+assert !isascii((1,2,3))
+assert !isascii(('x','y'))
+assert !isascii(789)
 
 ;higher-order functions
 assert map( \x(x*x),[1,2,3])==[1,4,9]

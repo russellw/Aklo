@@ -1,7 +1,7 @@
+;TODO reentrant?
 modules=()
 
 fn parse modname, file,text
-	;TODO: repr
 	;TODO: check for already parsed
 	text=replace("\r\n","\n",text)
 	text=replace("\r","\n",text)

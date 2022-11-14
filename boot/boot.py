@@ -724,6 +724,8 @@ def expr(a):
         case "@", *s:
             print("Etc.cat")
             pargs(s)
+        case "isfloat", _:
+            print("false")
         case "intern", *s:
             print("Sym.intern")
             pargs(s)
@@ -738,7 +740,7 @@ def expr(a):
             | ("range", *s)
             | ("writestream", *s)
             | ("readfile", *s)
-            | ("isnum", *s)
+            | ("isint", *s)
             | ("issym", *s)
             | ("islist", *s)
             | ("str", *s)
