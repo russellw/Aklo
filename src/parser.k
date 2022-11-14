@@ -200,6 +200,8 @@ fn parse modname, file,text
 
 	fn word()
 		;TODO reserve keywords?
+		;depends on external function call syntax
+		; External function names might need to overlap with keywords
 		if isidstart(tok!0)
 			^ intern(lex1())
 		errtok("expected word")
@@ -591,6 +593,8 @@ fn parse modname, file,text
 	eat("\n")
 
 	; imports
+	;TODO figure out syntax for incorporating e.g. C++ source Fragment files verbatim
+	;TODO figure out syntax for incorporating data files at compile time
 	;TODO include these in the module
 	while eat("import")
 		name = word()

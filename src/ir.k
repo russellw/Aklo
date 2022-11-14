@@ -1,4 +1,4 @@
-fn convert program
+fn convert modules
 	code=()
 	fn term (loop,a)
 		fn rec(a)
