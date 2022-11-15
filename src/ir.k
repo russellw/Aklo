@@ -1,11 +1,13 @@
-import parser
+import ast
 
 fn assignedvars params ,body
-	;TODO init w params
-	locs=()
 	nonlocals=()
-	locals=params
-	parser.walk(
+	locals=keys(params)
+
+	'.loc',@loc=body!0
+	locs=map(\(x)(x,loc),locals)
+
+	ast.walk(
 		\(loc,a)(
 			case a
 				'=',y,_
@@ -16,11 +18,13 @@ fn assignedvars params ,body
 					nonlocals<<y
 		)
 	)
+
 	conflicts=intersection(nonlocals,locals)
 	if conflicts
 		y=conflicts!0
 		file,line,fname=get (locs,y)
 		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
+
 	^locals
 
 fn convert modules
