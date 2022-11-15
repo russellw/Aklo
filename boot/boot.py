@@ -670,8 +670,8 @@ for name, module in modules.items():
 
 def expr(a):
     match a:
-        case "args":
-            print("Etc.args")
+        case "args" | "windowsp":
+            print("Etc." + a)
         case ("++", x) | ("--", x):
             print(a[0] + x)
         case ("post++", x) | ("post--", x):

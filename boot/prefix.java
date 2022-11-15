@@ -18,6 +18,7 @@ class Etc {
   static List<Object> args = new ArrayList<>();
   static int depth;
   static Set<String> tracing;
+  static final boolean windowsp = System.getProperty("os.name").startsWith("Windows");
 
   static void indent() {
     for (var i = 0; i < depth; i++) System.out.print(' ');
