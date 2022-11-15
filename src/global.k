@@ -26,6 +26,19 @@ fn ascii?(a)
 			^
 	^1
 
+fn find f,s
+	for i range(s)
+		if f(s!i)
+			^i
+	^-1
+
+fn findlast f,s
+	i=len(s)
+	while i--
+		if f(s!i)
+			^i
+	^-1
+
 fn every f,s
 	for a s
 		if!f (a)
@@ -324,8 +337,8 @@ fn dropwhile f,s
 fn span f ,s
 	^ takewhile (f,s),dropwhile(f,s)
 
-fn splitat n,s
-	^ take(n,s),drop(n,s)
+fn splitat i,s
+	^ take(i,s),drop(i,s)
 
 fn zip s,t
 	r=()
@@ -435,3 +448,14 @@ fn intersection s,t
 		if in(a,t)
 			r<<a
 	^uniq(r)
+
+fn dirseparator? c
+	if windows?
+		^in(c,":\\/")
+	^in(c,"/")
+
+fn splitdir s
+	i=findlast(dirseparator?,s)
+	if i<0
+		^".",s
+	^splitat(i+1,s)

@@ -518,6 +518,14 @@ assert product(())==1
 
 assert replace( "a","aa","aaa")=="aaaaaa"
 
+assert find(digit?,"abc123xyz")==3
+assert find(digit?,"123xyz")==0
+assert find(digit?,"abcxyz")==-1
+
+assert findlast(digit?,"abc123xyz")==5
+assert findlast(digit?,"abc123")==5
+assert findlast(digit?,"abcxyz")==-1
+
 ;commonprefix
 assert commonprefix(("a","ab","abc"))=="a"
 assert commonprefix(("ab","ab","ab"))=="ab"
@@ -622,6 +630,16 @@ case "abc"
 	@s,
 		a=s
 assert a=="abc"
+
+;filenames
+assert dirseparator? ("/"!0)
+assert !dirseparator? ("a"!0)
+
+assert splitdir("/a")==("/","a")
+
+dir,file=splitdir("foo/bar")
+assert dir=="foo"|dir=="foo/"
+assert file=="bar"
 
 {signal that tests actually completed}
 prn("ok")
