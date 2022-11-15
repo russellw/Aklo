@@ -14,3 +14,33 @@ fn walk f,s
 				map(rec,s)
 
 	map(rec,s)
+
+fn assignedvars params ,body
+	nonlocals=()
+	locals=keys(params)
+
+	'.loc',@loc=body!0
+	locs=map(\(x)(x,loc),locals)
+
+	walk(
+		\(loc,a)(
+			case a
+				'=',y,_
+					locs<<y,loc
+					locals<<y
+				':=',y,_
+					locs<<y,loc
+					nonlocals<<y
+		)
+	)
+
+	conflicts=intersection(nonlocals,locals)
+	if conflicts
+		y=conflicts!0
+		file,line,fname=get (locs,y)
+		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
+
+	^locals
+
+fn norm modules
+	^modules
