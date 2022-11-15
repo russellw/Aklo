@@ -239,11 +239,11 @@ fn first s
 fn second s
 	^ s!1
 
-fn keys m
-		^ map (first,m)
+fn keys s
+		^ map (first,s)
 
-fn vals m
-		^ map (second,m)
+fn vals s
+		^ map (second,s)
 
 fn commonprefix ss
 	s=ss!0
