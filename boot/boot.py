@@ -627,14 +627,14 @@ def parse(modname, file):
     # imports
     while eat("import"):
         name = word()
-        parse(name, f"{here}/../src/{name}.k")
+        parse(name, f"{here}/../compiler/{name}.k")
         expect("\n")
 
     # module
     modules[modname] = fbody(modname, [])
 
 
-parse("global", f"{here}/../src/global.k")
+parse("global", f"{here}/../lib/global.k")
 parse("program", args.file)
 
 
