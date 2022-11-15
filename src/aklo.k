@@ -34,4 +34,4 @@ while i<len( args)
 if !file
 	usage()
 ;TODO modname?
-parser.parse('program',file,readfile(file))
+modules=parser.parse('program',file,readfile(file))
