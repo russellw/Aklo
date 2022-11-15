@@ -111,7 +111,7 @@ class Etc {
     return (int) a >> (int) b;
   }
 
-  static boolean isstr(List<Object> a) {
+  static boolean isascii(List<Object> a) {
     if (a.isEmpty()) return false;
     for (var c0 : a) {
       if (!(c0 instanceof Integer)) return false;
@@ -138,7 +138,7 @@ class Etc {
       return;
     }
     var a = (List<Object>) a0;
-    if (isstr(a)) {
+    if (isascii(a)) {
       append(sb, "\"");
       for (var c0 : a) {
         var c = (int) c0;
@@ -269,11 +269,11 @@ class Etc {
     return true;
   }
 
-  static boolean isint(Object a) {
+  static boolean intp(Object a) {
     return a instanceof Integer;
   }
 
-  static boolean issym(Object a) {
+  static boolean symp(Object a) {
     return a instanceof Sym;
   }
 
@@ -285,7 +285,7 @@ class Etc {
     return 0;
   }
 
-  static boolean islist(Object a) {
+  static boolean listp(Object a) {
     return a instanceof List;
   }
 }

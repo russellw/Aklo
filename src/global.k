@@ -1,34 +1,28 @@
-fn isupper c
+fn upper? c
 	^ "A"!0<=c&c<="Z"!0
 
-fn islower c
+fn lower? c
 	^ "a"!0<=c&c<="z"!0
 
-fn isdigit c
+fn digit? c
 	^ "0"!0<=c&c<="9"!0
 
-fn isalpha c
-	^ islower (c)|isupper (c)
+fn alpha? c
+	^ lower? (c)|upper? (c)
 
-fn isalnum c
-	^ isalpha (c)|isdigit (c)
+fn alnum? c
+	^ alpha? (c)|digit? (c)
 
-fn isidstart c
-	^ isalpha (c)|in (c,"_$")
-
-fn isidpart c
-	^ isidstart (c)|isdigit (c)
-
-fn isprint(c)
+fn print?(c)
 	^" "!0<=c&c<=126
 
-fn isascii(a)
-	if isatom(a)|!a
+fn ascii?(a)
+	if atom?(a)|!a
 		^
 	for b a
-		if !isint(b)
+		if !int?(b)
 			^
-		if!isprint(b)&!in(b,"\n\r\t")
+		if!print?(b)&!in(b,"\n\r\t")
 			^
 	^1
 
@@ -89,35 +83,35 @@ fn startswith s,t
 	^ take (len( t),s)==t
 
 fn lower a
-	if islist( a)
+	if list?( a)
 		^ map (lower,a)
-	if isupper (a)
+	if upper? (a)
 		^ a+32
 	^ a
 
 fn upper a
-	if islist (a)
+	if list? (a)
 		^ map (upper,a)
-	if islower (a)
+	if lower? (a)
 		^ a-32
 	^ a
 
 fn parseint s,base
-	while s&isdigitb(s!0,base)
+	while s&digitb?(s!0,base)
 		c,@s=s
 		n=n*base+parsedigit (c)
 	^ n
 
 fn parsedigit c
-	if isdigit (c)
+	if digit? (c)
 		^ c-"0"!0
-	if islower (c)
+	if lower? (c)
 		^ 10+c-"a"!0
-	if isupper (c)
+	if upper? (c)
 		^ 10+c-"A"!0
 	^ -1
 
-fn isdigitb c,base
+fn digitb? c,base
 	n=parsedigit (c)
 	^ 0<=n&n<base
 
@@ -128,7 +122,7 @@ fn unesc s
 
 	fn seq n,base
 			while j<n
-				if !isdigitb( s!(i+j),base)
+				if !digitb?( s!(i+j),base)
 					break
 				j++
 			r@=utf8(parseint (slice (s,i,i+j),base))
@@ -190,19 +184,19 @@ fn utf8 c
 		bitor( 0b10000000,bitand(c,0b111111))
 	)
 
-fn isatom a
-	^!islist(a)
+fn atom? a
+	^!list?(a)
 
-fn isnum  a
-	^isint(a)|isfloat(a)
+fn num?  a
+	^int?(a)|float?(a)
 
 fn repr a
 	r=()
 	fn rec a
-		if isatom(a)
+		if atom?(a)
 			r@=str(a)
 			^
-		if isascii(a)
+		if ascii?(a)
 			r@="\""
 			for c a
 				case c,
@@ -230,7 +224,7 @@ fn repr a
 fn last s
 	^ s!(len (s)-1)
 
-fn isspace c
+fn space? c
 	^ in( c," \f\n\r\t\v")
 
 fn first s

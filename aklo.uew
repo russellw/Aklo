@@ -1,12 +1,14 @@
 /L13"Aklo" Line Comment = ; Block Comment On = { Block Comment Off = } Escape Char = \ String Chars = "' File Extensions = K
-/Delimiters = ~!@%^&*()-+=|\/{}[]:;"'<> ,	.?
+/Delimiters = ~!@%^&*()-+=|\/{}[]:;"'<> ,	.
 /Indent Strings = "case" "dowhile" "elif" "else" "fn" "for" "if" "while"
 /Open Brace Strings =  "(" "["
 /Close Brace Strings = ")" "]"
 /C1"blue"
 ^
 assert
+break
 case
+continue
 dowhile
 elif
 else
@@ -14,7 +16,7 @@ fn
 for
 if
 import
-return
+throw
 while
 /C2"red"
 false

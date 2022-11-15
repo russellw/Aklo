@@ -158,14 +158,14 @@ assert parseint( "123",10)==123
 assert parseint ("ff",16)==255
 assert parseint ("FFFF",16)==65535
 
-assert isdigitb ("9"!0,10)
-assert isdigitb ("9"!0,16)
+assert digitb? ("9"!0,10)
+assert digitb? ("9"!0,16)
 
-assert !isdigitb ("f"!0,10)
-assert isdigitb ("f"!0,16)
+assert !digitb? ("f"!0,10)
+assert digitb? ("f"!0,16)
 
-assert !isdigitb ("*"!0,10)
-assert !isdigitb ("*"!0,16)
+assert !digitb? ("*"!0,10)
+assert !digitb? ("*"!0,16)
 
 assert unesc( "abc")=="abc"
 assert unesc (r"\tabc\n")=="\tabc\n"
@@ -178,15 +178,15 @@ assert concat(("zxc","vb"))=="zxcvb"
 assert replicate( 4,9)==(9,9,9,9)
 assert replicate (-1,9)==()
 
-assert takewhile (isdigit,"123abc")=="123"
-assert takewhile (isdigit,"123")=="123"
-assert takewhile (isdigit,"abc")==""
+assert takewhile (digit?,"123abc")=="123"
+assert takewhile (digit?,"123")=="123"
+assert takewhile (digit?,"abc")==""
 
-assert dropwhile (isdigit,"123abc")=="abc"
-assert dropwhile (isdigit,"123")==""
-assert dropwhile (isdigit,"abc")=="abc"
+assert dropwhile (digit?,"123abc")=="abc"
+assert dropwhile (digit?,"123")==""
+assert dropwhile (digit?,"abc")=="abc"
 
-assert span (isdigit,"123abc")==("123","abc")
+assert span (digit?,"123abc")==("123","abc")
 
 assert splitat(2,"abcde")==("ab","cde")
 assert splitat(-1,"abcde")==("","abcde")
@@ -199,11 +199,11 @@ assert zipwith3(\(a,b,c)(a+b+c),(10,20),(1,2),(100,100))==(111,122)
 assert unzip (("a1","b2","c3"))==("abc","123")
 assert unzip3 (("a1x","b2y","c3z"))==("abc","123","xyz")
 
-assert split(isdigit,"a1b")==("a","b")
-assert split(isdigit,"")==("",)
-assert split(isdigit,"1")==("","")
-assert split(isdigit,"1zzz")==("","zzz")
-assert split(isdigit,"...9")==("...","")
+assert split(digit?,"a1b")==("a","b")
+assert split(digit?,"")==("",)
+assert split(digit?,"1")==("","")
+assert split(digit?,"1zzz")==("","zzz")
+assert split(digit?,"...9")==("...","")
 
 assert spliton("."!0,"123.456.")==("123","456","")
 
@@ -273,20 +273,20 @@ assert a==a
 assert a!=b
 
 ;types
-assert isint(0)
-assert isnum(0)
-assert !issym(0)
-assert !islist(0)
+assert int?(0)
+assert num?(0)
+assert !sym?(0)
+assert !list?(0)
 
-assert !isint('a')
-assert !isnum('a')
-assert issym('a')
-assert !islist('a')
+assert !int?('a')
+assert !num?('a')
+assert sym?('a')
+assert !list?('a')
 
-assert !isint([])
-assert !isnum([])
-assert !issym([])
-assert islist([])
+assert !int?([])
+assert !num?([])
+assert !sym?([])
+assert list?([])
 
 ;if
 a = 0
@@ -461,34 +461,34 @@ assert str(123)=="123"
 assert str('xyz')=="xyz"
 
 ;characters
-assert isupper( 65)
-assert !isupper( 97)
+assert upper?( 65)
+assert !upper?( 97)
 
-assert isprint(65)
-assert !isprint(10)
+assert print?(65)
+assert !print?(10)
 
-assert isascii("abc")
-assert !isascii("abc\0")
-assert !isascii((1,2,3))
-assert !isascii(('x','y'))
-assert !isascii(789)
+assert ascii?("abc")
+assert !ascii?("abc\0")
+assert !ascii?((1,2,3))
+assert !ascii?(('x','y'))
+assert !ascii?(789)
 
 ;higher-order functions
 assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
-assert filter( isdigit,"abc123")=="123"
+assert filter( digit?,"abc123")=="123"
 
-assert every( isupper,"")
-assert every (isupper,"ABC")
-assert !every (isupper,"ABC.")
+assert every( upper?,"")
+assert every (upper?,"ABC")
+assert !every (upper?,"ABC.")
 assert every (\a (a<10),(1,2,3))
 assert! every (\a( a<10),(1,2,13))
 
-assert !any( isupper,"")
-assert any (isupper,"ABC")
-assert any (isupper,"ABC.")
-assert !any (isupper,".")
+assert !any( upper?,"")
+assert any (upper?,"ABC")
+assert any (upper?,"ABC.")
+assert !any (upper?,".")
 
 fn add a,b
 	^ a+b

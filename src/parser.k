@@ -1,3 +1,9 @@
+fn idstart? c
+	^ alpha? (c)|in (c,"_$")
+
+fn idpart? c
+	^ idstart? (c)|digit? (c)|in (c,"?")
+
 fn parse modname, file,text
 	modules=()
 
@@ -74,7 +80,7 @@ fn parse modname, file,text
 					^
 
 				; space
-				if isspace(text!i)
+				if space?(text!i)
 					i++
 					continue
 
@@ -123,30 +129,30 @@ fn parse modname, file,text
 					^
 
 				; word
-				if isidstart(text!i)
-					while isidpart(text!i)
+				if idstart?(text!i)
+					while idpart?(text!i)
 						i++
 					tok:= slice(text,j,i)
 					^
 
 				; hexadecimal numbers are separate because they may contain 'e'
 				if lower(slice(text,i,i+2)) == "0x"
-					while isidpart(text!i)
+					while idpart?(text!i)
 						i++
 					tok:= slice(text,j,i)
 					^
 
 				; other number
-				if isdigit(text!i) | tok == "." & isdigit(text![i + 1])
-					while isidpart(text!i)
+				if digit?(text!i) | tok == "." & digit?(text![i + 1])
+					while idpart?(text!i)
 						i++
 					if text!i == "."!0
 						i++
-						while isidpart(text!i)
+						while idpart?(text!i)
 							i++
 						if lower(text![i - 1]) == "e"!0 & in(text!i ,"+-")
 							i++
-							while isidpart(text!i)
+							while idpart?(text!i)
 								i++
 					tok:= slice(text,j,i)
 					^
@@ -202,25 +208,25 @@ fn parse modname, file,text
 			;TODO reserve keywords?
 			;depends on external function call syntax
 			; External function names might need to overlap with keywords
-			if isidstart(tok!0)
+			if idstart?(tok!0)
 				^ intern(lex1())
 			errtok("expected word")
 
 		;types
-		fn istype()
+		fn type?()
 			if tok=="&"
 				^1
-			^isidstart (tok!0)
+			^idstart? (tok!0)
 
 		fn ptype
-			if!istype()
+			if!type?()
 				errtok("expected type")
 			if tok=="&"
 				^lex1(),ptype()
 			^word()
 
 		fn otype
-			if !istype()
+			if !type?()
 				^'any'
 			^ptype()
 
@@ -253,11 +259,11 @@ fn parse modname, file,text
 					"true"
 						lex()
 						^ 1
-				if isidstart(tok!0)
+				if idstart?(tok!0)
 					^ lex1()
 
 				; number
-				if isdigit(tok!0)
+				if digit?(tok!0)
 					s=replace("_","",tok)
 					case lower(take(2,s))
 						"0b"

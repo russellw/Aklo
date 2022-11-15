@@ -67,7 +67,7 @@ def isidstart(c):
 
 
 def isidpart(c):
-    return isidstart(c) or c.isdigit()
+    return isidstart(c) or c.isdigit() or c == "?"
 
 
 def unesc(s):
@@ -284,7 +284,7 @@ def parse(modname, file):
 
     def word():
         if isidstart(tok[0]):
-            return lex1()
+            return lex1().replace("?", "p")
         errtok("expected word")
 
     # expressions
@@ -310,7 +310,7 @@ def parse(modname, file):
 
             # word
             if isidstart(tok[0]):
-                return lex1()
+                return word()
 
             # number
             if tok[0].isdigit():
@@ -724,7 +724,7 @@ def expr(a):
         case "@", *s:
             print("Etc.cat")
             pargs(s)
-        case "isfloat", _:
+        case "floatp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")
@@ -740,9 +740,9 @@ def expr(a):
             | ("range", *s)
             | ("writestream", *s)
             | ("readfile", *s)
-            | ("isint", *s)
-            | ("issym", *s)
-            | ("islist", *s)
+            | ("intp", *s)
+            | ("symp", *s)
+            | ("listp", *s)
             | ("str", *s)
             | ("shl", *s)
             | ("shr", *s)
