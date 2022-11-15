@@ -561,6 +561,10 @@ a=(
 )
 assert a==[1,2,3]
 
+1,a,b=1,2,3
+assert a==2
+assert b==3
+
 ;case
 case '+',1,2
 	'+',x,y

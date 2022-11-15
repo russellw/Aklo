@@ -2,7 +2,6 @@ import parser
 
 fn assignedvars params ,body
 	;TODO init w params
-	;TODO check assign match
 	locs=()
 	nonlocals=()
 	locals=params

@@ -839,12 +839,19 @@ def checkcase(label, pattern, x):
                 checkcase(label, s[i], ("!", x, i))
 
 
+def assignconst(pattern, x):
+    print("assert Objects.equals")
+    pargs((pattern, x))
+    print(";")
+
+
 def assign(pattern, x):
     if isinstance(pattern, int):
+        assignconst(pattern, x)
         return
     match pattern:
         case "intern", ("List.of", *_):
-            0
+            assignconst(pattern, x)
         case "List.of", *s:
             x = tmp(x)
             if isrest(s):
