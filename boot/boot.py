@@ -1065,6 +1065,14 @@ def lam(params, body):
     # local variables
     localvars(params, body)
 
+    # falling off the end of a function means returning zero
+    # TODO refactor w/fn
+    match body[-1]:
+        case ("^", _) | ("throw", _):
+            0
+        case _:
+            body.append(("^", 0))
+
     # body
     print("public Object apply(List<Object> _args) {")
     print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", _args);')
