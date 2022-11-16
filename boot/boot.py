@@ -309,6 +309,21 @@ def parse(modname, file):
                 return ["List.of"] + [ord(c) for c in s]
 
             # word
+            if eat("ctreadfiles"):
+                expect("(")
+
+                # in the full language, the first argument is a filter function
+                # but in compiling the main compiler, this function can be ignored
+                # because we know it will look for *.k
+                expr()
+                expect(",")
+
+                # and the second argument is the path relative to the current source file
+                # which can also be ignored here
+                # because it will always be "."
+                expr()
+                expect(")")
+                return "ctreadfiles", os.path.dirname(file)
             if isidstart(tok[0]):
                 return word()
 
@@ -670,6 +685,8 @@ for name, module in modules.items():
 
 def expr(a):
     match a:
+        case "ctreadfiles", dir1:
+            print(f'Etc.ctreadfiles("{dir1}")')
         case "args" | "windowsp":
             print("Etc." + a)
         case ("++", x) | ("--", x):

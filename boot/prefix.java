@@ -1,6 +1,7 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.function.*;
 
@@ -19,6 +20,38 @@ class Etc {
   static int depth;
   static Set<String> tracing;
   static final boolean windowsp = System.getProperty("os.name").startsWith("Windows");
+
+  static List<Object> ctreadfiles(String dir) {
+    // in the full language, ctreadfiles works at compile time
+    // thereby generating arbitrarily large compile-time constants
+    // because they contain the full text of the files read
+    // but Java does not have a good way to embed arbitrarily large arrays in source code
+    // due to the limit on method size
+    // so during boot, the 'compiled to Java' version of the main compiler
+    // just performs ctreadfiles at runtime
+    // the tradeoff is that the boot version of the compiler
+    // cannot be redistributed separately from its source code
+    // this is acceptable for a program that will only be used once
+    var r = new ArrayList<>();
+    try {
+      Files.walkFileTree(
+          Paths.get(dir),
+          new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+              var file = path.toString();
+              if (file.endsWith(".k")) {
+                var file1 = encode(file);
+                r.add(List.of(file1, readfile(file1)));
+              }
+              return FileVisitResult.CONTINUE;
+            }
+          });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return r;
+  }
 
   static void indent() {
     for (var i = 0; i < depth; i++) System.out.print(' ');

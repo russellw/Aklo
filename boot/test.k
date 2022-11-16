@@ -641,5 +641,8 @@ dir,file=splitdir("foo/bar")
 assert dir=="foo"|dir=="foo/"
 assert file=="bar"
 
+files=keys(ctreadfiles(\(file)(endswith(file,".k")),"."))
+assert files
+
 {signal that tests actually completed}
 prn("ok")
