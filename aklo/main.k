@@ -34,7 +34,7 @@ while i<len( args)
 if !file
 	usage()
 
-libfiles=ctreadfiles(\(file)(endswith(file,".k")),"../lib")
+libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
 ;TODO modname?
 modules=parser.parse('program',file,readfile(file))
