@@ -318,12 +318,11 @@ def parse(modname, file):
                 expr()
                 expect(",")
 
-                # and the second argument is the path relative to the current source file
-                # which can also be ignored here
-                # because it will always be "."
-                expr()
+                # the second argument is the path relative to the current source file
+                assert tok[0] == '"'
+                dir1 = os.path.dirname(file) + "/" + unesc(lex1()[1:-1])
                 expect(")")
-                return "ctreadfiles", os.path.dirname(file)
+                return "ctreadfiles", dir1
             if isidstart(tok[0]):
                 return word()
 
