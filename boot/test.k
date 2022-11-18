@@ -473,6 +473,12 @@ assert !ascii?((1,2,3))
 assert !ascii?(('x','y'))
 assert !ascii?(789)
 
+assert join(",",())==""
+assert join(",",("abc",))=="abc"
+assert join(",",("abc","de"))=="abc,de"
+
+assert ascii?(joindir(("foo","bar")))
+
 ;higher-order functions
 assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]

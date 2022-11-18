@@ -53,6 +53,28 @@ class Etc {
     return r;
   }
 
+  static List<Object> listdir(Object dir) {
+    var r = new ArrayList<>();
+    try {
+      Files.walkFileTree(
+          Paths.get(decode(dir)),
+          new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+              var file = path.toString();
+              if (file.endsWith(".k")) {
+                var file1 = encode(file);
+                r.add(file1);
+              }
+              return FileVisitResult.CONTINUE;
+            }
+          });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return r;
+  }
+
   static void indent() {
     for (var i = 0; i < depth; i++) System.out.print(' ');
   }

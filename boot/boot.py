@@ -765,6 +765,7 @@ def expr(a):
             | ("shr", *s)
             | ("bitnot", *s)
             | ("bitand", *s)
+            | ("listdir", *s)
             | ("bitor", *s)
             | ("bitxor", *s)
         ):

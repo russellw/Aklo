@@ -459,3 +459,14 @@ fn splitdir s
 	if i<0
 		^".",s
 	^splitat(i+1,s)
+
+fn join t, ss
+	if!ss
+		^()
+	r=ss!0
+	for s tail(ss)
+		r@=t@s
+	^r
+
+fn joindir ss
+	^join("/",ss)
