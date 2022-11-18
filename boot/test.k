@@ -217,6 +217,12 @@ assert lines("")==("",)
 
 assert unlines(("ab","cd"))=="ab\ncd\n"
 
+a=1
+b=2,
+;TODO should this work without the brackets?
+(a,)=b
+assert a==2
+
 ;sets
 assert uniq("abcab")=="abc"
 assert union  ("abc","bcd")=="abcd"
