@@ -760,6 +760,7 @@ def expr(a):
             | ("intp", *s)
             | ("symp", *s)
             | ("listp", *s)
+            | ("dirp", *s)
             | ("str", *s)
             | ("shl", *s)
             | ("shr", *s)

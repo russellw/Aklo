@@ -26,6 +26,12 @@ fn ascii?(a)
 			^
 	^1
 
+fn indexof(a,s)
+	^find(\(b)(a==b),s)
+
+fn lastindexof(a,s)
+	^find(\(b)(a==b),s)
+
 fn find f,s
 	for i range(s)
 		if f(s!i)
@@ -459,6 +465,12 @@ fn splitdir s
 	if i<0
 		^".",s
 	^splitat(i+1,s)
+
+fn splitext s
+	i=lastindexof("."!0,s)
+	if i<0
+		^s,""
+	^ take(i,s),drop(i+1,s)
 
 fn join t, ss
 	if!ss

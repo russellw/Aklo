@@ -60,12 +60,11 @@ class Etc {
           Paths.get(decode(dir)),
           new SimpleFileVisitor<>() {
             @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs0) {
               var file = path.toString();
-              if (file.endsWith(".k")) {
-                var file1 = encode(file);
-                r.add(file1);
-              }
+              var attrs = List.of();
+              if (attrs0.isDirectory()) attrs = List.of(Sym.intern("dir?"), 1);
+              r.add(List.of(encode(file), attrs));
               return FileVisitResult.CONTINUE;
             }
           });
@@ -73,6 +72,10 @@ class Etc {
       throw new RuntimeException(e);
     }
     return r;
+  }
+
+  static boolean dirp(Object file) {
+    return Files.isDirectory(Path.of(decode(file)));
   }
 
   static void indent() {

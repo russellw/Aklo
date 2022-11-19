@@ -3,12 +3,9 @@ import ast
 import cxx
 import ir
 
-fn usage
-	eprn("Usage: aklo [options] file")
-	exit (1)
 
-file=0
 i=0
+packages=()
 while i<len( args)
 	s=args!i++
 	if s!0=='-'
@@ -28,13 +25,12 @@ while i<len( args)
 			_
 				eprn (s@": unknown option")
 				exit (1)
-	if file
-		usage()
-	file=s
-if !file
-	usage()
+	packages<<s
+if !packages
+	eprn("Usage: aklo [options] packages")
+	exit (1)
 
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
 ;TODO modname?
-modules=parser.parse('program',file,readfile(file))
+;modules=parser.parse('program',file,readfile(file))

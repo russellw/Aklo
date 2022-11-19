@@ -647,11 +647,15 @@ assert a=="abc"
 assert dirseparator? ("/"!0)
 assert !dirseparator? ("a"!0)
 
+assert splitdir("/")==("/","")
 assert splitdir("/a")==("/","a")
 
 dir,file=splitdir("foo/bar")
 assert dir=="foo"|dir=="foo/"
 assert file=="bar"
+
+assert  splitext("abcd.exe")!0=="abcd"
+assert  splitext("abcd.exe")!1=="exe"
 
 files=keys(ctreadfiles(\(file)(endswith(file,".k")),"."))
 assert files
