@@ -53,15 +53,19 @@ class Etc {
     return r;
   }
 
-  static List<Object> listdir(Object dir) {
+  static List<Object> listdir(Object dir0) {
+    var dir = decode(dir0);
+    var i = dir.length();
     var r = new ArrayList<>();
     try {
       Files.walkFileTree(
-          Paths.get(decode(dir)),
+          Paths.get(dir),
+          Set.of(),
+          1,
           new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes attrs0) {
-              var file = path.toString();
+              var file = path.toString().substring(i);
               var attrs = List.of();
               if (attrs0.isDirectory()) attrs = List.of(Sym.intern("dir?"), 1);
               r.add(List.of(encode(file), attrs));
@@ -360,7 +364,7 @@ class Sym {
     stem = null;
   }
 
-  private static Sym intern(String name) {
+  static Sym intern(String name) {
     var a = syms.get(name);
     if (a == null) {
       a = new Sym();

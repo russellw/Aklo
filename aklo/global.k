@@ -462,8 +462,8 @@ fn dirseparator? c
 
 fn splitdir s
 	i=findlast(dirseparator?,s)
-	if i<0
-		^".",s
+	;there are many edge cases in Windows file names
+	; so it is better to leave a trailing separator untouched
 	^splitat(i+1,s)
 
 fn splitext s

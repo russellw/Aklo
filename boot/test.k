@@ -649,10 +649,9 @@ assert !dirseparator? ("a"!0)
 
 assert splitdir("/")==("/","")
 assert splitdir("/a")==("/","a")
-
-dir,file=splitdir("foo/bar")
-assert dir=="foo"|dir=="foo/"
-assert file=="bar"
+assert splitdir("foo/bar")==("foo/","bar")
+assert splitdir("foo/")==("foo/","")
+assert splitdir("foo")==("","foo")
 
 assert  splitext("abcd.exe")!0=="abcd"
 assert  splitext("abcd.exe")!1=="exe"

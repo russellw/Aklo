@@ -5,7 +5,7 @@ import ir
 
 
 i=0
-packages=()
+pkargs=()
 while i<len( args)
 	s=args!i++
 	if s!0=='-'
@@ -25,12 +25,19 @@ while i<len( args)
 			_
 				eprn (s@": unknown option")
 				exit (1)
-	packages<<s
-if !packages
+	pkargs<<s
+if !pkargs
 	eprn("Usage: aklo [options] packages")
 	exit (1)
 
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
 ;TODO modname?
+pks=()
+for  s pkargs
+	if endswith(s,".k")
+		s=splitext(s)!0
+		root,name=splitdir(s)
+		pks<<root,(name,)
+		continue
 ;modules=parser.parse('program',file,readfile(file))
