@@ -16,7 +16,7 @@ fn walk f,s
 	map(rec,s)
 
 fn assignedvars params ,body
-	nonlocals=()
+	nonlocals=[]
 	locals=keys(params)
 
 	'.loc',@loc=body!0

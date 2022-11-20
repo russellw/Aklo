@@ -210,7 +210,7 @@ fn num?  a
 	^int?(a)|float?(a)
 
 fn repr a
-	r=()
+	r=[]
 	fn rec a
 		if atom?(a)
 			r@=str(a)
@@ -287,7 +287,7 @@ fn signum a
 
 fn reverse s
 	i=len (s)
-	r=()
+	r=[]
 	while i--
 		r<<s!i
 	^ r
@@ -345,7 +345,7 @@ fn splitat i,s
 	^ take(i,s),drop(i,s)
 
 fn zip s,t
-	r=()
+	r=[]
 	while s&t
 		a,@s=s
 		b,@t=t
@@ -353,7 +353,7 @@ fn zip s,t
 	^ r
 
 fn zip3 s,t,u
-	r=()
+	r=[]
 	while s&t&u
 		a,@s=s
 		b,@t=t
@@ -362,7 +362,7 @@ fn zip3 s,t,u
 	^ r
 
 fn zipwith f,s,t
-	r=()
+	r=[]
 	while s&t
 		a,@s=s
 		b,@t=t
@@ -370,7 +370,7 @@ fn zipwith f,s,t
 	^ r
 
 fn zipwith3 f,s,t,u
-	r=()
+	r=[]
 	while s&t&u
 		a,@s=s
 		b,@t=t
@@ -379,8 +379,8 @@ fn zipwith3 f,s,t,u
 	^ r
 
 fn unzip s
-	q=()
-	r=()
+	q=[]
+	r=[]
 	while s
 		(a,b),@s=s
 		q<<a
@@ -388,9 +388,9 @@ fn unzip s
 	^ q,r
 
 fn unzip3 s
-	p=()
-	q=()
-	r=()
+	p=[]
+	q=[]
+	r=[]
 	while s
 		(a,b,c),@s=s
 		p<<a
@@ -399,12 +399,12 @@ fn unzip3 s
 	^ p,q,r
 
 fn split f,s
-	r=()
-	rs=()
+	r=[]
+	rs=[]
 	for a: s
 		if f (a)
 			rs<<r
-			r=()
+			r=[]
 		else
 			r<<a
 	rs<<r
@@ -437,7 +437,7 @@ fn replace from,to,s
 	^ r
 
 fn uniq s
-	r=()
+	r=[]
 	for a: s
 		if!in(a,r)
 			r<<a
@@ -447,7 +447,7 @@ fn union s,t
 	^uniq(s@t)
 
 fn intersection s,t
-	r=()
+	r=[]
 	for a: s
 		if in(a,t)
 			r<<a

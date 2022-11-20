@@ -117,8 +117,6 @@ assert range( 1,5)==[1,2,3,4]
 assert range( 5,1)==[]
 assert range( 5)==[0,1,2,3,4]
 
-assert (1,2,3)==[1,2,3]
-
 assert slice ("abcd",1,3)=="bc"
 
 assert drop (1,"abcde")=="bcde"
@@ -147,12 +145,12 @@ assert upper ("abc...")=="ABC..."
 
 assert r"\n"=="\\n"
 
-assert utf8 (0x24)==(0x24,)
-assert utf8 (0xa3)==(0xc2,0xa3)
-assert utf8 (0x939)==(0xe0,0xa4,0xb9)
-assert utf8 (0x20ac)==(0xe2,0x82,0xac)
-assert utf8 (0xd55c)==(0xed,0x95,0x9c)
-assert utf8 (0x10348)==(0xf0,0x90,0x8d,0x88)
+assert utf8 (0x24)==[0x24,]
+assert utf8 (0xa3)==[0xc2,0xa3]
+assert utf8 (0x939)==[0xe0,0xa4,0xb9]
+assert utf8 (0x20ac)==[0xe2,0x82,0xac]
+assert utf8 (0xd55c)==[0xed,0x95,0x9c]
+assert utf8 (0x10348)==[0xf0,0x90,0x8d,0x88]
 
 assert parseint( "123",10)==123
 assert parseint ("ff",16)==255
@@ -175,8 +173,8 @@ assert reverse("abc")=="cba"
 
 assert concat(("zxc","vb"))=="zxcvb"
 
-assert replicate( 4,9)==(9,9,9,9)
-assert replicate (-1,9)==()
+assert replicate( 4,9)==[9,9,9,9]
+assert replicate (-1,9)==[]
 
 assert takewhile (digit?,"123abc")=="123"
 assert takewhile (digit?,"123")=="123"
@@ -186,41 +184,41 @@ assert dropwhile (digit?,"123abc")=="abc"
 assert dropwhile (digit?,"123")==""
 assert dropwhile (digit?,"abc")=="abc"
 
-assert span (digit?,"123abc")==("123","abc")
+assert span (digit?,"123abc")==["123","abc"]
 
-assert splitat(2,"abcde")==("ab","cde")
-assert splitat(-1,"abcde")==("","abcde")
-assert splitat(20,"abcde")==("abcde","")
+assert splitat(2,"abcde")==["ab","cde"]
+assert splitat(-1,"abcde")==["","abcde"]
+assert splitat(20,"abcde")==["abcde",""]
 
-assert zip ("abc","12")==("a1","b2")
-assert zip3 ("abc","12","xyz")==("a1x","b2y")
-assert zipwith(\(a,b)(a+b),(10,20),(1,2))==(11,22)
-assert zipwith3(\(a,b,c)(a+b+c),(10,20),(1,2),(100,100))==(111,122)
-assert unzip (("a1","b2","c3"))==("abc","123")
-assert unzip3 (("a1x","b2y","c3z"))==("abc","123","xyz")
+assert zip ("abc","12")==["a1","b2"]
+assert zip3 ("abc","12","xyz")==["a1x","b2y"]
+assert zipwith(\(a,b)(a+b),[10,20],[1,2])==[11,22]
+assert zipwith3(\(a,b,c)(a+b+c),[10,20],[1,2],[100,100])==[111,122]
+assert unzip (["a1","b2","c3"])==["abc","123"]
+assert unzip3 (["a1x","b2y","c3z"])==["abc","123","xyz"]
 
-assert split(digit?,"a1b")==("a","b")
-assert split(digit?,"")==("",)
-assert split(digit?,"1")==("","")
-assert split(digit?,"1zzz")==("","zzz")
-assert split(digit?,"...9")==("...","")
+assert split(digit?,"a1b")==["a","b"]
+assert split(digit?,"")==["",]
+assert split(digit?,"1")==["",""]
+assert split(digit?,"1zzz")==["","zzz"]
+assert split(digit?,"...9")==["...",""]
 
-assert spliton("."!0,"123.456.")==("123","456","")
+assert spliton("."!0,"123.456.")==["123","456",""]
 
-assert lines("a\nb\nc\n\n")==("a","b","c","")
-assert lines("a\nb\nc\n")==("a","b","c")
-assert lines("a\nb\nc")==("a","b","c")
-assert lines("\n")==("",)
+assert lines("a\nb\nc\n\n")==["a","b","c",""]
+assert lines("a\nb\nc\n")==["a","b","c"]
+assert lines("a\nb\nc")==["a","b","c"]
+assert lines("\n")==["",]
 ;the empty string is considered to consist of a single blank line
 ;unlike the Haskell lines function
-assert lines("")==("",)
+assert lines("")==["",]
 
-assert unlines(("ab","cd"))=="ab\ncd\n"
+assert unlines(["ab","cd"])=="ab\ncd\n"
 
 a=1
 b=2,
 ;TODO should this work without the brackets?
-(a,)=b
+[a,]=b
 assert a==2
 
 ;sets
@@ -505,7 +503,7 @@ fn add a,b
 
 assert fold(add,0,(1,2,3,4))==10
 assert fold(add,0,(1,))==1
-assert fold(add,0,())==0
+assert fold(add,0,[])==0
 
 assert fold(\(s,t)(s@t),"",("abc","def","gh"))=="abcdefgh"
 
@@ -521,10 +519,10 @@ assert minimum ("abc")=="a"!0
 assert minimum ("cba")=="a"!0
 
 assert sum((1,2,3,4))==10
-assert sum(())==0
+assert sum([])==0
 
 assert product((1,2,3,4))==24
-assert product(())==1
+assert product([])==1
 
 assert replace( "a","aa","aaa")=="aaaaaa"
 

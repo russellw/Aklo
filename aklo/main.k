@@ -5,7 +5,7 @@ import ir
 
 
 i=0
-packages=()
+packages=[]
 while i<len( args)
 	s=args!i++
 	if s!0=='-'
@@ -32,7 +32,7 @@ if !packages
 
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
-modules=()
+modules=[]
 
 fn module names ,file
 	name=splitext(file)!0
@@ -53,9 +53,9 @@ fn dir names
 for  s :packages
 	if endswith(s,".k")
 		root,file=splitdir(s)
-		module((),file)
+		module([],file)
 		continue
 	root,name=splitdir(s)
-	dir((name,))
+	dir([name,])
 show modules
 ;modules=parser.parse('program',file,readfile(file))

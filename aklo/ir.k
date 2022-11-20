@@ -1,5 +1,5 @@
 fn convert modules
-	code=()
+	code=[]
 	fn term (loop,a)
 		fn rec(a)
 			^term(loop,a)

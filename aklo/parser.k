@@ -5,7 +5,7 @@ fn idpart? c
 	^ idstart? (c)|digit? (c)|in (c,"?")
 
 fn parse modname, file,text
-	modules=()
+	modules=[]
 
 	fn parse1 modname, file,text
 		;TODO: check for already parsed
@@ -465,7 +465,7 @@ fn parse modname, file,text
 
 			fn block(loop)
 				expect(".indent")
-				r=()
+				r=[]
 				while ! eat(".dedent")
 					r<<('.loc',file,line,fname)
 					r<<stmt(loop)
@@ -592,7 +592,7 @@ fn parse modname, file,text
 			r = []
 			while tok != ".dedent"
 				r<<('.loc',file,line,fname)
-				r<<stmt((0,0))
+				r<<stmt([0,0])
 			^ r
 
 		; top level
@@ -612,6 +612,6 @@ fn parse modname, file,text
 
 		; module
 		;TODO: module name?
-		modules<<(modname,(file,fbody(modname,())))
+		modules<<(modname,(file,fbody(modname,[])))
 	parse1 (modname, file,text)
 	^modules
