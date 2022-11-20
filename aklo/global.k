@@ -481,4 +481,12 @@ fn join t, ss
 	^r
 
 fn joindir ss
-	^join("/",ss)
+	r=ss!0
+	for s tail(ss)
+		if!(r&dirseparator?(last(r)))
+			if windows?
+				r@="\\"
+			else
+				r@="/"
+		r@=s
+	^r

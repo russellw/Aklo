@@ -483,8 +483,6 @@ assert join(",",())==""
 assert join(",",("abc",))=="abc"
 assert join(",",("abc","de"))=="abc,de"
 
-assert ascii?(joindir(("foo","bar")))
-
 ;higher-order functions
 assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
@@ -655,6 +653,10 @@ assert splitdir("foo")==("","foo")
 
 assert  splitext("abcd.exe")!0=="abcd"
 assert  splitext("abcd.exe")!1=="exe"
+
+assert ascii?(joindir(("foo",)))
+assert ascii?(joindir(("foo","bar")))
+assert ascii?(joindir(("foo/","bar")))
 
 files=keys(ctreadfiles(\(file)(endswith(file,".k")),"."))
 assert files

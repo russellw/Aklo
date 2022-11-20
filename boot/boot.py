@@ -622,6 +622,16 @@ def parse(modname, file):
                     s.append(commas())
                     expect("\n")
                     return s
+                case "tron":
+                    lex()
+                    if eat("\n"):
+                        return s
+                    while 1:
+                        s.append(word())
+                        if not eat(","):
+                            break
+                    expect("\n")
+                    return s
             a = assignment()
             if eat(":"):
                 return ":", a, stmt()
@@ -1012,9 +1022,6 @@ def stmt(a):
             print("Etc.tracing = Set.of")
             pargs(f'"{x}"' for x in s)
             print(";")
-        case "tron":
-            print("Etc.depth = 0;")
-            print("Etc.tracing = Set.of();")
         case "troff":
             print("Etc.tracing = null;")
         case 0:
