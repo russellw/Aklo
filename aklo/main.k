@@ -36,17 +36,17 @@ modules=[]
 
 fn module names ,file
 	name=splitext(file)!0
-	file=joindir((root,)@names@(file,))
+	file=joindir([root]@names@[file])
 	names<<name
 	text=readfile(file)
 	modules<<names,text
 
 fn dir names
 	;TODO: should be able to write 'for file,d?: ...'?
-	for s: listdir(joindir((root,)@names))
+	for s: listdir(joindir([root]@names))
 		file,d?=s
 		if d?
-			dir(names@(file,))
+			dir(names@[file])
 		elif endswith(file,".k")
 			module (names ,file)
 
@@ -56,6 +56,6 @@ for  s :packages
 		module([],file)
 		continue
 	root,name=splitdir(s)
-	dir([name,])
+	dir([name])
 show modules
 ;modules=parser.parse('program',file,readfile(file))

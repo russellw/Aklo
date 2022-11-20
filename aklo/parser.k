@@ -18,7 +18,7 @@ fn parse modname, file,text
 		line = 1
 
 		dentc = 0
-		cols = [0,]
+		cols = [0]
 		dedents = 0
 
 		tok = 0
@@ -43,7 +43,7 @@ fn parse modname, file,text
 				j = i
 
 				;the simplest tokens are just one character
-				tok:= text!i,
+				tok:=[ text!i]
 
 				; newline
 				if tok == "\n"
@@ -158,7 +158,7 @@ fn parse modname, file,text
 					^
 
 				; punctuation
-				punct = (
+				punct = [
 					"!=",
 					":=",
 					"**",
@@ -172,7 +172,7 @@ fn parse modname, file,text
 					">=",
 					"@=",
 					"<<",
-				)
+				]
 				for s  :punct
 					if slice(text,i , i + len(s)) == s
 						i += len(s)
@@ -280,7 +280,7 @@ fn parse modname, file,text
 				; bracketed expression or list
 				if eat("(")
 					if eat(".indent")
-						r =  '.list',
+						r =  ['.list']
 						while ! eat(".dedent")
 							r<<expr()
 							eat(",")
@@ -288,7 +288,7 @@ fn parse modname, file,text
 						expect(")")
 						^ r
 					if eat(")")
-						^ '.list',
+						^ ['.list']
 					a = commas()
 					expect(")")
 					^ a
@@ -302,7 +302,7 @@ fn parse modname, file,text
 					case tok
 						"("
 							lex()
-							a = a,
+							a = [a]
 							if eat(".indent")
 								while ! eat(".dedent")
 									a<<expr()
@@ -365,7 +365,7 @@ fn parse modname, file,text
 					"\\"
 						;TODO loc
 						line1=line
-						r = [intern(lex1()),]
+						r = [intern(lex1())]
 
 						fparams1=params()
 						r<<fparams1
@@ -383,7 +383,7 @@ fn parse modname, file,text
 
 			; operator precedence parser
 			prec = 99
-			ops = ()
+			ops = []
 
 			fn mkop(op, left)
 				ops<<(op,( prec, left))
@@ -487,7 +487,7 @@ fn parse modname, file,text
 
 			fn stmt(loop)
 				continueok,breakok=loop
-				r = [intern (tok),]
+				r = [intern (tok)]
 				case tok
 					"assert"
 						r<<file
@@ -514,7 +514,7 @@ fn parse modname, file,text
 						r<<commas()
 						expect(".indent")
 						while ! eat(".dedent")
-							patterns = [commas(),]
+							patterns = [commas()]
 							while eat("\n")
 								patterns<<commas()
 							body = block((continueok,1))

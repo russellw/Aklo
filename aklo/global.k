@@ -149,11 +149,11 @@ fn unesc s
 
 	while i<len (s)
 		c=s!i++
-		if (c,)!="\\"
+		if c!="\\"!0
 			r<<c
 			continue
 		c=s!i++
-		case c,
+		case [c]
 			"\n"
 				0
 			"a"
@@ -184,24 +184,24 @@ fn unesc s
 
 fn utf8 c
 	if c<0x80
-		^ c,
+		^ [c]
 	if c<0x800
-		^(
+		^[
 			bitor( 0b11000000,shr(c,6))
 			bitor( 0b10000000,bitand(c,0b111111))
-		)
+		]
 	if c<0x10000
-		^(
+		^[
 			bitor( 0b11100000,shr(c,12))
 			bitor( 0b10000000,bitand(shr(c,6),0b111111))
 			bitor( 0b10000000,bitand(c,0b111111))
-		)
-	^ (
+		]
+	^ [
 		bitor( 0b11110000,shr(c,18))
 		bitor( 0b10000000,bitand(shr(c,12),0b111111))
 		bitor( 0b10000000,bitand(shr(c,6),0b111111))
 		bitor( 0b10000000,bitand(c,0b111111))
-	)
+	]
 
 fn atom? a
 	^!list?(a)
@@ -218,7 +218,7 @@ fn repr a
 		if ascii?(a)
 			r@="\""
 			for c: a
-				case c,
+				case [c]
 					"\n"
 						r@="\\n"
 					"\r"
@@ -472,7 +472,7 @@ fn splitext s
 
 fn join t, ss
 	if!ss
-		^()
+		^[]
 	r=ss!0
 	for s: tail(ss)
 		r@=t@s

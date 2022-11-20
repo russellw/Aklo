@@ -10,7 +10,7 @@ fn walk f,s
 			'fn',@_
 			'\\',@_
 				0
-			@s,
+			[@s]
 				map(rec,s)
 
 	map(rec,s)

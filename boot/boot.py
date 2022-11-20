@@ -260,11 +260,6 @@ def parse(modname, file):
                     i += len(s)
                     tok = s
                     return
-
-            if tok == "[":
-                tok = "("
-            if tok == "]":
-                tok = ")"
             i += 1
             return
 
@@ -346,21 +341,30 @@ def parse(modname, file):
                 lex()
                 return a
 
-            # bracketed expression or list
+            # bracketed expression
             if eat("("):
+                a = commas()
+                expect(")")
+                return a
+
+            # list
+            if eat("["):
+                s = ["List.of"]
                 if eat(".indent"):
-                    s = ["List.of"]
                     while not eat(".dedent"):
                         s.append(expr())
                         eat(",")
                         expect("\n")
-                    expect(")")
+                    expect("]")
                     return s
-                if eat(")"):
-                    return ["List.of"]
-                a = commas()
-                expect(")")
-                return a
+                if eat("]"):
+                    return s
+                while 1:
+                    s.append(expr())
+                    if not eat(","):
+                        break
+                expect("]")
+                return s
 
             # none of the above
             errtok("expected expression")
@@ -511,8 +515,7 @@ def parse(modname, file):
                 return a
             s = ["List.of", a]
             while eat(","):
-                if tok not in (")", ".indent", "\n"):
-                    s.append(expr())
+                s.append(expr())
             return s
 
         def assignment():

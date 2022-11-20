@@ -103,7 +103,7 @@ assert 1 - (2 - 3) == 2
 
 ;lists and strings
 assert "ABC"==[65,66,67]
-assert "A"==[65,]
+assert "A"==[65]
 
 assert "ABC"!0==65
 assert "ABC"!1==66
@@ -145,7 +145,7 @@ assert upper ("abc...")=="ABC..."
 
 assert r"\n"=="\\n"
 
-assert utf8 (0x24)==[0x24,]
+assert utf8 (0x24)==[0x24]
 assert utf8 (0xa3)==[0xc2,0xa3]
 assert utf8 (0x939)==[0xe0,0xa4,0xb9]
 assert utf8 (0x20ac)==[0xe2,0x82,0xac]
@@ -198,7 +198,7 @@ assert unzip (["a1","b2","c3"])==["abc","123"]
 assert unzip3 (["a1x","b2y","c3z"])==["abc","123","xyz"]
 
 assert split(digit?,"a1b")==["a","b"]
-assert split(digit?,"")==["",]
+assert split(digit?,"")==[""]
 assert split(digit?,"1")==["",""]
 assert split(digit?,"1zzz")==["","zzz"]
 assert split(digit?,"...9")==["...",""]
@@ -208,17 +208,16 @@ assert spliton("."!0,"123.456.")==["123","456",""]
 assert lines("a\nb\nc\n\n")==["a","b","c",""]
 assert lines("a\nb\nc\n")==["a","b","c"]
 assert lines("a\nb\nc")==["a","b","c"]
-assert lines("\n")==["",]
+assert lines("\n")==[""]
 ;the empty string is considered to consist of a single blank line
 ;unlike the Haskell lines function
-assert lines("")==["",]
+assert lines("")==[""]
 
 assert unlines(["ab","cd"])=="ab\ncd\n"
 
 a=1
-b=2,
-;TODO should this work without the brackets?
-[a,]=b
+b=[2]
+[a]=b
 assert a==2
 
 ;sets
@@ -357,7 +356,7 @@ assert n == 55
 i = 1
 a=""
 while i <= 5
-	a@=65,
+	a@=[65]
 	i++
 assert a=="AAAAA"
 
@@ -477,8 +476,8 @@ assert !ascii?((1,2,3))
 assert !ascii?(('x','y'))
 assert !ascii?(789)
 
-assert join(",",())==""
-assert join(",",("abc",))=="abc"
+assert join(",",[])==""
+assert join(",",["abc"])=="abc"
 assert join(",",("abc","de"))=="abc,de"
 
 ;higher-order functions
@@ -502,13 +501,13 @@ fn add a,b
 	^ a+b
 
 assert fold(add,0,(1,2,3,4))==10
-assert fold(add,0,(1,))==1
+assert fold(add,0,[1])==1
 assert fold(add,0,[])==0
 
 assert fold(\(s,t)(s@t),"",("abc","def","gh"))=="abcdefgh"
 
 assert reduce(add,(1,2,3,4))==10
-assert reduce(add,(1,))==1
+assert reduce(add,[1])==1
 
 assert reduce(\(s,t)(s@t),("abc","def","gh"))=="abcdefgh"
 
@@ -539,7 +538,7 @@ assert commonprefix(("a","ab","abc"))=="a"
 assert commonprefix(("ab","ab","ab"))=="ab"
 assert commonprefix(("ab","ab","az"))=="a"
 assert commonprefix(("ab","ab","b"))==""
-assert commonprefix(("ab",))=="ab"
+assert commonprefix(["ab"])=="ab"
 
 ;pattern matching assignment
 a=1,2,3
@@ -563,18 +562,18 @@ assert s==[2,3]
 b=a,@s
 assert b==[1,2,3]
 
-a=(
+a=[
 	1
 	2
 	3
-)
+]
 assert a==[1,2,3]
 
-a=(
+a=[
 	1,
 	2,
 	3,
-)
+]
 assert a==[1,2,3]
 
 1,a,b=1,2,3
@@ -629,13 +628,13 @@ assert a=="two"
 
 a=0
 case 5
-	@s,
+	[@s]
 		a=s
 assert !a
 
 a=0
 case "abc"
-	@s,
+	[@s]
 		a=s
 assert a=="abc"
 
@@ -652,7 +651,7 @@ assert splitdir("foo")==("","foo")
 assert  splitext("abcd.exe")!0=="abcd"
 assert  splitext("abcd.exe")!1=="exe"
 
-assert ascii?(joindir(("foo",)))
+assert ascii?(joindir(["foo"]))
 assert ascii?(joindir(("foo","bar")))
 assert ascii?(joindir(("foo/","bar")))
 
