@@ -33,6 +33,16 @@ if !pkargs
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
 ;TODO modname?
+fn dir names
+	for s listdir(joindir((root,)@names))
+		file,d?=s
+		if endswith(file,".k")
+			name=splitext(file)!0
+			pks<<root,names@(name,)
+			continue
+		if d?
+			dir(names@(file,))
+
 pks=()
 for  s pkargs
 	if endswith(s,".k")
@@ -40,4 +50,7 @@ for  s pkargs
 		root,name=splitdir(s)
 		pks<<root,(name,)
 		continue
+	root,name=splitdir(s)
+	dir((name,))
+show pks
 ;modules=parser.parse('program',file,readfile(file))

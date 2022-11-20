@@ -55,7 +55,6 @@ class Etc {
 
   static List<Object> listdir(Object dir0) {
     var dir = decode(dir0);
-    var i = dir.length();
     var r = new ArrayList<>();
     try {
       Files.walkFileTree(
@@ -65,7 +64,7 @@ class Etc {
           new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path path, BasicFileAttributes attrs0) {
-              var file = path.toString().substring(i);
+              var file = path.toString().substring(dir.length() + 1);
               var attrs = List.of();
               if (attrs0.isDirectory()) attrs = List.of(Sym.intern("dir?"), 1);
               r.add(List.of(encode(file), attrs));

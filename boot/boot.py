@@ -82,6 +82,10 @@ def parse(modname, file):
     # TODO: enforce initialization of local variables?
     if modname in modules:
         return
+
+    # google-java-format sometimes doesn't like comments with backslashes
+    # which will occur in Windows filenames
+    # the easiest solution is to just convert to / at the start
     file = file.replace("\\", "/")
 
     text = open(file).read()
