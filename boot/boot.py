@@ -587,6 +587,7 @@ def parse(modname, file):
                 case "for":
                     lex()
                     s.append(word())
+                    expect(":")
                     s.append(commas())
                     s.extend(block())
                     return s

@@ -34,7 +34,7 @@ libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
 ;TODO modname?
 fn dir names
-	for s listdir(joindir((root,)@names))
+	for s: listdir(joindir((root,)@names))
 		file,d?=s
 		if endswith(file,".k")
 			name=splitext(file)!0
@@ -44,7 +44,7 @@ fn dir names
 			dir(names@(file,))
 
 pks=()
-for  s pkargs
+for  s :pkargs
 	if endswith(s,".k")
 		s=splitext(s)!0
 		root,name=splitdir(s)

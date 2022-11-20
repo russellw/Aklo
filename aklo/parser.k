@@ -173,7 +173,7 @@ fn parse modname, file,text
 					"@=",
 					"<<",
 				)
-				for s  punct
+				for s  :punct
 					if slice(text,i , i + len(s)) == s
 						i += len(s)
 						tok:= s
@@ -528,6 +528,7 @@ fn parse modname, file,text
 					"for"
 						lex()
 						r<<word()
+						expect(":")
 						r<<commas()
 						r@=block((1,1))
 						^ r

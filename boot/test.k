@@ -365,7 +365,7 @@ assert a=="AAAAA"
 
 i=0
 m=0
-for c "ABC"
+for c: "ABC"
 	i++
 	m+=c
 assert i==3

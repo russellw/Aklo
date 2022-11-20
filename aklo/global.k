@@ -19,7 +19,7 @@ fn print?(c)
 fn ascii?(a)
 	if atom?(a)|!a
 		^
-	for b a
+	for b: a
 		if !int?(b)
 			^
 		if!print?(b)&!in(b,"\n\r\t")
@@ -33,7 +33,7 @@ fn lastindexof(a,s)
 	^find(\(b)(a==b),s)
 
 fn find f,s
-	for i range(s)
+	for i: range(s)
 		if f(s!i)
 			^i
 	^-1
@@ -46,25 +46,25 @@ fn findlast f,s
 	^-1
 
 fn every f,s
-	for a s
+	for a: s
 		if!f (a)
 			^
 	^ 1
 
 fn any f,s
-	for a s
+	for a: s
 		if f (a)
 			^ 1
 
 fn map f,s
 	r=[]
-	for a s
+	for a :s
 		r<<f(  a)
 	^ r
 
 fn filter f,s
 	r=[]
-	for a s
+	for a :s
 		if f (a)
 			r<<a
 	^ r
@@ -91,7 +91,7 @@ fn drop i,s
 	^ slice (s,i,len( s))
 
 fn in a,s
-	for b s
+	for b: s
 		if a==b
 			^ 1
 
@@ -217,7 +217,7 @@ fn repr a
 			^
 		if ascii?(a)
 			r@="\""
-			for c a
+			for c: a
 				case c,
 					"\n"
 						r@="\\n"
@@ -230,7 +230,7 @@ fn repr a
 			r@="\""
 			^
 		r@="("
-		for i range(a)
+		for i: range(a)
 			rec (a!i)
 			if i+1<len(a)
 				r@=", "
@@ -260,7 +260,7 @@ fn vals s
 
 fn commonprefix ss
 	s=ss!0
-	for i range(1,len(s)+1)
+	for i: range(1,len(s)+1)
 		t=take( i,s)
 		if !every(\s( startswith(s,t)),ss)
 			^ take (i-1,s)
@@ -324,7 +324,7 @@ fn concat ss
 
 fn replicate n ,a
 	r=[]
-	for i range (n)
+	for i: range (n)
 		r<<a
 	^ r
 
@@ -403,7 +403,7 @@ fn unzip3 s
 fn split f,s
 	r=()
 	rs=()
-	for a s
+	for a: s
 		if f (a)
 			rs<<r
 			r=()
@@ -422,7 +422,7 @@ fn lines s
 
 fn unlines ss
 	r=""
-	for s ss
+	for s: ss
 		r@=s@"\n"
 	^ r
 
@@ -440,7 +440,7 @@ fn replace from,to,s
 
 fn uniq s
 	r=()
-	for a s
+	for a: s
 		if!in(a,r)
 			r<<a
 	^r
@@ -450,7 +450,7 @@ fn union s,t
 
 fn intersection s,t
 	r=()
-	for a s
+	for a: s
 		if in(a,t)
 			r<<a
 	^uniq(r)
@@ -476,13 +476,13 @@ fn join t, ss
 	if!ss
 		^()
 	r=ss!0
-	for s tail(ss)
+	for s: tail(ss)
 		r@=t@s
 	^r
 
 fn joindir ss
 	r=ss!0
-	for s tail(ss)
+	for s: tail(ss)
 		if!(r&dirseparator?(last(r)))
 			if windows?
 				r@="\\"
