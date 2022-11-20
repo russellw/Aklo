@@ -229,14 +229,12 @@ fn repr a
 						r<<c
 			r@="\""
 			^
-		r@="("
+		r@="["
 		for i: range(a)
-			rec (a!i)
-			if i+1<len(a)
+			if i
 				r@=", "
-			if len(a)==1
-				r@=","
-		r@=")"
+			rec (a!i)
+		r@="]"
 	rec(a)
 	^ r
 

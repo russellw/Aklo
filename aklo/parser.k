@@ -478,6 +478,7 @@ fn parse modname, file,text
 				r<<block(loop)
 				case tok
 					"elif"
+						;TODO fix
 						r<<if1(loop)
 					"else"
 						lex()

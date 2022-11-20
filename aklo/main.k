@@ -5,7 +5,7 @@ import ir
 
 
 i=0
-pkargs=()
+packages=()
 while i<len( args)
 	s=args!i++
 	if s!0=='-'
@@ -25,8 +25,8 @@ while i<len( args)
 			_
 				eprn (s@": unknown option")
 				exit (1)
-	pkargs<<s
-if !pkargs
+	packages<<s
+if !packages
 	eprn("Usage: aklo [options] packages")
 	exit (1)
 
@@ -36,7 +36,7 @@ modules=()
 
 fn module names ,file
 	name=splitext(file)!0
-	file=joindir((root,)@names)@file
+	file=joindir((root,)@names@(file,))
 	names<<name
 	text=readfile(file)
 	modules<<names,text
@@ -50,7 +50,7 @@ fn dir names
 		elif endswith(file,".k")
 			module (names ,file)
 
-for  s :pkargs
+for  s :packages
 	if endswith(s,".k")
 		root,file=splitdir(s)
 		module((),file)

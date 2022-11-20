@@ -538,7 +538,7 @@ def parse(modname, file):
             s.append(block())
             match tok:
                 case "elif":
-                    s.append(if1())
+                    s.append([if1()])
                 case "else":
                     lex()
                     s.append(block())

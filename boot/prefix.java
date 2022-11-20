@@ -214,12 +214,12 @@ class Etc {
       append(sb, "\"");
       return;
     }
-    append(sb, "(");
+    append(sb, "[");
     for (var i = 0; i < a.size(); i++) {
-      if (i > 0) append(sb, " ");
+      if (i > 0) append(sb, ", ");
       repr(a.get(i), sb);
     }
-    append(sb, ")");
+    append(sb, "]");
   }
 
   static String repr(Object a) {
