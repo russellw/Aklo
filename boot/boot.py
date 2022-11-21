@@ -287,6 +287,7 @@ def parse(modname, file):
         errtok("expected word")
 
     # expressions
+    # TODO refactor to stmt(fname)?
     def fbody(fname, fparams):
         def primary():
             # symbol

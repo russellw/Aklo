@@ -178,11 +178,6 @@ fn parse modname, file,text
 						i += len(s)
 						tok:= s
 						^
-
-				if tok == "["
-					tok:= "("
-				if tok == "]"
-					tok:= ")"
 				i++
 				^
 
@@ -277,15 +272,20 @@ fn parse modname, file,text
 					lex()
 					^ a
 
-				; bracketed expression or list
+				; bracketed expression
 				if eat("(")
+					a = commas()
+					expect(")")
+					^ a
+
+				; list
+				if eat("[")
+					r =  ['.list']
 					if eat(".indent")
-						r =  ['.list']
 						while ! eat(".dedent")
-							r<<expr()
-							eat(",")
+							r<<commas()
 							expect("\n")
-						expect(")")
+						expect("]")
 						^ r
 					if eat(")")
 						^ ['.list']
