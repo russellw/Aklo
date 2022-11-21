@@ -287,11 +287,12 @@ fn parse modname, file,text
 							expect("\n")
 						expect("]")
 						^ r
-					if eat(")")
-						^ ['.list']
-					a = commas()
-					expect(")")
-					^ a
+					while  !eat("]")
+						r<<expr()
+						if eat("]")
+							break
+						expect(",")
+					^ r
 
 				; none of the above
 				errtok("expected expression")
@@ -305,8 +306,7 @@ fn parse modname, file,text
 							a = [a]
 							if eat(".indent")
 								while ! eat(".dedent")
-									a<<expr()
-									eat(",")
+									a<<commas()
 									expect("\n")
 								expect(")")
 								continue
@@ -315,6 +315,10 @@ fn parse modname, file,text
 								if eat(")")
 									break
 								expect(",")
+						"["
+							lex()
+							a='.subscript',a,expr()
+							expect("]")
 						"++"
 						"--"
 							^ intern("post" @ lex1()), a
@@ -388,9 +392,6 @@ fn parse modname, file,text
 			fn mkop(op, left)
 				ops<<(op,( prec, left))
 
-			mkop("!", 1)
-
-			prec--
 			mkop("**",0)
 
 			prec--
@@ -446,7 +447,6 @@ fn parse modname, file,text
 					^ a
 				r = ['.list', a]
 				while eat(",")
-					if !in(tok,(				")",".indent" , "\n"))
 							r<<expr()
 				^ r
 
@@ -474,12 +474,11 @@ fn parse modname, file,text
 			fn if1(loop)
 				assert  in(tok, ("if", "elif"))
 				lex()
-				r = ["if", expr()]
+				r = ['if', expr()]
 				r<<block(loop)
 				case tok
 					"elif"
-						;TODO fix
-						r<<if1(loop)
+						r<<[if1(loop)]
 					"else"
 						lex()
 						r<<block(loop)
