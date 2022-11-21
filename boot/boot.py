@@ -388,6 +388,10 @@ def parse(modname, file):
                                 break
                             expect(",")
                         continue
+                    case "[":
+                        lex()
+                        a = "subscript", a, expr()
+                        expect("]")
                     case "++" | "--":
                         return "post" + lex1(), a
                     case ".":
@@ -456,9 +460,6 @@ def parse(modname, file):
         def mkop(op, left):
             ops[op] = prec, left
 
-        mkop("!", 1)
-
-        prec -= 1
         mkop("**", 0)
 
         prec -= 1
@@ -731,9 +732,6 @@ def expr(a):
         case "!", x:
             print("!")
             truth(x)
-        case "!", x, y:
-            print("Etc.subscript")
-            pargs((x, y))
         case "-", x:
             print("Etc.neg")
             pargs([x])
@@ -769,6 +767,7 @@ def expr(a):
         case (
             ("len", *s)
             | ("get", *s)
+            | ("subscript", *s)
             | ("exit", *s)
             | ("slice", *s)
             | ("range", *s)
@@ -866,13 +865,13 @@ def checkcase(label, pattern, x):
                 n = len(s) - 1
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
-                    checkcase(label, s[i], ("!", x, i))
+                    checkcase(label, s[i], ("subscript", x, i))
                 checkcase(label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
             for i in range(n):
-                checkcase(label, s[i], ("!", x, i))
+                checkcase(label, s[i], ("subscript", x, i))
 
 
 def assignconst(pattern, x):
@@ -893,12 +892,12 @@ def assign(pattern, x):
             if isrest(s):
                 n = len(s) - 1
                 for i in range(n):
-                    assign(s[i], ("!", x, i))
+                    assign(s[i], ("subscript", x, i))
                 assign(s[n][1], ("drop", n, x))
                 return
             n = len(s)
             for i in range(n):
-                assign(s[i], ("!", x, i))
+                assign(s[i], ("subscript", x, i))
         case "_":
             0
         case "i" | "j" | "k":

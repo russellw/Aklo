@@ -105,9 +105,9 @@ assert 1 - (2 - 3) == 2
 assert "ABC"==[65,66,67]
 assert "A"==[65]
 
-assert "ABC"!0==65
-assert "ABC"!1==66
-assert "ABC"!2==67
+assert "ABC"[0]==65
+assert "ABC"[1]==66
+assert "ABC"[2]==67
 
 assert len( "ABC")==3
 assert  "ab"@"cd"=="abcd"
@@ -156,14 +156,14 @@ assert parseint( "123",10)==123
 assert parseint ("ff",16)==255
 assert parseint ("FFFF",16)==65535
 
-assert digitb? ("9"!0,10)
-assert digitb? ("9"!0,16)
+assert digitb? ("9"[0],10)
+assert digitb? ("9"[0],16)
 
-assert !digitb? ("f"!0,10)
-assert digitb? ("f"!0,16)
+assert !digitb? ("f"[0],10)
+assert digitb? ("f"[0],16)
 
-assert !digitb? ("*"!0,10)
-assert !digitb? ("*"!0,16)
+assert !digitb? ("*"[0],10)
+assert !digitb? ("*"[0],16)
 
 assert unesc( "abc")=="abc"
 assert unesc (r"\tabc\n")=="\tabc\n"
@@ -203,7 +203,7 @@ assert split(digit?,"1")==["",""]
 assert split(digit?,"1zzz")==["","zzz"]
 assert split(digit?,"...9")==["...",""]
 
-assert spliton("."!0,"123.456.")==["123","456",""]
+assert spliton("."[0],"123.456.")==["123","456",""]
 
 assert lines("a\nb\nc\n\n")==["a","b","c",""]
 assert lines("a\nb\nc\n")==["a","b","c"]
@@ -511,11 +511,11 @@ assert reduce(add,[1])==1
 
 assert reduce(\(s,t)(s@t),("abc","def","gh"))=="abcdefgh"
 
-assert maximum( "abc")=="c"!0
-assert maximum ("cba")=="c"!0
+assert maximum( "abc")=="c"[0]
+assert maximum ("cba")=="c"[0]
 
-assert minimum ("abc")=="a"!0
-assert minimum ("cba")=="a"!0
+assert minimum ("abc")=="a"[0]
+assert minimum ("cba")=="a"[0]
 
 assert sum((1,2,3,4))==10
 assert sum([])==0
@@ -632,8 +632,8 @@ case "abc"
 assert a=="abc"
 
 ;filenames
-assert dirseparator? ("/"!0)
-assert !dirseparator? ("a"!0)
+assert dirseparator? ("/"[0])
+assert !dirseparator? ("a"[0])
 
 assert splitdir("/")==("/","")
 assert splitdir("/a")==("/","a")
@@ -641,8 +641,8 @@ assert splitdir("foo/bar")==("foo/","bar")
 assert splitdir("foo/")==("foo/","")
 assert splitdir("foo")==("","foo")
 
-assert  splitext("abcd.exe")!0=="abcd"
-assert  splitext("abcd.exe")!1=="exe"
+assert  splitext("abcd.exe")[0]=="abcd"
+assert  splitext("abcd.exe")[1]=="exe"
 
 assert ascii?(joindir(["foo"]))
 assert ascii?(joindir(("foo","bar")))

@@ -1,11 +1,11 @@
 fn upper? c
-	^ "A"!0<=c&c<="Z"!0
+	^ "A"[0]<=c&c<="Z"[0]
 
 fn lower? c
-	^ "a"!0<=c&c<="z"!0
+	^ "a"[0]<=c&c<="z"[0]
 
 fn digit? c
-	^ "0"!0<=c&c<="9"!0
+	^ "0"[0]<=c&c<="9"[0]
 
 fn alpha? c
 	^ lower? (c)|upper? (c)
@@ -14,7 +14,7 @@ fn alnum? c
 	^ alpha? (c)|digit? (c)
 
 fn print?(c)
-	^" "!0<=c&c<=126
+	^" "[0]<=c&c<=126
 
 fn ascii?(a)
 	if atom?(a)|!a
@@ -34,14 +34,14 @@ fn lastindexof(a,s)
 
 fn find f,s
 	for i: range(s)
-		if f(s!i)
+		if f(s[i])
 			^i
 	^-1
 
 fn findlast f,s
 	i=len(s)
 	while i--
-		if f(s!i)
+		if f(s[i])
 			^i
 	^-1
 
@@ -116,18 +116,18 @@ fn upper a
 	^ a
 
 fn parseint s,base
-	while s&digitb?(s!0,base)
+	while s&digitb?(s[0],base)
 		c,@s=s
 		n=n*base+parsedigit (c)
 	^ n
 
 fn parsedigit c
 	if digit? (c)
-		^ c-"0"!0
+		^ c-"0"[0]
 	if lower? (c)
-		^ 10+c-"a"!0
+		^ 10+c-"a"[0]
 	if upper? (c)
-		^ 10+c-"A"!0
+		^ 10+c-"A"[0]
 	^ -1
 
 fn digitb? c,base
@@ -141,18 +141,18 @@ fn unesc s
 
 	fn seq n,base
 			while j<n
-				if !digitb?( s!(i+j),base)
+				if !digitb?( s[i+j],base)
 					break
 				j++
 			r@=utf8(parseint (slice (s,i,i+j),base))
 			i+=j
 
 	while i<len (s)
-		c=s!i++
-		if c!="\\"!0
+		c=s[i++]
+		if c!="\\"[0]
 			r<<c
 			continue
-		c=s!i++
+		c=s[i++]
 		case [c]
 			"\n"
 				0
@@ -233,22 +233,22 @@ fn repr a
 		for i: range(a)
 			if i
 				r@=", "
-			rec (a!i)
+			rec (a[i])
 		r@="]"
 	rec(a)
 	^ r
 
 fn last s
-	^ s!(len (s)-1)
+	^ s[len (s)-1]
 
 fn space? c
 	^ in( c," \f\n\r\t\v")
 
 fn first s
-	^ s!0
+	^ s[0]
 
 fn second s
-	^ s!1
+	^ s[1]
 
 fn keys s
 		^ map (first,s)
@@ -257,7 +257,7 @@ fn vals s
 		^ map (second,s)
 
 fn commonprefix ss
-	s=ss!0
+	s=ss[0]
 	for i: range(1,len(s)+1)
 		t=take( i,s)
 		if !every(\s( startswith(s,t)),ss)
@@ -289,7 +289,7 @@ fn reverse s
 	i=len (s)
 	r=[]
 	while i--
-		r<<s!i
+		r<<s[i]
 	^ r
 
 fn reduce f , s
@@ -328,13 +328,13 @@ fn replicate n ,a
 
 fn takewhile f,s
 	r=""
-	while s &(f(s!0))
+	while s &(f(s[0]))
 		a,@s=s
 		r<<a
 	^ r
 
 fn dropwhile f,s
-	while s &(f(s!0))
+	while s &(f(s[0]))
 		s=tail (s)
 	^ s
 
@@ -416,7 +416,7 @@ fn spliton a,s
 fn lines s
 	if endswith(s,"\n")
 		s=init (s)
-	^ spliton("\n"!0,s)
+	^ spliton("\n"[0],s)
 
 fn unlines ss
 	r=""
@@ -465,7 +465,7 @@ fn splitdir s
 	^splitat(i+1,s)
 
 fn splitext s
-	i=lastindexof("."!0,s)
+	i=lastindexof("."[0],s)
 	if i<0
 		^s,""
 	^ take(i,s),drop(i+1,s)
@@ -473,13 +473,13 @@ fn splitext s
 fn join t, ss
 	if!ss
 		^[]
-	r=ss!0
+	r=ss[0]
 	for s: tail(ss)
 		r@=t@s
 	^r
 
 fn joindir ss
-	r=ss!0
+	r=ss[0]
 	for s: tail(ss)
 		if!(r&dirseparator?(last(r)))
 			if windows?

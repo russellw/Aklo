@@ -19,7 +19,7 @@ fn assignedvars params ,body
 	nonlocals=[]
 	locals=keys(params)
 
-	'.loc',@loc=body!0
+	'.loc',@loc=body[0]
 	locs=map(\(x)(x,loc),locals)
 
 	walk(
@@ -36,7 +36,7 @@ fn assignedvars params ,body
 
 	conflicts=intersection(nonlocals,locals)
 	if conflicts
-		y=conflicts!0
+		y=conflicts[0]
 		file,line,fname=get (locs,y)
 		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
 

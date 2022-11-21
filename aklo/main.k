@@ -7,10 +7,10 @@ import ir
 i=0
 packages=[]
 while i<len( args)
-	s=args!i++
-	if s!0=='-'
+	s=args[i++]
+	if s[0]=='-'
 		o=s
-		while o!0=='-'
+		while o[0]=='-'
 			o=tail (o)
 		case o
 			"h"
@@ -35,7 +35,7 @@ libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 modules=[]
 
 fn module names ,file
-	name=splitext(file)!0
+	name=splitext(file)[0]
 	file=joindir([root]@names@[file])
 	names<<name
 	text=readfile(file)

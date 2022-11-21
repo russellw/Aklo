@@ -43,7 +43,7 @@ fn parse modname, file,text
 				j = i
 
 				;the simplest tokens are just one character
-				tok:=[ text!i]
+				tok:=[ text[i]]
 
 				; newline
 				if tok == "\n"
@@ -55,14 +55,14 @@ fn parse modname, file,text
 
 					; measure indent
 					col = 0
-					while in (text!i ,"\t ")
-						if text!i != dentc & dentc
+					while in (text[i] ,"\t ")
+						if text[i] != dentc & dentc
 							err("indented with tabs and spaces in same file")
-						dentc := text!i++
+						dentc := text[i++]
 						col++
 
 					; nothing important on this line, keep going
-					if in (text!i ,"\n;{")
+					if in (text[i] ,"\n;{")
 						continue
 
 					; one indent
@@ -80,23 +80,23 @@ fn parse modname, file,text
 					^
 
 				; space
-				if space?(text!i)
+				if space?(text[i])
 					i++
 					continue
 
 				; comment
 				if tok == ";"
-					while text!i != "\n"!0
+					while text[i] != "\n"[0]
 						i++
 					continue
 				if tok == "{"
 					i ++
 					line1 = line
-					while text!i != "}"!0
+					while text[i] != "}"[0]
 						if i == len(text)
 							line := line1
 							err("unclosed block comment")
-						if text!i == "\n"!0
+						if text[i] == "\n"[0]
 							line++
 						i++
 					i ++
@@ -106,11 +106,11 @@ fn parse modname, file,text
 				case tok
 					"'"
 					"\""
-						q = text!i++
-						while text!i != q
-							if text!i == "\\"!0
+						q = text[i++]
+						while text[i] != q
+							if text[i] == "\\"[0]
 								i++
-							if text!i == "\n"!0
+							if text[i] == "\n"[0]
 								err("unclosed quote")
 							i++
 						i++
@@ -120,8 +120,8 @@ fn parse modname, file,text
 				; raw string
 				if slice(text,i,i+2) == "r\""
 					i += 2
-					while text!i != "\""!0
-						if text!i == "\n"!0
+					while text[i] != "\""[0]
+						if text[i] == "\n"[0]
 							err("unclosed quote")
 						i++
 					i++
@@ -129,30 +129,30 @@ fn parse modname, file,text
 					^
 
 				; word
-				if idstart?(text!i)
-					while idpart?(text!i)
+				if idstart?(text[i])
+					while idpart?(text[i])
 						i++
 					tok:= slice(text,j,i)
 					^
 
 				; hexadecimal numbers are separate because they may contain 'e'
 				if lower(slice(text,i,i+2)) == "0x"
-					while idpart?(text!i)
+					while idpart?(text[i])
 						i++
 					tok:= slice(text,j,i)
 					^
 
 				; other number
-				if digit?(text!i) | tok == "." & digit?(text![i + 1])
-					while idpart?(text!i)
+				if digit?(text[i]) | tok == "." & digit?(text[i + 1])
+					while idpart?(text[i])
 						i++
-					if text!i == "."!0
+					if text[i] == "."[0]
 						i++
-						while idpart?(text!i)
+						while idpart?(text[i])
 							i++
-						if lower(text![i - 1]) == "e"!0 & in(text!i ,"+-")
+						if lower(text[i - 1]) == "e"[0] & in(text[i] ,"+-")
 							i++
-							while idpart?(text!i)
+							while idpart?(text[i])
 								i++
 					tok:= slice(text,j,i)
 					^
@@ -208,7 +208,7 @@ fn parse modname, file,text
 			;TODO reserve keywords?
 			;depends on external function call syntax
 			; External function names might need to overlap with keywords
-			if idstart?(tok!0)
+			if idstart?(tok[0])
 				^ intern(lex1())
 			errtok("expected word")
 
@@ -216,7 +216,7 @@ fn parse modname, file,text
 		fn type?()
 			if tok=="&"
 				^1
-			^idstart? (tok!0)
+			^idstart? (tok[0])
 
 		fn ptype
 			if!type?()
@@ -259,11 +259,11 @@ fn parse modname, file,text
 					"true"
 						lex()
 						^ 1
-				if idstart?(tok!0)
+				if idstart?(tok[0])
 					^ lex1()
 
 				; number
-				if digit?(tok!0)
+				if digit?(tok[0])
 					s=replace("_","",tok)
 					case lower(take(2,s))
 						"0b"
