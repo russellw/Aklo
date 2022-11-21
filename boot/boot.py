@@ -356,13 +356,11 @@ def parse(modname, file):
                         expect("\n")
                     expect("]")
                     return s
-                if eat("]"):
-                    return s
-                while 1:
+                while not eat("]"):
                     s.append(expr())
-                    if not eat(","):
+                    if eat("]"):
                         break
-                expect("]")
+                    expect(",")
                 return s
 
             # none of the above
