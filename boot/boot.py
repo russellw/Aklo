@@ -83,11 +83,6 @@ def parse(modname, file):
     if modname in modules:
         return
 
-    # google-java-format sometimes doesn't like comments with backslashes
-    # which will occur in Windows filenames
-    # the easiest solution is to just convert to / at the start
-    file = file.replace("\\", "/")
-
     text = open(file).read()
     i = 0
     line = 1
@@ -97,6 +92,11 @@ def parse(modname, file):
     dedents = 0
 
     tok = 0
+
+    # google-java-format sometimes doesn't like comments with backslashes
+    # which will occur in Windows filenames
+    # the easiest solution is to just convert to / at the start
+    file = file.replace("\\", "/")
 
     def err(msg):
         raise Exception(f"{file}:{line}: {msg}")

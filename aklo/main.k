@@ -3,7 +3,7 @@ import ast
 import cxx
 import ir
 
-
+;command line
 i=0
 packages=[]
 while i<len( args)
@@ -30,8 +30,10 @@ if !packages
 	eprn("Usage: aklo [options] packages")
 	exit (1)
 
+;standard library
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
+;list of specified packages
 modules=[]
 
 fn module names ,file
@@ -59,3 +61,12 @@ for  s :packages
 	dir([name])
 show modules
 ;modules=parser.parse('program',file,readfile(file))
+
+;parse
+modules=map(
+	\(m)(
+		names,text=m
+		^names,parser.parse(last(names),text)
+	)
+	modules
+)
