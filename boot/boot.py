@@ -267,9 +267,9 @@ def parse(modname, file):
         tok = ".dedent"
 
     def lex1():
-        s = tok
+        r = tok
         lex()
-        return s
+        return r
 
     # parser
     def eat(s):
@@ -350,19 +350,19 @@ def parse(modname, file):
 
             # list
             if eat("["):
-                s = ["List.of"]
+                r = ["List.of"]
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        s.append(commas())
+                        r.append(commas())
                         expect("\n")
                     expect("]")
-                    return s
+                    return r
                 while not eat("]"):
-                    s.append(expr())
+                    r.append(expr())
                     if eat("]"):
                         break
                     expect(",")
-                return s
+                return r
 
             # none of the above
             errtok("expected expression")
@@ -403,18 +403,18 @@ def parse(modname, file):
                 return a
 
         def params():
-            s = []
+            r = []
             match tok:
                 case "(":
                     lex()
                     if eat(".indent"):
                         while not eat(".dedent"):
-                            s.append(word())
+                            r.append(word())
                             expect("\n")
                         expect(")")
                     else:
                         while not eat(")"):
-                            s.append(word())
+                            r.append(word())
                             if eat(")"):
                                 break
                             expect(",")
@@ -423,10 +423,10 @@ def parse(modname, file):
                 case _:
                     # TODO should the brackets be optional?
                     while 1:
-                        s.append(word())
+                        r.append(word())
                         if not eat(","):
                             break
-            return s
+            return r
 
         def prefix():
             match tok:
@@ -434,20 +434,20 @@ def parse(modname, file):
                     return lex1(), prefix()
                 case "\\":
                     line1 = line
-                    s = [lex1()]
+                    r = [lex1()]
 
                     fparams1 = params()
-                    s.append(fparams1)
+                    r.append(fparams1)
 
                     expect("(")
-                    s.append((".loc", file, line1, "\\"))
+                    r.append((".loc", file, line1, "\\"))
                     if eat(".indent"):
-                        s.extend(fbody("\\", fparams1))
+                        r.extend(fbody("\\", fparams1))
                         expect(".dedent")
                     else:
-                        s.append(("^", commas()))
+                        r.append(("^", commas()))
                     expect(")")
-                    return s
+                    return r
             return postfix()
 
         # operator precedence parser
@@ -510,10 +510,10 @@ def parse(modname, file):
             a = expr()
             if tok != ",":
                 return a
-            s = ["List.of", a]
+            r = ["List.of", a]
             while eat(","):
-                s.append(expr())
-            return s
+                r.append(expr())
+            return r
 
         def assignment():
             # TODO inline
@@ -525,51 +525,51 @@ def parse(modname, file):
 
         def block():
             expect(".indent")
-            s = []
+            r = []
             while not eat(".dedent"):
-                s.append((".loc", file, line, fname))
-                s.append(stmt())
-            return s
+                r.append((".loc", file, line, fname))
+                r.append(stmt())
+            return r
 
         def if1():
             assert tok in ("if", "elif")
             lex()
-            s = ["if", expr()]
-            s.append(block())
+            r = ["if", expr()]
+            r.append(block())
             match tok:
                 case "elif":
-                    s.append([if1()])
+                    r.append([if1()])
                 case "else":
                     lex()
-                    s.append(block())
-            return s
+                    r.append(block())
+            return r
 
         def stmt():
-            s = [tok]
+            r = [tok]
             match tok:
                 case "assert":
-                    s.append(file)
-                    s.append(line)
-                    s.append(fname)
+                    r.append(file)
+                    r.append(line)
+                    r.append(fname)
                     lex()
                     x = expr()
-                    s.append(str(x))
-                    s.append(x)
+                    r.append(str(x))
+                    r.append(x)
                     expect("\n")
-                    return s
+                    return r
                 case "show":
-                    s.append(file)
-                    s.append(line)
-                    s.append(fname)
+                    r.append(file)
+                    r.append(line)
+                    r.append(fname)
                     lex()
                     x = commas()
-                    s.append(str(x))
-                    s.append(x)
+                    r.append(str(x))
+                    r.append(x)
                     expect("\n")
-                    return s
+                    return r
                 case "case":
                     lex()
-                    s.append(commas())
+                    r.append(commas())
                     expect(".indent")
                     while not eat(".dedent"):
                         patterns = [commas()]
@@ -577,66 +577,66 @@ def parse(modname, file):
                             patterns.append(commas())
                         body = block()
                         for pattern in patterns:
-                            s.append((pattern, *body))
-                    return s
+                            r.append((pattern, *body))
+                    return r
                 case "dowhile" | "while":
                     lex()
-                    s.append(expr())
-                    s.extend(block())
-                    return s
+                    r.append(expr())
+                    r.extend(block())
+                    return r
                 case "for":
                     lex()
-                    s.append(word())
+                    r.append(word())
                     expect(":")
-                    s.append(commas())
-                    s.extend(block())
-                    return s
+                    r.append(commas())
+                    r.extend(block())
+                    return r
                 case "fn":
                     line1 = line
                     lex()
 
                     fname1 = word()
-                    s.append(fname1)
+                    r.append(fname1)
 
                     fparams1 = params()
-                    s.append(fparams1)
+                    r.append(fparams1)
 
                     expect(".indent")
-                    s.append((".loc", file, line1, fname1))
-                    s.extend(fbody(fname1, fparams1))
+                    r.append((".loc", file, line1, fname1))
+                    r.extend(fbody(fname1, fparams1))
                     expect(".dedent")
-                    return s
+                    return r
                 case "if":
                     return if1()
                 case "break" | "continue":
                     lex()
                     if eat("\n"):
-                        return s[0]
-                    s.append(word())
+                        return r[0]
+                    r.append(word())
                     expect("\n")
-                    return s
+                    return r
                 case "^":
                     lex()
                     if eat("\n"):
                         return "^", 0
-                    s.append(commas())
+                    r.append(commas())
                     expect("\n")
-                    return s
+                    return r
                 case "throw":
                     lex()
-                    s.append(commas())
+                    r.append(commas())
                     expect("\n")
-                    return s
+                    return r
                 case "tron":
                     lex()
                     if eat("\n"):
-                        return s
+                        return r
                     while 1:
-                        s.append(word())
+                        r.append(word())
                         if not eat(","):
                             break
                     expect("\n")
-                    return s
+                    return r
             a = assignment()
             if eat(":"):
                 return ":", a, stmt()
@@ -644,11 +644,11 @@ def parse(modname, file):
             return a
 
         # function/module body
-        s = []
+        r = []
         while tok != ".dedent":
-            s.append((".loc", file, line, fname))
-            s.append(stmt())
-        return s
+            r.append((".loc", file, line, fname))
+            r.append(stmt())
+        return r
 
     # top level
     lex()
