@@ -377,8 +377,7 @@ def parse(modname, file):
                         a = [a]
                         if eat(".indent"):
                             while not eat(".dedent"):
-                                a.append(expr())
-                                eat(",")
+                                a.append(commas())
                                 expect("\n")
                             expect(")")
                             continue
