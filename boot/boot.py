@@ -409,7 +409,6 @@ def parse(modname, file):
                     if eat(".indent"):
                         while not eat(".dedent"):
                             s.append(word())
-                            eat(",")
                             expect("\n")
                         expect(")")
                     else:
