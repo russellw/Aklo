@@ -5,7 +5,7 @@ fn idpart? c
 	^ idstart? (c)|digit? (c)|in (c,"?")
 
 
-fn parse1 modname, file,text
+fn parse modname, file,text
 	text=replace("\r\n","\n",text)
 	text=replace("\r","\n",text)
 	if!endswith(text,"\n")
@@ -600,10 +600,9 @@ fn parse1 modname, file,text
 	;TODO figure out syntax for incorporating data files at compile time
 	;TODO include these in the module
 	while eat("import")
-		name = word()
-		;TODO: path
-		file1= name @ ".k"
-		parse1(intern(name),file1,readfile  (file1))
+		names=[]
+		dowhile eat(",")
+			names<< word()
 		expect("\n")
 
 	; module
