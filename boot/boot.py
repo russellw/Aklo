@@ -435,8 +435,7 @@ def parse(modname, file):
                 r = [lex1()]
 
                 # parameters
-                fparams1 = params()
-                r.append(fparams1)
+                r.append(params())
 
                 # body
                 expect("(")
