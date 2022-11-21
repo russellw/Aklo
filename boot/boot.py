@@ -352,8 +352,7 @@ def parse(modname, file):
                 s = ["List.of"]
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        s.append(expr())
-                        eat(",")
+                        s.append(commas())
                         expect("\n")
                     expect("]")
                     return s
