@@ -319,7 +319,9 @@ fn parse  file,text
 				"--"
 					^ intern("post" @ lex1()), a
 				"."
-					a=intern(lex1()),a,word()
+					a=['.',a]
+					while eat(".")
+						a<<word()
 				_
 					^ a
 
