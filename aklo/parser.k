@@ -532,6 +532,25 @@ fn parse  file,text
 				r<<commas()
 				r@=block(fname)
 				^ r
+			"var"
+				line1=line
+				lex()
+
+				;name
+				r<<word()
+
+				;type
+				r<<otype()
+
+				;location
+				r<<('.loc',file,line1,fname)
+
+				;initial value
+				if eat( "=")
+					r<<commas()
+
+				expect("\n")
+				^ r
 			"fn"
 				line1=line
 				lex()
@@ -546,9 +565,11 @@ fn parse  file,text
 				;return type
 				r<<otype()
 
+				;location
+				r<<('.loc',file,line1,fname)
+
 				;body
 				expect(".indent")
-				r<<('.loc',file,line1,fname)
 				while !eat( ".dedent")
 					r<<('.loc',file,line,fname)
 					r<<stmt(fname)
