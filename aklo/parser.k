@@ -5,7 +5,7 @@ fn idpart? c
 	^ idstart? (c)|digit? (c)|in (c,"?")
 
 
-fn parse modname, file,text
+fn parse  file,text
 	text=replace("\r\n","\n",text)
 	text=replace("\r","\n",text)
 	if!endswith(text,"\n")
@@ -598,6 +598,6 @@ fn parse modname, file,text
 
 	; module
 	while tok != ".dedent"
-		r<<('.loc',file,line,modname)
-		r<<stmt(modname)
+		r<<('.loc',file,line,0)
+		r<<stmt(0)
 	^ r
