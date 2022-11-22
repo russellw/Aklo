@@ -33,40 +33,29 @@ if !packages
 ;standard library
 libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 
-;list of specified packages
+;read modules
 modules=[]
 
-fn module names ,file
+fn add names ,file
 	name=splitext(file)[0]
-	file=joindir([root]@names@[file])
-	names<<name
-	text=readfile(file)
-	modules<<names,text
+	text=readfile(joindir([root]@names@[file]))
+	module=parser.parse(name,text)
+	modules<<names@[name],module
 
 fn dir names
 	;TODO: should be able to write 'for file,d?: ...'?
 	for s: listdir(joindir([root]@names))
-		file,d?=s
-		if d?
+		file,attrs=s
+		if attrs.dir?
 			dir(names@[file])
 		elif endswith(file,".k")
-			module (names ,file)
+			add (names ,file)
 
 for  s :packages
 	if endswith(s,".k")
 		root,file=splitdir(s)
-		module([],file)
+		add([],file)
 		continue
 	root,name=splitdir(s)
 	dir([name])
 show modules
-;modules=parser.parse('program',file,readfile(file))
-
-;parse
-modules=map(
-	\(m)(
-		names,text=m
-		^names,parser.parse(last(names),text)
-	)
-	modules
-)
