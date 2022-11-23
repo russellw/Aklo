@@ -468,6 +468,9 @@ fn parse  file,text
 		expect(".indent")
 		r=[]
 		while ! eat(".dedent")
+			;an early pass will mangle function names
+			; so we need to keep track of the original function names for debugging
+			; the easiest place to do it is alongside the filename and line number
 			r<<('.loc',file,line,fname)
 			r<<stmt(fname)
 		^ r
@@ -489,9 +492,6 @@ fn parse  file,text
 		r = [intern (tok)]
 		case tok
 			"assert"
-				r<<file
-				r<<line
-				r<<fname
 				lex()
 				x = expr()
 				r<<str(x)
@@ -499,9 +499,6 @@ fn parse  file,text
 				expect("\n")
 				^ r
 			"show"
-				r<<file
-				r<<line
-				r<<fname
 				lex()
 				x = commas()
 				r<<str(x)

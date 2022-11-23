@@ -460,7 +460,7 @@ fn dirseparator? c
 
 fn splitdir s
 	i=findlast(dirseparator?,s)
-	;there are many edge cases in Windows file names
+	;there are many edge cases in Windows filenames
 	; so it is better to leave a trailing separator untouched
 	^splitat(i+1,s)
 

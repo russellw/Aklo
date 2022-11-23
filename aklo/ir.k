@@ -1,4 +1,6 @@
 fn convert modules
+	file=0
+	line=0
 	code=[]
 	fn term (loop,a)
 		fn rec(a)
@@ -32,6 +34,11 @@ fn convert modules
 			^r
 
 		case a
+			'.loc',file1,line1,fname1
+				file=file1
+				line=line1
+				fname=fname1
+				code<<a
 			'^',x
 				code<<'^',rec(x)
 			'!',x
