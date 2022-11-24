@@ -59,4 +59,7 @@ for  s :packages
 		continue
 	root,name=splitdir(s)
 	dir([name])
+
+;convert to intermediate representation
+modules=ast.norm(modules)
 show modules

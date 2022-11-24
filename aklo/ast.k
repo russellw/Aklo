@@ -32,6 +32,7 @@ fn assignedvars params ,body
 					locs<<y,loc
 					nonlocals<<y
 		)
+		body
 	)
 
 	conflicts=intersection(nonlocals,locals)
@@ -41,6 +42,9 @@ fn assignedvars params ,body
 		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
 
 	^locals
+
+fn renfn(context,name,params,rtype,body)
+	^name,params,rtype,@body
 
 fn norm modules
 	^modules
