@@ -610,6 +610,7 @@ fn parse  file,text
 	;TODO figure out syntax for incorporating data files at compile time
 	;TODO include these in the module
 	while eat("import")
+		r<<('.loc',file,line,0)
 		q=['import']
 		dowhile eat(",")
 			q<< word()

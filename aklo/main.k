@@ -62,4 +62,3 @@ for  s :packages
 
 ;convert to intermediate representation
 modules=ast.norm(modules)
-show modules
