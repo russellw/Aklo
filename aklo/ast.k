@@ -28,7 +28,7 @@ fn walk f,s
 
 ;rename local variables and functions to unique symbols
 fn renlocals module
-	fn assignedvars params ,body
+	fn localvars params ,body
 		nonlocals=[]
 
 		;parameters are local variables
@@ -93,7 +93,7 @@ fn renlocals module
 	fn renfn(context,name,params,rtype,body)
 		^name,params,rtype,@body
 
-	show assignedvars([],module)
+	show localvars([],module)
 	^module
 
 fn norm modules
