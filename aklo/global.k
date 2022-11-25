@@ -488,3 +488,9 @@ fn joindir ss
 				r@="/"
 		r@=s
 	^r
+
+fn mapfirst(f,s)
+	^map(\(a)(f(a[0]),a[1]),s)
+
+fn mapsecond(f,s)
+	^map(\(a)(a[0],f(a[1])),s)

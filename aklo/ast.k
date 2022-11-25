@@ -15,36 +15,41 @@ fn walk f,s
 
 	map(rec,s)
 
-fn assignedvars params ,body
-	nonlocals=[]
-	locals=keys(params)
+;rename local variables and functions to unique symbols
+fn renlocals module
+	fn assignedvars params ,body
+		nonlocals=[]
+		locals=keys(params)
 
-	'.loc',@loc=body[0]
-	locs=map(\(x)(x,loc),locals)
+		'.loc',@loc=body[0]
+		locs=map(\(x)(x,loc),locals)
 
-	walk(
-		\(loc,a)(
-			case a
-				'=',y,_
-					locs<<y,loc
-					locals<<y
-				':=',y,_
-					locs<<y,loc
-					nonlocals<<y
+		walk(
+			\(loc,a)(
+				case a
+					'=',y,_
+						locs<<y,loc
+						locals<<y
+					':=',y,_
+						locs<<y,loc
+						nonlocals<<y
+			)
+			body
 		)
-		body
-	)
 
-	conflicts=intersection(nonlocals,locals)
-	if conflicts
-		y=conflicts[0]
-		file,line,fname=get (locs,y)
-		throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
+		conflicts=intersection(nonlocals,locals)
+		if conflicts
+			y=conflicts[0]
+			file,line,fname=get (locs,y)
+			throw file @ ":" @ str(line)@ ": "@fname @ ": " @ str(y)@" assigned both nonlocally and locally"
 
-	^locals
+		^locals
 
-fn renfn(context,name,params,rtype,body)
-	^name,params,rtype,@body
+	fn renfn(context,name,params,rtype,body)
+		^name,params,rtype,@body
+
+	^module
 
 fn norm modules
+	modules=mapsecond(renlocals,modules)
 	^modules

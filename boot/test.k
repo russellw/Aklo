@@ -484,6 +484,9 @@ assert join(",",("abc","de"))=="abc,de"
 assert map( \x(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
+assert mapfirst(first,[["a",2],["b",3]])==[[97,2],[98,3]]
+assert mapsecond(square,[["a",2],["b",3]])==[["a",4],["b",9]]
+
 assert filter( digit?,"abc123")=="123"
 
 assert every( upper?,"")
