@@ -251,7 +251,7 @@ fn parse  file,text
 				lex()
 				^ 1
 		if idstart?(tok[0])
-			^ lex1()
+			^ word()
 
 		; number
 		if digit?(tok[0])
@@ -581,6 +581,14 @@ fn parse  file,text
 				r<<commas()
 				expect("\n")
 				^ r
+			"tron"
+				lex()
+				if eat("\n")
+					^ r
+				dowhile eat(",")
+					r<<word()
+				expect("\n")
+				^ r
 			"throw"
 				lex()
 				r<<commas()
@@ -609,8 +617,9 @@ fn parse  file,text
 	;TODO figure out syntax for incorporating e.g. C++ source Fragment files verbatim
 	;TODO figure out syntax for incorporating data files at compile time
 	;TODO include these in the module
+	fname="global"
 	while eat("import")
-		r<<('.loc',file,line,0)
+		r<<('.loc',file,line,fname)
 		q=['import']
 		dowhile eat(",")
 			q<< word()
@@ -619,6 +628,6 @@ fn parse  file,text
 
 	; module
 	while tok != ".dedent"
-		r<<('.loc',file,line,0)
-		r<<stmt(0)
+		r<<('.loc',file,line,fname)
+		r<<stmt(fname)
 	^ r

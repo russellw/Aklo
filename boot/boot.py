@@ -1081,52 +1081,8 @@ for a in modules["global"]:
             globals1.add(name)
 
 
-def fref(a):
-    match a:
-        case "\\", params, *body:
-            lam(params, body)
-        case [*_]:
-            raise Exception(a)
-        case _:
-            if len(a) == 1:
-                print(f"((Function<List<Object>, Object>){a})")
-                return
-            if a in globals1:
-                print(f"new global.{a}()")
-                return
-            print(f"new {a}()")
-
-
-def lam(params, body):
-    print("new Function<List<Object>, Object>() {")
-
-    # local variables
-    localvars(params, body)
-
-    # falling off the end of a function means returning zero
-    # TODO refactor w/fn
-    match body[-1]:
-        case ("^", _) | ("throw", _):
-            0
-        case _:
-            body.append(("^", 0))
-
-    # body
-    print("public Object apply(List<Object> _args) {")
-    print(f'Etc.enter("{currentfile}", {currentline}, "\\\\", _args);')
-    print(f"assert _args.size() == {len(params)};")
-    for i in range(len(params)):
-        assign(params[i], f"_args.get({i})")
-    each(stmt, body)
-    print("}")
-
-    print("}")
-
-
-def fn(fname, params, body):
+def fbody(fname, params, body):
     (_, file, line, _), *body = body
-    print(f"// {file}:{line}")
-    print(f"class {fname} implements Function<List<Object>, Object> {{")
 
     # local functions
     r = []
@@ -1160,6 +1116,30 @@ def fn(fname, params, body):
     print("}")
 
 
+def fref(a):
+    match a:
+        case "\\", params, *body:
+            print("new Function<List<Object>, Object>() {")
+            fbody("\\\\", params, body)
+        case [*_]:
+            raise Exception(a)
+        case _:
+            if len(a) == 1:
+                print(f"((Function<List<Object>, Object>){a})")
+                return
+            if a in globals1:
+                print(f"new global.{a}()")
+                return
+            print(f"new {a}()")
+
+
+def fn(fname, params, body):
+    _, file, line, _ = body[0]
+    print(f"// {file}:{line}")
+    print(f"class {fname} implements Function<List<Object>, Object> {{")
+    fbody(fname, params, body)
+
+
 def ret(a):
     fname = currentfname.replace("\\", "\\\\")
     a = tmp(a)
@@ -1172,7 +1152,7 @@ for modname, module in modules.items():
     print('@SuppressWarnings("unchecked")')
     print(f"class {modname} {{")
 
-    # local functions
+    # functions
     r = []
     for a in module:
         match a:
@@ -1183,7 +1163,7 @@ for modname, module in modules.items():
                 r.append(a)
     module = r
 
-    # local variables
+    # variables
     localvars([], module, 1)
 
     # body

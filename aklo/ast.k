@@ -73,10 +73,10 @@ fn renlocals module
 						addlocal(x)
 					'=',x,_
 						lhs(x)
-						map(addlocal,x)
+						map(addlocal,r)
 					':=',x,_
 						lhs(x)
-						map(addnonlocal,x)
+						map(addnonlocal,r)
 			)
 			body
 		)
