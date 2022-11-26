@@ -2,29 +2,34 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-fn walk f,s
+proceed=gensym("proceed")
+fn mapterms f,s
 	loc=0
 
 	fn rec a
-		;unlike map, we here work top down
-		; so the callback function can signal stop if needed
-		if f(loc,a)
-			^
-
-		;recur?
 		case a
 			'.loc',@loc1
-				;track the current source location
 				loc:=loc1
+				^a
 			'fn',@_
 			'\\',@_
-				;don't recur into local functions
+			'.quote',_
+				;leaf node
 				0
-			[@s]
-				;recur into other compound terms
-				map(rec,s)
+			[@_]
+				b=f(loc,a)
+				if b==proceed
+					;branch node
+					^map(rec,a)
+				;leaf node
+				^b
+		;leaf node
+		b=f(loc,a)
+		if b==proceed
+			^a
+		^b
 
-	map(rec,s)
+	^map(rec,s)
 
 ;rename local variables and functions to unique symbols
 fn renlocals module
@@ -51,7 +56,7 @@ fn renlocals module
 
 		;gather all the explicit and implicit local variables
 		; and all the assignments to nonlocal variables
-		walk(
+		mapterms(
 			\(loc,a)(
 				r=[]
 				fn lhs(a)
@@ -77,6 +82,7 @@ fn renlocals module
 					':=',x,_
 						lhs(x)
 						map(addnonlocal,r)
+				^proceed
 			)
 			body
 		)
