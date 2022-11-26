@@ -90,7 +90,7 @@ fn renlocals module
 		;return a set of unique local variable names
 		^uniq(locals)
 
-	fn renfn(context,name,params,rtype,body)
+	fn renfn(env,name,params,rtype,body)
 		^name,params,rtype,@body
 
 	show localvars([],module)

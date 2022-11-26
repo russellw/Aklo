@@ -11,6 +11,8 @@ args = parser.parse_args()
 
 
 def each(f, s):
+    # map would not be a substitute here
+    # because Python's map returns a lazy iterator
     for a in s:
         f(a)
 
