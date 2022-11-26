@@ -3,9 +3,7 @@ fn err (loc,msg)
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
 proceed=gensym("proceed")
-fn mapterms f,s
-	loc=0
-
+fn mapterm f,loc,a
 	fn rec a
 		case a
 			'.loc',@loc1
@@ -29,7 +27,7 @@ fn mapterms f,s
 			^a
 		^b
 
-	^map(rec,s)
+	^rec(a)
 
 ;rename local variables and functions to unique symbols
 fn renlocals module
@@ -39,16 +37,15 @@ fn renlocals module
 		;parameters are local variables
 		locals=keys(params)
 
-		;track the current source location
 		;parameters are located at the function declaration
 		'.loc',@loc=body[0]
 		locs=map(\(x)(x,loc),locals)
 
-		fn addlocal(x)
+		fn addlocal(loc,x)
 						locs<<x,loc
 						locals<<x
 
-		fn addnonlocal(x)
+		fn addnonlocal(loc,x)
 						locs<<x,loc
 						nonlocals<<x
 
@@ -56,34 +53,38 @@ fn renlocals module
 
 		;gather all the explicit and implicit local variables
 		; and all the assignments to nonlocal variables
-		mapterms(
+		mapterm(
 			\(loc,a)(
-				r=[]
-				fn lhs(a)
-					case a
-						'.quote',_
-							0
-						'@',b
-							r<<b
-						'.list',@s
-							map(lhs,s)
-						[@_]
-							err(loc,"invalid assignment")
-						_
-							if sym?(a)
-								r<<a
+				fn lhs(f,a)
+					mapterm(
+						\(loc,a)(
+							case a
+								'.quote',_
+									^0
+								'@',_
+								'.list',@_
+									0
+								[@_]
+									err(loc,"invalid assignment")
+								_
+									if sym?(a)
+										f(loc,a)
+							^proceed
+						)
+						loc
+						a
+					)
 
 				case a
 					'var',x,@_
 						addlocal(x)
 					'=',x,_
-						lhs(x)
-						map(addlocal,r)
+						lhs(addlocal,x)
 					':=',x,_
-						lhs(x)
-						map(addnonlocal,r)
+						lhs(addnonlocal,x)
 				^proceed
 			)
+			loc
 			body
 		)
 
