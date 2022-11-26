@@ -677,23 +677,24 @@ sys.stdout.write(open(here + "/prefix.java").read())
 
 
 # expressions
-def pargs(s):
+def pargs(env, s):
     print("(")
     more = 0
     for a in s:
         if more:
             print(",")
         more = 1
-        expr(a)
+        expr(env, a)
     print(")")
 
 
-def truth(a):
+def truth(env, a):
     print("Etc.truth(")
-    expr(a)
+    expr(env, a)
     print(")")
 
 
+# TODO eliminate?
 hofs = set()
 for name, module in modules.items():
     for a in module:
@@ -702,7 +703,7 @@ for name, module in modules.items():
                 hofs.add(fname)
 
 
-def expr(a):
+def expr(env, a):
     match a:
         case "ctreadfiles", dir1:
             print(f'Etc.ctreadfiles("{dir1}")')
@@ -713,58 +714,58 @@ def expr(a):
         case ("post++", x) | ("post--", x):
             print(x + a[0][4:])
         case "\\", params, *body:
-            fref(a)
+            fref(env, a)
         case "//", x, y:
-            expr(x)
+            expr(env, x)
             print("/")
-            expr(y)
+            expr(env, y)
         case "range", x:
-            expr(("range", 0, x))
+            expr(env, ("range", 0, x))
         case "<", *s:
             print("Etc.lt")
-            pargs(s)
+            pargs(env, s)
         case "<=", *s:
             print("Etc.le")
-            pargs(s)
+            pargs(env, s)
         case ("|", x, y) | ("&", x, y):
-            truth(x)
+            truth(env, x)
             print(a[0] * 2)
-            truth(y)
+            truth(env, y)
         case "!", x:
             print("!")
-            truth(x)
+            truth(env, x)
         case "-", x:
             print("Etc.neg")
-            pargs([x])
+            pargs(env, [x])
         case "-", x, y:
             print("Etc.sub")
-            pargs((x, y))
+            pargs(env, (x, y))
         case "%", *s:
             print("Etc.rem")
-            pargs(s)
+            pargs(env, s)
         case "+", *s:
             print("Etc.add")
-            pargs(s)
+            pargs(env, s)
         case "*", *s:
             print("Etc.mul")
-            pargs(s)
+            pargs(env, s)
         case "==", *s:
             print("Objects.equals")
-            pargs(s)
+            pargs(env, s)
         case "!=", *s:
             print("!Objects.equals")
-            pargs(s)
+            pargs(env, s)
         case "@", *s:
             print("Etc.cat")
-            pargs(s)
+            pargs(env, s)
         case "floatp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")
-            pargs(s)
+            pargs(env, s)
         case "gensym", *s:
             print("new Sym")
-            pargs(s)
+            pargs(env, s)
         case (
             ("len", *s)
             | ("get", *s)
@@ -788,15 +789,15 @@ def expr(a):
             | ("bitxor", *s)
         ):
             print("Etc." + a[0])
-            pargs(s)
+            pargs(env, s)
         case "apply", f, s:
             fref(f)
             print(".apply(")
-            expr(s)
+            expr(env, s)
             print(")")
         case "=", x, y:
             print(x + "=")
-            expr(y)
+            expr(env, y)
         case "stdout":
             print("System.out")
         case "stderr":
@@ -806,27 +807,31 @@ def expr(a):
                 match s[-1]:
                     case "@", t:
                         print("Etc.cons")
-                        pargs(s[:-1] + [t])
+                        pargs(env, s[:-1] + [t])
                         return
             print("List.of")
-            pargs(s)
+            pargs(env, s)
         case f, g, *s:
-            fref(f)
+            # TODO eliminate?
+            fref(env, f)
             print(".apply(List.of(")
             if f in hofs:
-                fref(g)
+                fref(env, g)
             else:
-                expr(g)
+                expr(env, g)
             for x in s:
                 print(",")
-                expr(x)
+                expr(env, x)
             print("))")
         case f, *s:
-            fref(f)
+            fref(env, f)
             print(".apply(List.of")
-            pargs(s)
+            pargs(env, s)
             print(")")
         case _:
+            if a in env:
+                fref(env, a)
+                return
             print(a)
 
 
@@ -841,7 +846,7 @@ def isrest(s):
 def tmp(a):
     r = gensym()
     print(f"Object {r} = ")
-    expr(a)
+    expr(env, a)
     print(";")
     return r
 
@@ -849,15 +854,15 @@ def tmp(a):
 def checkcase(label, pattern, x):
     if isinstance(pattern, int):
         print("if (!Objects.equals(")
-        expr(x)
+        expr(env, x)
         print(f", {pattern})) break {label};")
         return
     match pattern:
         case "intern", ("List.of", *_):
             print("if (!Objects.equals(")
-            expr(x)
+            expr(env, x)
             print(",")
-            expr(pattern)
+            expr(env, pattern)
             print(f")) break {label};")
         case "List.of", *s:
             x = tmp(x)
@@ -877,7 +882,7 @@ def checkcase(label, pattern, x):
 
 def assignconst(pattern, x):
     print("assert Objects.equals")
-    pargs((pattern, x))
+    pargs(env, (pattern, x))
     print(";")
 
 
@@ -903,11 +908,11 @@ def assign(pattern, x):
             0
         case "i" | "j" | "k":
             print(pattern + "= (int)")
-            expr(x)
+            expr(env, x)
             print(";")
         case _:
             print(pattern + "=")
-            expr(x)
+            expr(env, x)
             print(";")
 
 
@@ -916,7 +921,7 @@ currentline = 0
 currentfname = 0
 
 
-def stmt(a):
+def stmt(env, a):
     global currentfile
     global currentline
     global currentfname
@@ -924,69 +929,69 @@ def stmt(a):
         case "<<", x, y:
             print(x + "=")
             print("Etc.cat1")
-            pargs((x, y))
+            pargs(env, (x, y))
             print(";")
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             print(x + "=")
-            expr((a[0][0], x, y))
+            expr(env, (a[0][0], x, y))
             print(";")
         case "for", x, s, *body:
             print(f"for (var {x}: (List)")
-            expr(s)
+            expr(env, s)
             print(") {")
-            each(stmt, body)
+            stmts(env, body)
             print("}")
         case "while", test, *body:
             print("while (")
-            truth(test)
+            truth(env, test)
             print(") {")
-            each(stmt, body)
+            stmts(env, body)
             print("}")
         case "dowhile", test, *body:
             print("do {")
-            each(stmt, body)
+            stmts(env, body)
             print("} while (")
-            truth(test)
+            truth(env, test)
             print(");")
         case "if", test, yes, no:
             print("if (")
-            truth(test)
+            truth(env, test)
             print(") {")
-            each(stmt, yes)
+            stmts(env, yes)
             print("} else {")
-            each(stmt, no)
+            stmts(env, no)
             print("}")
         case "if", test, yes:
             print("if (")
-            truth(test)
+            truth(env, test)
             print(") {")
-            each(stmt, yes)
+            stmts(env, yes)
             print("}")
         case "show", file, line, fname, name, val:
             fname = fname.replace("\\", "\\\\")
             print(f'Etc.show("{file}", {line}, "{fname}", "{name}",')
-            expr(val)
+            expr(env, val)
             print(");")
         case "assert", file, line, fname, name, test:
             fname = fname.replace("\\", "\\\\")
             print("if (!")
-            truth(test)
+            truth(env, test)
             print(
                 f') throw new RuntimeException("{file}:{line}: {fname}: {name}: assert failed");'
             )
         case "throw", x:
             print("throw new RuntimeException(Etc.decode(")
-            expr(x)
+            expr(env, x)
             print("));")
         case "{", *s:
             print("{")
-            each(stmt, s)
+            stmts(env, s)
             print("}")
         case "^", x:
             ret(x)
         case ("break", x) | ("continue", x):
             print(a[0])
-            expr(x)
+            expr(env, x)
             print(";")
         case ".loc", file, line, fname:
             currentfile = file
@@ -995,7 +1000,7 @@ def stmt(a):
             print(f"// {file}:{line}: {fname}")
         case ":", label, loop:
             print(label + ":")
-            stmt(loop)
+            stmt(env, loop)
         case "case", x, *cases:
             outerLabel = gensym()
             print(outerLabel + ": do {")
@@ -1005,7 +1010,7 @@ def stmt(a):
                 print(innerLabel + ": do {")
                 checkcase(innerLabel, pattern, x)
                 assign(pattern, x)
-                each(stmt, body)
+                stmts(env, body)
                 match body[-1]:
                     # unadorned continue will cause the Java compiler
                     # to generate an unreachable statement error
@@ -1027,15 +1032,20 @@ def stmt(a):
         case "tron", *s:
             print("Etc.depth = 0;")
             print("Etc.tracing = Set.of")
-            pargs(f'"{x}"' for x in s)
+            pargs(env, (f'"{x}"' for x in s))
             print(";")
         case "troff":
             print("Etc.tracing = null;")
         case 0:
             print(";")
         case _:
-            expr(a)
+            expr(env, a)
             print(";")
+
+
+def stmts(env, s):
+    for a in s:
+        stmt(env, a)
 
 
 # variables
@@ -1076,22 +1086,29 @@ def localvars(params, body, static=0):
 
 
 # functions
+def getfns(env, s):
+    for a in s:
+        match a:
+            case "fn", name, *_:
+                env.add(name)
+
+
 globals1 = set()
-for a in modules["global"]:
-    match a:
-        case "fn", name, params, *body:
-            globals1.add(name)
+getfns(globals1, modules["global"])
 
 
-def fbody(fname, params, body):
+def fbody(env, fname, params, body):
     (_, file, line, _), *body = body
 
     # local functions
+    env = set(env)
+    getfns(env, body)
+
     r = []
     for a in body:
         match a:
             case "fn", fname1, params1, *body1:
-                fn(fname1, params1, body1)
+                fn(env, fname1, params1, body1)
             case _:
                 r.append(a)
     body = r
@@ -1112,17 +1129,17 @@ def fbody(fname, params, body):
     print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(params[i], f"_args.get({i})")
-    each(stmt, body)
+    stmts(env, body)
     print("}")
 
     print("}")
 
 
-def fref(a):
+def fref(env, a):
     match a:
         case "\\", params, *body:
             print("new Function<List<Object>, Object>() {")
-            fbody("\\\\", params, body)
+            fbody(env, "\\\\", params, body)
         case [*_]:
             raise Exception(a)
         case _:
@@ -1135,11 +1152,11 @@ def fref(a):
             print(f"new {a}()")
 
 
-def fn(fname, params, body):
+def fn(env, fname, params, body):
     _, file, line, _ = body[0]
     print(f"// {file}:{line}")
     print(f"class {fname} implements Function<List<Object>, Object> {{")
-    fbody(fname, params, body)
+    fbody(env, fname, params, body)
 
 
 def ret(a):
@@ -1155,12 +1172,15 @@ for modname, module in modules.items():
     print(f"class {modname} {{")
 
     # functions
+    env = set(globals1)
+    getfns(env, module)
+
     r = []
     for a in module:
         match a:
             case "fn", fname, params, *body:
                 print("static")
-                fn(fname, params, body)
+                fn(env, fname, params, body)
             case _:
                 r.append(a)
     module = r
@@ -1174,7 +1194,7 @@ for modname, module in modules.items():
         for name in modules:
             if name != "program":
                 print(name + ".run();")
-    each(stmt, module)
+    stmts(env, module)
     print("}")
 
     print("}")
