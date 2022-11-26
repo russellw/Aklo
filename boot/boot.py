@@ -694,15 +694,6 @@ def truth(env, a):
     print(")")
 
 
-# TODO eliminate?
-hofs = set()
-for name, module in modules.items():
-    for a in module:
-        match a:
-            case "fn", fname, ["f", *_], *_:
-                hofs.add(fname)
-
-
 def expr(env, a):
     match a:
         case "ctreadfiles", dir1:
@@ -811,18 +802,6 @@ def expr(env, a):
                         return
             print("List.of")
             pargs(env, s)
-        case f, g, *s:
-            # TODO eliminate?
-            fref(env, f)
-            print(".apply(List.of(")
-            if f in hofs:
-                fref(env, g)
-            else:
-                expr(env, g)
-            for x in s:
-                print(",")
-                expr(env, x)
-            print("))")
         case f, *s:
             fref(env, f)
             print(".apply(List.of")
@@ -843,7 +822,7 @@ def isrest(s):
                 return 1
 
 
-def tmp(a):
+def tmp(env, a):
     r = gensym()
     print(f"Object {r} = ")
     expr(env, a)
@@ -851,7 +830,7 @@ def tmp(a):
     return r
 
 
-def checkcase(label, pattern, x):
+def checkcase(env, label, pattern, x):
     if isinstance(pattern, int):
         print("if (!Objects.equals(")
         expr(env, x)
@@ -865,45 +844,45 @@ def checkcase(label, pattern, x):
             expr(env, pattern)
             print(f")) break {label};")
         case "List.of", *s:
-            x = tmp(x)
+            x = tmp(env, x)
             print(f"if (!({x} instanceof List)) break {label};")
             if isrest(s):
                 n = len(s) - 1
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
-                    checkcase(label, s[i], ("subscript", x, i))
-                checkcase(label, s[n][1], ("drop", n, x))
+                    checkcase(env, label, s[i], ("subscript", x, i))
+                checkcase(env, label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
             for i in range(n):
-                checkcase(label, s[i], ("subscript", x, i))
+                checkcase(env, label, s[i], ("subscript", x, i))
 
 
-def assignconst(pattern, x):
+def assignconst(env, pattern, x):
     print("assert Objects.equals")
     pargs(env, (pattern, x))
     print(";")
 
 
-def assign(pattern, x):
+def assign(env, pattern, x):
     if isinstance(pattern, int):
-        assignconst(pattern, x)
+        assignconst(env, pattern, x)
         return
     match pattern:
         case "intern", ("List.of", *_):
-            assignconst(pattern, x)
+            assignconst(env, pattern, x)
         case "List.of", *s:
-            x = tmp(x)
+            x = tmp(env, x)
             if isrest(s):
                 n = len(s) - 1
                 for i in range(n):
-                    assign(s[i], ("subscript", x, i))
-                assign(s[n][1], ("drop", n, x))
+                    assign(env, s[i], ("subscript", x, i))
+                assign(env, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             for i in range(n):
-                assign(s[i], ("subscript", x, i))
+                assign(env, s[i], ("subscript", x, i))
         case "_":
             0
         case "i" | "j" | "k":
@@ -988,7 +967,7 @@ def stmt(env, a):
             stmts(env, s)
             print("}")
         case "^", x:
-            ret(x)
+            ret(env, x)
         case ("break", x) | ("continue", x):
             print(a[0])
             expr(env, x)
@@ -1004,12 +983,12 @@ def stmt(env, a):
         case "case", x, *cases:
             outerLabel = gensym()
             print(outerLabel + ": do {")
-            x = tmp(x)
+            x = tmp(env, x)
             for pattern, *body in cases:
                 innerLabel = gensym()
                 print(innerLabel + ": do {")
-                checkcase(innerLabel, pattern, x)
-                assign(pattern, x)
+                checkcase(env, innerLabel, pattern, x)
+                assign(env, pattern, x)
                 stmts(env, body)
                 match body[-1]:
                     # unadorned continue will cause the Java compiler
@@ -1024,7 +1003,7 @@ def stmt(env, a):
                 print("} while (false);")
             print("} while (false);")
         case ("=", pattern, x) | (":=", pattern, x):
-            assign(pattern, x)
+            assign(env, pattern, x)
         case ("++", x) | ("post++", x):
             print(f"{x} = Etc.add({x}, 1);")
         case ("--", x) | ("post--", x):
@@ -1128,7 +1107,7 @@ def fbody(env, fname, params, body):
     print(f'Etc.enter("{file}", {line}, "{fname}", _args);')
     print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
-        assign(params[i], f"_args.get({i})")
+        assign(env, params[i], f"_args.get({i})")
     stmts(env, body)
     print("}")
 
@@ -1159,9 +1138,9 @@ def fn(env, fname, params, body):
     fbody(env, fname, params, body)
 
 
-def ret(a):
+def ret(env, a):
     fname = currentfname.replace("\\", "\\\\")
-    a = tmp(a)
+    a = tmp(env, a)
     print(f'Etc.leave("{currentfile}", {currentline}, "{fname}", {a});')
     print(f"return {a};")
 
@@ -1172,15 +1151,15 @@ for modname, module in modules.items():
     print(f"class {modname} {{")
 
     # functions
-    env = set(globals1)
-    getfns(env, module)
+    env1 = set(globals1)
+    getfns(env1, module)
 
     r = []
     for a in module:
         match a:
             case "fn", fname, params, *body:
                 print("static")
-                fn(env, fname, params, body)
+                fn(env1, fname, params, body)
             case _:
                 r.append(a)
     module = r
@@ -1194,7 +1173,7 @@ for modname, module in modules.items():
         for name in modules:
             if name != "program":
                 print(name + ".run();")
-    stmts(env, module)
+    stmts(env1, module)
     print("}")
 
     print("}")
