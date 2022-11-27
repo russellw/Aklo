@@ -123,18 +123,16 @@ fn localvars params ,body
 fn norm modules
 	;generate explicit variable declarations
 	modules=mapsecond(
-		\(module)(
-			^mapfns(
-				\(params,body)(
-					s=[]
-					for x  :localvars(params,body)
-						s<<'var',x
-					^s@body
-				)
-				[]
-				module
+		\(module)(mapfns(
+			\(params,body)(
+				s=[]
+				for x  :localvars(params,body)
+					s<<'var',x
+				^s@body
 			)
-		)
+			[]
+			module
+		))
 		modules
 	)
 	show modules[0]
