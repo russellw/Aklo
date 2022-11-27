@@ -2,8 +2,29 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
+fn mapfns( f,params,body)
+	fn rec a
+		case a
+			'fn',name,params,rtype,@body
+				body= mapfns( f,params,body)
+				^'fn',name,params,rtype,@body
+			'\\',params,@body
+				body= mapfns( f,params,body)
+				^'\\',params,@body
+			'.quote',_
+				;leaf node
+				0
+			[@_]
+				;branch node
+				^map(rec,a)
+		;leaf node
+		^a
+
+	body=rec(body)
+	^f(params,body)
+
 proceed=gensym("proceed")
-fn mapterm f,loc,a
+fn mapterms f,loc,a
 	fn rec a
 		case a
 			'.loc',@loc1
@@ -29,6 +50,7 @@ fn mapterm f,loc,a
 
 	^rec(a)
 
+;generate explicit variable declarations
 fn localvars params ,body
 	nonlocals=[]
 	locals=keys(params)
@@ -45,10 +67,10 @@ fn localvars params ,body
 						err(loc,str(x)@" assigned both nonlocally and locally")
 					locals<<x
 
-	mapterm(
+	mapterms(
 		\(loc,a)(
 			fn lhs(f,a)
-				mapterm(
+				mapterms(
 					\(loc,a)(
 						case a
 							'.quote',_
@@ -68,6 +90,7 @@ fn localvars params ,body
 				)
 
 			case a
+				;TODO case
 				'var',x,@_
 					addlocal(x)
 				'=',x,_
@@ -81,10 +104,23 @@ fn localvars params ,body
 	)
 	^uniq(locals)
 
+fn explicitvars module
+	^mapfns(
+		\(params,body)(
+			s=[]
+			for x  :localvars(params,body)
+				s<<'var',x
+			^s@body
+		)
+		[]
+		module
+	)
+
+;rename local variables and functions to unique symbols
 fn localfns body
 	'.loc',@loc=body[0]
 	r=[]
-	mapterm(
+	mapterms(
 		\(loc,a)(
 			case a
 				'fn',name,@_
@@ -98,7 +134,6 @@ fn localfns body
 	)
 	^r
 
-;rename local variables and functions to unique symbols
 fn renlocals module
 	fn renfn(env,name,params,rtype,body)
 		^name,params,rtype,@body
@@ -108,5 +143,7 @@ fn renlocals module
 	^module
 
 fn norm modules
-	modules=mapsecond(renlocals,modules)
+	modules=mapsecond(explicitvars,modules)
+	show modules[0]
+	;modules=mapsecond(renlocals,modules)
 	^modules
