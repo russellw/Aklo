@@ -50,6 +50,7 @@ fn mapterms f,loc,a
 
 	^rec(a)
 
+;----------------------------------------------------------------------
 ;generate explicit variable declarations
 fn localvars params ,body
 	nonlocals=[]
@@ -116,6 +117,7 @@ fn explicitvars module
 		module
 	)
 
+;----------------------------------------------------------------------
 ;rename local variables and functions to unique symbols
 fn localfns body
 	'.loc',@loc=body[0]
@@ -142,6 +144,8 @@ fn renlocals module
 	show localfns(module)
 	^module
 
+;----------------------------------------------------------------------
+; Convert a program to internal representation
 fn norm modules
 	modules=mapsecond(explicitvars,modules)
 	show modules[0]
