@@ -1,6 +1,23 @@
+proceed=gensym("proceed")
 fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
+fn localfns body
+	'.loc',@loc=body[0]
+	r=[]
+	mapterms(
+		\(loc,a)(
+			case a
+				'fn',name,@_
+					if in(name,r)
+						err(loc,str(name)@" defined twice")
+					r<<name
+			^proceed
+		)
+		loc
+		body
+	)
+	^r
 
 fn mapfns( f,params,body)
 	fn rec a
@@ -23,7 +40,6 @@ fn mapfns( f,params,body)
 	body=rec(body)
 	^f(params,body)
 
-proceed=gensym("proceed")
 fn mapterms f,loc,a
 	fn rec a
 		case a
@@ -50,8 +66,6 @@ fn mapterms f,loc,a
 
 	^rec(a)
 
-;----------------------------------------------------------------------
-;generate explicit variable declarations
 fn localvars params ,body
 	nonlocals=[]
 	locals=keys(params)
@@ -82,6 +96,7 @@ fn localvars params ,body
 							[@_]
 								err(loc,"invalid assignment")
 							_
+								;TODO check keywords e.g. '.list'
 								if sym?(a)
 									f(loc,a)
 						^proceed
@@ -105,49 +120,34 @@ fn localvars params ,body
 	)
 	^uniq(locals)
 
-fn explicitvars module
-	^mapfns(
-		\(params,body)(
-			s=[]
-			for x  :localvars(params,body)
-				s<<'var',x
-			^s@body
-		)
-		[]
-		module
-	)
-
-;----------------------------------------------------------------------
-;rename local variables and functions to unique symbols
-fn localfns body
-	'.loc',@loc=body[0]
-	r=[]
-	mapterms(
-		\(loc,a)(
-			case a
-				'fn',name,@_
-					if in(name,r)
-						err(loc,str(name)@" defined twice")
-					r<<name
-			^proceed
-		)
-		loc
-		body
-	)
-	^r
-
-fn renlocals module
-	fn renfn(env,name,params,rtype,body)
-		^name,params,rtype,@body
-
-	show localvars([],module)
-	show localfns(module)
-	^module
-
-;----------------------------------------------------------------------
-; Convert a program to internal representation
 fn norm modules
-	modules=mapsecond(explicitvars,modules)
+	;generate explicit variable declarations
+	modules=mapsecond(
+		\(module)(
+			^mapfns(
+				\(params,body)(
+					s=[]
+					for x  :localvars(params,body)
+						s<<'var',x
+					^s@body
+				)
+				[]
+				module
+			)
+		)
+		modules
+	)
 	show modules[0]
+
+	;rename local variables and functions to unique symbols
+	fn renlocals module
+		fn renfn(env,name,params,rtype,body)
+			^name,params,rtype,@body
+
+		show localvars([],module)
+		show localfns(module)
+		^module
+
 	;modules=mapsecond(renlocals,modules)
+
 	^modules
