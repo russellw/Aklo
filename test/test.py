@@ -16,7 +16,7 @@ def do(file):
         s = s.strip()
         m = re.match(r";\s*ERR\s+(.*)", s)
         if m:
-            if m[1] in stderr:
+            if m[1] in stderr and p.returncode:
                 return
             raise Exception(stderr)
     if stderr:
