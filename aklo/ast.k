@@ -66,66 +66,64 @@ fn mapterms f,loc,a
 
 	^rec(a)
 
-fn localvars params ,body
-	nonlocals=[]
-	locals=keys(params)
-	'loc',@loc=body[0]
-
-	fn addnonlocal(loc,x)
-					if in(x,locals)
-						err(loc,str(x)@" assigned both nonlocally and locally")
-					nonlocals<<x
-
-
-	fn addlocal(loc,x)
-					if in(x,nonlocals)
-						err(loc,str(x)@" assigned both nonlocally and locally")
-					locals<<x
-
-	mapterms(
-		\(loc,a)(
-			fn lhs(f,a)
-				mapterms(
-					\(loc,a)(
-						case a
-							'quote',_
-								^0
-							'@',_
-							'list',@_
-								0
-							[@_]
-								err(loc,"invalid assignment")
-							_
-								if sym?(a)
-									f(loc,a)
-						^proceed
-					)
-					loc
-					a
-				)
-
-			case a
-				'var',x,@_
-					addlocal(x)
-				'when',x
-				'=',x,_
-					lhs(addlocal,x)
-				':=',x,_
-					lhs(addnonlocal,x)
-			^proceed
-		)
-		loc
-		body
-	)
-	^uniq(locals)
 
 fn norm modules
 	;generate explicit variable declarations
 	modules=mapsecond(
 		\(module)(mapfns(
 			\(params,body)(
+				nonlocals=[]
+				locals=keys(params)
+				'loc',@loc=body[0]
+
+				fn addnonlocal(loc,x)
+								if in(x,locals)
+									err(loc,str(x)@" assigned both nonlocally and locally")
+								nonlocals<<x
+
+
+				fn addlocal(loc,x)
+								if in(x,nonlocals)
+									err(loc,str(x)@" assigned both nonlocally and locally")
+								locals<<x
+
+				mapterms(
+					\(loc,a)(
+						fn lhs(f,a)
+							mapterms(
+								\(loc,a)(
+									case a
+										'quote',_
+											^0
+										'@',_
+										'list',@_
+											0
+										[@_]
+											err(loc,"invalid assignment")
+										_
+											if sym?(a)
+												f(loc,a)
+									^proceed
+								)
+								loc
+								a
+							)
+
+						case a
+							'var',x,@_
+								addlocal(x)
+							'when',x
+							'=',x,_
+								lhs(addlocal,x)
+							':=',x,_
+								lhs(addnonlocal,x)
+						^proceed
+					)
+					loc
+					body
+				)
 				s=[]
-				for x  :localvars(params,body)
+				for x  :uniq(locals)
 					s<<'var',x
 				^s@body
 			)
@@ -141,7 +139,6 @@ fn norm modules
 		fn renfn(env,name,params,rtype,body)
 			^name,params,rtype,@body
 
-		show localvars([],module)
 		show localfns(module)
 		^module
 
