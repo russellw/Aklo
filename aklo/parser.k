@@ -374,11 +374,11 @@ fn parse  file,text
 
 				;body
 				expect("(")
-				r<<('loc',file,line1,'\\')
+				r<<('loc',file,line1,"\\")
 				if eat(".indent")
 					while !eat( ".dedent")
-						r<<('loc',file,line,'\\')
-						r<<stmt('\\')
+						r<<('loc',file,line,"\\")
+						r<<stmt("\\")
 				else
 					r<<'^',commas()
 				expect(")")
@@ -550,8 +550,8 @@ fn parse  file,text
 				lex()
 
 				;name
-				fname=word()
-				r<<fname
+				fname=tok
+				r<<word()
 
 				;parameters
 				r<<params()
