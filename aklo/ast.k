@@ -119,12 +119,13 @@ fn norm modules
 	show modules[0]
 
 	;check for inconsistent declarations
-	mapsecond(
-		\(module)(mapfns(
+	for module:vals(modules)
+		mapfns(
 			\(params,body)(
+				'loc',@loc=body[0]
 				nonlocals=[]
 				locals=keys(params)
-				'loc',@loc=body[0]
+				fns=[]
 
 				fn addnonlocal(loc,x)
 								if in(x,locals)
@@ -139,49 +140,38 @@ fn norm modules
 
 				mapterms(
 					\(loc,a)(
-						fn lhs(f,a)
-							mapterms(
-								\(loc,a)(
-									case a
-										'quote',_
-											^0
-										'@',_
-										'list',@_
-											0
-										[@_]
-											err(loc,"invalid assignment")
-										_
-											if sym?(a)
-												f(loc,a)
-									^proceed
-								)
-								loc
-								a
-							)
-
 						case a
 							'var',x,@_
 								addlocal(loc,x)
-							'when',x
-							'=',x,_
-								lhs(addlocal,x)
 							':=',x,_
-								lhs(addnonlocal,x)
+								mapterms(
+									\(loc,a)(
+										case a
+											'quote',_
+												^0
+											'@',_
+											'list',@_
+												0
+											[@_]
+												err(loc,"invalid assignment")
+											_
+												if sym?(a)
+													addnonlocal(loc,a)
+										^proceed
+									)
+									loc
+									x
+								)
 						^proceed
 					)
 					loc
 					body
 				)
-				s=[]
-				for x  :uniq(locals)
-					s<<'var',x
-				^s@body
+				^[]
 			)
 			[]
 			module
-		))
-		modules
-	)
+		)
 
 	;rename local variables and functions to unique symbols
 	fn renlocals module
