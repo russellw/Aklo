@@ -3,6 +3,12 @@ import re
 import subprocess
 
 
+def search1(p, ss):
+    for s in ss:
+        if re.search(p, s):
+            return 1
+
+
 def do(file):
     print(file)
     cmd = "java", "-ea", "a.java", file, r"C:\aklo\aklo"
@@ -16,7 +22,7 @@ def do(file):
         s = s.strip()
         m = re.match(r";\s*ERR\s+(.*)", s)
         if m:
-            if m[1] in stderr and p.returncode:
+            if search1(m[1], stderr.splitlines()) and p.returncode:
                 return
             raise Exception(stderr)
     if stderr:
