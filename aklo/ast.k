@@ -117,7 +117,6 @@ fn norm modules
 		))
 		modules
 	)
-	show modules[0]
 
 	;check for inconsistent declarations
 	for module:vals(modules)
@@ -176,6 +175,37 @@ fn norm modules
 			[]
 			module
 		)
+
+	;Hoist declarations to start
+	show modules[0]
+	modules=mapsecond(
+		\(module)(mapfns(
+			\(params,body)(
+				'loc',@loc=body[0]
+				vars=[]
+				fns=[]
+				body=mapterms(
+					\(loc,a)(
+						case a
+							'var',@_
+								vars<<a
+								^0
+							'fn',@_
+								fns<<a
+								^0
+						^proceed
+					)
+					loc
+					body
+				)
+				^[body[0]]@vars@fns@tail(body)
+			)
+			[]
+			module
+		))
+		modules
+	)
+	show modules[0]
 
 	;rename local variables and functions to unique symbols
 	fn renlocals module
