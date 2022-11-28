@@ -72,48 +72,43 @@ fn norm modules
 	modules=mapsecond(
 		\(module)(mapfns(
 			\(params,body)(
-				locals=keys(params)
 				'loc',@loc=body[0]
-
-				fn addlocal(loc,x)
-								locals<<x
-
+				explicit=keys(params)
+				implicit=[]
 				mapterms(
 					\(loc,a)(
-						fn lhs(f,a)
-							mapterms(
-								\(loc,a)(
-									case a
-										'quote',_
-											^0
-										'@',_
-										'list',@_
-											0
-										[@_]
-											err(loc,"invalid assignment")
-										_
-											if sym?(a)
-												f(loc,a)
-									^proceed
-								)
-								loc
-								a
-							)
-
 						case a
 							'var',x,@_
-								addlocal(loc,x)
+								explicit<<x
 							'when',x
 							'=',x,_
-								lhs(addlocal,x)
+								mapterms(
+									\(loc,a)(
+										case a
+											'quote',_
+												^0
+											'@',_
+											'list',@_
+												0
+											[@_]
+												err(loc,"invalid assignment")
+											_
+												if sym?(a)
+													implicit<<a
+										^proceed
+									)
+									loc
+									x
+								)
 						^proceed
 					)
 					loc
 					body
 				)
 				s=[]
-				for x  :uniq(locals)
-					s<<'var',x
+				for x  :uniq(implicit)
+					if!in(x,explicit)
+						s<<'var',x
 				^[body[0]]@s@tail(body)
 			)
 			[]
