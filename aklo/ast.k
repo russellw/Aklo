@@ -3,7 +3,7 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 fn localfns body
-	'.loc',@loc=body[0]
+	'loc',@loc=body[0]
 	r=[]
 	mapterms(
 		\(loc,a)(
@@ -28,7 +28,7 @@ fn mapfns( f,params,body)
 			'\\',params,@body
 				body= mapfns( f,params,body)
 				^'\\',params,@body
-			'.quote',_
+			'quote',_
 				;leaf node
 				0
 			[@_]
@@ -43,19 +43,19 @@ fn mapfns( f,params,body)
 fn mapterms f,loc,a
 	fn rec a
 		case a
-			'.loc',@loc1
+			'loc',@loc1
 				loc:=loc1
 				^a
 			'fn',@_
 			'\\',@_
-			'.quote',_
+			'quote',_
 				;leaf node
 				0
-			[@_]
+			[op,@s]
 				b=f(loc,a)
 				if b==proceed
 					;branch node
-					^map(rec,a)
+					^op,@map(rec,s)
 				;leaf node
 				^b
 		;leaf node
@@ -69,7 +69,7 @@ fn mapterms f,loc,a
 fn localvars params ,body
 	nonlocals=[]
 	locals=keys(params)
-	'.loc',@loc=body[0]
+	'loc',@loc=body[0]
 
 	fn addnonlocal(loc,x)
 					if in(x,locals)
@@ -88,15 +88,14 @@ fn localvars params ,body
 				mapterms(
 					\(loc,a)(
 						case a
-							'.quote',_
+							'quote',_
 								^0
 							'@',_
-							'.list',@_
+							'list',@_
 								0
 							[@_]
 								err(loc,"invalid assignment")
 							_
-								;TODO check keywords e.g. '.list'
 								if sym?(a)
 									f(loc,a)
 						^proceed

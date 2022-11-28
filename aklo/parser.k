@@ -210,17 +210,17 @@ fn parse  file,text
 			^1
 		^idstart? (tok[0])
 
-	fn ptype
+	fn type1
 		if!type?()
 			errtok("expected type")
 		if tok=="&"
-			^lex1(),ptype()
+			^lex1(),type1()
 		^word()
 
-	fn otype
+	fn optionaltype
 		if !type?()
 			^'any'
-		^ptype()
+		^type1()
 
 	; expressions
 	fn primary()
@@ -228,19 +228,19 @@ fn parse  file,text
 		if startswith(tok,"'")
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
-			^ '.quote',intern(s)
+			^ 'quote',intern(s)
 
 		; string
 		if startswith(tok,"\"")
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
-			^'.list',@s
+			^'list',@s
 
 		; raw string
 		if startswith(tok,"r\"")
 			s = slice(tok,2,len(tok)-1)
 			lex()
-			^'.list',@s
+			^'list',@s
 
 		; word
 		case tok
@@ -276,7 +276,7 @@ fn parse  file,text
 
 		; list
 		if eat("[")
-			r =  ['.list']
+			r =  ['list']
 			if eat(".indent")
 				while ! eat(".dedent")
 					r<<commas()
@@ -299,7 +299,7 @@ fn parse  file,text
 			case tok
 				"("
 					lex()
-					a = [a]
+					a = 'call',a
 					if eat(".indent")
 						while ! eat(".dedent")
 							a<<commas()
@@ -313,7 +313,7 @@ fn parse  file,text
 						expect(",")
 				"["
 					lex()
-					a='.subscript',a,expr()
+					a='subscript',a,expr()
 					expect("]")
 				"++"
 				"--"
@@ -326,7 +326,7 @@ fn parse  file,text
 					^ a
 
 	fn param()
-		^word(),otype()
+		^word(),optionaltype()
 
 	fn params()
 		r = []
@@ -374,10 +374,10 @@ fn parse  file,text
 
 				;body
 				expect("(")
-				r<<('.loc',file,line1,'\\')
+				r<<('loc',file,line1,'\\')
 				if eat(".indent")
 					while !eat( ".dedent")
-						r<<('.loc',file,line,'\\')
+						r<<('loc',file,line,'\\')
 						r<<stmt('\\')
 				else
 					r<<'^',commas()
@@ -446,13 +446,12 @@ fn parse  file,text
 		a = expr()
 		if tok != ","
 			^ a
-		r = ['.list', a]
+		r = ['list', a]
 		while eat(",")
 					r<<expr()
 		^ r
 
 	fn assignment()
-		;TODO clear error message if the left-hand side is not assignable
 		a = commas()
 		case tok
 			"="
@@ -471,7 +470,7 @@ fn parse  file,text
 			;an early pass will mangle function names
 			; so we need to keep track of the original function names for debugging
 			; the easiest place to do it is alongside the filename and line number
-			r<<('.loc',file,line,fname)
+			r<<('loc',file,line,fname)
 			r<<stmt(fname)
 		^ r
 
@@ -479,13 +478,13 @@ fn parse  file,text
 		assert  in(tok, ("if", "elif"))
 		lex()
 		r = ['if', expr()]
-		r<<block(fname)
+		r<<'do',@block(fname)
 		case tok
 			"elif"
-				r<<[if1(fname)]
+				r<<if1(fname)
 			"else"
 				lex()
-				r<<block(fname)
+				r<<'do',@block(fname)
 		^ r
 
 	fn stmt(fname)
@@ -510,11 +509,9 @@ fn parse  file,text
 				r<<commas()
 				expect(".indent")
 				while ! eat(".dedent")
-					patterns = [commas()]
-					while eat("\n")
-						patterns<<commas()
-					body = block(fname)
-					r<<(patterns, @body)
+					dowhile eat("\n")
+						r<<'when',commas()
+					r<<('do', @block(fname))
 				^ r
 			"dowhile"
 			"while"
@@ -537,10 +534,10 @@ fn parse  file,text
 				r<<word()
 
 				;type
-				r<<otype()
+				r<<optionaltype()
 
 				;location
-				r<<('.loc',file,line1,fname)
+				r<<('loc',file,line1,fname)
 
 				;initial value
 				if eat( "=")
@@ -560,15 +557,15 @@ fn parse  file,text
 				r<<params()
 
 				;return type
-				r<<otype()
+				r<<optionaltype()
 
 				;location
-				r<<('.loc',file,line1,fname)
+				r<<('loc',file,line1,fname)
 
 				;body
 				expect(".indent")
 				while !eat( ".dedent")
-					r<<('.loc',file,line,fname)
+					r<<('loc',file,line,fname)
 					r<<stmt(fname)
 
 				^ r
@@ -598,7 +595,7 @@ fn parse  file,text
 			"continue"
 				lex()
 				if eat("\n")
-					^r[0]
+					^r
 				r<<word()
 				expect("\n")
 				^ r
@@ -619,7 +616,7 @@ fn parse  file,text
 	;TODO include these in the module
 	fname="global"
 	while eat("import")
-		r<<('.loc',file,line,fname)
+		r<<('loc',file,line,fname)
 		q=['import']
 		dowhile eat(",")
 			q<< word()
@@ -628,6 +625,6 @@ fn parse  file,text
 
 	; module
 	while tok != ".dedent"
-		r<<('.loc',file,line,fname)
+		r<<('loc',file,line,fname)
 		r<<stmt(fname)
 	^ r
