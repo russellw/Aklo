@@ -105,9 +105,9 @@ fn localvars params ,body
 				)
 
 			case a
-				;TODO case
 				'var',x,@_
 					addlocal(x)
+				'when',x
 				'=',x,_
 					lhs(addlocal,x)
 				':=',x,_
