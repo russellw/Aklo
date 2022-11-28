@@ -86,16 +86,15 @@ fn norm modules
 									\(loc,a)(
 										case a
 											'quote',_
-												^0
+												0
 											'@',_
 											'list',@_
-												0
+												^proceed
 											[@_]
 												err(loc,"invalid assignment")
 											_
 												if sym?(a)
 													implicit<<a
-										^proceed
 									)
 									loc
 									x
@@ -126,38 +125,41 @@ fn norm modules
 				nonlocals=[]
 				locals=keys(params)
 				fns=[]
-
-				fn addnonlocal(loc,x)
-								if in(x,locals)
-									err(loc,str(x)@" assigned both nonlocally and locally")
-								nonlocals<<x
-
-
-				fn addlocal(loc,x)
-								if in(x,nonlocals)
-									err(loc,str(x)@" assigned both nonlocally and locally")
-								locals<<x
-
 				mapterms(
 					\(loc,a)(
 						case a
+							'fn',x,@_
+								if in(x,nonlocals)|in(x,locals)
+									err(loc,str(x)@" is both a function and a variable")
+								if in(x,fns)
+									err(loc,str(x)@" defined twice")
+								fns<<x
 							'var',x,@_
-								addlocal(loc,x)
+								if in(x,fns)
+									err(loc,str(x)@" is both a function and a variable")
+								if in(x,nonlocals)
+									err(loc,str(x)@" is both nonlocal and local")
+								if in(x,locals)
+									err(loc,str(x)@" defined twice")
+								locals<<x
 							':=',x,_
 								mapterms(
 									\(loc,a)(
 										case a
 											'quote',_
-												^0
+												0
 											'@',_
 											'list',@_
-												0
+												^proceed
 											[@_]
 												err(loc,"invalid assignment")
 											_
 												if sym?(a)
-													addnonlocal(loc,a)
-										^proceed
+													if in(x,fns)
+														err(loc,str(x)@" is both a function and a variable")
+													if in(x,locals)
+														err(loc,str(x)@" is both nonlocal and local")
+													nonlocals<<x
 									)
 									loc
 									x
