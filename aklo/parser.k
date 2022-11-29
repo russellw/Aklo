@@ -614,7 +614,7 @@ fn parse  file,text
 	;TODO figure out syntax for incorporating e.g. C++ source Fragment files verbatim
 	;TODO figure out syntax for incorporating data files at compile time
 	;TODO include these in the module
-	fname="global"
+	fname="module"
 	while eat("import")
 		r<<('loc',file,line,fname)
 		q=['import']
