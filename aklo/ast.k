@@ -1,4 +1,17 @@
 proceed=gensym("proceed")
+fn splitdecls s
+	vars=[]
+	fns=[]
+	body=[]
+	for a:s
+		case a
+			'var',@_
+				vars<<a
+			'fn',@_
+				fns<<a
+			_
+				body<<a
+	^vars,fns,body
 fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
