@@ -658,5 +658,16 @@ assert ascii?(joindir(("foo/","bar")))
 files=keys(ctreadfiles(\(file)(endswith(file,".k")),"."))
 assert files
 
+;etc
+s=[]
+s<<1
+s<<2
+assert s==[1,2]
+
+s=[]
+1>>s
+2>>s
+assert s==[2,1]
+
 {signal that tests actually completed}
 prn("ok")

@@ -189,37 +189,37 @@ class Etc {
     return true;
   }
 
-  static void append(StringBuilder sb, String s) {
+  static void appendsb(StringBuilder sb, String s) {
     if (sb.length() >= 4096) throw new OverrunException();
     sb.append(s);
   }
 
   static void repr(Object a0, StringBuilder sb) {
     if (!(a0 instanceof List)) {
-      append(sb, a0.toString());
+      appendsb(sb, a0.toString());
       return;
     }
     var a = (List<Object>) a0;
     if (isascii(a)) {
-      append(sb, "\"");
+      appendsb(sb, "\"");
       for (var c0 : a) {
         var c = (int) c0;
         switch (c) {
-          case '\t' -> append(sb, "\\t");
-          case '\r' -> append(sb, "\\r");
-          case '\n' -> append(sb, "\\n");
-          default -> append(sb, Character.toString(c));
+          case '\t' -> appendsb(sb, "\\t");
+          case '\r' -> appendsb(sb, "\\r");
+          case '\n' -> appendsb(sb, "\\n");
+          default -> appendsb(sb, Character.toString(c));
         }
       }
-      append(sb, "\"");
+      appendsb(sb, "\"");
       return;
     }
-    append(sb, "[");
+    appendsb(sb, "[");
     for (var i = 0; i < a.size(); i++) {
-      if (i > 0) append(sb, ", ");
+      if (i > 0) appendsb(sb, ", ");
       repr(a.get(i), sb);
     }
-    append(sb, "]");
+    appendsb(sb, "]");
   }
 
   static String repr(Object a) {
@@ -282,7 +282,14 @@ class Etc {
     return r;
   }
 
-  static List<Object> cat1(Object s, Object a) {
+  static List<Object> prepend(Object a, Object s) {
+    var r = new ArrayList<>();
+    r.add(a);
+    r.addAll((List<Object>) s);
+    return r;
+  }
+
+  static List<Object> append(Object s, Object a) {
     var r = new ArrayList<>((List<Object>) s);
     r.add(a);
     return r;

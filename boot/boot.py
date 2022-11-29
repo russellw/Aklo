@@ -256,6 +256,7 @@ def parse(modname, file):
                 ">=",
                 "@=",
                 "<<",
+                ">>",
             )
             for s in punct:
                 if text[i : i + len(s)] == s:
@@ -522,7 +523,7 @@ def parse(modname, file):
         # TODO inline
         a = commas()
         match tok:
-            case "=" | "+=" | "-=" | "@=" | "<<" | ":=":
+            case "=" | "+=" | "-=" | "@=" | "<<" | ">>" | ":=":
                 return lex1(), a, commas()
         return a
 
@@ -907,7 +908,12 @@ def stmt(env, a):
     match a:
         case "<<", x, y:
             print(x + "=")
-            print("Etc.cat1")
+            print("Etc.append")
+            pargs(env, (x, y))
+            print(";")
+        case ">>", x, y:
+            print(y + "=")
+            print("Etc.prepend")
             pargs(env, (x, y))
             print(";")
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):

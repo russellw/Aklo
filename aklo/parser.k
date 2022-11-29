@@ -169,6 +169,7 @@ fn parse  file,text
 				">="
 				"@="
 				"<<"
+				">>"
 			]
 			for s  :punct
 				if slice(text,i , i + len(s)) == s
@@ -460,6 +461,7 @@ fn parse  file,text
 			"-="
 			"@="
 			"<<"
+			">>"
 				^ intern(lex1()), a, commas()
 		^ a
 
