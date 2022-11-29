@@ -382,10 +382,6 @@ assert get( a,'x')==1
 assert get (a,'y')==2
 assert get (a,'z')==0
 
-assert  a.x==1
-assert  a.y==2
-assert  a.z==0
-
 ;lambda
 f=\x,y(x+y)
 assert f(2,3)==5

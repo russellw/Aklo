@@ -47,7 +47,7 @@ fn dir names
 	;TODO: should be able to write 'for file,d?: ...'?
 	for s: listdir(joindir([root]@names))
 		file,attrs=s
-		if attrs.dir?
+		if get(attrs,'dir?')
 			dir(names@[file])
 		elif endswith(file,".k")
 			add (names ,file)

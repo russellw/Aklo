@@ -394,12 +394,7 @@ def parse(modname, file):
                 case "++" | "--":
                     return "post" + lex1(), a
                 case ".":
-                    lex()
-                    field = word()
-                    if a in modules:
-                        a += "." + field
-                    else:
-                        a = "get", a, quotesym(field)
+                    a += lex1() + word()
                     continue
             return a
 
