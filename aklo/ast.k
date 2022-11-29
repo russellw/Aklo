@@ -34,7 +34,8 @@ fn mapfns(f, g,env,params,body)
 		;leaf node
 		^a
 
-	env=f(env)
+	if f
+		env=f(env,params,body)
 	body=rec(body)
 	^g(env,params,body)
 
@@ -69,7 +70,7 @@ fn norm modules
 	;generate explicit variable declarations
 	modules=mapsecond(
 		\(module)(mapfns(
-			id
+			0
 			\(env,params,body)(
 				'loc',@loc=body[0]
 				explicit=keys(params)
@@ -121,7 +122,7 @@ fn norm modules
 	;check for inconsistent declarations
 	for module:vals(modules)
 		mapfns(
-			id
+			0
 			\(env,params,body)(
 				'loc',@loc=body[0]
 				nonlocals=[]
@@ -182,7 +183,7 @@ fn norm modules
 	show modules[0]
 	modules=mapsecond(
 		\(module)(mapfns(
-			id
+			0
 			\(env,params,body)(
 				'loc',@loc=body[0]
 				vars=[]
