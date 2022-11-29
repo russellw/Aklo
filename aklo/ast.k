@@ -2,22 +2,6 @@ proceed=gensym("proceed")
 fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
-fn localfns body
-	'loc',@loc=body[0]
-	r=[]
-	mapterms(
-		\(loc,a)(
-			case a
-				'fn',name,@_
-					if in(name,r)
-						err(loc,str(name)@" defined twice")
-					r<<name
-			^proceed
-		)
-		loc
-		body
-	)
-	^r
 
 fn mapfns( f,params,body)
 	fn rec a
@@ -208,13 +192,5 @@ fn norm modules
 	show modules[0]
 
 	;rename local variables and functions to unique symbols
-	fn renlocals module
-		fn renfn(env,name,params,rtype,body)
-			^name,params,rtype,@body
-
-		show localfns(module)
-		^module
-
-	;modules=mapsecond(renlocals,modules)
 
 	^modules
