@@ -1147,9 +1147,9 @@ for modname, module in modules.items():
 
     # body
     print("static void run() {")
-    if modname == "program":
+    if modname == "main":
         for name in modules:
-            if name != "program":
+            if name != "main":
                 print(name + ".run();")
     stmts(env1, module)
     print("}")
