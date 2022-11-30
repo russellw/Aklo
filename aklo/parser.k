@@ -610,7 +610,7 @@ fn parse  file,text
 	; top level
 	lex()
 	eat("\n")
-	fname="module"
+	fname="global"
 	r=[]
 	while tok != ".dedent"
 		r<<('loc',file,line,fname)
