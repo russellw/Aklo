@@ -180,7 +180,6 @@ fn norm modules
 		)
 
 	;Hoist declarations to start
-	show modules[0]
 	modules=mapsecond(
 		\(module)(mapfns(
 			0
@@ -210,8 +209,44 @@ fn norm modules
 		))
 		modules
 	)
-	show modules[0]
 
-	;rename local variables and functions to unique symbols
+{
+	;resolve names
+	show modules[0]
+	modules=mapsecond(
+		\(module)(mapfns(
+			\(env,params,body)(
+				vars,fns,body=splitdecls(body)
+				for name :keys(params)@vals(vars)@vals(fns)
+					name,gensym(str(name))>>env
+				^env
+			)
+			\(env,params,body)(
+				'loc',@loc=body[0]
+				;TODO need to return renamed parameters as well as body
+				^mapterms(
+					\(loc,a)(
+						;TODO type names
+						if sym?(a)
+							b=get(env,a)
+							if!b
+								err(loc,str(a)@" not found")
+							^b
+						^proceed
+					)
+					loc
+					body
+				)
+			)
+			[]
+			[]
+			module
+		))
+		modules
+	)
+	;TODO env needs to contain globals
+	;TODO deal with package dotted names
+	show modules[0]
+}
 
 	^modules
