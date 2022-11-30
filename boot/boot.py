@@ -664,7 +664,7 @@ def parse(modname, file):
     modules[modname] = r
 
 
-parse("global", f"{here}/../aklo/global.k")
+parse("ubiquitous", f"{here}/../aklo/ubiquitous.k")
 parse("program", args.file)
 
 
@@ -1073,8 +1073,8 @@ def getfns(env, s):
                 env.add(name)
 
 
-globals1 = set()
-getfns(globals1, modules["global"])
+ubiquitous = set()
+getfns(ubiquitous, modules["ubiquitous"])
 
 
 def fbody(env, fname, params, body):
@@ -1126,8 +1126,8 @@ def fref(env, a):
             if len(a) == 1:
                 print(f"((Function<List<Object>, Object>){a})")
                 return
-            if a in globals1:
-                print(f"new global.{a}()")
+            if a in ubiquitous:
+                print(f"new ubiquitous.{a}()")
                 return
             print(f"new {a}()")
 
@@ -1152,7 +1152,7 @@ for modname, module in modules.items():
     print(f"class {modname} {{")
 
     # functions
-    env1 = set(globals1)
+    env1 = set(ubiquitous)
     getfns(env1, module)
 
     r = []

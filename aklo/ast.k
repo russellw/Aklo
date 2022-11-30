@@ -244,7 +244,7 @@ fn norm modules
 		))
 		modules
 	)
-	;TODO env needs to contain globals
+	;TODO env needs to contain ubiquitous
 	;TODO deal with package dotted names
 	show modules[0]
 }
