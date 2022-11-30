@@ -36,7 +36,7 @@ fn add names ,file
 	name=replace("-","_",name)
 	text=readfile(joindir([root]@names@[file]))
 	module=parser.parse(name,text)
-	modules<<names@[name],module
+	modules<<map(intern,names@[name]),module
 
 fn dir names
 	;TODO: should be able to write 'for file,d?: ...'?

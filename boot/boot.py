@@ -784,6 +784,12 @@ def expr(env, a):
             if a in env:
                 fref(env, a)
                 return
+            match a:
+                case "intern":
+                    print(
+                        "(Function<List<Object>, Object>)(List<Object> _s) -> Sym.intern(_s.get(0))"
+                    )
+                    return
             print(a)
 
 
