@@ -610,22 +610,8 @@ fn parse  file,text
 	; top level
 	lex()
 	eat("\n")
-	r=[]
-
-	; imports
-	;TODO figure out syntax for incorporating e.g. C++ source Fragment files verbatim
-	;TODO figure out syntax for incorporating data files at compile time
-	;TODO include these in the module
 	fname="module"
-	while eat("import")
-		r<<('loc',file,line,fname)
-		q=['import']
-		dowhile eat(",")
-			q<< word()
-		expect("\n")
-		r<<q
-
-	; module
+	r=[]
 	while tok != ".dedent"
 		r<<('loc',file,line,fname)
 		r<<stmt(fname)

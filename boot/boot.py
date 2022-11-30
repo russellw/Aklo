@@ -1,13 +1,9 @@
-import argparse
 import inspect
 import os
 import subprocess
 import sys
 
-
-parser = argparse.ArgumentParser(description="Aklo bootstrap compiler")
-parser.add_argument("file")
-args = parser.parse_args()
+here = os.path.dirname(os.path.realpath(__file__))
 
 
 def each(f, s):
@@ -56,10 +52,6 @@ def gensym():
     return f"_{syms}"
 
 
-# library files need to be read from where the compiler is
-here = os.path.dirname(os.path.realpath(__file__))
-
-
 # parser
 modules = {}
 
@@ -80,12 +72,8 @@ def quotesym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
-def parse(modname, file):
-    # TODO: enforce initialization of local variables?
-    if modname in modules:
-        return
-
-    text = open(file).read()
+def parse(file):
+    text = open(f"{here}/../aklo/{file}.k").read()
     i = 0
     line = 1
 
@@ -94,11 +82,6 @@ def parse(modname, file):
     dedents = 0
 
     tok = 0
-
-    # google-java-format sometimes doesn't like comments with backslashes
-    # which will occur in Windows filenames
-    # the easiest solution is to just convert to / at the start
-    file = file.replace("\\", "/")
 
     def err(msg):
         raise Exception(f"{file}:{line}: {msg}")
@@ -314,17 +297,16 @@ def parse(modname, file):
             expect("(")
 
             # in the full language, the first argument is a filter function
-            # but in compiling the main compiler, this function can be ignored
+            # but in compiling the main compiler, this can be ignored
             # because we know it will look for *.k
             expr()
             expect(",")
 
             # the second argument is the path relative to the current source file
-            if tok[0] != '"':
-                errtok("expected string")
-            dir1 = os.path.dirname(file) + "/" + unesc(lex1()[1:-1])
+            # which will always be the main compiler source directory
+            lex()
             expect(")")
-            return "ctreadfiles", dir1
+            return "ctreadfiles", here.replace("\\", "/") + "/../aklo"
         if isidstart(tok[0]):
             return word()
 
@@ -649,23 +631,18 @@ def parse(modname, file):
     # top level
     lex()
     eat("\n")
-
-    # imports
-    while eat("import"):
-        name = word()
-        parse(name, f"{here}/../aklo/{name}.k")
-        expect("\n")
-
-    # module
     r = []
     while tok != ".dedent":
-        r.append((".loc", file, line, modname))
-        r.append(stmt(modname))
-    modules[modname] = r
+        r.append((".loc", file, line, file))
+        r.append(stmt(file))
+    modules[file] = r
 
 
-parse("ubiquitous", f"{here}/../aklo/ubiquitous.k")
-parse("program", args.file)
+for root, dirs, files in os.walk(here + "/../aklo"):
+    for file in files:
+        file, ext = os.path.splitext(file)
+        if ext == ".k":
+            parse(file)
 
 
 # output

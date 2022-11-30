@@ -15,7 +15,6 @@ else
 fn
 for
 if
-import
 throw
 var
 while

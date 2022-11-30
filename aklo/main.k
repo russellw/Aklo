@@ -1,8 +1,3 @@
-import parser
-import ast
-import cxx
-import ir
-
 ;command line
 i=0
 packages=[]
