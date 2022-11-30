@@ -210,6 +210,18 @@ fn norm modules
 		modules
 	)
 
+	;resolve global names
+	globals=[]
+	for names:keys(modules)
+		module=get(modules,names)
+		for a  :module
+						case a
+							'var',name,@_
+							'fn',name,@_
+								globals<<names@[name],gensym(str(name))
+	show globals
+
+
 {
 	;resolve names
 	show modules[0]
