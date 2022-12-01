@@ -39,9 +39,7 @@ fn add names ,file
 	modules<<map(intern,names@[name]),module
 
 fn dir names
-	;TODO: should be able to write 'for file,d?: ...'?
-	for s: listdir(joindir([root]@names))
-		file,attrs=s
+	for file,attrs: listdir(joindir([root]@names))
 		if get(attrs,'dir?')
 			dir(names@[file])
 		elif endswith(file,".k")

@@ -213,9 +213,7 @@ fn norm modules
 
 	;resolve global names
 	globals=[]
-	for names:keys(modules)
-		;TODO want to write this as for names,module:modules
-		module=get(modules,names)
+	for  names,module:modules
 		for a  :module
 						case a
 							'var',name,@_

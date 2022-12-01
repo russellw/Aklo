@@ -535,7 +535,7 @@ fn parse  file,text
 				^ r
 			"for"
 				lex()
-				r<<word()
+				r<<commas()
 				expect(":")
 				r<<commas()
 				r@=block(fname)

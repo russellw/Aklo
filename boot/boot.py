@@ -567,7 +567,7 @@ def parse(file):
                 return r
             case "for":
                 lex()
-                r.append(word())
+                r.append(commas())
                 expect(":")
                 r.append(commas())
                 r.extend(block(fname))
@@ -903,10 +903,12 @@ def stmt(env, a):
             print(x + "=")
             expr(env, (a[0][0], x, y))
             print(";")
-        case "for", x, s, *body:
+        case "for", y, s, *body:
+            x = gensym()
             print(f"for (var {x}: (List)")
             expr(env, s)
             print(") {")
+            assign(env, y, x)
             stmts(env, body)
             print("}")
         case "while", test, *body:
@@ -1034,7 +1036,7 @@ def assignedvars(params, body):
             case "case", x, *cases:
                 for pattern, *body in cases:
                     eachr(lhs, pattern)
-            case "=", x, _:
+            case ("=", x, _) | ("for", x, *_):
                 eachr(lhs, x)
 
     eachr(f, body)
@@ -1042,7 +1044,6 @@ def assignedvars(params, body):
 
 
 def localvars(params, body, static=0):
-    # TODO error check for same variable assigned with = and :=
     for a in assignedvars(params, body):
         if static:
             print("static")
