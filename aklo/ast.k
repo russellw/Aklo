@@ -254,7 +254,7 @@ fn norm modules
 		modules
 	)
 
-
+{
 	;resolve names
 	show modules[0]
 	modules=mapsecond(
@@ -290,5 +290,5 @@ fn norm modules
 	)
 	;TODO env needs to contain ubiquitous
 	show modules[0]
-
+}
 	^modules

@@ -494,3 +494,6 @@ fn mapfirst(f,s)
 
 fn mapsecond(f,s)
 	^map(\(a)(a[0],f(a[1])),s)
+
+fn str(a)
+	^str(a)
