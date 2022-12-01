@@ -82,6 +82,7 @@ fn norm modules
 						case a
 							'var',x,@_
 								explicit<<x
+							'for',x,@_
 							'when',x
 							'=',x,_
 								mapterms(
@@ -254,7 +255,6 @@ fn norm modules
 	)
 
 
-{
 	;resolve names
 	show modules[0]
 	modules=mapsecond(
@@ -289,8 +289,6 @@ fn norm modules
 		modules
 	)
 	;TODO env needs to contain ubiquitous
-	;TODO deal with package dotted names
 	show modules[0]
-}
 
 	^modules

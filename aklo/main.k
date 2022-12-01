@@ -35,7 +35,7 @@ fn add names ,file
 	name=splitext(file)[0]
 	name=replace("-","_",name)
 	text=readfile(joindir([root]@names@[file]))
-	module=parser.parse(name,text)
+	module=parser.parse(file,text)
 	modules<<map(intern,names@[name]),module
 
 fn dir names
