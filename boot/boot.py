@@ -790,6 +790,11 @@ def expr(env, a):
                         "(Function<List<Object>, Object>)(List<Object> _s) -> Sym.intern(_s.get(0))"
                     )
                     return
+                case "str":
+                    print(
+                        "(Function<List<Object>, Object>)(List<Object> _s) -> Etc.str(_s.get(0))"
+                    )
+                    return
             print(a)
 
 

@@ -213,13 +213,45 @@ fn norm modules
 	;resolve global names
 	globals=[]
 	for names:keys(modules)
+		;TODO want to write this as for names,module:modules
 		module=get(modules,names)
 		for a  :module
 						case a
 							'var',name,@_
 							'fn',name,@_
 								globals<<names@[name],gensym(str(name))
-	show globals
+	modules=map(
+		\(kv)(
+			from,module=kv
+			module=mapfns(
+				0
+				\(env,params,body)(
+					'loc',@loc=body[0]
+					^mapterms(
+						\(loc,a)(
+							case a
+								'.',@names
+									prefix=from
+									while prefix
+										prefix=init(prefix)
+										r=get(globals,prefix@names)
+										if  r
+											^r
+									err(loc,join(".",map(str,names))@" not found")
+							^proceed
+						)
+						loc
+						body
+					)
+				)
+				0
+				[]
+				module
+			)
+			^from,module
+		)
+		modules
+	)
 
 
 {
