@@ -245,6 +245,18 @@ fn parse  file,text
 
 		; word
 		case tok
+			"bitxor"
+			"bitor"
+			"bitand"
+			"shr"
+			"shl"
+				op=word()
+				expect("(")
+				a=expr()
+				expect(",")
+				b=expr()
+				expect(")")
+				^op,a,b
 			"false"
 				lex()
 				^ 0
