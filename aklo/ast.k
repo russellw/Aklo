@@ -237,8 +237,8 @@ fn norm modules
 				0
 				\(env,params,body)(
 					'loc',@loc=body[0]
-					;TODO need to return renamed parameters as well as body
-					^mapterms(
+					;TODO rename params and locals
+					body=mapterms(
 						\(loc,a)(
 							;TODO type names
 							if sym?(a)
@@ -263,6 +263,7 @@ fn norm modules
 						loc
 						body
 					)
+					^params,body
 				)
 				env
 				[]
