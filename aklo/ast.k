@@ -212,25 +212,30 @@ fn norm modules
 	)
 
 	;generate new symbols for global names
+	;this must be done for all modules before resolving names in any of them
+	; Otherwise there would be a problem when
+	; an earlier module refers to a name defined in a later one
 	globals=[]
-	for  names,module:modules
+	for  modname,module:modules
 		for a  :module
 						case a
 							'var',name,@_
 							'fn',name,@_
-								globals<<names@[name],gensym(str(name))
+								globals<<modname@[name],gensym(str(name))
 
 	;ubiquitous names are in the outer environment of every module
 	env=[]
-	for names,y:globals
-		case names
+	for modname,y:globals
+		case modname
 			'aklo','ubiquitous',x
 				x,y>>env
 
 	;resolve names
+	show modules
 	modules=map(
 		\(kv)(
-			from,module=kv
+			;need the module name to resolve dotted names relative to current module
+			modname,module=kv
 			module=mapfns(
 				0
 				\(env,params,body)(
@@ -246,7 +251,7 @@ fn norm modules
 								^b
 							case a
 								'.',@names
-									prefix=from
+									prefix=modname
 									while prefix
 										prefix=init(prefix)
 										r=get(globals,prefix@names)
@@ -266,9 +271,10 @@ fn norm modules
 				[]
 				module
 			)
-			^from,module
+			^modname,module
 		)
 		modules
 	)
+	show modules
 
 	^modules
