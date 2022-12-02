@@ -20,10 +20,10 @@ fn mapfns(f, g,env,params,body)
 	fn rec a
 		case a
 			'fn',name,params,rtype,@body
-				body= mapfns(f, g,env,params,body)
+				params,body= mapfns(f, g,env,params,body)
 				^'fn',name,params,rtype,@body
 			'\\',params,@body
-				body= mapfns(f, g,env,params,body)
+				params,body= mapfns(f, g,env,params,body)
 				^'\\',params,@body
 			'quote',_
 				;leaf node
@@ -67,148 +67,145 @@ fn mapterms f,loc,a
 
 
 fn norm modules
-	;generate explicit variable declarations
-	modules=mapsecond(
-		\(module)(mapfns(
-			0
-			\(env,params,body)(
-				'loc',@loc=body[0]
-				explicit=keys(params)
-				if uniq(explicit)!=explicit
-												err(loc,"duplicate parameter name")
-				implicit=[]
-				mapterms(
-					\(loc,a)(
-						case a
-							'var',x,@_
-								explicit<<x
-							'for',x,@_
-							'when',x
-							'=',x,_
-								mapterms(
-									\(loc,a)(
-										case a
-											'quote',_
-												0
-											'@',_
-											'list',@_
-												^proceed
-											[@_]
-												err(loc,"invalid assignment")
-											_
-												if sym?(a)
-													implicit<<a
-									)
-									loc
-									x
-								)
-						^proceed
-					)
-					loc
-					body
-				)
-				s=[]
-				for x  :uniq(implicit)
-					if!in(x,explicit)
-						s<<'var',x
-				^[body[0]]@s@tail(body)
+	fn mapmodules(f, g,env)
+		^mapsecond(
+			\(module)(
+				;processing a module is like processing a function body with no parameters
+				_,module=mapfns(f, g,env,[],module)
+				^module
 			)
-			0
-			[]
-			module
-		))
-		modules
+			modules
+		)
+
+	;generate explicit variable declarations
+	modules=mapmodules(
+		0
+		\(env,params,body)(
+			'loc',@loc=body[0]
+			explicit=keys(params)
+			if uniq(explicit)!=explicit
+				err(loc,"duplicate parameter name")
+			implicit=[]
+			mapterms(
+				\(loc,a)(
+					case a
+						'var',x,@_
+							explicit<<x
+						'for',x,@_
+						'when',x
+						'=',x,_
+							mapterms(
+								\(loc,a)(
+									case a
+										'quote',_
+											0
+										'@',_
+										'list',@_
+											^proceed
+										[@_]
+											err(loc,"invalid assignment")
+										_
+											if sym?(a)
+												implicit<<a
+								)
+								loc
+								x
+							)
+					^proceed
+				)
+				loc
+				body
+			)
+			s=[]
+			for x  :uniq(implicit)
+				if!in(x,explicit)
+					s<<'var',x
+			^params,[body[0]]@s@tail(body)
+		)
+		0
 	)
 
 	;check for inconsistent declarations
-	for module:vals(modules)
-		mapfns(
-			0
-			\(env,params,body)(
-				'loc',@loc=body[0]
-				nonlocals=[]
-				locals=keys(params)
-				fns=[]
-				mapterms(
-					\(loc,a)(
-						case a
-							'fn',x,@_
-								if in(x,nonlocals)|in(x,locals)
-									err(loc,str(x)@" is both a function and a variable")
-								if in(x,fns)
-									err(loc,str(x)@" defined twice")
-								fns<<x
-							'var',x,@_
-								if in(x,fns)
-									err(loc,str(x)@" is both a function and a variable")
-								if in(x,nonlocals)
-									err(loc,str(x)@" is both nonlocal and local")
-								if in(x,locals)
-									err(loc,str(x)@" defined twice")
-								locals<<x
-							':=',x,_
-								mapterms(
-									\(loc,a)(
-										case a
-											'quote',_
-												0
-											'@',_
-											'list',@_
-												^proceed
-											[@_]
-												err(loc,"invalid assignment")
-											_
-												if sym?(a)
-													if in(x,fns)
-														err(loc,str(x)@" is both a function and a variable")
-													if in(x,locals)
-														err(loc,str(x)@" is both nonlocal and local")
-													nonlocals<<x
-									)
-									loc
-									x
+	mapmodules(
+		0
+		\(env,params,body)(
+			'loc',@loc=body[0]
+			nonlocals=[]
+			locals=keys(params)
+			fns=[]
+			mapterms(
+				\(loc,a)(
+					case a
+						'fn',x,@_
+							if in(x,nonlocals)|in(x,locals)
+								err(loc,str(x)@" is both a function and a variable")
+							if in(x,fns)
+								err(loc,str(x)@" defined twice")
+							fns<<x
+						'var',x,@_
+							if in(x,fns)
+								err(loc,str(x)@" is both a function and a variable")
+							if in(x,nonlocals)
+								err(loc,str(x)@" is both nonlocal and local")
+							if in(x,locals)
+								err(loc,str(x)@" defined twice")
+							locals<<x
+						':=',x,_
+							mapterms(
+								\(loc,a)(
+									case a
+										'quote',_
+											0
+										'@',_
+										'list',@_
+											^proceed
+										[@_]
+											err(loc,"invalid assignment")
+										_
+											if sym?(a)
+												if in(x,fns)
+													err(loc,str(x)@" is both a function and a variable")
+												if in(x,locals)
+													err(loc,str(x)@" is both nonlocal and local")
+												nonlocals<<x
 								)
-						^proceed
-					)
-					loc
-					body
+								loc
+								x
+							)
+					^proceed
 				)
-				^[]
+				loc
+				body
 			)
-			0
-			[]
-			module
+			^params,body
 		)
+		0
+	)
 
 	;Hoist declarations to start
-	modules=mapsecond(
-		\(module)(mapfns(
-			0
-			\(env,params,body)(
-				'loc',@loc=body[0]
-				vars=[]
-				fns=[]
-				body=mapterms(
-					\(loc,a)(
-						case a
-							'var',@_
-								vars<<a
-								^0
-							'fn',@_
-								fns<<a
-								^0
-						^proceed
-					)
-					loc
-					body
+	modules=mapmodules(
+		0
+		\(env,params,body)(
+			'loc',@loc=body[0]
+			vars=[]
+			fns=[]
+			body=mapterms(
+				\(loc,a)(
+					case a
+						'var',@_
+							vars<<a
+							^0
+						'fn',@_
+							fns<<a
+							^0
+					^proceed
 				)
-				^[body[0]]@vars@fns@tail(body)
+				loc
+				body
 			)
-			0
-			[]
-			module
-		))
-		modules
+			^params,[body[0]]@vars@fns@tail(body)
+		)
+		0
 	)
 
 	;generate new symbols for global names
