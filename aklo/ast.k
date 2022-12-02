@@ -281,6 +281,10 @@ fn norm modules
 							if!b
 								err(loc,str(a)@" not found")
 							^b
+						case a
+							'label',_
+							'goto',_
+								^a
 						^proceed
 					)
 					loc

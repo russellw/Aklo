@@ -272,6 +272,7 @@ fn parse  file,text
 			"bitand"
 			"shr"
 			"shl"
+			"ctreadfiles"
 				op=word()
 				expect("(")
 				a=expr()
@@ -637,17 +638,22 @@ fn parse  file,text
 				r<<commas()
 				expect("\n")
 				^ r
-			"break"
-			"continue"
+			"goto"
 				lex()
-				if eat("\n")
-					^r
 				r<<word()
 				expect("\n")
 				^ r
+			"break"
+			"continue"
+				lex()
+				expect("\n")
+				^ r
 		a = assignment()
-		if eat(":")
-			^ ":", a, stmt(fname)
+		if sym?(a)
+			if eat(":")
+				expect("\n")
+				^ "label", a
+			errtok("expected statement")
 		expect("\n")
 		^ a
 

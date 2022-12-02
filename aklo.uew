@@ -14,6 +14,7 @@ elif
 else
 fn
 for
+goto
 if
 throw
 var
