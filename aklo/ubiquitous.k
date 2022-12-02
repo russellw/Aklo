@@ -502,5 +502,8 @@ fn  get(s,a)
 fn  gensym(s)
 	^gensym(s)
 
+fn  intern(s)
+	^intern(s)
+
 fn str(a)
 	^str(a)

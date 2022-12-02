@@ -245,9 +245,23 @@ fn parse  file,text
 
 		; word
 		case tok
+			"range"
+				op=word()
+				expect("(")
+				a=expr()
+				if eat(",")
+					b=expr()
+				else
+					b=a
+					a=0
+				expect(")")
+				^op,a,b
 			"sym?"
 			"list?"
+			"int?"
 			"readfile"
+			"bitnot"
+			"len"
 				op=word()
 				expect("(")
 				a=expr()
@@ -265,6 +279,16 @@ fn parse  file,text
 				b=expr()
 				expect(")")
 				^op,a,b
+			"slice"
+				op=word()
+				expect("(")
+				a=expr()
+				expect(",")
+				b=expr()
+				expect(",")
+				c=expr()
+				expect(")")
+				^op,a,b,c
 			"false"
 				lex()
 				^ 0
