@@ -220,7 +220,14 @@ fn norm modules
 							'fn',name,@_
 								globals<<names@[name],gensym(str(name))
 
-	;resolve dotted names
+	;ubiquitous names are in the outer environment of every module
+	env=[]
+	for names,y:globals
+		case names
+			'aklo','ubiquitous',x
+				x,y>>env
+
+	;resolve names
 	modules=map(
 		\(kv)(
 			from,module=kv
@@ -228,8 +235,15 @@ fn norm modules
 				0
 				\(env,params,body)(
 					'loc',@loc=body[0]
+					;TODO need to return renamed parameters as well as body
 					^mapterms(
 						\(loc,a)(
+							;TODO type names
+							if sym?(a)
+								b=get(env,a)
+								if!b
+									err(loc,str(a)@" not found")
+								^b
 							case a
 								'.',@names
 									prefix=from
@@ -239,62 +253,21 @@ fn norm modules
 										if  r
 											^r
 									err(loc,join(".",map(str,names))@" not found")
+								'label',_
+								'goto',_
+									^a
 							^proceed
 						)
 						loc
 						body
 					)
 				)
-				0
+				env
 				[]
 				module
 			)
 			^from,module
 		)
-		modules
-	)
-
-	;ubiquitous names are in the outer environment of every module
-	env=[]
-	for names,y:globals
-		case names
-			'aklo','ubiquitous',x
-				x,y>>env
-
-	;resolve names
-	modules=mapsecond(
-		\(module)(mapfns(
-			\(env,params,body)(
-				vars,fns,body=splitdecls(body)
-				for name :keys(params)@vals(vars)@vals(fns)
-					name,gensym(str(name))>>env
-				^env
-			)
-			\(env,params,body)(
-				'loc',@loc=body[0]
-				;TODO need to return renamed parameters as well as body
-				^mapterms(
-					\(loc,a)(
-						;TODO type names
-						if sym?(a)
-							b=get(env,a)
-							if!b
-								err(loc,str(a)@" not found")
-							^b
-						case a
-							'label',_
-							'goto',_
-								^a
-						^proceed
-					)
-					loc
-					body
-				)
-			)
-			env
-			[]
-			module
-		))
 		modules
 	)
 
