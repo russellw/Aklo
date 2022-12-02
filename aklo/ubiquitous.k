@@ -495,5 +495,12 @@ fn mapfirst(f,s)
 fn mapsecond(f,s)
 	^map(\(a)(a[0],f(a[1])),s)
 
+;TODO placeholders
+fn  get(s,a)
+	^get(s,a)
+
+fn  gensym(s)
+	^gensym(s)
+
 fn str(a)
 	^str(a)

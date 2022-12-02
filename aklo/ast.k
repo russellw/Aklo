@@ -211,7 +211,7 @@ fn norm modules
 		modules
 	)
 
-	;resolve global names
+	;generate new symbols for global names
 	globals=[]
 	for  names,module:modules
 		for a  :module
@@ -219,6 +219,8 @@ fn norm modules
 							'var',name,@_
 							'fn',name,@_
 								globals<<names@[name],gensym(str(name))
+
+	;resolve dotted names
 	modules=map(
 		\(kv)(
 			from,module=kv
@@ -252,9 +254,14 @@ fn norm modules
 		modules
 	)
 
-{
+	;ubiquitous names are in the outer environment of every module
+	env=[]
+	for names,y:globals
+		case names
+			'aklo','ubiquitous',x
+				x,y>>env
+
 	;resolve names
-	show modules[0]
 	modules=mapsecond(
 		\(module)(mapfns(
 			\(env,params,body)(
@@ -280,13 +287,11 @@ fn norm modules
 					body
 				)
 			)
-			[]
+			env
 			[]
 			module
 		))
 		modules
 	)
-	;TODO env needs to contain ubiquitous
-	show modules[0]
-}
+
 	^modules
