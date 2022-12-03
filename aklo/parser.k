@@ -420,11 +420,11 @@ fn parse  file,text
 
 				;body
 				expect("(")
-				r<<('loc',file,line1,"\\")
+				r<<('loc',file,line1,"lambda")
 				if eat(".indent")
 					while !eat( ".dedent")
-						r<<('loc',file,line,"\\")
-						r<<stmt("\\")
+						r<<('loc',file,line,"lambda")
+						r<<stmt("lambda")
 				else
 					r<<'^',commas()
 				expect(")")

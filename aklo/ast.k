@@ -182,6 +182,27 @@ fn norm modules
 		0
 	)
 
+	;expand lambdas
+	modules=mapmodules(
+		0
+		\(env,params,body)(
+			'loc',@loc=body[0]
+			body=mapterms(
+				\(loc,a)(
+					case a
+						'\\',params,@body
+							y=gensym("lambda")
+							^'do',('fn',y,params,'any',@body),y
+					^proceed
+				)
+				loc
+				body
+			)
+			^params,body
+		)
+		0
+	)
+
 	;Hoist declarations to start
 	modules=mapmodules(
 		0
