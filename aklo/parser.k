@@ -650,6 +650,7 @@ fn parse  file,text
 				^ r
 		a = assignment()
 		if sym?(a)
+			;TODO : should be prefix?
 			if eat(":")
 				expect("\n")
 				^ "label", a

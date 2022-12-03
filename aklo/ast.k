@@ -216,16 +216,17 @@ fn norm modules
 	for  modname,module:modules
 		for a  :module
 						case a
-							'var',name,@_
-							'fn',name,@_
-								globals<<modname@[name],gensym(str(name))
+							'var',x,@_
+							'fn',x,@_
+								y=gensym(str(x))
+								globals<<modname@[x],y
 
 	;ubiquitous names are in the outer environment of every module
 	env=[]
 	for modname,y:globals
 		case modname
 			'aklo','ubiquitous',x
-				x,y>>env
+				env<<x,y
 
 	;resolve names
 	show modules
@@ -236,8 +237,35 @@ fn norm modules
 			module=mapfns(
 				0
 				\(env,params,body)(
+					;rename parameters
+					params=map(
+						\(x)(
+							x,@s=x
+							y=gensym(str(x))
+							x,y>>env
+							^y,@s
+						)
+						params
+					)
+
+					; rename locals
+					body=map(
+						\(a)(
+							case  a
+								'var',x,@s
+								'fn',x,@s
+									y=gensym(str(x))
+									x,y>>env
+									^a[0],y,@s
+							^a
+						)
+						body
+					)
+
+					;resolve names
+					;TODO avoid double converting declarations, but make sure variables don't have initial value expressions
+					;TODO do local variables have initial value expressions? what about global variables?
 					'loc',@loc=body[0]
-					;TODO rename params and locals
 					body=mapterms(
 						\(loc,a)(
 							;TODO type names
