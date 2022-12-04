@@ -334,4 +334,7 @@ fn norm (modules)
 		modules
 	)
 
-	^modules
+	;Having resolved names, we can concatenate modules without ambiguity
+	program=concat(vals(modules))
+
+	^program
