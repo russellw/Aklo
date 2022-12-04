@@ -16,7 +16,6 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-;TODO does this need to exist?
 fn mapfns(f,params,body)
 	fn rec a
 		case a
@@ -35,7 +34,10 @@ fn mapfns(f,params,body)
 		;leaf node
 		^a
 
+	;recursively transform local functions
 	body=rec(body)
+
+	;transform the current function
 	^f(params,body)
 
 fn mapterms f,loc,a
@@ -70,8 +72,7 @@ fn norm modules
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
-				module=mapfns(f,[],module)
-				^module
+				^mapfns(f,[],module)
 			)
 			modules
 		)
