@@ -17,14 +17,14 @@ fn err (loc,msg)
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
 ;TODO does this need to exist?
-fn mapfns(f,env,params,body)
+fn mapfns(f,params,body)
 	fn rec a
 		case a
 			'fn',name,params,rtype,@body
-				body= mapfns(f,env,params,body)
+				body= mapfns(f,params,body)
 				^'fn',name,params,rtype,@body
 			'\\',params,@body
-				body= mapfns(f,env,params,body)
+				body= mapfns(f,params,body)
 				^'\\',params,@body
 			'quote',_
 				;leaf node
@@ -36,7 +36,7 @@ fn mapfns(f,env,params,body)
 		^a
 
 	body=rec(body)
-	^f(env,params,body)
+	^f(params,body)
 
 fn mapterms f,loc,a
 	fn rec a
@@ -66,11 +66,11 @@ fn mapterms f,loc,a
 
 
 fn norm modules
-	fn mapmodules(f,env)
+	fn mapmodules(f)
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
-				module=mapfns(f,env,[],module)
+				module=mapfns(f,[],module)
 				^module
 			)
 			modules
@@ -78,7 +78,7 @@ fn norm modules
 
 	;generate explicit variable declarations
 	modules=mapmodules(
-		\(env,params,body)(
+		\(params,body)(
 			'loc',@loc=body[0]
 			explicit=keys(params)
 			if uniq(explicit)!=explicit
@@ -120,12 +120,11 @@ fn norm modules
 					s<<'var',x
 			^[body[0]]@s@tail(body)
 		)
-		0
 	)
 
 	;check for inconsistent declarations
 	mapmodules(
-		\(env,params,body)(
+		\(params,body)(
 			'loc',@loc=body[0]
 			nonlocals=[]
 			locals=keys(params)
@@ -176,12 +175,11 @@ fn norm modules
 			)
 			^body
 		)
-		0
 	)
 
 	;expand lambdas
 	modules=mapmodules(
-		\(env,params,body)(
+		\(params,body)(
 			'loc',@loc=body[0]
 			body=mapterms(
 				\(loc,a)(
@@ -196,12 +194,11 @@ fn norm modules
 			)
 			^body
 		)
-		0
 	)
 
 	;Hoist declarations to start
 	modules=mapmodules(
-		\(env,params,body)(
+		\(params,body)(
 			'loc',@loc=body[0]
 			vars=[]
 			fns=[]
@@ -221,7 +218,6 @@ fn norm modules
 			)
 			^[body[0]]@vars@fns@tail(body)
 		)
-		0
 	)
 
 	;generate new symbols for global names
