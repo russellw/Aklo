@@ -19,7 +19,7 @@ fn err (loc,msg)
 fn mapfns(f,params,body)
 	;recursively transform local functions
 	body=mapterms(
-		\(loc,a)(
+		\(_,a)(
 			case a
 				'fn',name,params,rtype,@body
 					body= mapfns(f,params,body)

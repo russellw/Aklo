@@ -981,7 +981,6 @@ def stmt(env, a):
                     # to generate an unreachable statement error
                     # this is useful because the bootstrap compiler
                     # does not actually support this within a case
-                    # workaround: use a labeled loop
                     case ("break", _) | ("continue", _) | ("^", _) | ("throw", _):
                         0
                     case _:
@@ -1040,6 +1039,8 @@ def assignedvars(params, body):
 
 def localvars(params, body, static=0):
     for a in assignedvars(params, body):
+        if a == "_":
+            continue
         if static:
             print("static")
         if a in ("i", "j", "k"):
