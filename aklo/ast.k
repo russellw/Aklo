@@ -17,25 +17,21 @@ fn err (loc,msg)
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
 fn mapfns(f,params,body)
-	fn rec a
-		case a
-			'fn',name,params,rtype,@body
-				body= mapfns(f,params,body)
-				^'fn',name,params,rtype,@body
-			'\\',params,@body
-				body= mapfns(f,params,body)
-				^'\\',params,@body
-			'quote',_
-				;leaf node
-				0
-			[@_]
-				;branch node
-				^map(rec,a)
-		;leaf node
-		^a
-
 	;recursively transform local functions
-	body=rec(body)
+	body=mapterms(
+		\(loc,a)(
+			case a
+				'fn',name,params,rtype,@body
+					body= mapfns(f,params,body)
+					^'fn',name,params,rtype,@body
+				'\\',params,@body
+					body= mapfns(f,params,body)
+					^'\\',params,@body
+			^proceed
+		)
+		0
+		body
+	)
 
 	;transform the current function
 	^f(params,body)
