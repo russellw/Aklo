@@ -1,5 +1,5 @@
 proceed=gensym("proceed")
-fn splitdecls s
+fn splitdecls (s)
 	vars=[]
 	fns=[]
 	body=[]
@@ -36,8 +36,8 @@ fn mapfns(f,params,body)
 	;transform the current function
 	^f(params,body)
 
-fn mapterms f,loc,a
-	fn rec a
+fn mapterms (f,loc,a)
+	fn rec( a)
 		case a
 			'loc',@loc1
 				loc:=loc1
@@ -62,7 +62,7 @@ fn mapterms f,loc,a
 	^rec(a)
 
 
-fn norm modules
+fn norm (modules)
 	fn mapmodules(f)
 		^mapsecond(
 			\(module)(
@@ -242,7 +242,7 @@ fn norm modules
 			;need the module name to resolve dotted names relative to current module
 			modname,module=kv
 
-			fn rec env,params,body
+			fn rec( env,params,body)
 				;rename parameters
 				params=map(
 					\(x)(

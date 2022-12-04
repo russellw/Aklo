@@ -1,4 +1,4 @@
-fn convert modules
+fn convert (modules)
 	file=0
 	line=0
 	code=[]
@@ -6,7 +6,7 @@ fn convert modules
 		fn rec(a)
 			^term(loop,a)
 
-		fn assign y,x
+		fn assign (y,x)
 			code<<'=',y,rec(x)
 
 		fn cond(test,yes,no)

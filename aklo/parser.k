@@ -1,11 +1,11 @@
-fn idstart? c
+fn idstart?( c)
 	^ alpha? (c)|in (c,"_$")
 
-fn idpart? c
+fn idpart? (c)
 	^ idstart? (c)|digit? (c)|in (c,"?")
 
 
-fn parse  file,text
+fn parse  (file,text)
 	text=replace("\r\n","\n",text)
 	text=replace("\r","\n",text)
 	if!endswith(text,"\n")
@@ -20,7 +20,7 @@ fn parse  file,text
 
 	tok = 0
 
-	fn err msg
+	fn err (msg)
 		throw file @ ":" @ str(line) @ ": " @ msg
 
 	fn errtok(msg)
@@ -211,14 +211,14 @@ fn parse  file,text
 			^1
 		^idstart? (tok[0])
 
-	fn type1
+	fn type1()
 		if!type?()
 			errtok("expected type")
 		if tok=="&"
 			^lex1(),type1()
 		^word()
 
-	fn optionaltype
+	fn optionaltype()
 		if !type?()
 			^'any'
 		^type1()
@@ -355,6 +355,7 @@ fn parse  file,text
 				"("
 					lex()
 					a = 'call',a
+					;TODO refactor?
 					if eat(".indent")
 						while ! eat(".dedent")
 							a<<commas()
@@ -384,29 +385,16 @@ fn parse  file,text
 		^word(),optionaltype()
 
 	fn params()
+		expect("(")
 		r = []
-		case tok
-			"("
-				lex()
-				if eat(".indent")
-					while ! eat(".dedent")
-						r<<param()
-						eat(",")
-						expect("\n")
-					expect(")")
-				else
-					while ! eat(")")
-						r<<param()
-						if eat(")")
-							break
-						expect(",")
-			".indent"
-				0
-			_
-				while 1
+		if eat(".indent")
+			while ! eat(".dedent")
+				r<<param()
+				expect("\n")
+		elif tok!=")"
+				dowhile  eat(",")
 					r<<param()
-					if ! eat(",")
-						break
+		expect(")")
 		^ r
 
 	fn prefix()

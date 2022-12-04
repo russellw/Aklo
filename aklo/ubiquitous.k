@@ -1,16 +1,16 @@
-fn upper? c
+fn upper?(c)
 	^ "A"[0]<=c&c<="Z"[0]
 
-fn lower? c
+fn lower?(c)
 	^ "a"[0]<=c&c<="z"[0]
 
-fn digit? c
+fn digit?(c)
 	^ "0"[0]<=c&c<="9"[0]
 
-fn alpha? c
+fn alpha?(c)
 	^ lower? (c)|upper? (c)
 
-fn alnum? c
+fn alnum?(c)
 	^ alpha? (c)|digit? (c)
 
 fn print?(c)
@@ -32,96 +32,96 @@ fn indexof(a,s)
 fn lastindexof(a,s)
 	^find(\(b)(a==b),s)
 
-fn find f,s
+fn find (f,s)
 	for i: range(s)
 		if f(s[i])
 			^i
 	^-1
 
-fn findlast f,s
+fn findlast (f,s)
 	i=len(s)
 	while i--
 		if f(s[i])
 			^i
 	^-1
 
-fn every f,s
+fn every (f,s)
 	for a: s
 		if!f (a)
 			^
 	^ 1
 
-fn any f,s
+fn any (f,s)
 	for a: s
 		if f (a)
 			^ 1
 
-fn map f,s
+fn map (f,s)
 	r=[]
 	for a :s
 		r<<f(  a)
 	^ r
 
-fn filter f,s
+fn filter (f,s)
 	r=[]
 	for a :s
 		if f (a)
 			r<<a
 	^ r
 
-fn tail s
+fn tail (s)
 	^ drop ( 1, s)
 
-fn prn s
+fn prn (s)
 	pr (s@"\n")
 
-fn eprn s
+fn eprn (s)
 	epr (s@"\n")
 
-fn pr s
+fn pr (s)
 		writestream( stdout,s)
 
-fn epr s
+fn epr (s)
 		writestream( stderr,s)
 
-fn take i,s
+fn take (i,s)
 	^ slice( s,0,i)
 
-fn drop i,s
+fn drop (i,s)
 	^ slice (s,i,len( s))
 
-fn in a,s
+fn in (a,s)
 	for b: s
 		if a==b
 			^ 1
 
-fn endswith s,t
+fn endswith (s,t)
 	^ drop (len(s)-len( t),s)==t
 
-fn startswith s,t
+fn startswith (s,t)
 	^ take (len( t),s)==t
 
-fn lower a
+fn lower (a)
 	if list?( a)
 		^ map (lower,a)
 	if upper? (a)
 		^ a+32
 	^ a
 
-fn upper a
+fn upper (a)
 	if list? (a)
 		^ map (upper,a)
 	if lower? (a)
 		^ a-32
 	^ a
 
-fn parseint s,base
+fn parseint (s,base)
 	while s&digitb?(s[0],base)
 		c,@s=s
 		n=n*base+parsedigit (c)
 	^ n
 
-fn parsedigit c
+fn parsedigit (c)
 	if digit? (c)
 		^ c-"0"[0]
 	if lower? (c)
@@ -130,16 +130,16 @@ fn parsedigit c
 		^ 10+c-"A"[0]
 	^ -1
 
-fn digitb? c,base
+fn digitb?(c,base)
 	n=parsedigit (c)
 	^ 0<=n&n<base
 
-fn unesc s
+fn unesc (s)
 	i=0
 	j=0
 	r=""
 
-	fn seq n,base
+	fn seq (n,base)
 			while j<n
 				if !digitb?( s[i+j],base)
 					break
@@ -182,7 +182,7 @@ fn unesc s
 				r<<c
 	^ r
 
-fn utf8 c
+fn utf8 (c)
 	if c<0x80
 		^ [c]
 	if c<0x800
@@ -203,15 +203,15 @@ fn utf8 c
 		bitor( 0b10000000,bitand(c,0b111111))
 	]
 
-fn atom? a
+fn atom?( a)
 	^!list?(a)
 
-fn num?  a
+fn num?  (a)
 	^int?(a)|float?(a)
 
-fn repr a
+fn repr (a)
 	r=[]
-	fn rec a
+	fn rec (a)
 		if atom?(a)
 			r@=str(a)
 			^
@@ -238,113 +238,113 @@ fn repr a
 	rec(a)
 	^ r
 
-fn last s
+fn last (s)
 	^ s[len (s)-1]
 
-fn space? c
+fn space? (c)
 	^ in( c," \f\n\r\t\v")
 
-fn first s
+fn first (s)
 	^ s[0]
 
-fn second s
+fn second (s)
 	^ s[1]
 
-fn keys s
+fn keys (s)
 		^ map (first,s)
 
-fn vals s
+fn vals (s)
 		^ map (second,s)
 
-fn commonprefix ss
+fn commonprefix (ss)
 	s=ss[0]
 	for i: range(1,len(s)+1)
 		t=take( i,s)
-		if !every(\s( startswith(s,t)),ss)
+		if !every(\(s)( startswith(s,t)),ss)
 			^ take (i-1,s)
 	^ s
 
-fn max a,b
+fn max (a,b)
 	if a>b
 		^ a
 	^ b
 
-fn min a,b
+fn min (a,b)
 	if a<b
 		^ a
 	^ b
 
-fn abs a
+fn abs (a)
 	if a<0
 		^ -a
 	^ a
 
-fn signum a
+fn signum (a)
 	if a<0
 		^ -1
 	if a>0
 		^ 1
 
-fn reverse s
+fn reverse (s)
 	i=len (s)
 	r=[]
 	while i--
 		r<<s[i]
 	^ r
 
-fn reduce f , s
+fn reduce (f , s)
 	a,@s=s
 	^ fold (f,a,s)
 
-fn fold f ,a, s
+fn fold (f ,a, s)
 	if !s
 		^ a
 	b,@s=s
 	^ fold(f,f(a,b),s)
 
-fn maximum s
+fn maximum (s)
 	^ reduce (max,s)
 
-fn minimum s
+fn minimum (s)
 	^ reduce( min,s)
 
-fn sum s
+fn sum (s)
 	^ fold(\(a,b)(a+b),0,s)
 
-fn product s
+fn product (s)
 	^ fold (\(a,b)(a*b),1,s)
 
-fn init s
+fn init (s)
 	^ take (len(s)-1,s)
 
-fn concat ss
+fn concat (ss)
 	^ fold (\(s,t)(s@t),"",ss)
 
-fn replicate n ,a
+fn replicate (n ,a)
 	r=[]
 	for i: range (n)
 		r<<a
 	^ r
 
-fn takewhile f,s
+fn takewhile (f,s)
 	r=""
 	while s &(f(s[0]))
 		a,@s=s
 		r<<a
 	^ r
 
-fn dropwhile f,s
+fn dropwhile (f,s)
 	while s &(f(s[0]))
 		s=tail (s)
 	^ s
 
-fn span f ,s
+fn span (f ,s)
 	^ takewhile (f,s),dropwhile(f,s)
 
-fn splitat i,s
+fn splitat (i,s)
 	^ take(i,s),drop(i,s)
 
-fn zip s,t
+fn zip (s,t)
 	r=[]
 	while s&t
 		a,@s=s
@@ -352,7 +352,7 @@ fn zip s,t
 		r<<(a,b)
 	^ r
 
-fn zip3 s,t,u
+fn zip3 (s,t,u)
 	r=[]
 	while s&t&u
 		a,@s=s
@@ -361,7 +361,7 @@ fn zip3 s,t,u
 		r<<(a,b,c)
 	^ r
 
-fn zipwith f,s,t
+fn zipwith (f,s,t)
 	r=[]
 	while s&t
 		a,@s=s
@@ -369,7 +369,7 @@ fn zipwith f,s,t
 		r<<f(a,b)
 	^ r
 
-fn zipwith3 f,s,t,u
+fn zipwith3 (f,s,t,u)
 	r=[]
 	while s&t&u
 		a,@s=s
@@ -378,7 +378,7 @@ fn zipwith3 f,s,t,u
 		r<<f(a,b,c)
 	^ r
 
-fn unzip s
+fn unzip (s)
 	q=[]
 	r=[]
 	while s
@@ -387,7 +387,7 @@ fn unzip s
 		r<<b
 	^ q,r
 
-fn unzip3 s
+fn unzip3 (s)
 	p=[]
 	q=[]
 	r=[]
@@ -398,7 +398,7 @@ fn unzip3 s
 		r<<c
 	^ p,q,r
 
-fn split f,s
+fn split (f,s)
 	r=[]
 	rs=[]
 	for a: s
@@ -410,21 +410,21 @@ fn split f,s
 	rs<<r
 	^ rs
 
-fn spliton a,s
+fn spliton (a,s)
 	^ split (\(b)(a==b),s)
 
-fn lines s
+fn lines (s)
 	if endswith(s,"\n")
 		s=init (s)
 	^ spliton("\n"[0],s)
 
-fn unlines ss
+fn unlines (ss)
 	r=""
 	for s: ss
 		r@=s@"\n"
 	^ r
 
-fn replace from,to,s
+fn replace (from,to,s)
 	assert from
 	r=""
 	while s
@@ -436,41 +436,41 @@ fn replace from,to,s
 		r<<a
 	^ r
 
-fn uniq s
+fn uniq (s)
 	r=[]
 	for a: s
 		if!in(a,r)
 			r<<a
 	^r
 
-fn union s,t
+fn union (s,t)
 	^uniq(s@t)
 
-fn intersection s,t
+fn intersection (s,t)
 	r=[]
 	for a: s
 		if in(a,t)
 			r<<a
 	^uniq(r)
 
-fn dirseparator? c
+fn dirseparator? (c)
 	if windows?
 		^in(c,":\\/")
 	^in(c,"/")
 
-fn splitdir s
+fn splitdir (s)
 	i=findlast(dirseparator?,s)
 	;there are many edge cases in Windows filenames
 	; so it is better to leave a trailing separator untouched
 	^splitat(i+1,s)
 
-fn splitext s
+fn splitext (s)
 	i=lastindexof("."[0],s)
 	if i<0
 		^s,""
 	^ take(i,s),drop(i+1,s)
 
-fn join t, ss
+fn join (t, ss)
 	if!ss
 		^[]
 	r=ss[0]
@@ -478,7 +478,7 @@ fn join t, ss
 		r@=t@s
 	^r
 
-fn joindir ss
+fn joindir (ss)
 	r=ss[0]
 	for s: tail(ss)
 		if!(r&dirseparator?(last(r)))

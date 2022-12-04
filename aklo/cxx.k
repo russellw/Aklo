@@ -1,6 +1,6 @@
 r=[]
 
-fn ptype type
+fn ptype (type)
 	case type
 		'&',t
 			ptype (t)
@@ -22,7 +22,7 @@ fn ptype type
 		_
 			throw repr(type)
 
-fn compose program
+fn compose (program)
 	r:=[]
 	r@="#include <stdlib.h>\n"
 	^r

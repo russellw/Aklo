@@ -31,14 +31,14 @@ libfiles=ctreadfiles(\(file)(endswith(file,".k")),".")
 ;read modules
 modules=[]
 
-fn add names ,file
+fn add (names ,file)
 	name=splitext(file)[0]
 	name=replace("-","_",name)
 	text=readfile(joindir([root]@names@[file]))
 	module=parser.parse(file,text)
 	modules<<map(intern,names@[name]),module
 
-fn dir names
+fn dir (names)
 	for file,attrs: listdir(joindir([root]@names))
 		if get(attrs,'dir?')
 			dir(names@[file])

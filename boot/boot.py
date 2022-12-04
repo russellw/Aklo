@@ -382,28 +382,13 @@ def parse(file):
 
     def params():
         r = []
-        match tok:
-            case "(":
-                lex()
-                if eat(".indent"):
-                    while not eat(".dedent"):
-                        r.append(word())
-                        expect("\n")
-                    expect(")")
-                else:
-                    while not eat(")"):
-                        r.append(word())
-                        if eat(")"):
-                            break
-                        expect(",")
-            case ".indent":
-                0
-            case _:
-                # TODO should the brackets be optional?
-                while 1:
-                    r.append(word())
-                    if not eat(","):
-                        break
+        expect("(")
+        if tok != ")":
+            while 1:
+                r.append(word())
+                if not eat(","):
+                    break
+        expect(")")
         return r
 
     def prefix():

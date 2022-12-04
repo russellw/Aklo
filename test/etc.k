@@ -376,10 +376,10 @@ assert get (a,'y')==2
 assert get (a,'z')==0
 
 ;lambda
-f=\x,y(x+y)
+f=\(x,y)(x+y)
 assert f(2,3)==5
 
-f=\x,y(
+f=\(x,y)(
 	z=x+y
 	^ z
 )
@@ -389,37 +389,37 @@ f=\()(77)
 assert f()==77
 
 ;functions
-fn square a
+fn square (a)
 		^ a*a
 
 assert square (7)==49
 
-fn factorial n
+fn factorial (n)
 	if n<=1
 		^ 1
 	^ n*factorial(n-1)
 
 assert factorial (5)==120
 
-fn zero
+fn zero()
 	^
 
 assert zero()==0
 
-fn foo bar
+fn foo (bar)
 	bar=4
 	^ bar
 
 assert foo (3)==4
 
 ;mutual recursion
-fn evenrec n
+fn evenrec (n)
 	assert n>=0
 	if n==0
 		^  1
 	^ oddrec(n-1)
 
-fn oddrec n
+fn oddrec (n)
 	assert n>=0
 	if n==0
 		^
@@ -433,7 +433,7 @@ assert oddrec (3)
 ;lexical scope
 a=1
 
-fn f10
+fn f10()
 	a=2
 
 f10()
@@ -442,7 +442,7 @@ assert a==1
 ;nonlocal variables
 a=1
 
-fn f11
+fn f11()
 	a:=2
 
 f11()
@@ -470,7 +470,7 @@ assert join(",",["abc"])=="abc"
 assert join(",",("abc","de"))=="abc,de"
 
 ;higher-order functions
-assert map( \x(x*x),[1,2,3])==[1,4,9]
+assert map( \(x)(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
 assert mapfirst(first,[["a",2],["b",3]])==[[97,2],[98,3]]
@@ -481,15 +481,15 @@ assert filter( digit?,"abc123")=="123"
 assert every( upper?,"")
 assert every (upper?,"ABC")
 assert !every (upper?,"ABC.")
-assert every (\a (a<10),(1,2,3))
-assert! every (\a( a<10),(1,2,13))
+assert every (\(a) (a<10),(1,2,3))
+assert! every (\(a)( a<10),(1,2,13))
 
 assert !any( upper?,"")
 assert any (upper?,"ABC")
 assert any (upper?,"ABC.")
 assert !any (upper?,".")
 
-fn add a,b
+fn add (a,b)
 	^ a+b
 
 assert fold(add,0,(1,2,3,4))==10
