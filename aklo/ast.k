@@ -21,10 +21,10 @@ fn mapfns(f,env,params,body)
 	fn rec a
 		case a
 			'fn',name,params,rtype,@body
-				params,body= mapfns(f,env,params,body)
+				body= mapfns(f,env,params,body)
 				^'fn',name,params,rtype,@body
 			'\\',params,@body
-				params,body= mapfns(f,env,params,body)
+				body= mapfns(f,env,params,body)
 				^'\\',params,@body
 			'quote',_
 				;leaf node
@@ -70,7 +70,7 @@ fn norm modules
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
-				_,module=mapfns(f,env,[],module)
+				module=mapfns(f,env,[],module)
 				^module
 			)
 			modules
@@ -118,7 +118,7 @@ fn norm modules
 			for x  :uniq(implicit)
 				if!in(x,explicit)
 					s<<'var',x
-			^params,[body[0]]@s@tail(body)
+			^[body[0]]@s@tail(body)
 		)
 		0
 	)
@@ -174,7 +174,7 @@ fn norm modules
 				loc
 				body
 			)
-			^params,body
+			^body
 		)
 		0
 	)
@@ -194,7 +194,7 @@ fn norm modules
 				loc
 				body
 			)
-			^params,body
+			^body
 		)
 		0
 	)
@@ -219,7 +219,7 @@ fn norm modules
 				loc
 				body
 			)
-			^params,[body[0]]@vars@fns@tail(body)
+			^[body[0]]@vars@fns@tail(body)
 		)
 		0
 	)
