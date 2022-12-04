@@ -273,7 +273,7 @@ def parse(file):
         errtok("expected word")
 
     # expressions
-    def brackets(end):
+    def exprs(end):
         r = []
         if eat(".indent"):
             while not eat(".dedent"):
@@ -347,7 +347,7 @@ def parse(file):
 
         # list
         if eat("["):
-            return ["List.of"] + brackets("]")
+            return ["List.of"] + exprs("]")
 
         # none of the above
         errtok("expected expression")
@@ -358,7 +358,7 @@ def parse(file):
             match tok:
                 case "(":
                     lex()
-                    a = [a] + brackets(")")
+                    a = [a] + exprs(")")
                 case "[":
                     lex()
                     a = "subscript", a, expr()

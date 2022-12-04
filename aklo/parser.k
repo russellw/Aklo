@@ -224,7 +224,7 @@ fn parse  (file,text)
 		^type1()
 
 	; expressions
-	fn brackets(end)
+	fn exprs(end)
 			r=[]
 			if eat(".indent")
 				while ! eat(".dedent")
@@ -343,7 +343,7 @@ fn parse  (file,text)
 
 		; list
 		if eat("[")
-			^['list']@brackets("]")
+			^['list']@exprs("]")
 
 		; none of the above
 		errtok("expected expression")
@@ -354,7 +354,7 @@ fn parse  (file,text)
 			case tok
 				"("
 					lex()
-					a = ('call',a)@brackets(")")
+					a = ('call',a)@exprs(")")
 				"["
 					lex()
 					a='subscript',a,expr()
