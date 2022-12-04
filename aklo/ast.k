@@ -45,16 +45,15 @@ fn mapterms f,loc,a
 			'fn',@_
 			'\\',@_
 			'quote',_
-				;leaf node
+				;leaf node that may still be processed
 				0
 			[op,@s]
+				;branch node that may also be processed
 				b=f(loc,a)
 				if b==proceed
-					;branch node
 					^op,@map(rec,s)
-				;leaf node
 				^b
-		;leaf node
+		;leaf node that may still be processed
 		b=f(loc,a)
 		if b==proceed
 			^a
