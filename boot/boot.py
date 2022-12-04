@@ -273,6 +273,20 @@ def parse(file):
         errtok("expected word")
 
     # expressions
+    def brackets(end):
+        r = []
+        if eat(".indent"):
+            while not eat(".dedent"):
+                r.append(commas())
+                expect("\n")
+        elif tok != end:
+            while 1:
+                r.append(expr())
+                if not eat(","):
+                    break
+        expect(end)
+        return r
+
     def primary():
         # symbol
         if tok.startswith("'"):
@@ -333,18 +347,7 @@ def parse(file):
 
         # list
         if eat("["):
-            r = ["List.of"]
-            if eat(".indent"):
-                while not eat(".dedent"):
-                    r.append(commas())
-                    expect("\n")
-            elif tok != "]":
-                while 1:
-                    r.append(expr())
-                    if not eat(","):
-                        break
-            expect("]")
-            return r
+            return ["List.of"] + brackets("]")
 
         # none of the above
         errtok("expected expression")
@@ -355,17 +358,7 @@ def parse(file):
             match tok:
                 case "(":
                     lex()
-                    a = [a]
-                    if eat(".indent"):
-                        while not eat(".dedent"):
-                            a.append(commas())
-                            expect("\n")
-                    elif tok != ")":
-                        while 1:
-                            a.append(expr())
-                            if not eat(","):
-                                break
-                    expect(")")
+                    a = [a] + brackets(")")
                     continue
                 case "[":
                     lex()

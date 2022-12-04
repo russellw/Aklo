@@ -224,6 +224,18 @@ fn parse  (file,text)
 		^type1()
 
 	; expressions
+	fn brackets(end)
+			r=[]
+			if eat(".indent")
+				while ! eat(".dedent")
+					r<<commas()
+					expect("\n")
+			elif tok!=end
+				dowhile  eat(",")
+					r<<expr()
+			expect(end)
+			^r
+
 	fn primary()
 		; symbol
 		if startswith(tok,"'")
@@ -331,16 +343,7 @@ fn parse  (file,text)
 
 		; list
 		if eat("[")
-			r =  ['list']
-			if eat(".indent")
-				while ! eat(".dedent")
-					r<<commas()
-					expect("\n")
-			elif tok!="]"
-				dowhile  eat(",")
-					r<<expr()
-			expect("]")
-			^ r
+			^['list']@brackets("]")
 
 		; none of the above
 		errtok("expected expression")
@@ -351,15 +354,7 @@ fn parse  (file,text)
 			case tok
 				"("
 					lex()
-					a = 'call',a
-					if eat(".indent")
-						while ! eat(".dedent")
-							a<<commas()
-							expect("\n")
-					elif tok!=")"
-						dowhile  eat(",")
-							a<<expr()
-					expect(")")
+					a = ('call',a)@brackets(")")
 				"["
 					lex()
 					a='subscript',a,expr()
