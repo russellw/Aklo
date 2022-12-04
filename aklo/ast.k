@@ -16,14 +16,14 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-fn mapfns(f, g,env,params,body)
+fn mapfns(f,env,params,body)
 	fn rec a
 		case a
 			'fn',name,params,rtype,@body
-				params,body= mapfns(f, g,env,params,body)
+				params,body= mapfns(f,env,params,body)
 				^'fn',name,params,rtype,@body
 			'\\',params,@body
-				params,body= mapfns(f, g,env,params,body)
+				params,body= mapfns(f,env,params,body)
 				^'\\',params,@body
 			'quote',_
 				;leaf node
@@ -34,10 +34,8 @@ fn mapfns(f, g,env,params,body)
 		;leaf node
 		^a
 
-	if f
-		env=f(env,params,body)
 	body=rec(body)
-	^g(env,params,body)
+	^f(env,params,body)
 
 fn mapterms f,loc,a
 	fn rec a
@@ -67,11 +65,11 @@ fn mapterms f,loc,a
 
 
 fn norm modules
-	fn mapmodules(f, g,env)
+	fn mapmodules(f,env)
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
-				_,module=mapfns(f, g,env,[],module)
+				_,module=mapfns(f,env,[],module)
 				^module
 			)
 			modules
@@ -79,7 +77,6 @@ fn norm modules
 
 	;generate explicit variable declarations
 	modules=mapmodules(
-		0
 		\(env,params,body)(
 			'loc',@loc=body[0]
 			explicit=keys(params)
@@ -127,7 +124,6 @@ fn norm modules
 
 	;check for inconsistent declarations
 	mapmodules(
-		0
 		\(env,params,body)(
 			'loc',@loc=body[0]
 			nonlocals=[]
@@ -184,7 +180,6 @@ fn norm modules
 
 	;expand lambdas
 	modules=mapmodules(
-		0
 		\(env,params,body)(
 			'loc',@loc=body[0]
 			body=mapterms(
@@ -205,7 +200,6 @@ fn norm modules
 
 	;Hoist declarations to start
 	modules=mapmodules(
-		0
 		\(env,params,body)(
 			'loc',@loc=body[0]
 			vars=[]
