@@ -24,9 +24,9 @@ fn mapfns(f,params,body)
 				'fn',name,params,rtype,@body
 					body= mapfns(f,params,body)
 					^'fn',name,params,rtype,@body
-				'\\',params,@body
+				'lambda',params,@body
 					body= mapfns(f,params,body)
-					^'\\',params,@body
+					^'lambda',params,@body
 			^proceed
 		)
 		0
@@ -43,7 +43,7 @@ fn mapterms (f,loc,a)
 				loc:=loc1
 				^a
 			'fn',@_
-			'\\',@_
+			'lambda',@_
 			'quote',_
 				;leaf node that may still be processed
 				0
@@ -180,7 +180,7 @@ fn norm (modules)
 			body=mapterms(
 				\(loc,a)(
 					case a
-						'\\',params,@body
+						'lambda',params,@body
 							y=gensym("lambda")
 							^'do',('fn',y,params,'any',@body),y
 					^proceed

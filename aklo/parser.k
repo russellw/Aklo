@@ -398,7 +398,8 @@ fn parse  (file,text)
 			"\\"
 				;TODO loc
 				line1=line
-				r = [intern(lex1())]
+				lex()
+				r = ['lambda']
 
 				;parameters
 				r<<params()
