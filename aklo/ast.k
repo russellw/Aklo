@@ -16,6 +16,7 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
+;TODO does this need to exist?
 fn mapfns(f,env,params,body)
 	fn rec a
 		case a
@@ -225,7 +226,7 @@ fn norm modules
 
 	;generate new symbols for global names
 	;this must be done for all modules before resolving names in any of them
-	; Otherwise there would be a problem when
+	; otherwise there would be a problem when
 	; an earlier module refers to a name defined in a later one
 	globals=[]
 	for  modname,module:modules

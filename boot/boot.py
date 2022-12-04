@@ -623,8 +623,6 @@ def parse(file):
                 expect("\n")
                 return r
         a = assignment()
-        if eat(":"):
-            return ":", a, stmt(fname)
         expect("\n")
         return a
 

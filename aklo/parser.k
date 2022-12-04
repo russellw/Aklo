@@ -647,6 +647,11 @@ fn parse  file,text
 				r<<commas()
 				expect("\n")
 				^ r
+			":"
+				lex()
+				r='label',word()
+				expect("\n")
+				^ r
 			"goto"
 				lex()
 				r<<word()
@@ -659,10 +664,6 @@ fn parse  file,text
 				^ r
 		a = assignment()
 		if sym?(a)
-			;TODO : should be prefix?
-			if eat(":")
-				expect("\n")
-				^ "label", a
 			errtok("expected statement")
 		expect("\n")
 		^ a
