@@ -359,7 +359,6 @@ def parse(file):
                 case "(":
                     lex()
                     a = [a] + brackets(")")
-                    continue
                 case "[":
                     lex()
                     a = "subscript", a, expr()
@@ -368,8 +367,8 @@ def parse(file):
                     return "post" + lex1(), a
                 case ".":
                     a += lex1() + word()
-                    continue
-            return a
+                case _:
+                    return a
 
     def params():
         r = []
