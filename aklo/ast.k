@@ -77,8 +77,6 @@ fn norm (modules)
 		\(params,body)(
 			'loc',@loc=body[0]
 			explicit=keys(params)
-			if uniq(explicit)!=explicit
-				err(loc,"duplicate parameter name")
 			implicit=[]
 			mapterms(
 				\(loc,a)(
@@ -124,6 +122,8 @@ fn norm (modules)
 			'loc',@loc=body[0]
 			nonlocals=[]
 			locals=keys(params)
+			if uniq(locals)!=locals
+				err(loc,"duplicate parameter name")
 			fns=[]
 			mapterms(
 				\(loc,a)(
