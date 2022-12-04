@@ -278,31 +278,47 @@ fn norm (modules)
 					fns
 				)
 
+				;rename labels
+				'loc',@loc=body[0]
+				labels=[]
+				mapterms(
+					\(loc,a)(
+							case a
+								'label',x
+									y=gensym(str(x))
+									labels<<x,y
+							^proceed
+					)
+					loc
+					body
+				)
+
 				;resolve names in body of this function
 				;TODO avoid double converting declarations, but make sure variables don't have initial value expressions
 				;TODO do local variables have initial value expressions? what about global variables?
-				'loc',@loc=body[0]
 				body=mapterms(
 					\(loc,a)(
 							;TODO type names
 							if sym?(a)
-								b=get(env,a)
-								if!b
+								y=get(env,a)
+								if!y
 									err(loc,str(a)@" not found")
-								^b
+								^y
 							case a
 								'.',@names
 									prefix=modname
 									while prefix
 										prefix=init(prefix)
-										r=get(globals,prefix@names)
-										if  r
-											^r
+										y=get(globals,prefix@names)
+										if  y
+											^y
 									err(loc,join(".",map(str,names))@" not found")
-								'label',_
-								'goto',_
-									;labels will be resolved later
-									^a
+								'label',x
+								'goto',x
+									y=get(labels,x)
+									if!y
+										err(loc,str(x)@" not found")
+									^a[0],y
 							^proceed
 					)
 					loc
