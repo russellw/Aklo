@@ -658,5 +658,8 @@ s=[]
 2>>s
 assert s==[2,1]
 
+var v1=10
+var v2=v1
+
 {signal that tests actually completed}
 prn("ok")
