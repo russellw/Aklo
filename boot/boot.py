@@ -338,13 +338,12 @@ def parse(file):
                 while not eat(".dedent"):
                     r.append(commas())
                     expect("\n")
-                expect("]")
-                return r
-            while not eat("]"):
-                r.append(expr())
-                if eat("]"):
-                    break
-                expect(",")
+            elif tok != "]":
+                while 1:
+                    r.append(expr())
+                    if not eat(","):
+                        break
+            expect("]")
             return r
 
         # none of the above
@@ -361,13 +360,12 @@ def parse(file):
                         while not eat(".dedent"):
                             a.append(commas())
                             expect("\n")
-                        expect(")")
-                        continue
-                    while not eat(")"):
-                        a.append(expr())
-                        if eat(")"):
-                            break
-                        expect(",")
+                    elif tok != ")":
+                        while 1:
+                            a.append(expr())
+                            if not eat(","):
+                                break
+                    expect(")")
                     continue
                 case "[":
                     lex()

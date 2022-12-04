@@ -336,13 +336,10 @@ fn parse  (file,text)
 				while ! eat(".dedent")
 					r<<commas()
 					expect("\n")
-				expect("]")
-				^ r
-			while  !eat("]")
-				r<<expr()
-				if eat("]")
-					break
-				expect(",")
+			elif tok!="]"
+				dowhile  eat(",")
+					r<<expr()
+			expect("]")
 			^ r
 
 		; none of the above
@@ -355,18 +352,14 @@ fn parse  (file,text)
 				"("
 					lex()
 					a = 'call',a
-					;TODO refactor?
 					if eat(".indent")
 						while ! eat(".dedent")
 							a<<commas()
 							expect("\n")
-						expect(")")
-						continue
-					while ! eat(")")
-						a<<expr()
-						if eat(")")
-							break
-						expect(",")
+					elif tok!=")"
+						dowhile  eat(",")
+							a<<expr()
+					expect(")")
 				"["
 					lex()
 					a='subscript',a,expr()
