@@ -419,11 +419,11 @@ def parse(file):
 
                 # body
                 expect("(")
-                r.append((".loc", file, line1, "\\"))
+                r.append((".loc", file, line1, "lambda"))
                 if eat(".indent"):
                     while not eat(".dedent"):
-                        r.append((".loc", file, line, "\\"))
-                        r.append(stmt("\\"))
+                        r.append((".loc", file, line, "lambda"))
+                        r.append(stmt("lambda"))
                 else:
                     r.append(("^", commas()))
                 expect(")")
@@ -938,12 +938,10 @@ def stmt(env, a):
             stmts(env, yes)
             print("}")
         case "show", file, line, fname, name, val:
-            fname = fname.replace("\\", "\\\\")
             print(f'Etc.show("{file}", {line}, "{fname}", "{name}",')
             expr(env, val)
             print(");")
         case "assert", file, line, fname, name, test:
-            fname = fname.replace("\\", "\\\\")
             print("if (!")
             truth(env, test)
             print(

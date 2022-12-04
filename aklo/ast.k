@@ -250,45 +250,53 @@ fn norm modules
 				env<<x,y
 
 	;resolve names
-	show modules
 	modules=map(
 		\(kv)(
 			;need the module name to resolve dotted names relative to current module
 			modname,module=kv
-			module=mapfns(
-				0
-				\(env,params,body)(
-					;rename parameters
-					params=map(
-						\(x)(
-							x,@s=x
-							y=gensym(str(x))
-							x,y>>env
-							^y,@s
-						)
-						params
-					)
 
-					; rename locals
-					body=map(
-						\(a)(
-							case  a
-								'var',x,@s
-								'fn',x,@s
-									y=gensym(str(x))
-									x,y>>env
-									^a[0],y,@s
-							^a
-						)
-						body
+			fn rec env,params,body
+				;rename parameters
+				params=map(
+					\(x)(
+						x,@s=x
+						y=gensym(str(x))
+						x,y>>env
+						^y,@s
 					)
+					params
+				)
 
-					;resolve names
-					;TODO avoid double converting declarations, but make sure variables don't have initial value expressions
-					;TODO do local variables have initial value expressions? what about global variables?
-					'loc',@loc=body[0]
-					body=mapterms(
-						\(loc,a)(
+				; rename locals
+				;functions can  call each other
+				; so need to rename all functions and update the environment appropriately
+				; before recursing into any function
+				vars,fns,body=splitdecls(body)
+				fn decl(a)
+						op,x,@s=a
+						assert op=='var'|op=='fn'
+						y=gensym(str(x))
+						x,y>>env
+						^op,y,@s
+				vars=map(decl,vars)
+				fns=map(decl,fns)
+
+				;recurse into functions
+				fns=map(
+					\(a)(
+						'fn',name,params,rtype,@body=a
+						params,body=rec(env,params,body)
+						^'fn',name,params,rtype,@body
+					)
+					fns
+				)
+
+				;resolve names in body of this function
+				;TODO avoid double converting declarations, but make sure variables don't have initial value expressions
+				;TODO do local variables have initial value expressions? what about global variables?
+				'loc',@loc=body[0]
+				body=mapterms(
+					\(loc,a)(
 							;TODO type names
 							if sym?(a)
 								b=get(env,a)
@@ -306,22 +314,21 @@ fn norm modules
 									err(loc,join(".",map(str,names))@" not found")
 								'label',_
 								'goto',_
+									;labels will be resolved later
 									^a
 							^proceed
-						)
-						loc
-						body
 					)
-					^params,body
+					loc
+					body
 				)
-				env
-				[]
-				module
-			)
+
+				;return renamed entities as well as function body with updated names
+				^params,vars@fns@body
+
+			_,module=rec(env,[],module)
 			^modname,module
 		)
 		modules
 	)
-	show modules
 
 	^modules

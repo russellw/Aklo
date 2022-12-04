@@ -259,9 +259,12 @@ fn parse  file,text
 			"sym?"
 			"list?"
 			"int?"
+			"float?"
 			"readfile"
 			"bitnot"
 			"len"
+			"listdir"
+			"exit"
 				op=word()
 				expect("(")
 				a=expr()
@@ -272,6 +275,7 @@ fn parse  file,text
 			"bitand"
 			"shr"
 			"shl"
+			"writestream"
 			"ctreadfiles"
 				op=word()
 				expect("(")
@@ -290,6 +294,11 @@ fn parse  file,text
 				c=expr()
 				expect(")")
 				^op,a,b,c
+			"args"
+			"stdout"
+			"stderr"
+			"windows?"
+				^[word()]
 			"false"
 				lex()
 				^ 0
