@@ -288,6 +288,7 @@ fn parse  (file,text)
 			"shr"
 			"shl"
 			"writestream"
+			"writefile"
 			"ctreadfiles"
 				op=word()
 				expect("(")

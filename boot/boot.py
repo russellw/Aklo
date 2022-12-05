@@ -712,6 +712,7 @@ def expr(env, a):
             | ("range", *s)
             | ("writestream", *s)
             | ("readfile", *s)
+            | ("writefile", *s)
             | ("intp", *s)
             | ("symp", *s)
             | ("listp", *s)

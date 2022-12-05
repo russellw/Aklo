@@ -54,4 +54,7 @@ for  s :packages
 	dir([name])
 
 ;convert to intermediate representation
-modules=ast.norm(modules)
+program=ast.norm(modules)
+
+;output
+writefile("a.cc",cxx.compose(program))

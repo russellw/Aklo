@@ -128,6 +128,14 @@ class Etc {
     }
   }
 
+  static void writefile(Object file, Object s) {
+    try {
+      Files.write(Path.of(decode(file)), bytes(s));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   static byte[] bytes(Object s) {
     var s1 = (List<Object>) s;
     var r = new byte[s1.size()];
