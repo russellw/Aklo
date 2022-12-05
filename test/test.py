@@ -12,7 +12,9 @@ def search1(p, ss):
 
 def do(file):
     print(file)
+    src = [s.strip() for s in open(file).readlines()]
 
+    # compile Aklo code
     cmd = "java", "-ea", "a.java", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
@@ -20,19 +22,56 @@ def do(file):
     )
     stdout, stderr = p.communicate()
     stderr = str(stderr, "utf-8")
-    for s in open(file).readlines():
-        s = s.strip()
+
+    # are we looking for a compiler error?
+    for s in src:
         m = re.match(r";\s*ERR\s+(.*)", s)
         if m:
             if search1(m[1], stderr.splitlines()) and p.returncode:
                 return
             raise Exception(stderr)
+
+    # if not, make sure we didn't get one
     if stderr:
         raise Exception(stderr)
     if p.returncode:
         raise Exception(str(p.returncode))
 
+    # compile C++ code
     subprocess.check_call("cl /nologo a.cc")
+
+    # run the program
+    cmd = "a"
+    p = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = p.communicate()
+    stdout = str(stdout, "utf-8")
+    stderr = str(stderr, "utf-8")
+    print(stdout, end="")
+
+    # not expecting a runtime error
+    if stderr:
+        raise Exception(stderr)
+    if p.returncode:
+        raise Exception(str(p.returncode))
+
+    # are we looking for particular output?
+    for i in range(len(src)):
+        if src[i] == "{" and src[i + 1] == "OUT":
+            r = ""
+            for s in src[i + 2 :]:
+                if s == "}":
+                    break
+                r += s + "\n"
+            stdout = stdout.replace("\r", "")
+            if stdout == r:
+                return
+            print(repr(r))
+            print(repr(stdout))
+            raise Exception()
 
 
 parser = argparse.ArgumentParser(description="Run test cases")
