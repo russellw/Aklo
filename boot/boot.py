@@ -614,7 +614,7 @@ def parse(file):
 for root, dirs, files in os.walk(here + "/../aklo"):
     for file in files:
         file, ext = os.path.splitext(file)
-        if ext == ".k":
+        if ext == ".k" and file != "libc":
             parse(file)
 
 

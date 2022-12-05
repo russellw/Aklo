@@ -394,9 +394,9 @@ fn parse  (file,text)
 			"@"
 			"*"
 			"&"
+			"/"
 				^ intern(lex1()), prefix()
 			"\\"
-				;TODO loc
 				line1=line
 				lex()
 				r = ['lambda']
@@ -650,6 +650,7 @@ fn parse  (file,text)
 	eat("\n")
 	fname="global"
 	r=[]
+	r<<('loc',file,line,fname)
 	while tok != ".dedent"
 		r<<('loc',file,line,fname)
 		r<<stmt(fname)

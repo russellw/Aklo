@@ -40,7 +40,11 @@ fn mapterms (f,loc,a)
 	fn rec( a)
 		case a
 			'loc',@loc1
+				;leaf node that will not be processed
 				loc:=loc1
+				^a
+			'/',_
+				;leaf node that will not be processed
 				^a
 			'fn',@_
 			'lambda',@_
