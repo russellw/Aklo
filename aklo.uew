@@ -1,10 +1,9 @@
 /L13"Aklo" Line Comment = ; Block Comment On = { Block Comment Off = } Escape Char = \ String Chars = "' File Extensions = K
 /Delimiters = ~!@%^&*()-+=|\/{}[]:;"'<> ,	.
-/Indent Strings = "case" "dowhile" "elif" "else" "fn" "for" "if" "while"
+/Indent Strings = "case" "dowhile" "elif" "else" "fn" "for" "if" "while" "\"
 /Open Brace Strings =  "(" "["
 /Close Brace Strings = ")" "]"
 /C1"blue"
-^
 assert
 break
 case
@@ -27,11 +26,6 @@ show
 troff
 tron
 /C4"green"
-u8
-u16
-u32
-u64
-usize
 /C5"brown"
 !
 %
@@ -50,4 +44,6 @@ usize
 >
 @
 [
+\
 ]
+^

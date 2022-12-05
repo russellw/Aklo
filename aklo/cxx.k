@@ -5,20 +5,8 @@ fn type1 (type)
 		'&',t
 			type1 (t)
 			r@="*"
-		'u8'
+		'uchar'
 			r@="unsigned char"
-		'u16'
-			r@="uint16_t"
-		'u32'
-			r@="uint32_t"
-		'u64'
-			r@="uint64_t"
-		'usize'
-			r@="size_t"
-		'f32'
-			r@="float"
-		'f64'
-			r@="double"
 		_
 			r@=str(type)
 
