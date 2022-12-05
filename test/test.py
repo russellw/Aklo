@@ -12,6 +12,7 @@ def search1(p, ss):
 
 def do(file):
     print(file)
+
     cmd = "java", "-ea", "a.java", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
@@ -30,6 +31,8 @@ def do(file):
         raise Exception(stderr)
     if p.returncode:
         raise Exception(str(p.returncode))
+
+    subprocess.check_call("cl /nologo a.cc")
 
 
 parser = argparse.ArgumentParser(description="Run test cases")

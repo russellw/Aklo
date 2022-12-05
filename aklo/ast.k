@@ -344,4 +344,7 @@ fn norm (modules)
 	;Having resolved names, we can concatenate modules without ambiguity
 	program=concat(vals(modules))
 
-	^program
+	;TODO: properly flatten
+	r='fn','main',[],'int',@program
+	r<<'^',0
+	^[r]
