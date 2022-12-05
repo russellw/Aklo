@@ -51,6 +51,12 @@ fn stmt(a)
 			location(loc)
 			typename(name,type)
 			r@=";\n"
+		'var',name,type,loc,val
+			location(loc)
+			typename(name,type)
+			r@="="
+			expr(val)
+			r@=";\n"
 		'^',x
 			r@="return "
 			expr(x)

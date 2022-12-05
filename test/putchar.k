@@ -3,6 +3,7 @@ OUT
 A
 }
 
-var foo int
-/putchar(65)
+var c int=65
+var d int=c
+/putchar(d)
 /putchar(10)
