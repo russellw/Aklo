@@ -45,6 +45,11 @@ fn exprs(s)
 
 fn stmt(a)
 	case a
+		'=',x,y
+			expr(x)
+			r@="="
+			expr(y)
+			r@=";\n"
 		'loc',@loc
 			location(loc)
 		'var',name,type,loc

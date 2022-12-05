@@ -208,9 +208,12 @@ fn norm (modules)
 			body=mapterms(
 				\(loc,a)(
 					case a
-						'var',@_
+						'var',name,type,loc
 							vars<<a
 							^0
+						'var',name,type,loc,val
+							vars<<'var',name,type,loc
+							^'=',name,val
 						'fn',@_
 							fns<<a
 							^0
@@ -301,8 +304,6 @@ fn norm (modules)
 				)
 
 				;resolve names in body of this function
-				;TODO avoid double converting declarations, but make sure variables don't have initial value expressions
-				;TODO do local variables have initial value expressions? what about global variables?
 				body=mapterms(
 					\(loc,a)(
 							;TODO type names
