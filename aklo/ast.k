@@ -43,9 +43,12 @@ fn mapterms (f,loc,a)
 				;leaf node that will not be processed
 				loc:=loc1
 				^a
-			'/',_
-				;leaf node that will not be processed
-				^a
+			'/',name,@s
+				;branch node that may also be processed
+				b=f(loc,a)
+				if b==proceed
+					^'/',name,@map(rec,s)
+				^b
 			'fn',@_
 			'lambda',@_
 			'quote',_

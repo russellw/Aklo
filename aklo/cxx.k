@@ -34,13 +34,25 @@ fn typename(name,type)
 			r@=" "
 			r@=str(name)
 
+fn expr(a)
+			r@=str(a)
+
+fn exprs(s)
+	for i:range(s)
+		if i
+			r@=","
+		expr(s[i])
+
 fn stmt(a)
 	case a
+		'loc',@loc
+			location(loc)
 		'var',name,type,loc
 			location(loc)
 			typename(name,type)
 			r@=";\n"
 		'fn',name,params,rtype,@body
+			;TODO should unadorned loc be part of fn?
 			typename(name,rtype)
 			r@="("
 			for pname,ptype:params
@@ -48,6 +60,15 @@ fn stmt(a)
 			r@=") {\n"
 			map(stmt,body)
 			r@="}\n"
+		'/',name,@s
+			r@=str(name)
+			r@="("
+			exprs(s)
+			r@=");\n"
+		_
+			if int?(a)
+				^
+			throw repr(a)
 
 fn compose (program)
 	r:=[]

@@ -237,7 +237,7 @@ fn parse  (file,text)
 			^r
 
 	fn primary()
-		; symbol
+		; quoted symbol
 		if startswith(tok,"'")
 			s = unesc(slice(tok,1,len(tok)-1))
 			lex()
@@ -254,6 +254,12 @@ fn parse  (file,text)
 			s = slice(tok,2,len(tok)-1)
 			lex()
 			^'list',@s
+
+		;external function call
+		if tok=="/"
+			r=intern(lex1()),word()
+			expect("(")
+			^r@exprs(")")
 
 		; word
 		case tok
@@ -395,7 +401,6 @@ fn parse  (file,text)
 			"@"
 			"*"
 			"&"
-			"/"
 				^ intern(lex1()), prefix()
 			"\\"
 				line1=line
