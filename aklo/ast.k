@@ -102,7 +102,7 @@ fn norm (modules)
 											err(loc,"invalid assignment")
 										_
 											if sym?(a)
-												implicit<<a
+												implicit<<a,loc
 								)
 								loc
 								x
@@ -113,9 +113,9 @@ fn norm (modules)
 				body
 			)
 			s=[]
-			for x  :uniq(implicit)
+			for x  :uniq(keys(implicit))
 				if!in(x,explicit)
-					s<<'var',x
+					s<<'var',x,'any',get(implicit,x)
 			^[body[0]]@s@tail(body)
 		)
 	)

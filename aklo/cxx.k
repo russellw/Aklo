@@ -1,9 +1,9 @@
 r=[]
 
-fn ptype (type)
+fn type1 (type)
 	case type
 		'&',t
-			ptype (t)
+			type1 (t)
 			r@="*"
 		'u8'
 			r@="unsigned char"
@@ -20,9 +20,30 @@ fn ptype (type)
 		'f64'
 			r@="double"
 		_
-			throw repr(type)
+			r@=str(type)
+
+fn location(loc)
+	file,line,fname=loc
+	show	 file
+	r@="#line "@str(line)@" \""@file@"\""
+	if fname
+		r@=" // "@fname
+	r@="\n"
+
+fn stmt(a)
+	case a
+		'var',name,type,loc
+			location(loc)
+			type1(type)
+			r@=" "
+			r@=str(name)
+			r@=";\n"
 
 fn compose (program)
 	r:=[]
+	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
+	map(stmt,program)
+	show program
+	show r
 	^r

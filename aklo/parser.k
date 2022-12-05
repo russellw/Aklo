@@ -571,7 +571,7 @@ fn parse  (file,text)
 				r<<optionaltype()
 
 				;location
-				r<<('loc',file,line1,fname)
+				r<<(file,line1,fname)
 
 				;initial value
 				if eat( "=")
@@ -649,10 +649,9 @@ fn parse  (file,text)
 	; top level
 	lex()
 	eat("\n")
-	fname="global"
 	r=[]
-	r<<('loc',file,line,fname)
+	r<<('loc',file,line,"")
 	while tok != ".dedent"
-		r<<('loc',file,line,fname)
-		r<<stmt(fname)
+		r<<('loc',file,line,"")
+		r<<stmt("")
 	^ r

@@ -1,3 +1,4 @@
+import argparse
 import os
 import re
 import subprocess
@@ -31,10 +32,17 @@ def do(file):
         raise Exception(str(p.returncode))
 
 
-here = os.path.dirname(os.path.realpath(__file__))
-for root, dirs, files in os.walk(here):
-    for file in files:
-        ext = os.path.splitext(file)[1]
-        if ext == ".k":
-            do(os.path.join(root, file))
+parser = argparse.ArgumentParser(description="Run test cases")
+parser.add_argument("files", nargs="*")
+args = parser.parse_args()
+if args.files:
+    for file in args.files:
+        do(file)
+else:
+    here = os.path.dirname(os.path.realpath(__file__))
+    for root, dirs, files in os.walk(here):
+        for file in files:
+            ext = os.path.splitext(file)[1]
+            if ext == ".k":
+                do(os.path.join(root, file))
 print("ok")
