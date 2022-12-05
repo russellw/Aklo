@@ -24,20 +24,30 @@ fn type1 (type)
 
 fn location(loc)
 	file,line,fname=loc
-	show	 file
 	r@="#line "@str(line)@" \""@file@"\""
 	if fname
 		r@=" // "@fname
 	r@="\n"
 
+fn typename(name,type)
+			type1(type)
+			r@=" "
+			r@=str(name)
+
 fn stmt(a)
 	case a
 		'var',name,type,loc
 			location(loc)
-			type1(type)
-			r@=" "
-			r@=str(name)
+			typename(name,type)
 			r@=";\n"
+		'fn',name,params,rtype,@body
+			typename(name,rtype)
+			r@="("
+			for pname,ptype:params
+				typename(pname,ptype)
+			r@=") {\n"
+			map(stmt,body)
+			r@="}\n"
 
 fn compose (program)
 	r:=[]

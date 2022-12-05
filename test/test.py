@@ -12,7 +12,7 @@ def search1(p, ss):
 
 def do(file):
     print(file)
-    cmd = "java", "-ea", "a.java", file, r"C:\aklo\aklo"
+    cmd = "java", "-ea", "a.java", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,
