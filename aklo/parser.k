@@ -412,12 +412,13 @@ fn parse  (file,text)
 
 				;body
 				expect("(")
-				r<<('loc',file,line1,"lambda")
+				r<<(file,line1,"lambda")
 				if eat(".indent")
 					while !eat( ".dedent")
 						r<<('loc',file,line,"lambda")
 						r<<stmt("lambda")
 				else
+					r<<('loc',file,line,"lambda")
 					r<<'^',commas()
 				expect(")")
 
@@ -599,7 +600,7 @@ fn parse  (file,text)
 				r<<optionaltype()
 
 				;location
-				r<<('loc',file,line1,fname)
+				r<<(file,line1,fname)
 
 				;body
 				expect(".indent")
@@ -655,7 +656,7 @@ fn parse  (file,text)
 	lex()
 	eat("\n")
 	r=[]
-	r<<('loc',file,line,"")
+	r<<(file,line,"")
 	while tok != ".dedent"
 		r<<('loc',file,line,"")
 		r<<stmt("")

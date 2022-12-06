@@ -54,8 +54,8 @@ fn stmt(a)
 			r@="return "
 			expr(x)
 			r@=";\n"
-		'fn',name,params,rtype,@body
-			;TODO should unadorned loc be part of fn?
+		'fn',name,params,rtype,loc,@body
+			location(loc)
 			typename(name,rtype)
 			r@="("
 			for pname,ptype:params

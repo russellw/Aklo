@@ -16,25 +16,25 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-fn mapfns(f,params,body)
+fn mapfns(f,params,loc,body)
 	;recursively transform local functions
 	body=mapterms(
 		\(_,a)(
 			case a
-				'fn',name,params,rtype,@body
-					body= mapfns(f,params,body)
-					^'fn',name,params,rtype,@body
-				'lambda',params,@body
-					body= mapfns(f,params,body)
-					^'lambda',params,@body
+				'fn',name,params,rtype,loc,@body
+					body= mapfns(f,params,loc,body)
+					^'fn',name,params,rtype,loc,@body
+				'lambda',params,loc,@body
+					body= mapfns(f,params,loc,body)
+					^'lambda',params,loc,@body
 			^proceed
 		)
-		0
+		loc
 		body
 	)
 
 	;transform the current function
-	^f(params,body)
+	^f(params,loc,body)
 
 fn mapterms (f,loc,a)
 	fn rec( a)
@@ -74,15 +74,16 @@ fn norm (modules)
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
-				^mapfns(f,[],module)
+				loc,@body=module
+				body=mapfns(f,[],loc,body)
+				^loc,@body
 			)
 			modules
 		)
 
 	;generate explicit variable declarations
 	modules=mapmodules(
-		\(params,body)(
-			'loc',@loc=body[0]
+		\(params,loc,body)(
 			explicit=keys(params)
 			implicit=[]
 			mapterms(
@@ -119,14 +120,13 @@ fn norm (modules)
 			for x  :uniq(keys(implicit))
 				if!in(x,explicit)
 					s<<'var',x,'any',get(implicit,x)
-			^[body[0]]@s@tail(body)
+			^s@body
 		)
 	)
 
 	;check for inconsistent declarations
 	mapmodules(
-		\(params,body)(
-			'loc',@loc=body[0]
+		\(params,loc,body)(
 			nonlocals=[]
 			locals=keys(params)
 			if uniq(locals)!=locals
@@ -182,27 +182,24 @@ fn norm (modules)
 
 	;expand lambdas
 	modules=mapmodules(
-		\(params,body)(
-			'loc',@loc=body[0]
-			body=mapterms(
+		\(params,loc,body)(
+			^mapterms(
 				\(loc,a)(
 					case a
 						'lambda',params,@body
 							y=gensym("lambda")
-							^'do',('fn',y,params,'any',@body),y
+							^'do',('fn',y,params,'any',loc,@body),y
 					^proceed
 				)
 				loc
 				body
 			)
-			^body
 		)
 	)
 
 	;Hoist declarations to start
 	modules=mapmodules(
-		\(params,body)(
-			'loc',@loc=body[0]
+		\(params,loc,body)(
 			vars=[]
 			fns=[]
 			body=mapterms(
@@ -222,7 +219,7 @@ fn norm (modules)
 				loc
 				body
 			)
-			^[body[0]]@vars@fns@tail(body)
+			^vars@fns@body
 		)
 	)
 
@@ -252,7 +249,7 @@ fn norm (modules)
 			;need the module name to resolve dotted names relative to current module
 			modname,module=kv
 
-			fn rec( env,params,body)
+			fn rec( env,params,loc,body)
 				;rename parameters
 				params=map(
 					\(x)(
@@ -281,15 +278,14 @@ fn norm (modules)
 				;recurse into functions
 				fns=map(
 					\(a)(
-						'fn',name,params,rtype,@body=a
-						params,body=rec(env,params,body)
-						^'fn',name,params,rtype,@body
+						'fn',name,params,rtype,loc,@body=a
+						params,body=rec(env,params,loc,body)
+						^'fn',name,params,rtype,loc,@body
 					)
 					fns
 				)
 
 				;rename labels
-				'loc',@loc=body[0]
 				labels=[]
 				mapterms(
 					\(loc,a)(
@@ -336,16 +332,18 @@ fn norm (modules)
 				;return renamed entities as well as function body with updated names
 				^params,vars@fns@body
 
-			_,module=rec(env,[],module)
-			^modname,module
+			loc,@body=module
+			_,body=rec(env,[],loc,body)
+			^modname,[loc]@body
 		)
 		modules
 	)
 
 	;Having resolved names, we can concatenate modules without ambiguity
-	program=concat(vals(modules))
+	program=concat(map(tail,vals(modules)))
 
 	;TODO: properly flatten
-	r='fn','main',[],'int',@program
+	loc=modules[0][1][0]
+	r='fn','main',[],'int',loc,@program
 	r<<'^',0
 	^[r]
