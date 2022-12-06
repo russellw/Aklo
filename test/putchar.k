@@ -3,7 +3,7 @@ OUT
 A
 }
 
-var c int=65
+var c int=6
 var d int=c
 
 if 1
@@ -20,6 +20,9 @@ else
 :stuck
 while 0
 	goto stuck
+
+while d<65
+	d=d+1
 
 /putchar(d)
 /putchar(10)

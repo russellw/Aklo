@@ -349,6 +349,11 @@ fn norm (modules)
 			vars,fns,body=splitdecls(body)
 			code=[]
 
+			fn genvar(name)
+				a=gensym(name)
+				vars<<'var',a,'any',loc
+				^a
+
 			fn term (loop,a)
 				fn rec(a)
 					^term(loop,a)
@@ -360,10 +365,9 @@ fn norm (modules)
 					yeslabel = gensym("ifyes")
 					nolabel = gensym("ifno")
 					afterlabel = gensym("ifafter")
-					r = gensym("ifresult")
+					r = genvar("ifresult")
 
 					;test
-					code<<':',testlabel
 					code<<'if',rec(test),yeslabel
 					code<<'goto',nolabel
 
@@ -393,17 +397,17 @@ fn norm (modules)
 					'!',x
 						^if1(x,0,1)
 					'if',test,yes,no
-						^if1(test,yes,no)
+						if1(test,yes,no)
 					'/',name,@s
-						r=gensym(str(name))
-						assign(r,('/',name,@map(rec,s)))
+						r=genvar(str(name))
+						code<<'=',r,('/',name,@map(rec,s))
 						^r
 					'|',x,y
-						r=gensym("or")
+						r=genvar("or")
 						assign(r,x)
 						^if1(r,r,y)
 					'&',x,y
-						r=gensym("and")
+						r=genvar("and")
 						assign(r,x)
 						^if1(r,y,r)
 					'while',test,@body
@@ -443,6 +447,11 @@ fn norm (modules)
 					'goto',_
 					':',_
 						code<<a
+					'+',@s
+					'<',@s
+						r=genvar("")
+						code<<'=',r,(a[0],@map(rec,s))
+						^r
 					[@_]
 						throw repr(a)
 					_

@@ -7,6 +7,9 @@ fn type1 (type)
 			r@="*"
 		'uchar'
 			r@="unsigned char"
+		'any'
+			;TODO placeholder
+			r@="int"
 		_
 			r@=str(type)
 
@@ -23,6 +26,15 @@ fn typename(name,type)
 			r@=str(name)
 
 fn expr(a)
+	case a
+		'/',name,@s
+			r@=str(name)
+			r@="("
+			exprs(s)
+			r@=")"
+		[@_]
+			throw repr(a)
+		_
 			r@=str(a)
 
 fn exprs(s)
@@ -76,15 +88,9 @@ fn stmt(a)
 			r@=") goto "
 			expr(label)
 			r@=";\n"
-		'/',name,@s
-			r@=str(name)
-			r@="("
-			exprs(s)
-			r@=");\n"
 		_
-			if int?(a)
-				^
-			throw repr(a)
+			expr(a)
+			r@=";\n"
 
 fn compose (program)
 	r:=[]
@@ -92,5 +98,4 @@ fn compose (program)
 	r@="#include <stdlib.h>\n"
 	map(stmt,program)
 	show program
-	show r
 	^r
