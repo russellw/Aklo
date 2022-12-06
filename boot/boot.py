@@ -13,22 +13,14 @@ def each(f, s):
         f(a)
 
 
-def eachr(f, a):
+def eachterms(f, a):
     match a:
+        case ("fn", *_) | ("\\", *_):
+            pass
         case [*_]:
             for b in a:
-                eachr(f, b)
+                eachterms(f, b)
     f(a)
-
-
-def mapr(f, a):
-    match a:
-        case [*_]:
-            a = [mapr(f, b) for b in a]
-    b = f(a)
-    if b is None:
-        return a
-    return b
 
 
 def partition(f, s):
@@ -1005,11 +997,11 @@ def assignedvars(params, body):
         match a:
             case "case", x, *cases:
                 for pattern, *body in cases:
-                    eachr(lhs, pattern)
+                    eachterms(lhs, pattern)
             case ("=", x, _) | ("for", x, *_):
-                eachr(lhs, x)
+                eachterms(lhs, x)
 
-    eachr(f, body)
+    eachterms(f, body)
     return r.keys()
 
 
