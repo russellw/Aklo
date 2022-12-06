@@ -70,11 +70,12 @@ fn stmt(a)
 			r@="goto "
 			expr(x)
 			r@=";\n"
-		'if',test,yes
+		'if',test,label
 			r@="if ("
 			expr(test)
-			r@=")"
-			stmt(yes)
+			r@=") goto "
+			expr(label)
+			r@=";\n"
 		'/',name,@s
 			r@=str(name)
 			r@="("

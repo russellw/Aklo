@@ -342,8 +342,121 @@ fn norm (modules)
 	;Having resolved names, we can concatenate modules without ambiguity
 	program=concat(map(tail,vals(modules)))
 
-	;TODO: properly flatten
+	;expand to three-address code
 	loc=modules[0][1][0]
+	program=mapfns(
+		\(params,loc,body)(
+			vars,fns,body=splitdecls(body)
+			code=[]
+
+			fn term (loop,a)
+				fn rec(a)
+					^term(loop,a)
+
+				fn assign (y,x)
+					code<<'=',y,rec(x)
+
+				fn if1(test,yes,no)
+					yeslabel = gensym("ifyes")
+					nolabel = gensym("ifno")
+					afterlabel = gensym("ifafter")
+					r = gensym("ifresult")
+
+					;test
+					code<<':',testlabel
+					code<<'if',rec(test),yeslabel
+					code<<'goto',nolabel
+
+					;yes
+					code<<':',yeslabel
+					assign(r,yes)
+					code<<'goto',afterlabel
+
+					;no
+					code<<':',nolabel
+					assign(r,no)
+
+					;after
+					code<<':',afterlabel
+					^r
+
+				case a
+					'do',@s
+						map(rec,s)
+					'=',y,x
+						assign(y,x)
+					'loc',@loc1
+						loc:=loc1
+						code<<a
+					'^',x
+						code<<'^',rec(x)
+					'!',x
+						^if1(x,0,1)
+					'if',test,yes,no
+						^if1(test,yes,no)
+					'/',name,@s
+						r=gensym(str(name))
+						assign(r,('/',name,@map(rec,s)))
+						^r
+					'|',x,y
+						r=gensym("or")
+						assign(r,x)
+						^if1(r,r,y)
+					'&',x,y
+						r=gensym("and")
+						assign(r,x)
+						^if1(r,y,r)
+					'while',test,@body
+						bodylabel = gensym("whilebody")
+						testlabel = gensym("whiletest")
+						afterlabel = gensym("whileafter")
+						loop = testlabel, afterlabel
+
+						code<<'goto',testlabel
+
+						;body
+						code<<':',bodylabel
+						map(rec,body)
+
+						;test
+						code<<':',testlabel
+						code<<'if',rec(test),bodylabel
+
+						;after
+						code<<':',afterlabel
+					'dowhile',test,@body
+						bodylabel = gensym("dowhilebody")
+						testlabel = gensym("dowhiletest")
+						afterlabel = gensym("dowhileafter")
+						loop = testlabel, afterlabel
+
+						;body
+						code<<':',bodylabel
+						map(rec,body)
+
+						;test
+						code<<':',testlabel
+						code<<'if',rec(test),bodylabel
+
+						;after
+						code<<':',afterlabel
+					'goto',_
+					':',_
+						code<<a
+					[@_]
+						throw repr(a)
+					_
+							^a
+
+			map(\(a)(term((0,0),a)),body)
+			^vars@fns@code
+		)
+		[]
+		loc
+		program
+	)
+
+	;TODO: properly flatten
 	r='fn','main',[],'int',loc,@program
 	r<<'^',0
 	^[r]

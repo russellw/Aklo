@@ -525,6 +525,8 @@ fn parse  (file,text)
 			"else"
 				lex()
 				r<<'do',@block(fname)
+			_
+				r<<0
 		^ r
 
 	fn stmt(fname)
