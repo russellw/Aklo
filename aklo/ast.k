@@ -359,7 +359,8 @@ fn norm (modules)
 					^term(loop,a)
 
 				fn assign (y,x)
-					code<<'=',y,rec(x)
+					x=rec(x)
+					code<<'=',y,x
 
 				fn if1(test,yes,no)
 					yeslabel = gensym("ifyes")
@@ -368,7 +369,8 @@ fn norm (modules)
 					r = genvar("ifresult")
 
 					;test
-					code<<'if',rec(test),yeslabel
+					test=rec(test)
+					code<<'if',test,yeslabel
 					code<<'goto',nolabel
 
 					;yes
@@ -393,14 +395,16 @@ fn norm (modules)
 						loc:=loc1
 						code<<a
 					'^',x
-						code<<'^',rec(x)
+						x=rec(x)
+						code<<'^',x
 					'!',x
 						^if1(x,0,1)
 					'if',test,yes,no
 						if1(test,yes,no)
 					'/',name,@s
+						s=map(rec,s)
 						r=genvar(str(name))
-						code<<'=',r,('/',name,@map(rec,s))
+						code<<'=',r,('/',name,@s)
 						^r
 					'|',x,y
 						r=genvar("or")
@@ -424,7 +428,8 @@ fn norm (modules)
 
 						;test
 						code<<':',testlabel
-						code<<'if',rec(test),bodylabel
+						test=rec(test)
+						code<<'if',test,bodylabel
 
 						;after
 						code<<':',afterlabel
@@ -440,7 +445,8 @@ fn norm (modules)
 
 						;test
 						code<<':',testlabel
-						code<<'if',rec(test),bodylabel
+						test=rec(test)
+						code<<'if',test,bodylabel
 
 						;after
 						code<<':',afterlabel
@@ -449,8 +455,9 @@ fn norm (modules)
 						code<<a
 					'+',@s
 					'<',@s
+						s=map(rec,s)
 						r=genvar("")
-						code<<'=',r,(a[0],@map(rec,s))
+						code<<'=',r,(a[0],@s)
 						^r
 					[@_]
 						throw repr(a)

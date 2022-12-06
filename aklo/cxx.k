@@ -32,6 +32,11 @@ fn expr(a)
 			r@="("
 			exprs(s)
 			r@=")"
+		'+',x,y
+		'<',x,y
+			expr(x)
+			r@=str(a[0])
+			expr(y)
 		[@_]
 			throw repr(a)
 		_
@@ -97,5 +102,4 @@ fn compose (program)
 	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
 	map(stmt,program)
-	show program
 	^r
