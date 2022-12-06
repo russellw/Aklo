@@ -63,6 +63,18 @@ fn stmt(a)
 			r@=") {\n"
 			map(stmt,body)
 			r@="}\n"
+		':',x
+			expr(x)
+			r@=":\n"
+		'goto',x
+			r@="goto "
+			expr(x)
+			r@=";\n"
+		'if',test,yes
+			r@="if ("
+			expr(test)
+			r@=")"
+			stmt(yes)
 		'/',name,@s
 			r@=str(name)
 			r@="("
