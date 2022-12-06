@@ -290,7 +290,7 @@ fn norm (modules)
 				mapterms(
 					\(loc,a)(
 							case a
-								'label',x
+								':',x
 									y=gensym(str(x))
 									labels<<x,y
 							^proceed
@@ -317,7 +317,7 @@ fn norm (modules)
 										if  y
 											^y
 									err(loc,join(".",map(str,names))@" not found")
-								'label',x
+								':',x
 								'goto',x
 									y=get(labels,x)
 									if!y

@@ -632,10 +632,6 @@ fn parse  (file,text)
 				expect("\n")
 				^ r
 			":"
-				lex()
-				r='label',word()
-				expect("\n")
-				^ r
 			"goto"
 				lex()
 				r<<word()
