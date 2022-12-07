@@ -85,11 +85,11 @@ fn stmt(a)
 			r@=";\n"
 		'loc',@loc
 			location(loc)
-		'var',name,type,loc
+		'var',loc,name,type
 			location(loc)
 			typename(name,type)
 			r@=";\n"
-		'var',name,type,loc,val
+		'var',loc,name,type,val
 			location(loc)
 			typename(name,type)
 			r@="="
@@ -99,7 +99,7 @@ fn stmt(a)
 			r@="return "
 			expr(x)
 			r@=";\n"
-		'fn',name,params,rtype,loc,@body
+		'fn',loc,name,params,rtype,@body
 			location(loc)
 			typename(name,rtype)
 			r@="("

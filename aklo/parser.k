@@ -410,16 +410,15 @@ fn parse  (file,text)
 			"&"
 				^ intern(lex1()), prefix()
 			"\\"
-				line1=line
+				;location
+				r = ['lambda',(file,line,"lambda")]
 				lex()
-				r = ['lambda']
 
 				;parameters
 				r<<params()
 
 				;body
 				expect("(")
-				r<<(file,line1,"lambda")
 				if eat(".indent")
 					while !eat( ".dedent")
 						r<<('loc',file,line,"lambda")
@@ -582,7 +581,8 @@ fn parse  (file,text)
 				r@=block(fname)
 				^ r
 			"var"
-				line1=line
+				;location
+				r<<(file,line,fname)
 				lex()
 
 				;name
@@ -591,9 +591,6 @@ fn parse  (file,text)
 				;type
 				r<<optionaltype()
 
-				;location
-				r<<(file,line1,fname)
-
 				;initial value
 				if eat( "=")
 					r<<commas()
@@ -601,11 +598,13 @@ fn parse  (file,text)
 				expect("\n")
 				^ r
 			"fn"
+				;location
 				line1=line
 				lex()
+				fname=tok
+				r<<(file,line1,fname)
 
 				;name
-				fname=tok
 				r<<word()
 
 				;parameters
@@ -613,9 +612,6 @@ fn parse  (file,text)
 
 				;return type
 				r<<optionaltype()
-
-				;location
-				r<<(file,line1,fname)
 
 				;body
 				expect(".indent")

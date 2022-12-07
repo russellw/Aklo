@@ -16,17 +16,17 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-fn mapfns(f,params,loc,body)
+fn mapfns(f,loc,params,body)
 	;recursively transform local functions
 	body=mapterms(
 		\(_,a)(
 			case a
-				'fn',name,params,rtype,loc,@body
-					body= mapfns(f,params,loc,body)
-					^'fn',name,params,rtype,loc,@body
-				'lambda',params,loc,@body
-					body= mapfns(f,params,loc,body)
-					^'lambda',params,loc,@body
+				'fn',loc,name,params,rtype,@body
+					body= mapfns(f,loc,params,body)
+					^'fn',loc,name,params,rtype,@body
+				'lambda',loc,params,@body
+					body= mapfns(f,loc,params,body)
+					^'lambda',loc,params,@body
 			^proceed
 		)
 		loc
@@ -34,7 +34,7 @@ fn mapfns(f,params,loc,body)
 	)
 
 	;transform the current function
-	^f(params,loc,body)
+	^f(loc,params,body)
 
 fn mapterms (f,loc,a)
 	fn rec( a)
@@ -75,7 +75,7 @@ fn norm (modules)
 			\(module)(
 				;processing a module is like processing a function body with no parameters
 				loc,@body=module
-				body=mapfns(f,[],loc,body)
+				body=mapfns(f,loc,[],body)
 				^loc,@body
 			)
 			modules
@@ -83,13 +83,13 @@ fn norm (modules)
 
 	;generate explicit variable declarations
 	modules=mapmodules(
-		\(params,loc,body)(
+		\(loc,params,body)(
 			explicit=keys(params)
 			implicit=[]
 			mapterms(
 				\(loc,a)(
 					case a
-						'var',x,@_
+						'var',_,x,@_
 							explicit<<x
 						'for',x,@_
 						'when',x
@@ -105,7 +105,7 @@ fn norm (modules)
 										[@_]
 											err(loc,"invalid assignment")
 										_
-											if sym?(a)
+											if sym?(a)&!in(a,keys(implicit))
 												implicit<<a,loc
 								)
 								loc
@@ -117,16 +117,16 @@ fn norm (modules)
 				body
 			)
 			s=[]
-			for x  :uniq(keys(implicit))
+			for x,loc  :implicit
 				if!in(x,explicit)
-					s<<'var',x,'any',get(implicit,x)
+					s<<'var',loc,x,'any'
 			^s@body
 		)
 	)
 
 	;check for inconsistent declarations
 	mapmodules(
-		\(params,loc,body)(
+		\(loc,params,body)(
 			nonlocals=[]
 			locals=keys(params)
 			if uniq(locals)!=locals
@@ -135,13 +135,13 @@ fn norm (modules)
 			mapterms(
 				\(loc,a)(
 					case a
-						'fn',x,@_
+						'fn',loc,x,@_
 							if in(x,nonlocals)|in(x,locals)
 								err(loc,str(x)@" is both a function and a variable")
 							if in(x,fns)
 								err(loc,str(x)@" defined twice")
 							fns<<x
-						'var',x,@_
+						'var',loc,x,@_
 							if in(x,fns)
 								err(loc,str(x)@" is both a function and a variable")
 							if in(x,nonlocals)
@@ -182,13 +182,13 @@ fn norm (modules)
 
 	;expand lambdas
 	modules=mapmodules(
-		\(params,loc,body)(
+		\(loc,params,body)(
 			^mapterms(
 				\(loc,a)(
 					case a
-						'lambda',params,@body
+						'lambda',loc,params,@body
 							y=gensym("lambda")
-							^'do',('fn',y,params,'any',loc,@body),y
+							^'do',('fn',loc,y,params,'any',@body),y
 					^proceed
 				)
 				loc
@@ -199,17 +199,17 @@ fn norm (modules)
 
 	;Hoist declarations to start
 	modules=mapmodules(
-		\(params,loc,body)(
+		\(loc,params,body)(
 			vars=[]
 			fns=[]
 			body=mapterms(
 				\(loc,a)(
 					case a
-						'var',name,type,loc
+						'var',loc,name,type
 							vars<<a
 							^0
-						'var',name,type,loc,val
-							vars<<'var',name,type,loc
+						'var',loc,name,type,val
+							vars<<'var',loc,name,type
 							^'=',name,val
 						'fn',@_
 							fns<<a
@@ -231,8 +231,8 @@ fn norm (modules)
 	for  modname,module:modules
 		for a  :module
 						case a
-							'var',x,@_
-							'fn',x,@_
+							'var',_,x,@_
+							'fn',_,x,@_
 								y=gensym(str(x))
 								globals<<modname@[x],y
 
@@ -249,7 +249,7 @@ fn norm (modules)
 			;need the module name to resolve dotted names relative to current module
 			modname,module=kv
 
-			fn rec( env,params,loc,body)
+			fn rec( env,loc,params,body)
 				;rename parameters
 				params=map(
 					\(x)(
@@ -267,20 +267,20 @@ fn norm (modules)
 				; before recursing into any function
 				vars,fns,body=splitdecls(body)
 				fn decl(a)
-						op,x,@s=a
+						op,loc,x,@s=a
 						assert op=='var'|op=='fn'
 						y=gensym(str(x))
 						x,y>>env
-						^op,y,@s
+						^op,loc,y,@s
 				vars=map(decl,vars)
 				fns=map(decl,fns)
 
 				;recurse into functions
 				fns=map(
 					\(a)(
-						'fn',name,params,rtype,loc,@body=a
-						params,body=rec(env,params,loc,body)
-						^'fn',name,params,rtype,loc,@body
+						'fn',loc,name,params,rtype,@body=a
+						params,body=rec(env,loc,params,body)
+						^'fn',loc,name,params,rtype,@body
 					)
 					fns
 				)
@@ -333,7 +333,7 @@ fn norm (modules)
 				^params,vars@fns@body
 
 			loc,@body=module
-			_,body=rec(env,[],loc,body)
+			_,body=rec(env,loc,[],body)
 			^modname,[loc]@body
 		)
 		modules
@@ -343,15 +343,16 @@ fn norm (modules)
 	program=concat(map(tail,vals(modules)))
 
 	;expand to three-address code
+	;TODO vars as separate list field
 	loc=modules[0][1][0]
 	program=mapfns(
-		\(params,loc,body)(
+		\(loc,params,body)(
 			vars,fns,body=splitdecls(body)
 			code=[]
 
 			fn genvar(name)
 				a=gensym(name)
-				vars<<'var',a,'any',loc
+				vars<<'var',loc,a,'any'
 				^a
 
 			fn term (loop,a)
@@ -511,6 +512,6 @@ fn norm (modules)
 	)
 
 	;TODO: properly flatten
-	r='fn','main',[],'int',loc,@program
+	r='fn',loc,'main',[],'int',@program
 	r<<'^',0
 	^[r]
