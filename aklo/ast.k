@@ -495,6 +495,8 @@ fn norm (modules)
 						r=genvar("")
 						code<<'=',r,(a[0],@s)
 						^r
+					'quote',_
+						^a
 					[@_]
 						throw repr(a)
 					_

@@ -237,44 +237,30 @@ fn parse  (file,text)
 			^r
 
 	fn primary()
-		; quoted symbol
-		if startswith(tok,"'")
-			s = unesc(slice(tok,1,len(tok)-1))
-			lex()
-			^ 'quote',intern(s)
+		;remember the current location in case we need to report an error
+		file1=file
+		line1=line
 
-		; string
-		if startswith(tok,"\"")
-			s = unesc(slice(tok,1,len(tok)-1))
-			lex()
-			^'list',@s
+		;unless there is an error, this token will definitely be consumed
+		s=tok
+		lex()
+		r=[intern(s)]
 
-		; raw string
-		if startswith(tok,"r\"")
-			s = slice(tok,2,len(tok)-1)
-			lex()
-			^'list',@s
-
-		;external function call
-		if tok=="/"
-			lex()
-			r='xcall',word()
-			expect("(")
-			^r@exprs(")")
-
-		; word
-		case tok
-			"range"
-				op=word()
+		;some primary expressions are indicated by specific tokens
+		case s
+			"/"
+				r='xcall',word()
 				expect("(")
-				a=expr()
+				^r@exprs(")")
+			"range"
+				expect("(")
+				r<<expr()
 				if eat(",")
-					b=expr()
+					r<<expr()
 				else
-					b=a
-					a=0
+					r=['range',0,r[1]]
 				expect(")")
-				^op,a,b
+				^r
 			"sym?"
 			"list?"
 			"int?"
@@ -284,11 +270,10 @@ fn parse  (file,text)
 			"len"
 			"listdir"
 			"exit"
-				op=word()
 				expect("(")
-				a=expr()
+				r<<expr()
 				expect(")")
-				^op,a
+				^r
 			"bitxor"
 			"bitor"
 			"bitand"
@@ -297,63 +282,82 @@ fn parse  (file,text)
 			"writestream"
 			"writefile"
 			"ctreadfiles"
-				op=word()
 				expect("(")
-				a=expr()
+				r<<expr()
 				expect(",")
-				b=expr()
+				r<<expr()
 				expect(")")
-				^op,a,b
+				^r
 			"slice"
-				op=word()
 				expect("(")
-				a=expr()
+				r<<expr()
 				expect(",")
-				b=expr()
+				r<<expr()
 				expect(",")
-				c=expr()
+				r<<expr()
 				expect(")")
-				^op,a,b,c
+				^r
 			"args"
 			"stdout"
 			"stderr"
 			"windows?"
-				^[word()]
+				^r
 			"false"
-				lex()
 				^ 0
 			"true"
-				lex()
 				^ 1
-		if idstart?(tok[0])
-			^ word()
+			"("
+				a = commas()
+				expect(")")
+				^ a
+			"["
+				^['list']@exprs("]")
+
+		; quoted symbol
+		if startswith(s,"'")
+			s = unesc(slice(s,1,len(s)-1))
+			^ 'quote',intern(s)
+
+		; string
+		if startswith(s,"\"")
+			s = unesc(slice(s,1,len(s)-1))
+			^'list',@s
+
+		; raw string
+		if startswith(s,"r\"")
+			s = slice(s,2,len(s)-1)
+			^'list',@s
+
+		; word
+		if idstart?(s[0])
+			^ r[0]
 
 		; number
-		if digit?(tok[0])
-			s=replace("_","",tok)
+		if digit?(s[0])
+			s=replace("_","",s)
+
+			;integer
 			case lower(take(2,s))
 				"0b"
-					a = parseint(drop(2,s), 2)
+					^ parseint(drop(2,s), 2)
 				"0o"
-					a = parseint(drop(2,s), 8)
+					^ parseint(drop(2,s), 8)
 				"0x"
-					a = parseint(drop(2,s), 16)
-				_
-					a = parseint(s,10)
-			lex()
-			^ a
+					^ parseint(drop(2,s), 16)
+			if every(digit?,s)
+				^ parseint(s,10)
 
-		; bracketed expression
-		if eat("(")
-			a = commas()
-			expect(")")
-			^ a
-
-		; list
-		if eat("[")
-			^['list']@exprs("]")
+			;floating point
+			op='parsedouble'
+			if endswith(lower(s),"f")
+				s=init(s)
+				op='parsefloat'
+			^'xcall',op,('quote',s)
 
 		; none of the above
+		file:=file1
+		line:=line1
+		tok:=s
 		errtok("expected expression")
 
 	fn postfix()

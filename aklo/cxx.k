@@ -33,6 +33,8 @@ fn binaryexpr(op,a,b)
 			expr(b)
 fn expr(a)
 	case a
+		'xcall','parsedouble',('quote',s)
+			r@=s
 		'xcall',name,@s
 			r@=str(name)
 			r@="("
