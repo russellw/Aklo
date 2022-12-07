@@ -24,5 +24,12 @@ while 0
 while d<65
 	d=d+1
 
+assert 1
+
+i=0
+while i<10
+	i=i+1
+assert i==10
+
 /putchar(d)
 /putchar(10)

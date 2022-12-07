@@ -450,11 +450,18 @@ fn norm (modules)
 
 						;after
 						code<<':',afterlabel
+					'assert',test,msg
+						test=rec(test)
+						code<<'assert',test,msg
 					'goto',_
 					':',_
 						code<<a
 					'+',@s
+					'-',@s
+					'*',@s
 					'<',@s
+					'<=',@s
+					'==',@s
 						s=map(rec,s)
 						r=genvar("")
 						code<<'=',r,(a[0],@s)

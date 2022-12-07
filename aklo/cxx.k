@@ -33,7 +33,11 @@ fn expr(a)
 			exprs(s)
 			r@=")"
 		'+',x,y
+		'-',x,y
+		'*',x,y
 		'<',x,y
+		'<=',x,y
+		'==',x,y
 			expr(x)
 			r@=str(a[0])
 			expr(y)
@@ -80,12 +84,12 @@ fn stmt(a)
 			r@=") {\n"
 			map(stmt,body)
 			r@="}\n"
-		':',x
-			expr(x)
+		':',label
+			expr(label)
 			r@=":\n"
-		'goto',x
+		'goto',label
 			r@="goto "
-			expr(x)
+			expr(label)
 			r@=";\n"
 		'if',test,label
 			r@="if ("
@@ -93,6 +97,17 @@ fn stmt(a)
 			r@=") goto "
 			expr(label)
 			r@=";\n"
+		'assert',test,msg
+			r@="if (!"
+			expr(test)
+			r@=")\n"
+			stmt(('throw',msg))
+		'throw',msg
+			;TODO
+			r@="{\n"
+			r@="fputs(\""@msg@"\", stderr);\n"
+			r@="exit(1);\n"
+			r@="}\n"
 		_
 			expr(a)
 			r@=";\n"

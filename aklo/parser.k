@@ -529,14 +529,20 @@ fn parse  (file,text)
 				r<<0
 		^ r
 
+	fn here(fname)
+		r=file @ ":" @ str(line)
+		if fname
+			r@=": "@fname
+		^r
+
 	fn stmt(fname)
 		r = [intern (tok)]
 		case tok
 			"assert"
 				lex()
 				x = expr()
-				r<<str(x)
 				r<<x
+				r<<here(fname)@": "@str(x)
 				expect("\n")
 				^ r
 			"show"
