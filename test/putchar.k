@@ -106,5 +106,27 @@ assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
 
+i=3
+i+=4
+assert i==7
+
+i = 0
+
+j = ++i
+assert i == 1
+assert j == 1
+
+j = --i
+assert i == 0
+assert j == 0
+
+j = i++
+assert i == 1
+assert j == 0
+
+j = i--
+assert i == 0
+assert j == 1
+
 /putchar(d)
 /putchar(10)

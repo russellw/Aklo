@@ -387,6 +387,26 @@ fn norm (modules)
 					^r
 
 				case a
+					'post++',y
+						r=genvar("postinc")
+						assign(r,y)
+						assign(y,('+',y,1))
+						^r
+					'post--',y
+						r=genvar("postdec")
+						assign(r,y)
+						assign(y,('-',y,1))
+						^r
+					'++',y
+						assign(y,('+',y,1))
+						^y
+					'--',y
+						assign(y,('-',y,1))
+						^y
+					'+=',y,x
+						assign(y,('+',y,x))
+					'-=',y,x
+						assign(y,('-',y,x))
 					'do',@s
 						map(rec,s)
 					'=',y,x
