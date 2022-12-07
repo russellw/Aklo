@@ -506,8 +506,8 @@ fn norm (modules)
 			map(\(a)(term((0,0),a)),body)
 			^vars@fns@code
 		)
-		[]
 		loc
+		[]
 		program
 	)
 
