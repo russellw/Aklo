@@ -463,6 +463,8 @@ fn norm (modules)
 					'shr',@s
 					'bitnot',@s
 					'neg',@s
+					'%',@s
+					'//',@s
 					'+',@s
 					'-',@s
 					'*',@s

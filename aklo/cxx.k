@@ -34,17 +34,22 @@ fn binaryexpr(op,a,b)
 fn expr(a)
 	case a
 		'/',name,@s
+			;TODO call this operator something else internally
 			r@=str(name)
 			r@="("
 			exprs(s)
 			r@=")"
 		'+',x,y
+		'%',x,y
 		'-',x,y
 		'*',x,y
 		'<',x,y
 		'<=',x,y
 		'==',x,y
 			binaryexpr(str(a[0]),x,y)
+		'//',x,y
+			;TODO what if args are float?
+			binaryexpr("/",x,y)
 		'bitand',x,y
 			binaryexpr("&",x,y)
 		'bitor',x,y

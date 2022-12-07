@@ -73,5 +73,38 @@ assert bitnot (0)==-1
 a=1
 assert bitnot (a)==-2
 
+assert 0xff==255
+assert 0Xfe+2==256
+assert 0b10000==16
+assert 0o100==64
+assert 1_234==1234
+
+assert 1<2
+assert !(1<1)
+assert !(2<1)
+
+assert 2>1
+assert !(1>1)
+assert !(1>2)
+
+assert 1<=2
+assert 1<=1
+assert !(2<=1)
+
+assert 2>=1
+assert 1>=1
+assert !(1>=2)
+
+assert 1 + 2 == 3
+assert 10 - 1 == 9
+assert 2 * 5 == 10
+assert 10 % 7 == 3
+assert 1 - 3 == -2
+assert 10//3==3
+
+assert 1 + 2 * 3 == 7
+assert 1 - 2 - 3 == -4
+assert 1 - (2 - 3) == 2
+
 /putchar(d)
 /putchar(10)
