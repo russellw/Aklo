@@ -24,7 +24,13 @@ fn typename(name,type)
 			type1(type)
 			r@=" "
 			r@=str(name)
-
+fn unaryexpr(op,a)
+			r@=op
+			expr(a)
+fn binaryexpr(op,a,b)
+			expr(a)
+			r@=op
+			expr(b)
 fn expr(a)
 	case a
 		'/',name,@s
@@ -38,9 +44,21 @@ fn expr(a)
 		'<',x,y
 		'<=',x,y
 		'==',x,y
-			expr(x)
-			r@=str(a[0])
-			expr(y)
+			binaryexpr(str(a[0]),x,y)
+		'bitand',x,y
+			binaryexpr("&",x,y)
+		'bitor',x,y
+			binaryexpr("|",x,y)
+		'bitxor',x,y
+			binaryexpr("^",x,y)
+		'shl',x,y
+			binaryexpr("<<",x,y)
+		'shr',x,y
+			binaryexpr(">>",x,y)
+		'bitnot',x
+			unaryexpr("~",x)
+		'neg',x
+			unaryexpr("-",x)
 		[@_]
 			throw repr(a)
 		_

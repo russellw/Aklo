@@ -394,10 +394,12 @@ fn parse  (file,text)
 
 	fn prefix()
 		case tok
+			"-"
+				lex()
+				^ 'neg', prefix()
 			"!"
 			"++"
 			"--"
-			"-"
 			"@"
 			"*"
 			"&"
