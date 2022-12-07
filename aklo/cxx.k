@@ -33,8 +33,7 @@ fn binaryexpr(op,a,b)
 			expr(b)
 fn expr(a)
 	case a
-		'/',name,@s
-			;TODO call this operator something else internally
+		'xcall',name,@s
 			r@=str(name)
 			r@="("
 			exprs(s)

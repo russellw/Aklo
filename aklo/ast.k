@@ -43,11 +43,11 @@ fn mapterms (f,loc,a)
 				;leaf node that will not be processed
 				loc:=loc1
 				^a
-			'/',name,@s
+			'xcall',name,@s
 				;branch node that may also be processed
 				b=f(loc,a)
 				if b==proceed
-					^'/',name,@map(rec,s)
+					^'xcall',name,@map(rec,s)
 				^b
 			'fn',@_
 			'lambda',@_
@@ -421,10 +421,10 @@ fn norm (modules)
 						^if1(x,0,1)
 					'if',test,yes,no
 						if1(test,yes,no)
-					'/',name,@s
+					'xcall',name,@s
 						s=map(rec,s)
 						r=genvar(str(name))
-						code<<'=',r,('/',name,@s)
+						code<<'=',r,('xcall',name,@s)
 						^r
 					'|',x,y
 						r=genvar("or")

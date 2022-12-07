@@ -257,7 +257,8 @@ fn parse  (file,text)
 
 		;external function call
 		if tok=="/"
-			r=intern(lex1()),word()
+			lex()
+			r='xcall',word()
 			expect("(")
 			^r@exprs(")")
 
