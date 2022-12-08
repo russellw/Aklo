@@ -41,6 +41,9 @@ fn mapterms (f,loc,a)
 			'quote',_
 				;leaf node that may still be processed
 				0
+			[[@_],@_]
+				;list of terms
+				^map(rec,a)
 			[op,@s]
 				;branch node that may also be processed
 				b=f(loc,a)
