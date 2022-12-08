@@ -1,17 +1,4 @@
 proceed=gensym("proceed")
-fn splitdecls (s)
-	vars=[]
-	fns=[]
-	body=[]
-	for a:s
-		case a
-			'var',@_
-				vars<<a
-			'fn',@_
-				fns<<a
-			_
-				body<<a
-	^vars,fns,body
 fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
@@ -84,7 +71,7 @@ fn norm (modules)
 	;generate explicit variable declarations
 	modules=mapmodules(
 		\(loc,params,body)(
-			explicit=keys(params)
+			explicit=vals(params)
 			implicit=[]
 			mapterms(
 				\(loc,a)(
@@ -128,7 +115,8 @@ fn norm (modules)
 	mapmodules(
 		\(loc,params,body)(
 			nonlocals=[]
-			locals=keys(params)
+			locals=vals(params)
+			;TODO more specific?
 			if uniq(locals)!=locals
 				err(loc,"duplicate parameter name")
 			fns=[]
@@ -206,20 +194,20 @@ fn norm (modules)
 				\(loc,a)(
 					case a
 						'var',loc,name,type
-							vars<<a
+							vars<<loc,name,type
 							^0
 						'var',loc,name,type,val
-							vars<<'var',loc,name,type
+							vars<<loc,name,type
 							^'=',name,val
-						'fn',@_
-							fns<<a
+						'fn',@s
+							fns<<s
 							^0
 					^proceed
 				)
 				loc
 				body
 			)
-			^vars@fns@body
+			^vars,fns,body
 		)
 	)
 
@@ -228,11 +216,8 @@ fn norm (modules)
 	; otherwise there would be a problem when
 	; an earlier module refers to a name defined in a later one
 	globals=[]
-	for  modname,module:modules
-		for a  :module
-						case a
-							'var',_,x,@_
-							'fn',_,x,@_
+	for  modname,(_,vars,fns,_):modules
+		for _,x,@_  :vars@fns
 								y=gensym(str(x))
 								globals<<modname@[x],y
 
@@ -249,38 +234,27 @@ fn norm (modules)
 			;need the module name to resolve dotted names relative to current module
 			modname,module=kv
 
-			fn rec( env,loc,params,body)
-				;rename parameters
-				params=map(
-					\(x)(
-						x,@s=x
+			fn rec( env,loc,params,vars,fns,body)
+				fn decl(a)
+						loc,x,@s=a
 						y=gensym(str(x))
 						x,y>>env
-						^y,@s
-					)
-					params
-				)
+						^loc,y,@s
 
 				; rename locals
-				;functions can  call each other
+				;functions can call each other
 				; so need to rename all functions and update the environment appropriately
 				; before recursing into any function
-				vars,fns,body=splitdecls(body)
-				fn decl(a)
-						op,loc,x,@s=a
-						assert op=='var'|op=='fn'
-						y=gensym(str(x))
-						x,y>>env
-						^op,loc,y,@s
+				params=map(decl,params)
 				vars=map(decl,vars)
 				fns=map(decl,fns)
 
 				;recurse into functions
 				fns=map(
 					\(a)(
-						'fn',loc,name,params,rtype,@body=a
-						params,body=rec(env,loc,params,body)
-						^'fn',loc,name,params,rtype,@body
+						loc,name,params,rtype,vars,fns,@body=a
+						params,vars,fns,body=rec(env,loc,params,vars,fns,body)
+						^loc,name,params,rtype,vars,fns,@body
 					)
 					fns
 				)
@@ -330,29 +304,36 @@ fn norm (modules)
 				)
 
 				;return renamed entities as well as function body with updated names
-				^params,vars@fns@body
+				^params,vars,fns,body
 
-			loc,@body=module
-			_,body=rec(env,loc,[],body)
-			^modname,[loc]@body
+			loc,vars,fns,body=module
+			_,vars,fns,body=rec(env,loc,[],vars,fns,body)
+			^modname,[loc,vars,fns,body]
 		)
 		modules
 	)
 
 	;Having resolved names, we can concatenate modules without ambiguity
-	program=concat(map(tail,vals(modules)))
+	vars=[]
+	fns=[]
+	body=[]
+	for _,vars1,fns1,body1:vals(modules)
+		;TODO Should this be doable in one operation?
+		vars@=vars1
+		fns@=fns1
+		body@=body1
 
 	;expand to three-address code
-	;TODO vars as separate list field
+	;TODO pattern match assign?
 	loc=modules[0][1][0]
-	program=mapfns(
+	vars,fns,body=mapfns(
 		\(loc,params,body)(
-			vars,fns,body=splitdecls(body)
+			vars,fns,body=body
 			code=[]
 
 			fn genvar(name)
 				a=gensym(name)
-				vars<<'var',loc,a,'any'
+				vars<<loc,a,'any'
 				^a
 
 			fn term (loop,a)
@@ -504,14 +485,17 @@ fn norm (modules)
 							^a
 
 			map(\(a)(term((0,0),a)),body)
-			^vars@fns@code
+			^vars,fns,code
 		)
 		loc
 		[]
-		program
+		vars,fns,body
 	)
 
 	;TODO: properly flatten
-	r='fn',loc,'main',[],'int',@program
+	r=loc,'main',[],'int',vars,body
 	r<<'^',0
-	^[r]
+
+	vars=[]
+	fns=[r]
+	^vars,fns

@@ -85,29 +85,10 @@ fn stmt(a)
 			r@=";\n"
 		'loc',@loc
 			location(loc)
-		'var',loc,name,type
-			location(loc)
-			typename(name,type)
-			r@=";\n"
-		'var',loc,name,type,val
-			location(loc)
-			typename(name,type)
-			r@="="
-			expr(val)
-			r@=";\n"
 		'^',x
 			r@="return "
 			expr(x)
 			r@=";\n"
-		'fn',loc,name,params,rtype,@body
-			location(loc)
-			typename(name,rtype)
-			r@="("
-			for pname,ptype:params
-				typename(pname,ptype)
-			r@=") {\n"
-			map(stmt,body)
-			r@="}\n"
 		':',label
 			expr(label)
 			r@=":\n"
@@ -136,9 +117,40 @@ fn stmt(a)
 			expr(a)
 			r@=";\n"
 
+fn var1(a)
+	case a
+		loc,name,type
+			location(loc)
+			typename(name,type)
+		loc,name,type,val
+			location(loc)
+			typename(name,type)
+			r@="="
+			expr(val)
+		_
+			throw repr(a)
+	r@=";\n"
+
+fn fn1(a)
+	loc,name,params,rtype,vars,body=a
+	location(loc)
+	typename(name,rtype)
+	r@="("
+	for i:range(params)
+		if i
+			r@=","
+		_,pname,ptype=params[i]
+		typename(pname,ptype)
+	r@=") {\n"
+	map(var1,vars)
+	map(stmt,body)
+	r@="}\n"
+
 fn compose (program)
+	vars,fns=program
 	r:=[]
 	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
-	map(stmt,program)
+	map(var1,vars)
+	map(fn1,fns)
 	^r

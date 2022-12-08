@@ -381,19 +381,19 @@ fn parse  (file,text)
 				_
 					^ a
 
-	fn param()
-		^word(),optionaltype()
+	fn param(fname)
+		^(file,line,fname),word(),optionaltype()
 
-	fn params()
+	fn params(fname)
 		expect("(")
 		r = []
 		if eat(".indent")
 			while ! eat(".dedent")
-				r<<param()
+				r<<param(fname)
 				expect("\n")
 		elif tok!=")"
 				dowhile  eat(",")
-					r<<param()
+					r<<param(fname)
 		expect(")")
 		^ r
 
@@ -415,7 +415,7 @@ fn parse  (file,text)
 				lex()
 
 				;parameters
-				r<<params()
+				r<<params("lambda")
 
 				;body
 				expect("(")
@@ -571,6 +571,7 @@ fn parse  (file,text)
 			"while"
 				lex()
 				r<<expr()
+				;TODO simplify
 				r@=block(fname)
 				^ r
 			"for"
@@ -608,7 +609,7 @@ fn parse  (file,text)
 				r<<word()
 
 				;parameters
-				r<<params()
+				r<<params(fname)
 
 				;return type
 				r<<optionaltype()
