@@ -476,6 +476,11 @@ fn intersection (s,t)
 			r<<a
 	^uniq(r)
 
+fn eqsets(s,t)
+	s=uniq(s)
+	t=uniq(t)
+	^len(s)==len(t)&every(\(a)(in(a,s)),t)
+
 fn dirseparator? (c)
 	if windows?
 		^in(c,":\\/")
