@@ -5,5 +5,7 @@ i=0
 goto next
 :next
 
+assert 1
+
 var a double
 a=1.5

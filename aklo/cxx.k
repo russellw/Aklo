@@ -65,6 +65,8 @@ fn expr(a)
 			unaryexpr("~",x)
 		'neg',x
 			unaryexpr("-",x)
+		'quote',x
+			r@=repr(x)
 		[@_]
 			throw repr(a)
 		_
@@ -102,15 +104,12 @@ fn stmt(a)
 			r@=") goto "
 			expr(label)
 			r@=";\n"
-		'assert',test,msg
-			r@="if (!"
-			expr(test)
-			r@=")\n"
-			stmt(('throw',msg))
 		'throw',msg
 			;TODO
 			r@="{\n"
-			r@="fputs(\""@msg@"\", stderr);\n"
+			r@="fputs("
+			expr(msg)
+			r@=", stderr);\n"
 			r@="exit(1);\n"
 			r@="}\n"
 		_

@@ -398,9 +398,10 @@ fn norm (modules)
 					'loc',@loc1
 						loc:=loc1
 						code<<a
+					'throw',x
 					'^',x
 						x=rec(x)
-						code<<'^',x
+						code<<a[0],x
 					'!',x
 						^if1(x,0,1)
 					'if',test,yes,no
@@ -454,9 +455,6 @@ fn norm (modules)
 
 						;after
 						code<<':',afterlabel
-					'assert',test,msg
-						test=rec(test)
-						code<<'assert',test,msg
 					'goto',_
 					':',_
 						code<<a
@@ -481,6 +479,8 @@ fn norm (modules)
 						^r
 					'quote',_
 						^a
+					[[@_],@_]
+						^map(rec,a)
 					[@_]
 						throw repr(a)
 					_

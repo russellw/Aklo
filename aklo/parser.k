@@ -535,20 +535,21 @@ fn parse  (file,text)
 				r<<0
 		^ r
 
-	fn here(fname)
-		r=file @ ":" @ str(line)
+	fn here(line1,fname)
+		r=file @ ":" @ str(line1)
 		if fname
 			r@=": "@fname
 		^r
 
 	fn stmt(fname)
+		line1=line
 		r = [intern (tok)]
 		case tok
 			"assert"
 				lex()
-				x = expr()
-				r<<x
-				r<<"assert failed: "@here(fname)@": "@str(x)
+				x=expr()
+				msg="assert failed: "@here(line1,fname)@": "@str(x)
+				r=['if',x,0,['do',['throw',('quote',msg)]]]
 				expect("\n")
 				^ r
 			"show"
@@ -656,6 +657,7 @@ fn parse  (file,text)
 				^ r
 		a = assignment()
 		if sym?(a)
+			line:=line1
 			errtok("expected statement")
 		expect("\n")
 		^ a
