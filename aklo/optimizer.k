@@ -10,6 +10,7 @@ fn labelusers(body,label)
 	for i:range(body)
 		a=body[i]
 		case a
+			'if',_,label1
 			'goto',label1
 				if label==label1
 					r<<i,a
@@ -36,6 +37,19 @@ fn next(body,i)
 	dowhile body[i][0]=='loc'
 		i++
 	^i
+
+fn localusers(body,a)
+	assert atom?(a)
+	r=[]
+	for i : range(body)
+		mapleaves(
+			\(b)(
+				if a==b
+					r<<i
+			)
+			body[i]
+		)
+	^r
 
 fn emptygotos(body)
 	s=[]
@@ -65,4 +79,5 @@ fn optimize(gvars,fns)
 		fns=mapbody(emptylocs,fns)
 		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
+		;fns=mapbody(unusedassignments,fns)
 	^gvars,fns

@@ -62,6 +62,14 @@ fn map (f,s)
 		r<<f(  a)
 	^ r
 
+fn mapleaves (f,a)
+	if atom?(a)
+		^f(a)
+	r=[]
+	for b :a
+		r<<mapleaves(f,  b)
+	^ r
+
 fn filter (f,s)
 	r=[]
 	for a :s
