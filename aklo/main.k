@@ -54,7 +54,10 @@ for  s :packages
 	dir([name])
 
 ;convert to intermediate representation
-program=ast.norm(modules)
+vars,fns=ast.norm(modules)
+
+;optimize
+vars,fns=optimizer.optimize(vars,fns)
 
 ;output
-writefile("a.cc",cxx.compose(program))
+writefile("a.cc",cxx.compose(vars,fns))

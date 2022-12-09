@@ -146,8 +146,7 @@ fn fn1(a)
 	map(stmt,body)
 	r@="}\n"
 
-fn compose (program)
-	vars,fns=program
+fn compose (vars,fns)
 	r:=[]
 	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
