@@ -32,6 +32,22 @@ fn emptylocs(body)
 			s<<i
 	^filteri(\(i)(!in(i,s)),body)
 
+fn next(body,i)
+	dowhile body[i][0]=='loc'
+		i++
+	^i
+
+fn emptygotos(body)
+	s=[]
+	for i : range(len(body)-1)
+		case body[i]
+			'goto',label
+				case body[next(body,i)]
+					':',label1
+						if label==label1
+							s<<i
+	^filteri(\(i)(!in(i,s)),body)
+
 fn unusedlabels(body)
 	^filter(
 		\(a)(
@@ -47,5 +63,6 @@ fn optimize(gvars,fns)
 	dowhile old!=(gvars,fns)
 		old=gvars,fns
 		fns=mapbody(emptylocs,fns)
+		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
 	^gvars,fns
