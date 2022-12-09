@@ -327,8 +327,7 @@ fn norm (modules)
 		body@=body1
 
 	;expand to three-address code
-	;TODO pattern match assign?
-	loc=modules[0][1][0]
+	loc,@_=modules[0][1]
 	vars,fns,body=mapfns(
 		\(loc,params,body)(
 			vars,fns,body=body
