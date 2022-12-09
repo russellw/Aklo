@@ -321,12 +321,12 @@ fn parse  (file,text)
 		; string
 		if startswith(s,"\"")
 			s = unesc(slice(s,1,len(s)-1))
-			^'list',@s
+			^'quote',s
 
 		; raw string
 		if startswith(s,"r\"")
 			s = slice(s,2,len(s)-1)
-			^'list',@s
+			^'quote',s
 
 		; word
 		if idstart?(s[0])
