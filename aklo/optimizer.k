@@ -5,34 +5,29 @@ fn insts(fns)
 			r<<name,i,body[i]
 	^r
 
-fn labelusers(fns,label)
-	^filter(
-		\(a)(
-			case a
-				'goto',label1
-					^label==label1
-		)
-		insts(fns)
-	)
+fn labelusers(body,label)
+	r=[]
+	for i:range(body)
+		a=body[i]
+		case a
+			'goto',label1
+				if label==label1
+					r<<i,a
+	^r
 
-fn unusedlabels(fns)
-	^map(
-		\(F)(
+fn unusedlabels(F)
 			loc,name,params,rtype,vars,body=F
 			body=filter(
 				\(a)(
 					case a
 						':',label
-							^labelusers(fns,label)
+							^labelusers(body,label)
 					^1
 				)
 				body
 			)
 			^loc,name,params,rtype,vars,body
-		)
-		fns
-	)
 
 fn optimize(gvars,fns)
-	fns=unusedlabels(fns)
+	fns=map(unusedlabels,fns)
 	^gvars,fns

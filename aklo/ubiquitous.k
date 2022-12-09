@@ -250,6 +250,9 @@ fn first (s)
 fn second (s)
 	^ s[1]
 
+fn third (s)
+	^ s[2]
+
 fn keys (s)
 		^ map (first,s)
 
