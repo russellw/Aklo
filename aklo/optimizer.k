@@ -90,6 +90,18 @@ fn unusedlabels(body)
 		body
 	)
 
+fn nops(body)
+	^filter(
+		\(a)(
+			case a
+				'xcall','parsedouble',_
+				'quote',_
+					^
+			^list?(a)
+		)
+		body
+	)
+
 fn unusedassignments(body)
 	^map(
 		\(a,i)(
@@ -109,5 +121,6 @@ fn optimize(gvars,fns)
 		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
 		fns=mapbody(unusedassignments,fns)
+		fns=mapbody(nops,fns)
 		fns=map(unusedvars,fns)
 	^gvars,fns

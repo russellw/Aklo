@@ -495,8 +495,8 @@ fn norm (modules)
 	)
 
 	;TODO: properly flatten
+	body<<'^',0
 	r=loc,'main',[],'int',vars,body
-	r<<'^',0
 
 	vars=[]
 	fns=[r]
