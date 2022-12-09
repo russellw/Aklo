@@ -47,14 +47,6 @@ fn emptylocs(body)
 						s<<i
 	^filter(\(_,i)(!in(i,s)),body)
 
-fn next(body,i)
-	while 1
-		i++
-		case body[i]
-			'loc',@_
-				0
-			_
-				^i
 
 fn localusers(body,a)
 	assert atom?(a)
@@ -69,12 +61,11 @@ fn localusers(body,a)
 	^r
 
 fn emptygotos(body)
-	;TODO cleanup
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
 			'goto',label
-				case body[next(body,i)]
+				case body[i+1]
 					':',label1
 						if label==label1
 							s<<i
