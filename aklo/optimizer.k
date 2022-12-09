@@ -15,19 +15,37 @@ fn labelusers(body,label)
 					r<<i,a
 	^r
 
-fn unusedlabels(F)
+fn mapbody(f,fns)
+	^map(
+		\(F)(
 			loc,name,params,rtype,vars,body=F
-			body=filter(
-				\(a)(
-					case a
-						':',label
-							^labelusers(body,label)
-					^1
-				)
-				body
-			)
+			body=f(body)
 			^loc,name,params,rtype,vars,body
+		)
+		fns
+	)
+
+fn emptylocs(body)
+	s=[]
+	for i : range(len(body)-1)
+		if body[i][0]=='loc'& body[i+1][0]=='loc'
+			s<<i
+	^filteri(\(i)(!in(i,s)),body)
+
+fn unusedlabels(body)
+	^filter(
+		\(a)(
+			case a
+				':',label
+					^labelusers(body,label)
+			^1
+		)
+		body
+	)
 
 fn optimize(gvars,fns)
-	fns=map(unusedlabels,fns)
+	dowhile old!=(gvars,fns)
+		old=gvars,fns
+		fns=mapbody(emptylocs,fns)
+		fns=mapbody(unusedlabels,fns)
 	^gvars,fns

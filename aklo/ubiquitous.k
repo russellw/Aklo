@@ -69,6 +69,13 @@ fn filter (f,s)
 			r<<a
 	^ r
 
+fn filteri (f,s)
+	r=[]
+	for i :range(s)
+		if f (i)
+			r<<s[i]
+	^ r
+
 fn tail (s)
 	^ drop ( 1, s)
 
