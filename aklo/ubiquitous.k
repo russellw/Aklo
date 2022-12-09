@@ -62,6 +62,18 @@ fn map (f,s)
 		r<<f (s[i],i)
 	^ r
 
+fn occurs(needle,haystack)
+	assert atom? (needle)
+	r=0
+	mapleaves(
+		\(a)(
+			if a==needle
+				r:=1
+		)
+		haystack
+	)
+	^r
+
 fn mapleaves (f,a)
 	if atom?(a)
 		^f(a)

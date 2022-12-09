@@ -40,26 +40,32 @@ fn mapbody(f,fns)
 fn emptylocs(body)
 	s=[]
 	for i : range(len(body)-1)
-		if body[i][0]=='loc'& body[i+1][0]=='loc'
-			s<<i
+		case body[i]
+			'loc',@_
+				case body[i+1]
+					'loc',@_
+						s<<i
 	^filter(\(_,i)(!in(i,s)),body)
 
 fn next(body,i)
-	dowhile body[i][0]=='loc'
+	while 1
 		i++
-	^i
+		case body[i]
+			'loc',@_
+				0
+			_
+				^i
 
 fn localusers(body,a)
 	assert atom?(a)
 	r=[]
 	for i : range(body)
-		mapleaves(
-			\(b)(
-				if a==b
-					r<<i
-			)
-			body[i]
-		)
+		b=body[i]
+		case b
+			'=',y,x
+				b=x
+		if occurs(a,b)
+			r<<i
 	^r
 
 fn emptygotos(body)
@@ -89,9 +95,7 @@ fn unusedassignments(body)
 		\(a,i)(
 			case a
 				'=',y,x
-					s=localusers(body,y)
-					if len(s)==1
-						assert s[0]==i
+					if !localusers(body,y)
 						^x
 			^a
 		)
