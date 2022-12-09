@@ -16,6 +16,17 @@ fn labelusers(body,label)
 					r<<i,a
 	^r
 
+fn unusedvars(F)
+	loc,name,params,rtype,vars,body=F
+	vars=filter(
+		\(a)(
+			_,x,@_=a
+			^localusers(body,x)
+		)
+		vars
+	)
+	^loc,name,params,rtype,vars,body
+
 fn mapbody(f,fns)
 	^map(
 		\(F)(
@@ -94,4 +105,5 @@ fn optimize(gvars,fns)
 		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
 		fns=mapbody(unusedassignments,fns)
+		fns=map(unusedvars,fns)
 	^gvars,fns
