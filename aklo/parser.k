@@ -548,7 +548,7 @@ fn parse  (file,text)
 				lex()
 				x = expr()
 				r<<x
-				r<<here(fname)@": "@str(x)
+				r<<"assert failed: "@here(fname)@": "@str(x)
 				expect("\n")
 				^ r
 			"show"

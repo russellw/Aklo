@@ -72,15 +72,8 @@ fn mapleaves (f,a)
 
 fn filter (f,s)
 	r=[]
-	for a :s
-		if f (a)
-			r<<a
-	^ r
-
-fn filteri (f,s)
-	r=[]
 	for i :range(s)
-		if f (i)
+		if f (s[i],i)
 			r<<s[i]
 	^ r
 

@@ -31,7 +31,7 @@ fn emptylocs(body)
 	for i : range(len(body)-1)
 		if body[i][0]=='loc'& body[i+1][0]=='loc'
 			s<<i
-	^filteri(\(i)(!in(i,s)),body)
+	^filter(\(_,i)(!in(i,s)),body)
 
 fn next(body,i)
 	dowhile body[i][0]=='loc'
@@ -60,7 +60,7 @@ fn emptygotos(body)
 					':',label1
 						if label==label1
 							s<<i
-	^filteri(\(i)(!in(i,s)),body)
+	^filter(\(_,i)(!in(i,s)),body)
 
 fn unusedlabels(body)
 	^filter(
