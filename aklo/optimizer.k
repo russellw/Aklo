@@ -69,6 +69,7 @@ fn localusers(body,a)
 	^r
 
 fn emptygotos(body)
+	;TODO cleanup
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
@@ -114,6 +115,34 @@ fn unusedassignments(body)
 		body
 	)
 
+fn labelidx(body,label)
+	for i,a :indexed(body)
+			case a
+				':',label1
+					if label==label1
+						^i
+	throw"label not found"
+
+fn cfg(body)
+	g=[]
+	for i,a :indexed(body)
+			case a
+				'throw',_
+				'^',_
+					0
+				'goto',label
+					g<<i,labelidx(body,label)
+				'if',_,label
+					g<<i,labelidx(body,label)
+					g<<i,i+1
+				_
+					g<<i,i+1
+	^g
+
+fn deadcode(body)
+	g=cfg(body)
+	^filter(\(a,i)(graph.reaches(g,0,i)),body)
+
 fn ifconsts(body)
 	^map(
 		\(a)(
@@ -132,6 +161,7 @@ fn optimize(gvars,fns)
 	dowhile old!=(gvars,fns)
 		old=gvars,fns
 		fns=mapbody(emptylocs,fns)
+		fns=mapbody(deadcode,fns)
 		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
 		fns=mapbody(unusedassignments,fns)

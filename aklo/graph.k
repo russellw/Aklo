@@ -127,6 +127,7 @@ fn transsuccs(g, a)
 
 
 
+;TODO move tests to test module
 ; https://tanujkhattar.wordpress.com/2016/01/11/dominator-tree-of-a-directed-graph/
 ns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'r']
 s='r'

@@ -517,6 +517,13 @@ fn joindir (ss)
 		r@=s
 	^r
 
+fn indexed(s)
+	;TODO retrofit
+	r=[]
+	for  i:range(s)
+		r<<i,s[i]
+	^r
+
 fn mapfirst(f,s)
 	^map(\(a)(f(a[0]),a[1]),s)
 
