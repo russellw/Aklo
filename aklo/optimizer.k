@@ -73,11 +73,25 @@ fn unusedlabels(body)
 		body
 	)
 
+fn unusedassignments(body)
+	^map(
+		\(a,i)(
+			case a
+				'=',y,x
+					s=localusers(body,y)
+					if len(s)==1
+						assert s[0]==i
+						^x
+			^a
+		)
+		body
+	)
+
 fn optimize(gvars,fns)
 	dowhile old!=(gvars,fns)
 		old=gvars,fns
 		fns=mapbody(emptylocs,fns)
 		fns=mapbody(emptygotos,fns)
 		fns=mapbody(unusedlabels,fns)
-		;fns=mapbody(unusedassignments,fns)
+		fns=mapbody(unusedassignments,fns)
 	^gvars,fns

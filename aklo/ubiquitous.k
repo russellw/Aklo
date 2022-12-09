@@ -58,8 +58,8 @@ fn any (f,s)
 
 fn map (f,s)
 	r=[]
-	for a :s
-		r<<f(  a)
+	for i :range(s)
+		r<<f (s[i],i)
 	^ r
 
 fn mapleaves (f,a)
