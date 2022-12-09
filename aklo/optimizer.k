@@ -104,11 +104,25 @@ fn nops(body)
 
 fn unusedassignments(body)
 	^map(
-		\(a,i)(
+		\(a)(
 			case a
 				'=',y,x
 					if !localusers(body,y)
 						^x
+			^a
+		)
+		body
+	)
+
+fn ifconsts(body)
+	^map(
+		\(a)(
+			case a
+				'if',test,label
+					if num?(test)
+						if test
+							^'goto',label
+						^
 			^a
 		)
 		body
@@ -122,5 +136,6 @@ fn optimize(gvars,fns)
 		fns=mapbody(unusedlabels,fns)
 		fns=mapbody(unusedassignments,fns)
 		fns=mapbody(nops,fns)
+		fns=mapbody(ifconsts,fns)
 		fns=map(unusedvars,fns)
 	^gvars,fns

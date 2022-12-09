@@ -106,12 +106,10 @@ fn stmt(a)
 			r@=";\n"
 		'throw',msg
 			;TODO
-			r@="{\n"
 			r@="fputs("
 			expr(msg)
 			r@=", stderr);\n"
 			r@="exit(1);\n"
-			r@="}\n"
 		_
 			expr(a)
 			r@=";\n"
