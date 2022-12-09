@@ -1,10 +1,3 @@
-fn insts(fns)
-	r=[]
-	for loc,name,params,rtype,vars,body:fns
-		for i:range(body)
-			r<<name,i,body[i]
-	^r
-
 fn labelusers(body,label)
 	r=[]
 	for i:range(body)
@@ -148,9 +141,9 @@ fn ifconsts(body)
 		body
 	)
 
-fn optimize(gvars,fns)
-	dowhile old!=(gvars,fns)
-		old=gvars,fns
+fn optimize(vars,fns)
+	dowhile old!=(vars,fns)
+		old=vars,fns
 		fns=mapbody(emptylocs,fns)
 		fns=mapbody(deadcode,fns)
 		fns=mapbody(emptygotos,fns)
@@ -159,4 +152,4 @@ fn optimize(gvars,fns)
 		fns=mapbody(nops,fns)
 		fns=mapbody(ifconsts,fns)
 		fns=map(unusedvars,fns)
-	^gvars,fns
+	^vars,fns
