@@ -157,7 +157,54 @@ fn ifconsts(body)
 		body
 	)
 
+fn eval(a)
+			if atom?(a)
+				^a
+			;TODO simplify,  and fixup bootstrap compiler accordingly
+			if!every(\(b)(int?(b)),tail(a))
+				^a
+			case a
+				'==',x,y
+					^x==y
+				'<',x,y
+					^x<y
+				'<=',x,y
+					^x<=y
+				'+',x,y
+					^x+y
+				'*',x,y
+					^x*y
+				'-',x,y
+					^x-y
+				'neg',x
+					^-x
+				'bitnot',x
+					bitnot(x)
+				'bitand',x,y
+					bitand(x,y)
+				'bitor',x,y
+					bitor(x,y)
+				'bitxor',x,y
+					bitxor(x,y)
+				'shl',x,y
+					shl(x,y)
+				'shr',x,y
+					shr(x,y)
+			^a
+
+fn evalconsts(body)
+	^map(
+		\(a)(
+			case a
+				'=',y,x
+					^'=',y,eval(x)
+			^a
+		)
+		body
+	)
+
 fn optimize(vars,fns)
+	tron eval
 	dowhile old!=(vars,fns)
 		old=vars,fns
 		fns=mapbody(emptylocs,fns)
@@ -167,5 +214,6 @@ fn optimize(vars,fns)
 		fns=mapbody(unusedassignments,fns)
 		fns=mapbody(nops,fns)
 		fns=mapbody(ifconsts,fns)
+		fns=mapbody(evalconsts,fns)
 		fns=map(unusedvars,fns)
 	^vars,fns
