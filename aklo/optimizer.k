@@ -179,17 +179,17 @@ fn eval(a)
 				'neg',x
 					^-x
 				'bitnot',x
-					bitnot(x)
+					^bitnot(x)
 				'bitand',x,y
-					bitand(x,y)
+					^bitand(x,y)
 				'bitor',x,y
-					bitor(x,y)
+					^bitor(x,y)
 				'bitxor',x,y
-					bitxor(x,y)
+					^bitxor(x,y)
 				'shl',x,y
-					shl(x,y)
+					^shl(x,y)
 				'shr',x,y
-					shr(x,y)
+					^shr(x,y)
 			^a
 
 fn evalconsts(body)
@@ -204,7 +204,6 @@ fn evalconsts(body)
 	)
 
 fn optimize(vars,fns)
-	tron eval
 	dowhile old!=(vars,fns)
 		old=vars,fns
 		fns=mapbody(emptylocs,fns)
