@@ -1031,6 +1031,8 @@ getfns(ubiquitous, modules["ubiquitous"])
 
 
 def fbody(env, fname, params, body):
+    global currentfname
+    currentfname = fname
     (_, file, line, _), *body = body
 
     # local functions
