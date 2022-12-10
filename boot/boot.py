@@ -1074,7 +1074,7 @@ def fref(env, a):
     match a:
         case "\\", params, *body:
             print("new Function<List<Object>, Object>() {")
-            fbody(env, "\\\\", params, body)
+            fbody(env, "lambda", params, body)
         case [*_]:
             raise Exception(a)
         case _:
@@ -1095,9 +1095,8 @@ def fn(env, fname, params, body):
 
 
 def ret(env, a):
-    fname = currentfname.replace("\\", "\\\\")
     a = tmp(env, a)
-    print(f'Etc.leave("{currentfile}", {currentline}, "{fname}", {a});')
+    print(f'Etc.leave("{currentfile}", {currentline}, "{currentfname}", {a});')
     print(f"return {a};")
 
 
