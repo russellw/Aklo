@@ -79,8 +79,24 @@ fn nops(body)
 	^filter(
 		\(a)(
 			case a
-				'xcall','parsedouble',_
-				'quote',_
+				'+',@_
+				'-',@_
+				'*',@_
+				'%',@_
+				'//',@_
+				'==',@_
+				'<',@_
+				'<=',@_
+				'neg',@_
+				'bitand',@_
+				'bitor',@_
+				'bitxor',@_
+				'bitnot',@_
+				'shl',@_
+				'shr',@_
+				'**',@_
+				'xcall','parsedouble',@_
+				'quote',@_
 					^
 			^list?(a)
 		)
