@@ -6,10 +6,10 @@ fn labelusers(body,label)
 			'if',_,label1
 			'goto',label1
 				if label==label1
-					r<<i,a
+					r<<i
 	^r
 
-fn unusedvars(F)
+fn deadvar(F)
 	loc,name,params,rtype,vars,body=F
 	vars=filter(
 		\(a)(
@@ -30,7 +30,7 @@ fn mapbody(f,fns)
 		fns
 	)
 
-fn emptylocs(body)
+fn redundantloc(body)
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
@@ -53,7 +53,7 @@ fn localusers(body,a)
 			r<<i
 	^r
 
-fn emptygotos(body)
+fn redundantgoto(body)
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
@@ -64,7 +64,7 @@ fn emptygotos(body)
 							s<<i
 	^filter(\(_,i)(!in(i,s)),body)
 
-fn unusedlabels(body)
+fn deadlabel(body)
 	^filter(
 		\(a)(
 			case a
@@ -75,7 +75,7 @@ fn unusedlabels(body)
 		body
 	)
 
-fn nops(body)
+fn nop(body)
 	^filter(
 		\(a)(
 			case a
@@ -103,7 +103,7 @@ fn nops(body)
 		body
 	)
 
-fn unusedassignments(body)
+fn deadstore(body)
 	^map(
 		\(a)(
 			case a
@@ -143,7 +143,7 @@ fn deadcode(body)
 	g=cfg(body)
 	^filter(\(a,i)(graph.reaches(g,0,i)),body)
 
-fn ifconsts(body)
+fn ifconst(body)
 	^map(
 		\(a)(
 			case a
@@ -192,7 +192,7 @@ fn eval(a)
 					^shr(x,y)
 			^a
 
-fn evalconsts(body)
+fn constfold(body)
 	^map(
 		\(a)(
 			case a
@@ -206,13 +206,13 @@ fn evalconsts(body)
 fn optimize(vars,fns)
 	dowhile old!=(vars,fns)
 		old=vars,fns
-		fns=mapbody(emptylocs,fns)
+		fns=mapbody(redundantloc,fns)
 		fns=mapbody(deadcode,fns)
-		fns=mapbody(emptygotos,fns)
-		fns=mapbody(unusedlabels,fns)
-		fns=mapbody(unusedassignments,fns)
-		fns=mapbody(nops,fns)
-		fns=mapbody(ifconsts,fns)
-		fns=mapbody(evalconsts,fns)
-		fns=map(unusedvars,fns)
+		fns=mapbody(redundantgoto,fns)
+		fns=mapbody(deadlabel,fns)
+		fns=mapbody(deadstore,fns)
+		fns=mapbody(nop,fns)
+		fns=mapbody(ifconst,fns)
+		fns=mapbody(constfold,fns)
+		fns=map(deadvar,fns)
 	^vars,fns
