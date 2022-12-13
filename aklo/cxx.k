@@ -1,9 +1,9 @@
 r=[]
 
-fn type1 (type)
+fn composeType (type)
 	case type
 		'&',t
-			type1 (t)
+			composeType (t)
 			r@="*"
 		'uchar'
 			r@="unsigned char"
@@ -20,14 +20,14 @@ fn location(loc)
 		r@=" // "@fname
 	r@="\n"
 
-fn typename(name,type)
-			type1(type)
+fn typeName(name,type)
+			composeType(type)
 			r@=" "
 			r@=str(name)
-fn unaryexpr(op,a)
+fn unaryExpr(op,a)
 			r@=op
 			expr(a)
-fn binaryexpr(op,a,b)
+fn binaryExpr(op,a,b)
 			expr(a)
 			r@=op
 			expr(b)
@@ -47,24 +47,24 @@ fn expr(a)
 		'<',x,y
 		'<=',x,y
 		'==',x,y
-			binaryexpr(str(a[0]),x,y)
+			binaryExpr(str(a[0]),x,y)
 		'//',x,y
 			;TODO what if args are float?
-			binaryexpr("/",x,y)
+			binaryExpr("/",x,y)
 		'bitand',x,y
-			binaryexpr("&",x,y)
+			binaryExpr("&",x,y)
 		'bitor',x,y
-			binaryexpr("|",x,y)
+			binaryExpr("|",x,y)
 		'bitxor',x,y
-			binaryexpr("^",x,y)
+			binaryExpr("^",x,y)
 		'shl',x,y
-			binaryexpr("<<",x,y)
+			binaryExpr("<<",x,y)
 		'shr',x,y
-			binaryexpr(">>",x,y)
+			binaryExpr(">>",x,y)
 		'bitnot',x
-			unaryexpr("~",x)
+			unaryExpr("~",x)
 		'neg',x
-			unaryexpr("-",x)
+			unaryExpr("-",x)
 		'quote',x
 			r@=repr(x)
 		[@_]
@@ -114,32 +114,32 @@ fn stmt(a)
 			expr(a)
 			r@=";\n"
 
-fn var1(a)
+fn defineVar(a)
 	case a
 		loc,name,type
 			location(loc)
-			typename(name,type)
+			typeName(name,type)
 		loc,name,type,val
 			location(loc)
-			typename(name,type)
+			typeName(name,type)
 			r@="="
 			expr(val)
 		_
 			throw repr(a)
 	r@=";\n"
 
-fn fn1(a)
+fn defineFn(a)
 	loc,name,params,rtype,vars,body=a
 	location(loc)
-	typename(name,rtype)
+	typeName(name,rtype)
 	r@="("
 	for i:range(params)
 		if i
 			r@=","
 		_,pname,ptype=params[i]
-		typename(pname,ptype)
+		typeName(pname,ptype)
 	r@=") {\n"
-	map(var1,vars)
+	map(defineVar,vars)
 	map(stmt,body)
 	r@="}\n"
 
@@ -147,6 +147,6 @@ fn compose (vars,fns)
 	r:=[]
 	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
-	map(var1,vars)
-	map(fn1,fns)
+	map(defineVar,vars)
+	map(defineFn,fns)
 	^r

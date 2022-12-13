@@ -1,4 +1,4 @@
-fn labelusers(body,label)
+fn labelUsers(body,label)
 	r=[]
 	for i:range(body)
 		a=body[i]
@@ -9,18 +9,18 @@ fn labelusers(body,label)
 					r<<i
 	^r
 
-fn deadvar(F)
+fn deadVar(F)
 	loc,name,params,rtype,vars,body=F
 	vars=filter(
 		\(a)(
 			_,x,@_=a
-			^localusers(body,x)
+			^localUsers(body,x)
 		)
 		vars
 	)
 	^loc,name,params,rtype,vars,body
 
-fn mapbody(f,fns)
+fn mapBody(f,fns)
 	^map(
 		\(F)(
 			loc,name,params,rtype,vars,body=F
@@ -30,7 +30,7 @@ fn mapbody(f,fns)
 		fns
 	)
 
-fn redundantloc(body)
+fn redundantLoc(body)
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
@@ -41,7 +41,7 @@ fn redundantloc(body)
 	^filter(\(_,i)(!in(i,s)),body)
 
 
-fn localusers(body,a)
+fn localUsers(body,a)
 	assert atom?(a)
 	r=[]
 	for i : range(body)
@@ -53,7 +53,7 @@ fn localusers(body,a)
 			r<<i
 	^r
 
-fn redundantgoto(body)
+fn redundantGoto(body)
 	s=[]
 	for i : range(len(body)-1)
 		case body[i]
@@ -64,12 +64,12 @@ fn redundantgoto(body)
 							s<<i
 	^filter(\(_,i)(!in(i,s)),body)
 
-fn deadlabel(body)
+fn deadLabel(body)
 	^filter(
 		\(a)(
 			case a
 				':',label
-					^labelusers(body,label)
+					^labelUsers(body,label)
 			^1
 		)
 		body
@@ -103,19 +103,19 @@ fn nop(body)
 		body
 	)
 
-fn deadstore(body)
+fn deadStore(body)
 	^map(
 		\(a)(
 			case a
 				'=',y,x
-					if !localusers(body,y)
+					if !localUsers(body,y)
 						^x
 			^a
 		)
 		body
 	)
 
-fn labelidx(body,label)
+fn labelIdx(body,label)
 	for i,a :indexed(body)
 			case a
 				':',label1
@@ -131,19 +131,19 @@ fn cfg(body)
 				'^',_
 					0
 				'goto',label
-					g<<i,labelidx(body,label)
+					g<<i,labelIdx(body,label)
 				'if',_,label
-					g<<i,labelidx(body,label)
+					g<<i,labelIdx(body,label)
 					g<<i,i+1
 				_
 					g<<i,i+1
 	^g
 
-fn deadcode(body)
+fn deadCode(body)
 	g=cfg(body)
 	^filter(\(a,i)(graph.reaches(g,0,i)),body)
 
-fn ifconst(body)
+fn ifConst(body)
 	^map(
 		\(a)(
 			case a
@@ -192,7 +192,7 @@ fn eval(a)
 					^shr(x,y)
 			^a
 
-fn constfold(body)
+fn constFold(body)
 	^map(
 		\(a)(
 			case a
@@ -206,14 +206,14 @@ fn constfold(body)
 fn optimize(vars,fns)
 	dowhile old!=(vars,fns)
 		old=vars,fns
-		fns=mapbody(redundantloc,fns)
-		fns=mapbody(deadcode,fns)
-		fns=mapbody(redundantgoto,fns)
-		fns=mapbody(deadlabel,fns)
-		fns=mapbody(deadstore,fns)
-		fns=mapbody(nop,fns)
-		fns=mapbody(ifconst,fns)
-		fns=mapbody(constfold,fns)
-		fns=map(deadvar,fns)
+		fns=mapBody(redundantLoc,fns)
+		fns=mapBody(deadCode,fns)
+		fns=mapBody(redundantGoto,fns)
+		fns=mapBody(deadLabel,fns)
+		fns=mapBody(deadStore,fns)
+		fns=mapBody(nop,fns)
+		fns=mapBody(ifConst,fns)
+		fns=mapBody(constFold,fns)
+		fns=map(deadVar,fns)
 		;TODO jump threading
 	^vars,fns

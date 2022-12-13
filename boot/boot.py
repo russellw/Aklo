@@ -13,13 +13,13 @@ def each(f, s):
         f(a)
 
 
-def eachterms(f, a):
+def eachTerms(f, a):
     match a:
         case ("fn", *_) | ("\\", *_):
             pass
         case [*_]:
             for b in a:
-                eachterms(f, b)
+                eachTerms(f, b)
     f(a)
 
 
@@ -48,19 +48,19 @@ def gensym():
 modules = {}
 
 
-def isidstart(c):
+def isIdStart(c):
     return c.isalpha() or c in "_$"
 
 
-def isidpart(c):
-    return isidstart(c) or c.isdigit() or c == "?"
+def isIdPart(c):
+    return isIdStart(c) or c.isdigit() or c == "?"
 
 
 def unesc(s):
     return s.encode("utf-8").decode("unicode_escape")
 
 
-def quotesym(s):
+def quoteSym(s):
     return "intern", ["List.of"] + [ord(c) for c in s]
 
 
@@ -78,7 +78,7 @@ def parse(file):
     def err(msg):
         raise Exception(f"{file}:{line}: {msg}")
 
-    def errtok(msg):
+    def errTok(msg):
         nonlocal line
         if tok == "\n":
             line -= 1
@@ -188,30 +188,30 @@ def parse(file):
                 return
 
             # word
-            if isidstart(tok):
-                while isidpart(text[i]):
+            if isIdStart(tok):
+                while isIdPart(text[i]):
                     i += 1
                 tok = text[j:i]
                 return
 
             # hexadecimal numbers are separate because they may contain 'e'
             if text[i : i + 2].lower() == "0x":
-                while isidpart(text[i]):
+                while isIdPart(text[i]):
                     i += 1
                 tok = text[j:i]
                 return
 
             # other number
             if tok.isdigit() or tok == "." and text[i + 1].isdigit():
-                while isidpart(text[i]):
+                while isIdPart(text[i]):
                     i += 1
                 if text[i] == ".":
                     i += 1
-                    while isidpart(text[i]):
+                    while isIdPart(text[i]):
                         i += 1
                     if text[i - 1].lower() == "e" and text[i] in "+-":
                         i += 1
-                        while isidpart(text[i]):
+                        while isIdPart(text[i]):
                             i += 1
                 tok = text[j:i]
                 return
@@ -257,12 +257,12 @@ def parse(file):
 
     def expect(s):
         if not eat(s):
-            errtok(f"expected {repr(s)}")
+            errTok(f"expected {repr(s)}")
 
     def word():
-        if isidstart(tok[0]):
+        if isIdStart(tok[0]):
             return lex1().replace("?", "p")
-        errtok("expected word")
+        errTok("expected word")
 
     # expressions
     def exprs(end):
@@ -284,7 +284,7 @@ def parse(file):
         if tok.startswith("'"):
             s = unesc(tok[1:-1])
             lex()
-            return quotesym(s)
+            return quoteSym(s)
 
         # string
         if tok.startswith('"'):
@@ -313,7 +313,7 @@ def parse(file):
             lex()
             expect(")")
             return "ctreadfiles", here.replace("\\", "/") + "/../aklo"
-        if isidstart(tok[0]):
+        if isIdStart(tok[0]):
             return word()
 
         # number
@@ -342,7 +342,7 @@ def parse(file):
             return ["List.of"] + exprs("]")
 
         # none of the above
-        errtok("expected expression")
+        errTok("expected expression")
 
     def postfix():
         a = primary()
@@ -402,35 +402,35 @@ def parse(file):
     prec = 99
     ops = {}
 
-    def mkop(op, left):
+    def makeOp(op, left):
         ops[op] = prec, left
 
-    mkop("**", 0)
+    makeOp("**", 0)
 
     prec -= 1
-    mkop("%", 1)
-    mkop("*", 1)
-    mkop("/", 1)
-    mkop("//", 1)
+    makeOp("%", 1)
+    makeOp("*", 1)
+    makeOp("/", 1)
+    makeOp("//", 1)
 
     prec -= 1
-    mkop("+", 1)
-    mkop("-", 1)
-    mkop("@", 1)
+    makeOp("+", 1)
+    makeOp("-", 1)
+    makeOp("@", 1)
 
     prec -= 1
-    mkop("!=", 1)
-    mkop("<", 1)
-    mkop("<=", 1)
-    mkop("==", 1)
-    mkop(">", 1)
-    mkop(">=", 1)
+    makeOp("!=", 1)
+    makeOp("<", 1)
+    makeOp("<=", 1)
+    makeOp("==", 1)
+    makeOp(">", 1)
+    makeOp(">=", 1)
 
     prec -= 1
-    mkop("&", 1)
+    makeOp("&", 1)
 
     prec -= 1
-    mkop("|", 1)
+    makeOp("|", 1)
 
     def infix(prec):
         a = prefix()
@@ -479,14 +479,14 @@ def parse(file):
             r.append(stmt(fname))
         return r
 
-    def if1(fname):
+    def parseIf(fname):
         assert tok in ("if", "elif")
         lex()
         r = ["if", expr()]
         r.append(block(fname))
         match tok:
             case "elif":
-                r.append([if1(fname)])
+                r.append([parseIf(fname)])
             case "else":
                 lex()
                 r.append(block(fname))
@@ -559,7 +559,7 @@ def parse(file):
 
                 return r
             case "if":
-                return if1(fname)
+                return parseIf(fname)
             case "break" | "continue":
                 lex()
                 if eat("\n"):
@@ -615,7 +615,7 @@ sys.stdout.write(open(here + "/prefix.java").read())
 
 
 # expressions
-def pargs(env, s):
+def printArgs(env, s):
     print("(")
     more = 0
     for a in s:
@@ -646,15 +646,15 @@ def expr(env, a):
             fref(env, a)
         case "//", *s:
             print("Etc.div")
-            pargs(env, s)
+            printArgs(env, s)
         case "range", x:
             expr(env, ("range", 0, x))
         case "<", *s:
             print("Etc.lt")
-            pargs(env, s)
+            printArgs(env, s)
         case "<=", *s:
             print("Etc.le")
-            pargs(env, s)
+            printArgs(env, s)
         case ("|", x, y) | ("&", x, y):
             truth(env, x)
             print(a[0] * 2)
@@ -664,36 +664,36 @@ def expr(env, a):
             truth(env, x)
         case "-", x:
             print("Etc.neg")
-            pargs(env, [x])
+            printArgs(env, [x])
         case "-", x, y:
             print("Etc.sub")
-            pargs(env, (x, y))
+            printArgs(env, (x, y))
         case "%", *s:
             print("Etc.rem")
-            pargs(env, s)
+            printArgs(env, s)
         case "+", *s:
             print("Etc.add")
-            pargs(env, s)
+            printArgs(env, s)
         case "*", *s:
             print("Etc.mul")
-            pargs(env, s)
+            printArgs(env, s)
         case "==", *s:
             print("Objects.equals")
-            pargs(env, s)
+            printArgs(env, s)
         case "!=", *s:
             print("!Objects.equals")
-            pargs(env, s)
+            printArgs(env, s)
         case "@", *s:
             print("Etc.cat")
-            pargs(env, s)
+            printArgs(env, s)
         case "floatp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")
-            pargs(env, s)
+            printArgs(env, s)
         case "gensym", *s:
             print("new Sym")
-            pargs(env, s)
+            printArgs(env, s)
         case (
             ("len", *s)
             | ("get", *s)
@@ -718,7 +718,7 @@ def expr(env, a):
             | ("bitxor", *s)
         ):
             print("Etc." + a[0])
-            pargs(env, s)
+            printArgs(env, s)
         case "apply", f, s:
             fref(f)
             print(".apply(")
@@ -736,14 +736,14 @@ def expr(env, a):
                 match s[-1]:
                     case "@", t:
                         print("Etc.cons")
-                        pargs(env, s[:-1] + [t])
+                        printArgs(env, s[:-1] + [t])
                         return
             print("List.of")
-            pargs(env, s)
+            printArgs(env, s)
         case f, *s:
             fref(env, f)
             print(".apply(List.of")
-            pargs(env, s)
+            printArgs(env, s)
             print(")")
         case _:
             if a in env:
@@ -763,7 +763,7 @@ def expr(env, a):
 
 
 # statements
-def isrest(s):
+def isRest(s):
     if s:
         match s[-1]:
             case "@", _:
@@ -778,7 +778,7 @@ def tmp(env, a):
     return r
 
 
-def checkcase(env, label, pattern, x):
+def checkCase(env, label, pattern, x):
     if isinstance(pattern, int):
         print("if (!Objects.equals(")
         expr(env, x)
@@ -794,35 +794,35 @@ def checkcase(env, label, pattern, x):
         case "List.of", *s:
             x = tmp(env, x)
             print(f"if (!({x} instanceof List)) break {label};")
-            if isrest(s):
+            if isRest(s):
                 n = len(s) - 1
                 print(f"if (((List<Object>){x}).size() < {n}) break {label};")
                 for i in range(n):
-                    checkcase(env, label, s[i], ("subscript", x, i))
-                checkcase(env, label, s[n][1], ("drop", n, x))
+                    checkCase(env, label, s[i], ("subscript", x, i))
+                checkCase(env, label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
             print(f"if (((List<Object>){x}).size() != {n}) break {label};")
             for i in range(n):
-                checkcase(env, label, s[i], ("subscript", x, i))
+                checkCase(env, label, s[i], ("subscript", x, i))
 
 
-def assignconst(env, pattern, x):
+def assignConst(env, pattern, x):
     print("assert Objects.equals")
-    pargs(env, (pattern, x))
+    printArgs(env, (pattern, x))
     print(";")
 
 
 def assign(env, pattern, x):
     if isinstance(pattern, int):
-        assignconst(env, pattern, x)
+        assignConst(env, pattern, x)
         return
     match pattern:
         case "intern", ("List.of", *_):
-            assignconst(env, pattern, x)
+            assignConst(env, pattern, x)
         case "List.of", *s:
             x = tmp(env, x)
-            if isrest(s):
+            if isRest(s):
                 n = len(s) - 1
                 for i in range(n):
                     assign(env, s[i], ("subscript", x, i))
@@ -843,25 +843,25 @@ def assign(env, pattern, x):
             print(";")
 
 
-currentfile = 0
-currentline = 0
-currentfname = 0
+currentFile = 0
+currentLine = 0
+currentFName = 0
 
 
 def stmt(env, a):
-    global currentfile
-    global currentline
-    global currentfname
+    global currentFile
+    global currentLine
+    global currentFName
     match a:
         case "<<", x, y:
             print(x + "=")
             print("Etc.append")
-            pargs(env, (x, y))
+            printArgs(env, (x, y))
             print(";")
         case ">>", x, y:
             print(y + "=")
             print("Etc.prepend")
-            pargs(env, (x, y))
+            printArgs(env, (x, y))
             print(";")
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             print(x + "=")
@@ -926,9 +926,9 @@ def stmt(env, a):
             expr(env, x)
             print(";")
         case ".loc", file, line, fname:
-            currentfile = file
-            currentline = line
-            currentfname = fname
+            currentFile = file
+            currentLine = line
+            currentFName = fname
             print(f"// {file}:{line}: {fname}")
         case ":", label, loop:
             print(label + ":")
@@ -940,7 +940,7 @@ def stmt(env, a):
             for pattern, *body in cases:
                 innerLabel = gensym()
                 print(innerLabel + ": do {")
-                checkcase(env, innerLabel, pattern, x)
+                checkCase(env, innerLabel, pattern, x)
                 assign(env, pattern, x)
                 stmts(env, body)
                 match body[-1]:
@@ -963,7 +963,7 @@ def stmt(env, a):
         case "tron", *s:
             print("Etc.depth = 0;")
             print("Etc.tracing = Set.of")
-            pargs(env, (f'"{x}"' for x in s))
+            printArgs(env, (f'"{x}"' for x in s))
             print(";")
         case "troff":
             print("Etc.tracing = null;")
@@ -980,7 +980,7 @@ def stmts(env, s):
 
 
 # variables
-def assignedvars(params, body):
+def assignedVars(params, body):
     # dict keeps deterministic order
     r = {x: 1 for x in params}
 
@@ -996,16 +996,16 @@ def assignedvars(params, body):
         match a:
             case "case", x, *cases:
                 for pattern, *body in cases:
-                    eachterms(lhs, pattern)
+                    eachTerms(lhs, pattern)
             case ("=", x, _) | ("for", x, *_):
-                eachterms(lhs, x)
+                eachTerms(lhs, x)
 
-    eachterms(f, body)
+    eachTerms(f, body)
     return r.keys()
 
 
-def localvars(params, body, static=0):
-    for a in assignedvars(params, body):
+def localVars(params, body, static=0):
+    for a in assignedVars(params, body):
         if a == "_":
             continue
         if static:
@@ -1018,7 +1018,7 @@ def localvars(params, body, static=0):
 
 
 # functions
-def getfns(env, s):
+def getFns(env, s):
     for a in s:
         match a:
             case "fn", name, *_:
@@ -1026,17 +1026,17 @@ def getfns(env, s):
 
 
 ubiquitous = set()
-getfns(ubiquitous, modules["ubiquitous"])
+getFns(ubiquitous, modules["ubiquitous"])
 
 
 def fbody(env, fname, params, body):
-    global currentfname
-    currentfname = fname
+    global currentFName
+    currentFName = fname
     (_, file, line, _), *body = body
 
     # local functions
     env = set(env)
-    getfns(env, body)
+    getFns(env, body)
 
     r = []
     for a in body:
@@ -1048,7 +1048,7 @@ def fbody(env, fname, params, body):
     body = r
 
     # local variables
-    localvars(params, body)
+    localVars(params, body)
 
     # falling off the end of a function means returning zero
     match body[-1]:
@@ -1095,18 +1095,18 @@ def fn(env, fname, params, body):
 
 def ret(env, a):
     a = tmp(env, a)
-    print(f'Etc.leave("{currentfile}", {currentline}, "{currentfname}", {a});')
+    print(f'Etc.leave("{currentFile}", {currentLine}, "{currentFName}", {a});')
     print(f"return {a};")
 
 
 # modules
-for modname, module in modules.items():
+for modName, module in modules.items():
     print('@SuppressWarnings("unchecked")')
-    print(f"class {modname} {{")
+    print(f"class {modName} {{")
 
     # functions
     env1 = set(ubiquitous)
-    getfns(env1, module)
+    getFns(env1, module)
 
     r = []
     for a in module:
@@ -1119,11 +1119,11 @@ for modname, module in modules.items():
     module = r
 
     # variables
-    localvars([], module, 1)
+    localVars([], module, 1)
 
     # body
     print("static void run() {")
-    if modname == "main":
+    if modName == "main":
         for name in modules:
             if name != "main":
                 print(name + ".run();")

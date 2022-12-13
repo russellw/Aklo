@@ -3,16 +3,16 @@ fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
 
-fn mapfns(f,loc,params,body)
+fn mapFns(f,loc,params,body)
 	;recursively transform local functions
-	body=mapterms(
+	body=mapTerms(
 		\(_,a)(
 			case a
 				'fn',loc,name,params,rtype,@body
-					body= mapfns(f,loc,params,body)
+					body= mapFns(f,loc,params,body)
 					^'fn',loc,name,params,rtype,@body
 				'lambda',loc,params,@body
-					body= mapfns(f,loc,params,body)
+					body= mapFns(f,loc,params,body)
 					^'lambda',loc,params,@body
 			^proceed
 		)
@@ -23,7 +23,7 @@ fn mapfns(f,loc,params,body)
 	;transform the current function
 	^f(loc,params,body)
 
-fn mapterms (f,loc,a)
+fn mapTerms (f,loc,a)
 	fn rec( a)
 		case a
 			'loc',@loc1
@@ -60,23 +60,23 @@ fn mapterms (f,loc,a)
 
 
 fn norm (modules)
-	fn mapmodules(f)
+	fn mapModules(f)
 		^mapsecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
 				loc,@body=module
-				body=mapfns(f,loc,[],body)
+				body=mapFns(f,loc,[],body)
 				^loc,@body
 			)
 			modules
 		)
 
 	;generate explicit variable declarations
-	modules=mapmodules(
+	modules=mapModules(
 		\(loc,params,body)(
 			explicit=vals(params)
 			implicit=[]
-			mapterms(
+			mapTerms(
 				\(loc,a)(
 					case a
 						'var',_,x,@_
@@ -84,7 +84,7 @@ fn norm (modules)
 						'for',x,@_
 						'when',x
 						'=',x,_
-							mapterms(
+							mapTerms(
 								\(loc,a)(
 									case a
 										'quote',_
@@ -115,7 +115,7 @@ fn norm (modules)
 	)
 
 	;check for inconsistent declarations
-	mapmodules(
+	mapModules(
 		\(loc,params,body)(
 			nonlocals=[]
 			locals=vals(params)
@@ -123,7 +123,7 @@ fn norm (modules)
 			if uniq(locals)!=locals
 				err(loc,"duplicate parameter name")
 			fns=[]
-			mapterms(
+			mapTerms(
 				\(loc,a)(
 					case a
 						'fn',loc,x,@_
@@ -141,7 +141,7 @@ fn norm (modules)
 								err(loc,str(x)@" defined twice")
 							locals<<x
 						':=',x,_
-							mapterms(
+							mapTerms(
 								\(loc,a)(
 									case a
 										'quote',_
@@ -172,9 +172,9 @@ fn norm (modules)
 	)
 
 	;expand lambdas
-	modules=mapmodules(
+	modules=mapModules(
 		\(loc,params,body)(
-			^mapterms(
+			^mapTerms(
 				\(loc,a)(
 					case a
 						'lambda',loc,params,@body
@@ -189,11 +189,11 @@ fn norm (modules)
 	)
 
 	;Hoist declarations to start
-	modules=mapmodules(
+	modules=mapModules(
 		\(loc,params,body)(
 			vars=[]
 			fns=[]
-			body=mapterms(
+			body=mapTerms(
 				\(loc,a)(
 					case a
 						'var',loc,name,type
@@ -219,15 +219,15 @@ fn norm (modules)
 	; otherwise there would be a problem when
 	; an earlier module refers to a name defined in a later one
 	globals=[]
-	for  modname,(_,vars,fns,_):modules
+	for  modName,(_,vars,fns,_):modules
 		for _,x,@_  :vars@fns
 								y=gensym(str(x))
-								globals<<modname@[x],y
+								globals<<modName@[x],y
 
 	;ubiquitous names are in the outer environment of every module
 	env=[]
-	for modname,y:globals
-		case modname
+	for modName,y:globals
+		case modName
 			'aklo','ubiquitous',x
 				env<<x,y
 
@@ -235,7 +235,7 @@ fn norm (modules)
 	modules=map(
 		\(kv)(
 			;need the module name to resolve dotted names relative to current module
-			modname,module=kv
+			modName,module=kv
 
 			fn rec( env,loc,params,vars,fns,body)
 				fn decl(a)
@@ -264,7 +264,7 @@ fn norm (modules)
 
 				;rename labels
 				labels=[]
-				mapterms(
+				mapTerms(
 					\(loc,a)(
 							case a
 								':',x
@@ -277,7 +277,7 @@ fn norm (modules)
 				)
 
 				;resolve names in body of this function
-				body=mapterms(
+				body=mapTerms(
 					\(loc,a)(
 							;TODO type names
 							if sym?(a)
@@ -287,7 +287,7 @@ fn norm (modules)
 								^y
 							case a
 								'.',@names
-									prefix=modname
+									prefix=modName
 									while prefix
 										prefix=init(prefix)
 										y=get(globals,prefix@names)
@@ -311,7 +311,7 @@ fn norm (modules)
 
 			loc,vars,fns,body=module
 			_,vars,fns,body=rec(env,loc,[],vars,fns,body)
-			^modname,[loc,vars,fns,body]
+			^modName,[loc,vars,fns,body]
 		)
 		modules
 	)
@@ -328,12 +328,12 @@ fn norm (modules)
 
 	;expand to three-address code
 	loc,@_=modules[0][1]
-	vars,fns,body=mapfns(
+	vars,fns,body=mapFns(
 		\(loc,params,body)(
 			vars,fns,body=body
 			code=[]
 
-			fn genvar(name)
+			fn genVar(name)
 				a=gensym(name)
 				vars<<loc,a,'any'
 				^a
@@ -347,37 +347,37 @@ fn norm (modules)
 					code<<'=',y,x
 
 				fn if1(test,yes,no)
-					yeslabel = gensym("ifyes")
-					nolabel = gensym("ifno")
-					afterlabel = gensym("ifafter")
-					r = genvar("ifresult")
+					yesLabel = gensym("ifYes")
+					noLabel = gensym("ifNo")
+					afterLabel = gensym("ifAfter")
+					r = genVar("ifResult")
 
 					;test
 					test=rec(test)
-					code<<'if',test,yeslabel
-					code<<'goto',nolabel
+					code<<'if',test,yesLabel
+					code<<'goto',noLabel
 
 					;yes
-					code<<':',yeslabel
+					code<<':',yesLabel
 					assign(r,yes)
-					code<<'goto',afterlabel
+					code<<'goto',afterLabel
 
 					;no
-					code<<':',nolabel
+					code<<':',noLabel
 					assign(r,no)
 
 					;after
-					code<<':',afterlabel
+					code<<':',afterLabel
 					^r
 
 				case a
 					'post++',y
-						r=genvar("postinc")
+						r=genVar("postInc")
 						assign(r,y)
 						assign(y,('+',y,1))
 						^r
 					'post--',y
-						r=genvar("postdec")
+						r=genVar("postDec")
 						assign(r,y)
 						assign(y,('-',y,1))
 						^r
@@ -408,53 +408,53 @@ fn norm (modules)
 						if1(test,yes,no)
 					'xcall',name,@s
 						s=map(rec,s)
-						r=genvar(str(name))
+						r=genVar(str(name))
 						code<<'=',r,('xcall',name,@s)
 						^r
 					'|',x,y
-						r=genvar("or")
+						r=genVar("or")
 						assign(r,x)
 						^if1(r,r,y)
 					'&',x,y
-						r=genvar("and")
+						r=genVar("and")
 						assign(r,x)
 						^if1(r,y,r)
 					'while',test,@body
-						bodylabel = gensym("whilebody")
-						testlabel = gensym("whiletest")
-						afterlabel = gensym("whileafter")
-						loop = testlabel, afterlabel
+						bodyLabel = gensym("whileBody")
+						testLabel = gensym("whileTest")
+						afterLabel = gensym("whileAfter")
+						loop = testLabel, afterLabel
 
-						code<<'goto',testlabel
+						code<<'goto',testLabel
 
 						;body
-						code<<':',bodylabel
+						code<<':',bodyLabel
 						map(rec,body)
 
 						;test
-						code<<':',testlabel
+						code<<':',testLabel
 						test=rec(test)
-						code<<'if',test,bodylabel
+						code<<'if',test,bodyLabel
 
 						;after
-						code<<':',afterlabel
+						code<<':',afterLabel
 					'dowhile',test,@body
-						bodylabel = gensym("dowhilebody")
-						testlabel = gensym("dowhiletest")
-						afterlabel = gensym("dowhileafter")
-						loop = testlabel, afterlabel
+						bodyLabel = gensym("dowhileBody")
+						testLabel = gensym("dowhileTest")
+						afterLabel = gensym("dowhileAfter")
+						loop = testLabel, afterLabel
 
 						;body
-						code<<':',bodylabel
+						code<<':',bodyLabel
 						map(rec,body)
 
 						;test
-						code<<':',testlabel
+						code<<':',testLabel
 						test=rec(test)
-						code<<'if',test,bodylabel
+						code<<'if',test,bodyLabel
 
 						;after
-						code<<':',afterlabel
+						code<<':',afterLabel
 					'goto',_
 					':',_
 						code<<a
@@ -474,7 +474,7 @@ fn norm (modules)
 					'<=',@s
 					'==',@s
 						s=map(rec,s)
-						r=genvar("")
+						r=genVar("")
 						code<<'=',r,(a[0],@s)
 						^r
 					'quote',_

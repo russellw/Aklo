@@ -1,8 +1,8 @@
-fn idstart?( c)
+fn idStart?( c)
 	^ alpha? (c)|in (c,"_$")
 
-fn idpart? (c)
-	^ idstart? (c)|digit? (c)|in (c,"?")
+fn idPart? (c)
+	^ idStart? (c)|digit? (c)|in (c,"?")
 
 
 fn parse  (file,text)
@@ -23,7 +23,7 @@ fn parse  (file,text)
 	fn err (msg)
 		throw file @ ":" @ str(line) @ ": " @ msg
 
-	fn errtok(msg)
+	fn errTok(msg)
 		if tok == "\n"
 			line--
 		err( repr(tok)@": "@msg)
@@ -126,30 +126,30 @@ fn parse  (file,text)
 				^
 
 			; word
-			if idstart?(text[i])
-				while idpart?(text[i])
+			if idStart?(text[i])
+				while idPart?(text[i])
 					i++
 				tok:= slice(text,j,i)
 				^
 
 			; hexadecimal numbers are separate because they may contain 'e'
 			if lower(slice(text,i,i+2)) == "0x"
-				while idpart?(text[i])
+				while idPart?(text[i])
 					i++
 				tok:= slice(text,j,i)
 				^
 
 			; other number
 			if digit?(text[i]) | tok == "." & digit?(text[i + 1])
-				while idpart?(text[i])
+				while idPart?(text[i])
 					i++
 				if text[i] == "."[0]
 					i++
-					while idpart?(text[i])
+					while idPart?(text[i])
 						i++
 					if lower(text[i - 1]) == "e"[0] & in(text[i] ,"+-")
 						i++
-						while idpart?(text[i])
+						while idPart?(text[i])
 							i++
 				tok:= slice(text,j,i)
 				^
@@ -195,33 +195,33 @@ fn parse  (file,text)
 
 	fn expect(s)
 		if ! eat(s)
-			errtok("expected "@repr (s))
+			errTok("expected "@repr (s))
 
 	fn word()
 		;TODO reserve keywords?
 		;depends on external function call syntax
 		; External function names might need to overlap with keywords
-		if idstart?(tok[0])
+		if idStart?(tok[0])
 			^ intern(lex1())
-		errtok("expected word")
+		errTok("expected word")
 
 	;types
 	fn type?()
 		if tok=="&"
 			^1
-		^idstart? (tok[0])
+		^idStart? (tok[0])
 
-	fn type1()
+	fn parseType()
 		if!type?()
-			errtok("expected type")
+			errTok("expected type")
 		if tok=="&"
-			^lex1(),type1()
+			^lex1(),parseType()
 		^word()
 
-	fn optionaltype()
+	fn optionalType()
 		if !type?()
 			^'any'
-		^type1()
+		^parseType()
 
 	; expressions
 	fn exprs(end)
@@ -329,7 +329,7 @@ fn parse  (file,text)
 			^'quote',s
 
 		; word
-		if idstart?(s[0])
+		if idStart?(s[0])
 			^ r[0]
 
 		; number
@@ -358,7 +358,7 @@ fn parse  (file,text)
 		file:=file1
 		line:=line1
 		tok:=s
-		errtok("expected expression")
+		errTok("expected expression")
 
 	fn postfix()
 		a = primary()
@@ -382,7 +382,7 @@ fn parse  (file,text)
 					^ a
 
 	fn param(fname)
-		^(file,line,fname),word(),optionaltype()
+		^(file,line,fname),word(),optionalType()
 
 	fn params(fname)
 		expect("(")
@@ -435,35 +435,35 @@ fn parse  (file,text)
 	prec = 99
 	ops = []
 
-	fn mkop(op, left)
+	fn makeOp(op, left)
 		ops<<(op,( prec, left))
 
-	mkop("**",0)
+	makeOp("**",0)
 
 	prec--
-	mkop("%", 1)
-	mkop("*", 1)
-	mkop("/", 1)
-	mkop("//", 1)
+	makeOp("%", 1)
+	makeOp("*", 1)
+	makeOp("/", 1)
+	makeOp("//", 1)
 
 	prec--
-	mkop("+", 1)
-	mkop("-", 1)
-	mkop("@", 1)
+	makeOp("+", 1)
+	makeOp("-", 1)
+	makeOp("@", 1)
 
 	prec--
-	mkop("!=", 1)
-	mkop("<", 1)
-	mkop("<=", 1)
-	mkop("==", 1)
-	mkop(">", 1)
-	mkop(">=", 1)
+	makeOp("!=", 1)
+	makeOp("<", 1)
+	makeOp("<=", 1)
+	makeOp("==", 1)
+	makeOp(">", 1)
+	makeOp(">=", 1)
 
 	prec--
-	mkop("&", 1)
+	makeOp("&", 1)
 
 	prec--
-	mkop("|", 1)
+	makeOp("|", 1)
 
 	fn infix(prec)
 		a = prefix()
@@ -520,14 +520,14 @@ fn parse  (file,text)
 			r<<stmt(fname)
 		^ r
 
-	fn if1(fname)
+	fn parseIf(fname)
 		assert  in(tok, ("if", "elif"))
 		lex()
 		r = ['if', expr()]
 		r<<'do',@block(fname)
 		case tok
 			"elif"
-				r<<if1(fname)
+				r<<parseIf(fname)
 			"else"
 				lex()
 				r<<'do',@block(fname)
@@ -591,7 +591,7 @@ fn parse  (file,text)
 				r<<word()
 
 				;type
-				r<<optionaltype()
+				r<<optionalType()
 
 				;initial value
 				if eat( "=")
@@ -613,7 +613,7 @@ fn parse  (file,text)
 				r<<params(fname)
 
 				;return type
-				r<<optionaltype()
+				r<<optionalType()
 
 				;body
 				expect(".indent")
@@ -623,7 +623,7 @@ fn parse  (file,text)
 
 				^ r
 			"if"
-				^ if1(fname)
+				^ parseIf(fname)
 			"^"
 				lex()
 				if eat("\n")
@@ -658,7 +658,7 @@ fn parse  (file,text)
 		a = assignment()
 		if sym?(a)
 			line:=line1
-			errtok("expected statement")
+			errTok("expected statement")
 		expect("\n")
 		^ a
 

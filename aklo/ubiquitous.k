@@ -542,16 +542,3 @@ fn  intern(s)
 
 fn str(a)
 	^str(a)
-
-
-fn fix(f,a)
-	dowhile old!=a
-		old=a
-		a=f(a)
-	^a
-
-;TODO move tests to test module
-fn half(a)
-	^a//2
-
-assert fix(half,1000)==0
