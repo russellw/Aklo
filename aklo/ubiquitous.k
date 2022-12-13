@@ -26,10 +26,10 @@ fn ascii?(a)
 			^
 	^1
 
-fn indexof(a,s)
+fn indexOf(a,s)
 	^find(\(b)(a==b),s)
 
-fn lastindexof(a,s)
+fn lastIndexOf(a,s)
 	^find(\(b)(a==b),s)
 
 fn find (f,s)
@@ -38,7 +38,7 @@ fn find (f,s)
 			^i
 	^-1
 
-fn findlast (f,s)
+fn findLast (f,s)
 	i=len(s)
 	while i--
 		if f(s[i])
@@ -65,7 +65,7 @@ fn map (f,s)
 fn occurs(needle,haystack)
 	assert atom? (needle)
 	r=0
-	mapleaves(
+	mapLeaves(
 		\(a)(
 			if a==needle
 				r:=1
@@ -74,12 +74,12 @@ fn occurs(needle,haystack)
 	)
 	^r
 
-fn mapleaves (f,a)
+fn mapLeaves (f,a)
 	if atom?(a)
 		^f(a)
 	r=[]
 	for b :a
-		r<<mapleaves(f,  b)
+		r<<mapLeaves(f,  b)
 	^ r
 
 fn filter (f,s)
@@ -115,10 +115,10 @@ fn in (a,s)
 		if a==b
 			^ 1
 
-fn endswith (s,t)
+fn endsWith (s,t)
 	^ drop (len(s)-len( t),s)==t
 
-fn startswith (s,t)
+fn startsWith (s,t)
 	^ take (len( t),s)==t
 
 fn lower (a)
@@ -135,13 +135,13 @@ fn upper (a)
 		^ a-32
 	^ a
 
-fn parseint (s,base)
-	while s&digitb?(s[0],base)
+fn parseInt (s,base)
+	while s&digitBase?(s[0],base)
 		c,@s=s
-		n=n*base+parsedigit (c)
+		n=n*base+parseDigit (c)
 	^ n
 
-fn parsedigit (c)
+fn parseDigit (c)
 	if digit? (c)
 		^ c-"0"[0]
 	if lower? (c)
@@ -150,8 +150,8 @@ fn parsedigit (c)
 		^ 10+c-"A"[0]
 	^ -1
 
-fn digitb?(c,base)
-	n=parsedigit (c)
+fn digitBase?(c,base)
+	n=parseDigit (c)
 	^ 0<=n&n<base
 
 fn unesc (s)
@@ -161,10 +161,10 @@ fn unesc (s)
 
 	fn seq (n,base)
 			while j<n
-				if !digitb?( s[i+j],base)
+				if !digitBase?( s[i+j],base)
 					break
 				j++
-			r@=utf8(parseint (slice (s,i,i+j),base))
+			r@=utf8(parseInt (slice (s,i,i+j),base))
 			i+=j
 
 	while i<len (s)
@@ -279,11 +279,11 @@ fn keys (s)
 fn vals (s)
 		^ map (second,s)
 
-fn commonprefix (ss)
+fn commonPrefix (ss)
 	s=ss[0]
 	for i: range(1,len(s)+1)
 		t=take( i,s)
-		if !every(\(s)( startswith(s,t)),ss)
+		if !every(\(s)( startsWith(s,t)),ss)
 			^ take (i-1,s)
 	^ s
 
@@ -349,22 +349,22 @@ fn replicate (n ,a)
 		r<<a
 	^ r
 
-fn takewhile (f,s)
+fn takeWhile (f,s)
 	r=""
 	while s &(f(s[0]))
 		a,@s=s
 		r<<a
 	^ r
 
-fn dropwhile (f,s)
+fn dropWhile (f,s)
 	while s &(f(s[0]))
 		s=tail (s)
 	^ s
 
 fn span (f ,s)
-	^ takewhile (f,s),dropwhile(f,s)
+	^ takeWhile (f,s),dropWhile(f,s)
 
-fn splitat (i,s)
+fn splitAt (i,s)
 	^ take(i,s),drop(i,s)
 
 fn zip (s,t)
@@ -384,7 +384,7 @@ fn zip3 (s,t,u)
 		r<<(a,b,c)
 	^ r
 
-fn zipwith (f,s,t)
+fn zipWith (f,s,t)
 	r=[]
 	while s&t
 		a,@s=s
@@ -392,7 +392,7 @@ fn zipwith (f,s,t)
 		r<<f(a,b)
 	^ r
 
-fn zipwith3 (f,s,t,u)
+fn zipWith3 (f,s,t,u)
 	r=[]
 	while s&t&u
 		a,@s=s
@@ -433,13 +433,13 @@ fn split (f,s)
 	rs<<r
 	^ rs
 
-fn spliton (a,s)
+fn splitOn (a,s)
 	^ split (\(b)(a==b),s)
 
 fn lines (s)
-	if endswith(s,"\n")
+	if endsWith(s,"\n")
 		s=init (s)
-	^ spliton("\n"[0],s)
+	^ splitOn("\n"[0],s)
 
 fn unlines (ss)
 	r=""
@@ -451,7 +451,7 @@ fn replace (from,to,s)
 	assert from
 	r=""
 	while s
-		if startswith( s,from)
+		if startsWith( s,from)
 			s=drop (len(from),s)
 			r@=to
 			continue
@@ -476,24 +476,24 @@ fn intersection (s,t)
 			r<<a
 	^uniq(r)
 
-fn eqsets(s,t)
+fn eqSets(s,t)
 	s=uniq(s)
 	t=uniq(t)
 	^len(s)==len(t)&every(\(a)(in(a,s)),t)
 
-fn dirseparator? (c)
+fn dirSeparator? (c)
 	if windows?
 		^in(c,":\\/")
 	^in(c,"/")
 
-fn splitdir (s)
-	i=findlast(dirseparator?,s)
+fn splitDir (s)
+	i=findLast(dirSeparator?,s)
 	;there are many edge cases in Windows filenames
 	; so it is better to leave a trailing separator untouched
-	^splitat(i+1,s)
+	^splitAt(i+1,s)
 
-fn splitext (s)
-	i=lastindexof("."[0],s)
+fn splitExt (s)
+	i=lastIndexOf("."[0],s)
 	if i<0
 		^s,""
 	^ take(i,s),drop(i+1,s)
@@ -506,10 +506,10 @@ fn join (t, ss)
 		r@=t@s
 	^r
 
-fn joindir (ss)
+fn joinDir (ss)
 	r=ss[0]
 	for s: tail(ss)
-		if!(r&dirseparator?(last(r)))
+		if!(r&dirSeparator?(last(r)))
 			if windows?
 				r@="\\"
 			else
@@ -524,10 +524,10 @@ fn indexed(s)
 		r<<i,s[i]
 	^r
 
-fn mapfirst(f,s)
+fn mapFirst(f,s)
 	^map(\(a)(f(a[0]),a[1]),s)
 
-fn mapsecond(f,s)
+fn mapSecond(f,s)
 	^map(\(a)(a[0],f(a[1])),s)
 
 ;TODO placeholders

@@ -61,7 +61,7 @@ fn mapTerms (f,loc,a)
 
 fn norm (modules)
 	fn mapModules(f)
-		^mapsecond(
+		^mapSecond(
 			\(module)(
 				;processing a module is like processing a function body with no parameters
 				loc,@body=module

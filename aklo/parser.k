@@ -8,7 +8,7 @@ fn idPart? (c)
 fn parse  (file,text)
 	text=replace("\r\n","\n",text)
 	text=replace("\r","\n",text)
-	if!endswith(text,"\n")
+	if!endsWith(text,"\n")
 		text@="\n"
 
 	i = 0
@@ -314,17 +314,17 @@ fn parse  (file,text)
 				^['list']@exprs("]")
 
 		; quoted symbol
-		if startswith(s,"'")
+		if startsWith(s,"'")
 			s = unesc(slice(s,1,len(s)-1))
 			^ 'quote',intern(s)
 
 		; string
-		if startswith(s,"\"")
+		if startsWith(s,"\"")
 			s = unesc(slice(s,1,len(s)-1))
 			^'quote',s
 
 		; raw string
-		if startswith(s,"r\"")
+		if startsWith(s,"r\"")
 			s = slice(s,2,len(s)-1)
 			^'quote',s
 
@@ -339,17 +339,17 @@ fn parse  (file,text)
 			;integer
 			case lower(take(2,s))
 				"0b"
-					^ parseint(drop(2,s), 2)
+					^ parseInt(drop(2,s), 2)
 				"0o"
-					^ parseint(drop(2,s), 8)
+					^ parseInt(drop(2,s), 8)
 				"0x"
-					^ parseint(drop(2,s), 16)
+					^ parseInt(drop(2,s), 16)
 			if every(digit?,s)
-				^ parseint(s,10)
+				^ parseInt(s,10)
 
 			;floating point
 			op='parsedouble'
-			if endswith(lower(s),"f")
+			if endsWith(lower(s),"f")
 				s=init(s)
 				op='parsefloat'
 			^'xcall',op,('quote',s)

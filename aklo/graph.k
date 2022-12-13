@@ -155,7 +155,7 @@ g<<'r', 'a'
 g<<'r', 'b'
 g<<'r', 'c'
 
-assert eqsets (nodes (g),ns)
+assert eqSets (nodes (g),ns)
 assert preds( g,'c')==['r']
 assert succs (g,'a')==['d']
 
@@ -209,10 +209,10 @@ g<<10, 12
 g<<11, 12
 g<<12, 13
 
-assert eqsets( nodes (g),ns)
+assert eqSets( nodes (g),ns)
 
 ;dominance frontier
-assert eqsets(domfrontier(g,s,5),[4,5,12,13])
+assert eqSets(domfrontier(g,s,5),[4,5,12,13])
 
 ; https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/cdcl.html
 ns = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', false]
@@ -235,8 +235,8 @@ g<<'x10', 'x12'
 g<<'x11', false
 g<<'x12', false
 
-assert eqsets (nodes (g),ns)
+assert eqSets (nodes (g),ns)
 
 ; first UIP
 assert idom(g,'x6', false) == 'x8'
-assert eqsets(transsuccs(g,'x6'), ['x7', 'x8', 'x9', 'x10', 'x11', 'x12', false])
+assert eqSets(transsuccs(g,'x6'), ['x7', 'x8', 'x9', 'x10', 'x11', 'x12', false])

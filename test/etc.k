@@ -127,13 +127,13 @@ assert init("")==""
 assert in (8,[6,7,8])
 assert! in (9,[6,7,8])
 
-assert startswith ("qwerty","qwe")
-assert !startswith ("qwerty","qwz")
-assert !startswith ("qw","qwer")
+assert startsWith ("qwerty","qwe")
+assert !startsWith ("qwerty","qwz")
+assert !startsWith ("qw","qwer")
 
-assert endswith( "qwerty","rty")
-assert !endswith( "ty","rty")
-assert !endswith ("qwerty","ety")
+assert endsWith( "qwerty","rty")
+assert !endsWith( "ty","rty")
+assert !endsWith ("qwerty","ety")
 
 assert lower (97)==97
 assert lower (65)==97
@@ -152,18 +152,18 @@ assert utf8 (0x20ac)==[0xe2,0x82,0xac]
 assert utf8 (0xd55c)==[0xed,0x95,0x9c]
 assert utf8 (0x10348)==[0xf0,0x90,0x8d,0x88]
 
-assert parseint( "123",10)==123
-assert parseint ("ff",16)==255
-assert parseint ("FFFF",16)==65535
+assert parseInt( "123",10)==123
+assert parseInt ("ff",16)==255
+assert parseInt ("FFFF",16)==65535
 
-assert digitb? ("9"[0],10)
-assert digitb? ("9"[0],16)
+assert digitBase? ("9"[0],10)
+assert digitBase? ("9"[0],16)
 
-assert !digitb? ("f"[0],10)
-assert digitb? ("f"[0],16)
+assert !digitBase? ("f"[0],10)
+assert digitBase? ("f"[0],16)
 
-assert !digitb? ("*"[0],10)
-assert !digitb? ("*"[0],16)
+assert !digitBase? ("*"[0],10)
+assert !digitBase? ("*"[0],16)
 
 assert unesc( "abc")=="abc"
 assert unesc (r"\tabc\n")=="\tabc\n"
@@ -176,24 +176,24 @@ assert concat(("zxc","vb"))=="zxcvb"
 assert replicate( 4,9)==[9,9,9,9]
 assert replicate (-1,9)==[]
 
-assert takewhile (digit?,"123abc")=="123"
-assert takewhile (digit?,"123")=="123"
-assert takewhile (digit?,"abc")==""
+assert takeWhile (digit?,"123abc")=="123"
+assert takeWhile (digit?,"123")=="123"
+assert takeWhile (digit?,"abc")==""
 
-assert dropwhile (digit?,"123abc")=="abc"
-assert dropwhile (digit?,"123")==""
-assert dropwhile (digit?,"abc")=="abc"
+assert dropWhile (digit?,"123abc")=="abc"
+assert dropWhile (digit?,"123")==""
+assert dropWhile (digit?,"abc")=="abc"
 
 assert span (digit?,"123abc")==["123","abc"]
 
-assert splitat(2,"abcde")==["ab","cde"]
-assert splitat(-1,"abcde")==["","abcde"]
-assert splitat(20,"abcde")==["abcde",""]
+assert splitAt(2,"abcde")==["ab","cde"]
+assert splitAt(-1,"abcde")==["","abcde"]
+assert splitAt(20,"abcde")==["abcde",""]
 
 assert zip ("abc","12")==["a1","b2"]
 assert zip3 ("abc","12","xyz")==["a1x","b2y"]
-assert zipwith(\(a,b)(a+b),[10,20],[1,2])==[11,22]
-assert zipwith3(\(a,b,c)(a+b+c),[10,20],[1,2],[100,100])==[111,122]
+assert zipWith(\(a,b)(a+b),[10,20],[1,2])==[11,22]
+assert zipWith3(\(a,b,c)(a+b+c),[10,20],[1,2],[100,100])==[111,122]
 assert unzip (["a1","b2","c3"])==["abc","123"]
 assert unzip3 (["a1x","b2y","c3z"])==["abc","123","xyz"]
 
@@ -203,7 +203,7 @@ assert split(digit?,"1")==["",""]
 assert split(digit?,"1zzz")==["","zzz"]
 assert split(digit?,"...9")==["...",""]
 
-assert spliton("."[0],"123.456.")==["123","456",""]
+assert splitOn("."[0],"123.456.")==["123","456",""]
 
 assert lines("a\nb\nc\n\n")==["a","b","c",""]
 assert lines("a\nb\nc\n")==["a","b","c"]
@@ -473,8 +473,8 @@ assert join(",",("abc","de"))=="abc,de"
 assert map( \(x)(x*x),[1,2,3])==[1,4,9]
 assert map( square,[1,2,3])==[1,4,9]
 
-assert mapfirst(first,[["a",2],["b",3]])==[[97,2],[98,3]]
-assert mapsecond(square,[["a",2],["b",3]])==[["a",4],["b",9]]
+assert mapFirst(first,[["a",2],["b",3]])==[[97,2],[98,3]]
+assert mapSecond(square,[["a",2],["b",3]])==[["a",4],["b",9]]
 
 assert filter( digit?,"abc123")=="123"
 
@@ -521,16 +521,16 @@ assert find(digit?,"abc123xyz")==3
 assert find(digit?,"123xyz")==0
 assert find(digit?,"abcxyz")==-1
 
-assert findlast(digit?,"abc123xyz")==5
-assert findlast(digit?,"abc123")==5
-assert findlast(digit?,"abcxyz")==-1
+assert findLast(digit?,"abc123xyz")==5
+assert findLast(digit?,"abc123")==5
+assert findLast(digit?,"abcxyz")==-1
 
-;commonprefix
-assert commonprefix(("a","ab","abc"))=="a"
-assert commonprefix(("ab","ab","ab"))=="ab"
-assert commonprefix(("ab","ab","az"))=="a"
-assert commonprefix(("ab","ab","b"))==""
-assert commonprefix(["ab"])=="ab"
+;commonPrefix
+assert commonPrefix(("a","ab","abc"))=="a"
+assert commonPrefix(("ab","ab","ab"))=="ab"
+assert commonPrefix(("ab","ab","az"))=="a"
+assert commonPrefix(("ab","ab","b"))==""
+assert commonPrefix(["ab"])=="ab"
 
 ;pattern matching assignment
 a=1,2,3
@@ -628,23 +628,23 @@ case "abc"
 assert a=="abc"
 
 ;filenames
-assert dirseparator? ("/"[0])
-assert !dirseparator? ("a"[0])
+assert dirSeparator? ("/"[0])
+assert !dirSeparator? ("a"[0])
 
-assert splitdir("/")==("/","")
-assert splitdir("/a")==("/","a")
-assert splitdir("foo/bar")==("foo/","bar")
-assert splitdir("foo/")==("foo/","")
-assert splitdir("foo")==("","foo")
+assert splitDir("/")==("/","")
+assert splitDir("/a")==("/","a")
+assert splitDir("foo/bar")==("foo/","bar")
+assert splitDir("foo/")==("foo/","")
+assert splitDir("foo")==("","foo")
 
-assert  splitext("abcd.exe")[0]=="abcd"
-assert  splitext("abcd.exe")[1]=="exe"
+assert  splitExt("abcd.exe")[0]=="abcd"
+assert  splitExt("abcd.exe")[1]=="exe"
 
-assert ascii?(joindir(["foo"]))
-assert ascii?(joindir(("foo","bar")))
-assert ascii?(joindir(("foo/","bar")))
+assert ascii?(joinDir(["foo"]))
+assert ascii?(joinDir(("foo","bar")))
+assert ascii?(joinDir(("foo/","bar")))
 
-files=keys(compileTimeReadFiles(\(file)(endswith(file,".k")),"."))
+files=keys(compileTimeReadFiles(\(file)(endsWith(file,".k")),"."))
 assert files
 
 ;etc

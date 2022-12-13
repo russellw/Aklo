@@ -26,31 +26,31 @@ if !packages
 	exit (1)
 
 ;standard library
-libFiles=compileTimeReadFiles(\(file)(endswith(file,".k")),".")
+libFiles=compileTimeReadFiles(\(file)(endsWith(file,".k")),".")
 
 ;read modules
 modules=[]
 
 fn add (names ,file)
-	name=splitext(file)[0]
+	name=splitExt(file)[0]
 	name=replace("-","_",name)
-	text=readFile(joindir([root]@names@[file]))
+	text=readFile(joinDir([root]@names@[file]))
 	module=parser.parse(file,text)
 	modules<<map(intern,names@[name]),module
 
 fn dir (names)
-	for file,attrs: listDir(joindir([root]@names))
+	for file,attrs: listDir(joinDir([root]@names))
 		if get(attrs,'dir?')
 			dir(names@[file])
-		elif endswith(file,".k")
+		elif endsWith(file,".k")
 			add (names ,file)
 
 for  s :packages
-	if endswith(s,".k")
-		root,file=splitdir(s)
+	if endsWith(s,".k")
+		root,file=splitDir(s)
 		add([],file)
 		continue
-	root,name=splitdir(s)
+	root,name=splitDir(s)
 	dir([name])
 
 ;convert to intermediate representation
