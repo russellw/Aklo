@@ -99,10 +99,10 @@ fn eprn (s)
 	epr (s@"\n")
 
 fn pr (s)
-		writestream( stdout,s)
+		writeStream( stdout,s)
 
 fn epr (s)
-		writestream( stderr,s)
+		writeStream( stderr,s)
 
 fn take (i,s)
 	^ slice( s,0,i)

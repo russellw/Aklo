@@ -22,13 +22,13 @@ class Etc {
   static final boolean windowsp = System.getProperty("os.name").startsWith("Windows");
 
   static List<Object> compileTimeReadFiles(String dir) {
-    // in the full language, ctreadfiles works at compile time
+    // in the full language, compileTimeReadFiles works at compile time
     // thereby generating arbitrarily large compile-time constants
     // because they contain the full text of the files read
     // but Java does not have a good way to embed arbitrarily large arrays in source code
     // due to the limit on method size
     // so during boot, the 'compiled to Java' version of the main compiler
-    // just performs ctreadfiles at runtime
+    // just performs compileTimeReadFiles at runtime
     // the tradeoff is that the boot version of the compiler
     // cannot be redistributed separately from its source code
     // this is acceptable for a program that will only be used once
@@ -42,7 +42,7 @@ class Etc {
               var file = path.toString();
               if (file.endsWith(".k")) {
                 var file1 = encode(file);
-                r.add(List.of(file1, readfile(file1)));
+                r.add(List.of(file1, readFile(file1)));
               }
               return FileVisitResult.CONTINUE;
             }
@@ -53,7 +53,7 @@ class Etc {
     return r;
   }
 
-  static List<Object> listdir(Object dir0) {
+  static List<Object> listDir(Object dir0) {
     var dir = decode(dir0);
     var r = new ArrayList<>();
     try {
@@ -110,7 +110,7 @@ class Etc {
     System.out.println();
   }
 
-  static Object writestream(Object stream, Object s) {
+  static Object writeStream(Object stream, Object s) {
     var stream1 = (PrintStream) stream;
     for (var c : (List<Object>) s) stream1.write((int) c);
     return null;
@@ -120,7 +120,7 @@ class Etc {
     return new String(bytes(s), StandardCharsets.UTF_8);
   }
 
-  static List<Object> readfile(Object file) {
+  static List<Object> readFile(Object file) {
     try {
       return list(Files.readAllBytes(Path.of(decode(file))));
     } catch (IOException e) {
@@ -128,7 +128,7 @@ class Etc {
     }
   }
 
-  static void writefile(Object file, Object s) {
+  static void writeFile(Object file, Object s) {
     try {
       Files.write(Path.of(decode(file)), bytes(s));
     } catch (IOException e) {
@@ -181,7 +181,7 @@ class Etc {
     return (int) a >> (int) b;
   }
 
-  static boolean isascii(List<Object> a) {
+  static boolean isAscii(List<Object> a) {
     if (a.isEmpty()) return false;
     for (var c0 : a) {
       if (!(c0 instanceof Integer)) return false;
@@ -208,7 +208,7 @@ class Etc {
       return;
     }
     var a = (List<Object>) a0;
-    if (isascii(a)) {
+    if (isAscii(a)) {
       appendsb(sb, "\"");
       for (var c0 : a) {
         var c = (int) c0;

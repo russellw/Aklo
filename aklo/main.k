@@ -34,12 +34,12 @@ modules=[]
 fn add (names ,file)
 	name=splitext(file)[0]
 	name=replace("-","_",name)
-	text=readfile(joindir([root]@names@[file]))
+	text=readFile(joindir([root]@names@[file]))
 	module=parser.parse(file,text)
 	modules<<map(intern,names@[name]),module
 
 fn dir (names)
-	for file,attrs: listdir(joindir([root]@names))
+	for file,attrs: listDir(joindir([root]@names))
 		if get(attrs,'dir?')
 			dir(names@[file])
 		elif endswith(file,".k")
@@ -60,4 +60,4 @@ vars,fns=ast.norm(modules)
 vars,fns=optimizer.optimize(vars,fns)
 
 ;output
-writefile("a.cc",cxx.compose(vars,fns))
+writeFile("a.cc",cxx.compose(vars,fns))

@@ -265,10 +265,10 @@ fn parse  (file,text)
 			"list?"
 			"int?"
 			"float?"
-			"readfile"
+			"readFile"
 			"bitNot"
 			"len"
-			"listdir"
+			"listDir"
 			"exit"
 				expect("(")
 				r<<expr()
@@ -279,8 +279,8 @@ fn parse  (file,text)
 			"bitAnd"
 			"shr"
 			"shl"
-			"writestream"
-			"writefile"
+			"writeStream"
+			"writeFile"
 			"compileTimeReadFiles"
 				expect("(")
 				r<<expr()
