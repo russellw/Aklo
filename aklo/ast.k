@@ -333,7 +333,7 @@ fn norm (modules)
 			vars,fns,body=body
 			code=[]
 
-			fn genVar(name)
+			fn makeVar(name)
 				a=sym(name)
 				vars<<loc,a,'any'
 				^a
@@ -350,7 +350,7 @@ fn norm (modules)
 					yesLabel = sym("ifYes")
 					noLabel = sym("ifNo")
 					afterLabel = sym("ifAfter")
-					r = genVar("ifResult")
+					r = makeVar("ifResult")
 
 					;test
 					test=rec(test)
@@ -372,12 +372,12 @@ fn norm (modules)
 
 				case a
 					'post++',y
-						r=genVar("postInc")
+						r=makeVar("postInc")
 						assign(r,y)
 						assign(y,('+',y,1))
 						^r
 					'post--',y
-						r=genVar("postDec")
+						r=makeVar("postDec")
 						assign(r,y)
 						assign(y,('-',y,1))
 						^r
@@ -408,15 +408,15 @@ fn norm (modules)
 						if1(test,yes,no)
 					'xcall',name,@s
 						s=map(rec,s)
-						r=genVar(str(name))
+						r=makeVar(str(name))
 						code<<'=',r,('xcall',name,@s)
 						^r
 					'|',x,y
-						r=genVar("or")
+						r=makeVar("or")
 						assign(r,x)
 						^if1(r,r,y)
 					'&',x,y
-						r=genVar("and")
+						r=makeVar("and")
 						assign(r,x)
 						^if1(r,y,r)
 					'while',test,@body
@@ -474,7 +474,7 @@ fn norm (modules)
 					'<=',@s
 					'==',@s
 						s=map(rec,s)
-						r=genVar("")
+						r=makeVar("")
 						code<<'=',r,(a[0],@s)
 						^r
 					'quote',_
