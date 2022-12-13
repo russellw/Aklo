@@ -1,4 +1,4 @@
-proceed=gensym("proceed")
+proceed=sym("proceed")
 fn err (loc,msg)
 	file,line,fname=loc
 	throw file @ ":" @ str(line)@ ": "@fname  @ ": " @ msg
@@ -178,7 +178,7 @@ fn norm (modules)
 				\(loc,a)(
 					case a
 						'lambda',loc,params,@body
-							y=gensym("lambda")
+							y=sym("lambda")
 							^'do',('fn',loc,y,params,'any',@body),y
 					^proceed
 				)
@@ -221,7 +221,7 @@ fn norm (modules)
 	globals=[]
 	for  modName,(_,vars,fns,_):modules
 		for _,x,@_  :vars@fns
-								y=gensym(str(x))
+								y=sym(str(x))
 								globals<<modName@[x],y
 
 	;ubiquitous names are in the outer environment of every module
@@ -240,7 +240,7 @@ fn norm (modules)
 			fn rec( env,loc,params,vars,fns,body)
 				fn decl(a)
 						loc,x,@s=a
-						y=gensym(str(x))
+						y=sym(str(x))
 						x,y>>env
 						^loc,y,@s
 
@@ -268,7 +268,7 @@ fn norm (modules)
 					\(loc,a)(
 							case a
 								':',x
-									y=gensym(str(x))
+									y=sym(str(x))
 									labels<<x,y
 							^proceed
 					)
@@ -334,7 +334,7 @@ fn norm (modules)
 			code=[]
 
 			fn genVar(name)
-				a=gensym(name)
+				a=sym(name)
 				vars<<loc,a,'any'
 				^a
 
@@ -347,9 +347,9 @@ fn norm (modules)
 					code<<'=',y,x
 
 				fn if1(test,yes,no)
-					yesLabel = gensym("ifYes")
-					noLabel = gensym("ifNo")
-					afterLabel = gensym("ifAfter")
+					yesLabel = sym("ifYes")
+					noLabel = sym("ifNo")
+					afterLabel = sym("ifAfter")
 					r = genVar("ifResult")
 
 					;test
@@ -420,9 +420,9 @@ fn norm (modules)
 						assign(r,x)
 						^if1(r,y,r)
 					'while',test,@body
-						bodyLabel = gensym("whileBody")
-						testLabel = gensym("whileTest")
-						afterLabel = gensym("whileAfter")
+						bodyLabel = sym("whileBody")
+						testLabel = sym("whileTest")
+						afterLabel = sym("whileAfter")
 						loop = testLabel, afterLabel
 
 						code<<'goto',testLabel
@@ -439,9 +439,9 @@ fn norm (modules)
 						;after
 						code<<':',afterLabel
 					'dowhile',test,@body
-						bodyLabel = gensym("dowhileBody")
-						testLabel = gensym("dowhileTest")
-						afterLabel = gensym("dowhileAfter")
+						bodyLabel = sym("dowhileBody")
+						testLabel = sym("dowhileTest")
+						afterLabel = sym("dowhileAfter")
 						loop = testLabel, afterLabel
 
 						;body

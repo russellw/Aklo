@@ -38,7 +38,7 @@ def show(a):
 syms = 0
 
 
-def gensym():
+def sym():
     global syms
     syms += 1
     return f"_{syms}"
@@ -691,7 +691,7 @@ def expr(env, a):
         case "intern", *s:
             print("Sym.intern")
             printArgs(env, s)
-        case "gensym", *s:
+        case "sym", *s:
             print("new Sym")
             printArgs(env, s)
         case (
@@ -771,7 +771,7 @@ def isRest(s):
 
 
 def tmp(env, a):
-    r = gensym()
+    r = sym()
     print(f"Object {r} = ")
     expr(env, a)
     print(";")
@@ -868,7 +868,7 @@ def stmt(env, a):
             expr(env, (a[0][0], x, y))
             print(";")
         case "for", y, s, *body:
-            x = gensym()
+            x = sym()
             print(f"for (var {x}: (List)")
             expr(env, s)
             print(") {")
@@ -934,11 +934,11 @@ def stmt(env, a):
             print(label + ":")
             stmt(env, loop)
         case "case", x, *cases:
-            outerLabel = gensym()
+            outerLabel = sym()
             print(outerLabel + ": do {")
             x = tmp(env, x)
             for pattern, *body in cases:
-                innerLabel = gensym()
+                innerLabel = sym()
                 print(innerLabel + ": do {")
                 checkCase(env, innerLabel, pattern, x)
                 assign(env, pattern, x)

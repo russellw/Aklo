@@ -534,8 +534,8 @@ fn mapSecond(f,s)
 fn  get(s,a)
 	^get(s,a)
 
-fn  gensym(s)
-	^gensym(s)
+fn  sym(s)
+	^sym(s)
 
 fn  intern(s)
 	^intern(s)
