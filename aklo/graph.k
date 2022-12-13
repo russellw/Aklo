@@ -15,14 +15,14 @@ fn nodes(g)
 		r @= a,b
 	^uniq(r)
 
-fn preds(g, a)
+fn predecessors(g, a)
 	r = []
 	for b,c: g
 		if a==c
 			r << b
 	^uniq(r)
 
-fn succs(g, a)
+fn successors(g, a)
 	r = []
 	for b,c: g
 		if a == b
@@ -36,10 +36,10 @@ fn dfs(f, g, a)
 			^
 		visited<<a
 		f(a)
-		map(rec, succs(g, a))
+		map(rec, successors(g, a))
 	rec(a)
 
-fn dfswithout(f,g, a, w)
+fn dfsWithout(f,g, a, w)
 	visited = []
 	fn rec(a)
 		if a == w
@@ -48,32 +48,32 @@ fn dfswithout(f,g, a, w)
 			^
 		visited<<a
 		f(a)
-		map(rec, succs(g, a))
+		map(rec, successors(g, a))
 	rec(a)
 
-fn domfrontier(g, s, a)
+fn domFrontier(g, s, a)
 	r = []
 	for b: nodes(g)
-		if strictlydominates(g, s, a, b)
+		if strictlyDominates(g, s, a, b)
 			continue
-		for c: preds(g, b)
+		for c: predecessors(g, b)
 			if dominates(g, s, a, c)
 				r << b
 	^uniq(r)
 
 fn dominates(g, s, a, b)
-	^!reacheswithout(g, s, b, a)
+	^!reachesWithout(g, s, b, a)
 
 fn idom(g, s, b)
 	for a: nodes(g)
-		if isidom(g, s, a, b)
+		if idom?(g, s, a, b)
 			^a
 	throw"no idom"
 
-fn isidom(g, s, a, b)
-	if !strictlydominates(g, s, a, b)
+fn idom?(g, s, a, b)
+	if !strictlyDominates(g, s, a, b)
 		^
-	for c: strictdominators(g, s, b)
+	for c: strictDominators(g, s, b)
 		if !dominates(g, s, c, a)
 			^
 	^1
@@ -90,9 +90,9 @@ fn reaches(g, a, b)
 	)
 	^r
 
-fn reacheswithout(g, a, b, w)
+fn reachesWithout(g, a, b, w)
 	r = 0
-	dfswithout(
+	dfsWithout(
 		\(c)(
 			if b==c
 				r:=1
@@ -103,17 +103,17 @@ fn reacheswithout(g, a, b, w)
 	)
 	^r
 
-fn strictdominators(g, s, b)
+fn strictDominators(g, s, b)
 	r = []
 	for a: nodes(g)
-		if strictlydominates(g, s, a, b)
+		if strictlyDominates(g, s, a, b)
 			r << a
 	^r
 
-fn strictlydominates(g, s, a, b)
+fn strictlyDominates(g, s, a, b)
 	^a != b & dominates(g, s, a, b)
 
-fn transsuccs(g, a)
+fn transitiveSuccessors(g, a)
 	r = []
 	dfs(
 		\(b)(
@@ -156,8 +156,8 @@ g<<'r', 'b'
 g<<'r', 'c'
 
 assert eqSets (nodes (g),ns)
-assert preds( g,'c')==['r']
-assert succs (g,'a')==['d']
+assert predecessors( g,'c')==['r']
+assert successors (g,'a')==['d']
 
 ;x dominates x
 for x :ns
@@ -212,7 +212,7 @@ g<<12, 13
 assert eqSets( nodes (g),ns)
 
 ;dominance frontier
-assert eqSets(domfrontier(g,s,5),[4,5,12,13])
+assert eqSets(domFrontier(g,s,5),[4,5,12,13])
 
 ; https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/cdcl.html
 ns = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', false]
@@ -239,4 +239,4 @@ assert eqSets (nodes (g),ns)
 
 ; first UIP
 assert idom(g,'x6', false) == 'x8'
-assert eqSets(transsuccs(g,'x6'), ['x7', 'x8', 'x9', 'x10', 'x11', 'x12', false])
+assert eqSets(transitiveSuccessors(g,'x6'), ['x7', 'x8', 'x9', 'x10', 'x11', 'x12', false])
