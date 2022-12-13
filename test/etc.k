@@ -644,7 +644,7 @@ assert ascii?(joindir(["foo"]))
 assert ascii?(joindir(("foo","bar")))
 assert ascii?(joindir(("foo/","bar")))
 
-files=keys(ctreadfiles(\(file)(endswith(file,".k")),"."))
+files=keys(compileTimeReadFiles(\(file)(endswith(file,".k")),"."))
 assert files
 
 ;etc

@@ -21,7 +21,7 @@ class Etc {
   static Set<String> tracing;
   static final boolean windowsp = System.getProperty("os.name").startsWith("Windows");
 
-  static List<Object> ctreadfiles(String dir) {
+  static List<Object> compileTimeReadFiles(String dir) {
     // in the full language, ctreadfiles works at compile time
     // thereby generating arbitrarily large compile-time constants
     // because they contain the full text of the files read

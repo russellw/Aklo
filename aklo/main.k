@@ -26,7 +26,7 @@ if !packages
 	exit (1)
 
 ;standard library
-libFiles=ctreadfiles(\(file)(endswith(file,".k")),".")
+libFiles=compileTimeReadFiles(\(file)(endswith(file,".k")),".")
 
 ;read modules
 modules=[]

@@ -299,7 +299,7 @@ def parse(file):
             return ["List.of"] + [ord(c) for c in s]
 
         # word
-        if eat("ctreadfiles"):
+        if eat("compileTimeReadFiles"):
             expect("(")
 
             # in the full language, the first argument is a filter function
@@ -312,7 +312,7 @@ def parse(file):
             # which will always be the main compiler source directory
             lex()
             expect(")")
-            return "ctreadfiles", here.replace("\\", "/") + "/../aklo"
+            return "compileTimeReadFiles", here.replace("\\", "/") + "/../aklo"
         if isIdStart(tok[0]):
             return word()
 
@@ -634,8 +634,8 @@ def truth(env, a):
 
 def expr(env, a):
     match a:
-        case "ctreadfiles", dir1:
-            print(f'Etc.ctreadfiles("{dir1}")')
+        case "compileTimeReadFiles", dir1:
+            print(f'Etc.compileTimeReadFiles("{dir1}")')
         case "args" | "windowsp":
             print("Etc." + a)
         case ("++", x) | ("--", x):

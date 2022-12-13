@@ -281,7 +281,7 @@ fn parse  (file,text)
 			"shl"
 			"writestream"
 			"writefile"
-			"ctreadfiles"
+			"compileTimeReadFiles"
 				expect("(")
 				r<<expr()
 				expect(",")
