@@ -207,20 +207,20 @@ fn utf8 (c)
 		^ [c]
 	if c<0x800
 		^[
-			bitor( 0b11000000,shr(c,6))
-			bitor( 0b10000000,bitand(c,0b111111))
+			bitOr( 0b11000000,shr(c,6))
+			bitOr( 0b10000000,bitAnd(c,0b111111))
 		]
 	if c<0x10000
 		^[
-			bitor( 0b11100000,shr(c,12))
-			bitor( 0b10000000,bitand(shr(c,6),0b111111))
-			bitor( 0b10000000,bitand(c,0b111111))
+			bitOr( 0b11100000,shr(c,12))
+			bitOr( 0b10000000,bitAnd(shr(c,6),0b111111))
+			bitOr( 0b10000000,bitAnd(c,0b111111))
 		]
 	^ [
-		bitor( 0b11110000,shr(c,18))
-		bitor( 0b10000000,bitand(shr(c,12),0b111111))
-		bitor( 0b10000000,bitand(shr(c,6),0b111111))
-		bitor( 0b10000000,bitand(c,0b111111))
+		bitOr( 0b11110000,shr(c,18))
+		bitOr( 0b10000000,bitAnd(shr(c,12),0b111111))
+		bitOr( 0b10000000,bitAnd(shr(c,6),0b111111))
+		bitOr( 0b10000000,bitAnd(c,0b111111))
 	]
 
 fn atom?( a)

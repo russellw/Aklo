@@ -161,15 +161,15 @@ class Etc {
     return (int) a % (int) b;
   }
 
-  static int bitand(Object a, Object b) {
+  static int bitAnd(Object a, Object b) {
     return (int) a & (int) b;
   }
 
-  static int bitor(Object a, Object b) {
+  static int bitOr(Object a, Object b) {
     return (int) a | (int) b;
   }
 
-  static int bitxor(Object a, Object b) {
+  static int bitXor(Object a, Object b) {
     return (int) a ^ (int) b;
   }
 
@@ -315,7 +315,7 @@ class Etc {
     return -(int) a;
   }
 
-  static int bitnot(Object a) {
+  static int bitNot(Object a) {
     return ~(int) a;
   }
 

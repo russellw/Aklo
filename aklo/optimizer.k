@@ -88,10 +88,10 @@ fn nop(body)
 				'<',@_
 				'<=',@_
 				'neg',@_
-				'bitand',@_
-				'bitor',@_
-				'bitxor',@_
-				'bitnot',@_
+				'bitAnd',@_
+				'bitOr',@_
+				'bitXor',@_
+				'bitNot',@_
 				'shl',@_
 				'shr',@_
 				'**',@_
@@ -178,14 +178,14 @@ fn eval(a)
 					^x-y
 				'neg',x
 					^-x
-				'bitnot',x
-					^bitnot(x)
-				'bitand',x,y
-					^bitand(x,y)
-				'bitor',x,y
-					^bitor(x,y)
-				'bitxor',x,y
-					^bitxor(x,y)
+				'bitNot',x
+					^bitNot(x)
+				'bitAnd',x,y
+					^bitAnd(x,y)
+				'bitOr',x,y
+					^bitOr(x,y)
+				'bitXor',x,y
+					^bitXor(x,y)
 				'shl',x,y
 					^shl(x,y)
 				'shr',x,y

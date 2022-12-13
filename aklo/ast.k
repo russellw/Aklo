@@ -458,12 +458,12 @@ fn norm (modules)
 					'goto',_
 					':',_
 						code<<a
-					'bitand',@s
-					'bitor',@s
-					'bitxor',@s
+					'bitAnd',@s
+					'bitOr',@s
+					'bitXor',@s
 					'shl',@s
 					'shr',@s
-					'bitnot',@s
+					'bitNot',@s
 					'neg',@s
 					'%',@s
 					'//',@s

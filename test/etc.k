@@ -22,28 +22,28 @@ assert !(true & false)
 assert true & true
 
 ;bitwise
-assert !bitand(0 , 0)
-assert !bitand(0 , 1)
-assert !bitand(1 , 0)
-assert bitand( 1 , 1)
+assert !bitAnd(0 , 0)
+assert !bitAnd(0 , 1)
+assert !bitAnd(1 , 0)
+assert bitAnd( 1 , 1)
 
-assert !bitor(0 , 0)
-assert bitor( 0 , 1)
-assert bitor( 1 , 0)
-assert bitor( 1 , 1)
+assert !bitOr(0 , 0)
+assert bitOr( 0 , 1)
+assert bitOr( 1 , 0)
+assert bitOr( 1 , 1)
 
-assert !bitxor(0 , 0)
-assert bitxor (0 , 1)
-assert bitxor (1 , 0)
-assert !bitxor(1 , 1)
+assert !bitXor(0 , 0)
+assert bitXor (0 , 1)
+assert bitXor (1 , 0)
+assert !bitXor(1 , 1)
 
 assert shl( 1,8)==256
 assert shr (256,8)==1
 
-assert bitnot (0)==-1
+assert bitNot (0)==-1
 
 a=1
-assert bitnot (a)==-2
+assert bitNot (a)==-2
 
 ;numbers
 assert 0xff==255

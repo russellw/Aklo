@@ -51,17 +51,17 @@ fn expr(a)
 		'//',x,y
 			;TODO what if args are float?
 			binaryExpr("/",x,y)
-		'bitand',x,y
+		'bitAnd',x,y
 			binaryExpr("&",x,y)
-		'bitor',x,y
+		'bitOr',x,y
 			binaryExpr("|",x,y)
-		'bitxor',x,y
+		'bitXor',x,y
 			binaryExpr("^",x,y)
 		'shl',x,y
 			binaryExpr("<<",x,y)
 		'shr',x,y
 			binaryExpr(">>",x,y)
-		'bitnot',x
+		'bitNot',x
 			unaryExpr("~",x)
 		'neg',x
 			unaryExpr("-",x)

@@ -266,7 +266,7 @@ fn parse  (file,text)
 			"int?"
 			"float?"
 			"readfile"
-			"bitnot"
+			"bitNot"
 			"len"
 			"listdir"
 			"exit"
@@ -274,9 +274,9 @@ fn parse  (file,text)
 				r<<expr()
 				expect(")")
 				^r
-			"bitxor"
-			"bitor"
-			"bitand"
+			"bitXor"
+			"bitOr"
+			"bitAnd"
 			"shr"
 			"shl"
 			"writestream"
