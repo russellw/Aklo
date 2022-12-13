@@ -84,6 +84,8 @@ fn mapLeaves (f,a)
 
 fn filter (f,s)
 	r=[]
+	;TODO is it better to provide an optionally used argument like this
+	; Or have two filter functions?
 	for i :range(s)
 		if f (s[i],i)
 			r<<s[i]
