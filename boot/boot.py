@@ -644,10 +644,9 @@ def expr(env, a):
             print(x + a[0][4:])
         case "\\", params, *body:
             fref(env, a)
-        case "//", x, y:
-            expr(env, x)
-            print("/")
-            expr(env, y)
+        case "//", *s:
+            print("Etc.div")
+            pargs(env, s)
         case "range", x:
             expr(env, ("range", 0, x))
         case "<", *s:

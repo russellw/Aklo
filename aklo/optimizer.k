@@ -215,4 +215,5 @@ fn optimize(vars,fns)
 		fns=mapbody(ifconst,fns)
 		fns=mapbody(constfold,fns)
 		fns=map(deadvar,fns)
+		;TODO jump threading
 	^vars,fns

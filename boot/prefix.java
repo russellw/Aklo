@@ -323,6 +323,10 @@ class Etc {
     return (int) a - (int) b;
   }
 
+  static int div(Object a, Object b) {
+    return (int) a / (int) b;
+  }
+
   static boolean lt(Object a, Object b) {
     return (int) a < (int) b;
   }
