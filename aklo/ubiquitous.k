@@ -61,8 +61,14 @@ fn any (f,s)
 
 fn map (f,s)
 	r=[]
+	for a:s
+		r<<f (a)
+	^ r
+
+fn mapIdx (f,s)
+	r=[]
 	for i :range(s)
-		r<<f (s[i],i)
+		r<<f (i,s[i])
 	^ r
 
 fn occurs(needle,haystack)
@@ -87,10 +93,15 @@ fn mapLeaves (f,a)
 
 fn filter (f,s)
 	r=[]
-	;TODO is it better to provide an optionally used argument like this
-	; Or have two filter functions?
+	for a:s
+		if f (a)
+			r<<a
+	^ r
+
+fn filterIdx (f,s)
+	r=[]
 	for i :range(s)
-		if f (s[i],i)
+		if f (i,s[i])
 			r<<s[i]
 	^ r
 

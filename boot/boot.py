@@ -1060,7 +1060,7 @@ def fbody(env, fname, params, body):
     # body
     print("public Object apply(List<Object> _args) {")
     print(f'Etc.enter("{file}", {line}, "{fname}", _args);')
-    print(f"assert _args.size() >= {len(params)};")
+    print(f"assert _args.size() == {len(params)};")
     for i in range(len(params)):
         assign(env, params[i], f"_args.get({i})")
     stmts(env, body)

@@ -31,14 +31,14 @@ fn mapBody(f,fns)
 	)
 
 fn redundantLoc(body)
-	s=[]
+	redundant=[]
 	for i : range(len(body)-1)
 		case body[i]
 			'loc',@_
 				case body[i+1]
 					'loc',@_
-						s<<i
-	^filter(\(_,i)(!in(i,s)),body)
+						redundant<<i
+	^filterIdx(\(i,_)(!in(i,redundant)),body)
 
 
 fn usingVar(body,a)
@@ -54,15 +54,15 @@ fn usingVar(body,a)
 	^r
 
 fn redundantGoto(body)
-	s=[]
+	redundant=[]
 	for i : range(len(body)-1)
 		case body[i]
 			'goto',label
 				case body[i+1]
 					':',label1
 						if label==label1
-							s<<i
-	^filter(\(_,i)(!in(i,s)),body)
+							redundant<<i
+	^filterIdx(\(i,_)(!in(i,redundant)),body)
 
 fn deadLabel(body)
 	^filter(
@@ -129,7 +129,7 @@ fn cfg(body)
 
 fn deadCode(body)
 	g=cfg(body)
-	^filter(\(a,i)(graph.reaches(g,0,i)),body)
+	^filterIdx(\(i,_)(graph.reaches(g,0,i)),body)
 
 fn ifConst(body)
 	^map(
@@ -238,8 +238,8 @@ fn dataFlow(body)
 	^In
 
 fn deadStore(body)
-	^map(
-		\(a,i)(
+	^mapIdx(
+		\(i,a)(
 			case a
 				'=',y,x
 					if !usingAssignment(body,i)
