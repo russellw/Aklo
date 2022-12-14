@@ -220,7 +220,7 @@ fn dataFlow(body)
 							if x!=y
 								r<<j
 				^r
-		^s
+		^[]
 
 	fn trans(i,s)
 		^union(gen(i),difference(s,kill(i,s)))
