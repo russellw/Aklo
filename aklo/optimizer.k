@@ -211,13 +211,12 @@ fn dataFlow(body)
 		case  body[i]
 			'=',x,_
 				;if this node defines a certain variable
-				; any incoming definition of that variable can be killed
 				r=[]
 				for j:s
 					case body[j]
 						'=',y,_
-							;only keep the definitions that are not killed
-							if x!=y
+							; any incoming definition of that variable can be killed
+							if x==y
 								r<<j
 				^r
 		^[]
