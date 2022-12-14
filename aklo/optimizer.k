@@ -40,17 +40,28 @@ fn redundantLoc(body)
 						redundant<<i
 	^filterIdx(\(i,_)(!in(i,redundant)),body)
 
+fn mapInputs(f,a)
+	;there are many rules of the form
+	;'if there is a definition, do this'
+	; those can be coded directly as case statements
+	; this function factors out the rarer rules of the form
+	;'if there is a definition, do this for the value, otherwise do it for the whole instruction'
+	case a
+		'=',y,x
+			^'=',y,f(x)
+	^f(a)
 
 fn varUse(body,a)
 	assert atom?(a)
 	r=[]
 	for i : range(body)
-		b=body[i]
-		case b
-			'=',y,x
-				b=x
-		if occurs(a,b)
-			r<<i
+		mapInputs(
+			\(b)(
+				if occurs(a,b)
+					r<<i
+			)
+			body[i]
+		)
 	^r
 
 fn redundantGoto(body)
