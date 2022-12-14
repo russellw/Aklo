@@ -471,6 +471,13 @@ fn uniq (s)
 fn union (s,t)
 	^uniq(s@t)
 
+fn difference(s,t)
+	r=[]
+	for a: s
+		if !in(a,t)
+			r<<a
+	^uniq(r)
+
 fn intersection (s,t)
 	r=[]
 	for a: s

@@ -103,18 +103,6 @@ fn nop(body)
 		body
 	)
 
-fn deadStore(body)
-	^map(
-		\(a)(
-			case a
-				'=',y,x
-					if !localUsers(body,y)
-						^x
-			^a
-		)
-		body
-	)
-
 fn labelIdx(body,label)
 	for i,a :indexed(body)
 			case a
@@ -192,12 +180,72 @@ fn eval(a)
 					^shr(x,y)
 			^a
 
-fn constFold(body)
+fn constFolding(body)
 	^map(
 		\(a)(
 			case a
 				'=',y,x
 					^'=',y,eval(x)
+			^a
+		)
+		body
+	)
+
+fn dataFlow(body)
+	;https://en.wikipedia.org/wiki/Data-flow_analysis
+	;https://en.wikipedia.org/wiki/Reaching_definition
+	g=cfg(body)
+
+	;in and out sets start off empty at all nodes
+	in=replicate(len(g),[])
+	out=in
+
+	fn join(ss)
+		^uniq(concat(ss))
+
+	fn gen(i)
+		case  body[i]
+			'=',@_
+				^[i]
+		^[]
+
+	fn kill(i,s)
+		case  body[i]
+			'=',x,_
+				;if this node assigns a value to a certain variable
+				; any incoming definition of that variable can be killed
+				r=[]
+				for j:s
+					case body[j]
+						'=',y,_
+							;only keep the definitions that are not killed
+							if x!=y
+								r<<j
+				^r
+		^s
+
+	fn trans(i,s)
+		^union(gen(i),difference(s,kill(i,s)))
+
+	;iterate to fixed point
+	dowhile old!=(in,out)
+		old=in,out
+		in1=[]
+		out1=[]
+		for i:range(g)
+			in1<<join(map(\(j)(out[j]),graph.predecessors(g,i)))
+			out1<<trans(i,in[i])
+		in=in1
+		out=out1
+	^in
+
+fn deadStore(body)
+	^map(
+		\(a)(
+			case a
+				'=',y,x
+					if !localUsers(body,y)
+						^x
 			^a
 		)
 		body
@@ -213,7 +261,7 @@ fn optimize(vars,fns)
 		fns=mapBody(deadStore,fns)
 		fns=mapBody(nop,fns)
 		fns=mapBody(ifConst,fns)
-		fns=mapBody(constFold,fns)
+		fns=mapBody(constFolding,fns)
 		fns=map(deadVar,fns)
 		;TODO jump threading
 	^vars,fns
