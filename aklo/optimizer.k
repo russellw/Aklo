@@ -210,7 +210,7 @@ fn dataFlow(body)
 	fn kill(i,s)
 		case  body[i]
 			'=',x,_
-				;if this node assigns a value to a certain variable
+				;if this node defines a certain variable
 				; any incoming definition of that variable can be killed
 				r=[]
 				for j:s
@@ -250,16 +250,16 @@ fn deadStore(body)
 	)
 
 fn usingAssignment(body,i)
-	;the variable being assigned
+	;the variable being defined
 	'=',a,_=body[i]
 
-	;which instructions does this assignment reach
+	;which instructions does this definition reach
 	reaching= dataFlow(body)
 
 	;which instructions use this variable
 	r=[]
 	for j:usingVar(body,a)
-		;is this assignment among those reaching that instruction
+		;is this definition among those reaching that instruction
 		if in(i,reaching[j])
 			r<<j
 	^r

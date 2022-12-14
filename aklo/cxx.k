@@ -114,7 +114,7 @@ fn stmt(a)
 			expr(a)
 			r@=";\n"
 
-fn defineVar(a)
+fn defVar(a)
 	case a
 		loc,name,type
 			location(loc)
@@ -128,7 +128,7 @@ fn defineVar(a)
 			throw repr(a)
 	r@=";\n"
 
-fn defineFn(a)
+fn defFn(a)
 	loc,name,params,rtype,vars,body=a
 	location(loc)
 	typeName(name,rtype)
@@ -139,7 +139,7 @@ fn defineFn(a)
 		_,pname,ptype=params[i]
 		typeName(pname,ptype)
 	r@=") {\n"
-	map(defineVar,vars)
+	map(defVar,vars)
 	map(stmt,body)
 	r@="}\n"
 
@@ -147,6 +147,6 @@ fn compose (vars,fns)
 	r:=[]
 	r@="#include <stdio.h>\n"
 	r@="#include <stdlib.h>\n"
-	map(defineVar,vars)
-	map(defineFn,fns)
+	map(defVar,vars)
+	map(defFn,fns)
 	^r
