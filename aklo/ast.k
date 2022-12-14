@@ -500,4 +500,17 @@ fn norm (modules)
 
 	vars=[]
 	fns=[r]
+
+	;initialize variables to zero by default
+	fns=map(
+		\(F)(
+			loc,name,params,rtype,vars,body=F
+			inits=[]
+			for _,x,@_:vars
+				inits<<'=',x,0
+			^loc,name,params,rtype,vars,inits@body
+		)
+		fns
+	)
+
 	^vars,fns
