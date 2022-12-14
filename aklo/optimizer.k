@@ -1,4 +1,4 @@
-fn labelUsers(body,label)
+fn usingLabel(body,label)
 	r=[]
 	for i:range(body)
 		a=body[i]
@@ -14,7 +14,7 @@ fn deadVar(F)
 	vars=filter(
 		\(a)(
 			_,x,@_=a
-			^localUsers(body,x)
+			^usingVar(body,x)
 		)
 		vars
 	)
@@ -41,7 +41,7 @@ fn redundantLoc(body)
 	^filter(\(_,i)(!in(i,s)),body)
 
 
-fn localUsers(body,a)
+fn usingVar(body,a)
 	assert atom?(a)
 	r=[]
 	for i : range(body)
@@ -69,7 +69,7 @@ fn deadLabel(body)
 		\(a)(
 			case a
 				':',label
-					^labelUsers(body,label)
+					^usingLabel(body,label)
 			^1
 		)
 		body
@@ -197,11 +197,9 @@ fn dataFlow(body)
 	g=cfg(body)
 
 	;in and out sets start off empty at all nodes
-	in=replicate(len(g),[])
-	out=in
+	In=replicate(len(g),[])
+	Out=In
 
-	fn join(ss)
-		^uniq(concat(ss))
 
 	fn gen(i)
 		case  body[i]
@@ -228,28 +226,43 @@ fn dataFlow(body)
 		^union(gen(i),difference(s,kill(i,s)))
 
 	;iterate to fixed point
-	dowhile old!=(in,out)
-		old=in,out
-		in1=[]
-		out1=[]
+	dowhile old!=(In,Out)
+		old=In,Out
+		In1=[]
+		Out1=[]
 		for i:range(g)
-			in1<<join(map(\(j)(out[j]),graph.predecessors(g,i)))
-			out1<<trans(i,in[i])
-		in=in1
-		out=out1
-	^in
+			In1<<unions(map(\(j)(Out[j]),graph.predecessors(g,i)))
+			Out1<<trans(i,In[i])
+		In=In1
+		Out=Out1
+	^In
 
 fn deadStore(body)
 	^map(
-		\(a)(
+		\(a,i)(
 			case a
 				'=',y,x
-					if !localUsers(body,y)
+					if !usingAssignment(body,i)
 						^x
 			^a
 		)
 		body
 	)
+
+fn usingAssignment(body,i)
+	;the variable being assigned
+	'=',a,_=body[i]
+
+	;which instructions does this assignment reach
+	reaching= dataFlow(body)
+
+	;which instructions use this variable
+	r=[]
+	for j:usingVar(body,a)
+		;is this assignment among those reaching that instruction
+		if in(i,reaching[j])
+			r<<j
+	^r
 
 fn optimize(vars,fns)
 	dowhile old!=(vars,fns)
