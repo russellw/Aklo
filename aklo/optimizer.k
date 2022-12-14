@@ -1,4 +1,4 @@
-fn usingLabel(body,label)
+fn labelUse(body,label)
 	r=[]
 	for i:range(body)
 		a=body[i]
@@ -14,7 +14,7 @@ fn deadVar(F)
 	vars=filter(
 		\(a)(
 			_,x,@_=a
-			^usingVar(body,x)
+			^varUse(body,x)
 		)
 		vars
 	)
@@ -41,7 +41,7 @@ fn redundantLoc(body)
 	^filterIdx(\(i,_)(!in(i,redundant)),body)
 
 
-fn usingVar(body,a)
+fn varUse(body,a)
 	assert atom?(a)
 	r=[]
 	for i : range(body)
@@ -69,7 +69,7 @@ fn deadLabel(body)
 		\(a)(
 			case a
 				':',label
-					^usingLabel(body,label)
+					^labelUse(body,label)
 			^1
 		)
 		body
@@ -241,14 +241,14 @@ fn deadStore(body)
 		\(i,a)(
 			case a
 				'=',y,x
-					if !usingAssignment(body,i)
+					if !defUse(body,i)
 						^x
 			^a
 		)
 		body
 	)
 
-fn usingAssignment(body,i)
+fn defUse(body,i)
 	;the variable being defined
 	'=',a,_=body[i]
 
@@ -257,7 +257,7 @@ fn usingAssignment(body,i)
 
 	;which instructions use this variable
 	r=[]
-	for j:usingVar(body,a)
+	for j:varUse(body,a)
 		;is this definition among those reaching that instruction
 		if in(i,reaching[j])
 			r<<j
