@@ -87,7 +87,6 @@ fn parse  (file,text)
 					i++
 				continue
 			if tok == "{"
-				i ++
 				line1 = line
 				while text[i] != "}"[0]
 					if i == len(text)
@@ -136,6 +135,12 @@ fn parse  (file,text)
 			if lower(slice(text,i,i+2)) == "0x"
 				while idPart?(text[i])
 					i++
+				if text[i] == "."[0]
+					dowhile idPart?(text[i])
+						i++
+				if lower(text[i - 1]) == "p"[0] & in(text[i] ,"+-")
+					dowhile idPart?(text[i])
+						i++
 				tok:= slice(text,j,i)
 				^
 
@@ -144,13 +149,11 @@ fn parse  (file,text)
 				while idPart?(text[i])
 					i++
 				if text[i] == "."[0]
-					i++
-					while idPart?(text[i])
+					dowhile idPart?(text[i])
 						i++
-					if lower(text[i - 1]) == "e"[0] & in(text[i] ,"+-")
+				if lower(text[i - 1]) == "e"[0] & in(text[i] ,"+-")
+					dowhile idPart?(text[i])
 						i++
-						while idPart?(text[i])
-							i++
 				tok:= slice(text,j,i)
 				^
 
@@ -350,11 +353,9 @@ fn parse  (file,text)
 				^ parseInt(s,10)
 
 			;floating point
-			op='parsedouble'
 			if endsWith(lower(s),"f")
-				s=init(s)
-				op='parsefloat'
-			^'xcall',op,('quote',s)
+				^parseFloat(init(s))
+			^parseDouble(s)
 
 		; none of the above
 		file:=file1

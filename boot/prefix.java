@@ -128,6 +128,14 @@ class Etc {
     }
   }
 
+  static Double parseDouble(Object s) {
+    return Double.parseDouble(decode(s));
+  }
+
+  static Float parseFloat(Object s) {
+    return Float.parseFloat(decode(s));
+  }
+
   static void writeFile(Object file, Object s) {
     try {
       Files.write(Path.of(decode(file)), bytes(s));

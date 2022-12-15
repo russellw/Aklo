@@ -702,6 +702,8 @@ def expr(env, a):
             | ("slice", *s)
             | ("range", *s)
             | ("writeStream", *s)
+            | ("parseDouble", *s)
+            | ("parseFloat", *s)
             | ("readFile", *s)
             | ("writeFile", *s)
             | ("integerp", *s)
