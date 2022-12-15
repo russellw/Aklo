@@ -552,7 +552,7 @@ fn parse  (file,text)
 				r=['if',x,0,['do',['throw',('quote',msg)]]]
 				expect("\n")
 				^ r
-			"show"
+			"dbg"
 				lex()
 				x = commas()
 				r<<str(x)

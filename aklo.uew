@@ -22,7 +22,7 @@ while
 false
 true
 /C3"yellow"
-show
+dbg
 troff
 tron
 /C4"green"

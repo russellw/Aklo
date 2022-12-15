@@ -240,11 +240,11 @@ class Etc {
     return sb.toString();
   }
 
-  static void show(String file, int line, String fname, String name, Object val) {
+  static void dbg(String file, int line, String fname, String name, Object val) {
     System.out.printf("%s:%d: %s: %s: %s\n", file, line, fname, name, repr(val));
   }
 
-  static void show(Object a) {
+  static void dbg(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 

@@ -29,7 +29,7 @@ def partition(f, s):
     return q, r
 
 
-def show(a):
+def dbg(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     sys.stderr.write(f"{info.filename}:{info.function}:{info.lineno}: {a}\n")
 
@@ -505,7 +505,7 @@ def parse(file):
                 r.append(x)
                 expect("\n")
                 return r
-            case "show":
+            case "dbg":
                 r.append(file)
                 r.append(line)
                 r.append(fname)
@@ -901,8 +901,8 @@ def stmt(env, a):
             print(") {")
             stmts(env, yes)
             print("}")
-        case "show", file, line, fname, name, val:
-            print(f'Etc.show("{file}", {line}, "{fname}", "{name}",')
+        case "dbg", file, line, fname, name, val:
+            print(f'Etc.dbg("{file}", {line}, "{fname}", "{name}",')
             expr(env, val)
             print(");")
         case "assert", file, line, fname, name, test:
