@@ -233,7 +233,7 @@ fn utf8 (c)
 fn atom?( a)
 	^!list?(a)
 
-fn num?  (a)
+fn number?  (a)
 	^int?(a)|float?(a)
 
 fn repr (a)

@@ -145,7 +145,7 @@ fn ifConst(body)
 		\(a)(
 			case a
 				'if',test,label
-					if num?(test)
+					if number?(test)
 						if test
 							^'goto',label
 						^
@@ -258,7 +258,7 @@ fn deadStore(body)
 	)
 
 fn const?(a)
-	if int?(a)
+	if number?(a)
 		^1
 
 fn constPropagation(body)
@@ -272,7 +272,6 @@ fn constPropagation(body)
 						^x
 
 					;get all the definitions of this variable
-					tron useDef
 					s=map(\(j)(body[j][2]),useDef(body,i,x))
 
 					;are they all constant?
