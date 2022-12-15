@@ -104,7 +104,6 @@ fn nop(body)
 				'shl',@_
 				'shr',@_
 				'**',@_
-				'xcall','parsedouble',@_
 				'quote',@_
 					^
 			^list?(a)
