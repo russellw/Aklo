@@ -704,7 +704,7 @@ def expr(env, a):
             | ("writeStream", *s)
             | ("readFile", *s)
             | ("writeFile", *s)
-            | ("intp", *s)
+            | ("exactp", *s)
             | ("symp", *s)
             | ("listp", *s)
             | ("dirp", *s)

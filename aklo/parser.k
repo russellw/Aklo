@@ -263,7 +263,7 @@ fn parse  (file,text)
 				^r
 			"sym?"
 			"list?"
-			"int?"
+			"exact?"
 			"inexact?"
 			"readFile"
 			"bitNot"

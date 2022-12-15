@@ -23,7 +23,7 @@ fn ascii?(a)
 	if atom?(a)|!a
 		^
 	for b: a
-		if !int?(b)
+		if !exact?(b)
 			^
 		if!print?(b)&!in(b,"\n\r\t")
 			^
@@ -234,7 +234,7 @@ fn atom?( a)
 	^!list?(a)
 
 fn number?  (a)
-	^int?(a)|inexact?(a)
+	^exact?(a)|inexact?(a)
 
 fn repr (a)
 	r=[]

@@ -276,17 +276,17 @@ assert a==a
 assert a!=b
 
 ;types
-assert int?(0)
+assert exact?(0)
 assert number?(0)
 assert !sym?(0)
 assert !list?(0)
 
-assert !int?('a')
+assert !exact?('a')
 assert !number?('a')
 assert sym?('a')
 assert !list?('a')
 
-assert !int?([])
+assert !exact?([])
 assert !number?([])
 assert !sym?([])
 assert list?([])
