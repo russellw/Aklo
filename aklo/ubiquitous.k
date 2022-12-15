@@ -19,11 +19,14 @@ fn alnum?(c)
 fn print?(c)
 	^" "[0]<=c&c<=126
 
+fn exact?(a)
+	^integer?(a)|rational?(a)
+
 fn ascii?(a)
 	if atom?(a)|!a
 		^
 	for b: a
-		if !exact?(b)
+		if !integer?(b)
 			^
 		if!print?(b)&!in(b,"\n\r\t")
 			^

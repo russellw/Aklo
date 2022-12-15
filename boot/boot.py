@@ -686,7 +686,7 @@ def expr(env, a):
         case "@", *s:
             print("Etc.cat")
             printArgs(env, s)
-        case "inexactp", _:
+        case ("rationalp", _) | ("inexactp", _):
             print("false")
         case "intern", *s:
             print("Sym.intern")
@@ -704,7 +704,7 @@ def expr(env, a):
             | ("writeStream", *s)
             | ("readFile", *s)
             | ("writeFile", *s)
-            | ("exactp", *s)
+            | ("integerp", *s)
             | ("symp", *s)
             | ("listp", *s)
             | ("dirp", *s)

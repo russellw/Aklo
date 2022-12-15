@@ -350,7 +350,7 @@ class Etc {
     return true;
   }
 
-  static boolean exactp(Object a) {
+  static boolean integerp(Object a) {
     return a instanceof Integer;
   }
 

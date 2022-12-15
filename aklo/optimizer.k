@@ -158,7 +158,7 @@ fn eval(a)
 			if atom?(a)
 				^a
 			;TODO simplify,  and fixup bootstrap compiler accordingly
-			if!every(\(b)(exact?(b)),tail(a))
+			if!every(\(b)(number?(b)),tail(a))
 				^a
 			case a
 				'==',x,y
