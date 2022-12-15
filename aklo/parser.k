@@ -264,7 +264,7 @@ fn parse  (file,text)
 			"sym?"
 			"list?"
 			"int?"
-			"float?"
+			"inexact?"
 			"readFile"
 			"bitNot"
 			"len"

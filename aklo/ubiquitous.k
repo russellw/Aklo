@@ -234,7 +234,7 @@ fn atom?( a)
 	^!list?(a)
 
 fn number?  (a)
-	^int?(a)|float?(a)
+	^int?(a)|inexact?(a)
 
 fn repr (a)
 	r=[]

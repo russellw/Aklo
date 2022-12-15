@@ -686,7 +686,7 @@ def expr(env, a):
         case "@", *s:
             print("Etc.cat")
             printArgs(env, s)
-        case "floatp", _:
+        case "inexactp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")

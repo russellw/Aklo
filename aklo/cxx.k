@@ -49,7 +49,7 @@ fn expr(a)
 		'==',x,y
 			binaryExpr(str(a[0]),x,y)
 		'//',x,y
-			;TODO what if args are float?
+			;TODO what if args are inexact?
 			binaryExpr("/",x,y)
 		'bitAnd',x,y
 			binaryExpr("&",x,y)
