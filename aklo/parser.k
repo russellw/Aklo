@@ -263,8 +263,10 @@ fn parse  (file,text)
 				^r
 			"sym?"
 			"list?"
-			"exact?"
-			"inexact?"
+			"integer?"
+			"rational?"
+			"float?"
+			"double?"
 			"readFile"
 			"bitNot"
 			"len"

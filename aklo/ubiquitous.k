@@ -22,6 +22,9 @@ fn print?(c)
 fn exact?(a)
 	^integer?(a)|rational?(a)
 
+fn inexact?(a)
+	^float?(a)|double?(a)
+
 fn ascii?(a)
 	if atom?(a)|!a
 		^
