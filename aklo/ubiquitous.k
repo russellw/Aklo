@@ -86,10 +86,12 @@ fn occurs(needle,haystack)
 fn mapLeaves (f,a)
 	if atom?(a)
 		^f(a)
-	r=[]
-	for b :a
-		r<<mapLeaves(f,  b)
-	^ r
+	^map(\(b)(mapLeaves(f,  b)),a)
+
+fn mapLeaves1 (f,a)
+	if atom?(a)
+		^f(a)
+	^a[0],@map(\(b)(mapLeaves(f,  b)),tail(a))
 
 fn filter (f,s)
 	r=[]

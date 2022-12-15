@@ -41,23 +41,26 @@ fn redundantLoc(body)
 	^filterIdx(\(i,_)(!in(i,redundant)),body)
 
 fn mapInputs(f,a)
-	;there are many rules of the form
-	;'if there is a definition, do this'
-	; those can be coded directly as case statements
-	; this function factors out the rarer rules of the form
-	;'if there is a definition, do this for the value, otherwise do it for the whole instruction'
 	case a
+		'=',y,('call',g,@s)
+			^'=',y,('call',g,@map(f,s))
+		'=',y,('xcall',g,@s)
+			^'=',y,('xcall',g,@map(f,s))
 		'=',y,x
-			^'=',y,f(x)
-	^f(a)
+			^'=',y,mapLeaves1(f,x)
+		'call',g,@s
+			^'call',g,@map(f,s)
+		'xcall',g,@s
+			^'xcall',g,@map(f,s)
+	^a
 
-fn varUse(body,a)
-	assert atom?(a)
+fn varUse(body,x)
+	assert atom?(x)
 	r=[]
 	for i : range(body)
 		mapInputs(
-			\(b)(
-				if occurs(a,b)
+			\(y)(
+				if x==y
 					r<<i
 			)
 			body[i]
@@ -259,16 +262,62 @@ fn deadStore(body)
 		body
 	)
 
+fn const?(a)
+	if int?(a)
+		^1
+
+fn constPropagation(body)
+	^mapIdx(
+		\(i,a)(
+			;for each input to this instruction
+			^mapInputs(
+				\(x)(
+					;is it a variable?
+					if !sym?(x)
+						^x
+
+					;get all the definitions of this variable
+					tron useDef
+					s=map(\(j)(body[j][2]),useDef(body,i,x))
+
+					;are they all constant?
+					if!every(const?,s)
+									^x
+
+					;are they all the same constant?
+					if len(uniq(s))>1
+									^x
+
+					;replace variable with value
+					^s[0]
+				)
+				a
+			)
+		)
+		body
+	)
+
+fn useDef(body,i,x)
+	;which instructions reach this definition
+	r=[]
+	for j: dataFlow(body)[i]
+		case body[j]
+			'=',y,_
+				;is this a definition of the target variable
+				if x==y
+					r<<j
+	^r
+
 fn defUse(body,i)
 	;the variable being defined
-	'=',a,_=body[i]
+	'=',x,_=body[i]
 
 	;which instructions does this definition reach
 	reaching= dataFlow(body)
 
 	;which instructions use this variable
 	r=[]
-	for j:varUse(body,a)
+	for j:varUse(body,x)
 		;is this definition among those reaching that instruction
 		if in(i,reaching[j])
 			r<<j
@@ -285,6 +334,7 @@ fn optimize(vars,fns)
 		fns=mapBody(nop,fns)
 		fns=mapBody(ifConst,fns)
 		fns=mapBody(constFolding,fns)
+		fns=mapBody(constPropagation,fns)
 		fns=map(deadVar,fns)
 		;TODO jump threading
 	^vars,fns
