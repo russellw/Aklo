@@ -42,16 +42,11 @@ fn redundantLoc(body)
 
 fn mapInputs(f,a)
 	case a
-		'=',y,('call',g,@s)
-			^'=',y,('call',g,@map(f,s))
-		'=',y,('xcall',g,@s)
-			^'=',y,('xcall',g,@map(f,s))
 		'=',y,x
-			^'=',y,mapLeaves1(f,x)
-		'call',g,@s
-			^'call',g,@map(f,s)
-		'xcall',g,@s
-			^'xcall',g,@map(f,s)
+			^'=',y,mapLeaves(f,x)
+		'call',@_
+		'xcall',@_
+			^mapLeaves(f,a)
 	^a
 
 fn varUse(body,x)

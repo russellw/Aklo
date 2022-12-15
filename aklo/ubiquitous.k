@@ -71,27 +71,16 @@ fn mapIdx (f,s)
 		r<<f (i,s[i])
 	^ r
 
-fn occurs(needle,haystack)
-	assert atom? (needle)
-	r=0
-	mapLeaves(
-		\(a)(
-			if a==needle
-				r:=1
-		)
-		haystack
-	)
-	^r
-
 fn mapLeaves (f,a)
-	if atom?(a)
-		^f(a)
-	^map(\(b)(mapLeaves(f,  b)),a)
-
-fn mapLeaves1 (f,a)
-	if atom?(a)
-		^f(a)
-	^a[0],@map(\(b)(mapLeaves(f,  b)),tail(a))
+	case  a
+		'call',g,@s
+			;TODO curry?
+			^'call',g,@map(\(b)(mapLeaves(f,  b)),s)
+		'xcall',g,@s
+			^'xcall',g,@map(\(b)(mapLeaves(f,  b)),s)
+		op,@s
+			^op,@map(\(b)(mapLeaves(f,  b)),s)
+	^f(a)
 
 fn filter (f,s)
 	r=[]
