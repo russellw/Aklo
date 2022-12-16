@@ -672,6 +672,12 @@ def expr(env, a):
         case "!", x:
             print("!")
             truth(env, x)
+        case "listp", x:
+            expr(env, x)
+            print("instanceof List")
+        case "symp", x:
+            expr(env, x)
+            print("instanceof Sym")
         case "-", x:
             print("Etc.neg")
             printArgs(env, [x])
@@ -717,8 +723,6 @@ def expr(env, a):
             | ("readFile", *s)
             | ("writeFile", *s)
             | ("integerp", *s)
-            | ("symp", *s)
-            | ("listp", *s)
             | ("dirp", *s)
             | ("str", *s)
             | ("shl", *s)

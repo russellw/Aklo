@@ -358,19 +358,11 @@ public class Etc {
     return a instanceof Integer;
   }
 
-  public static boolean symp(Object a) {
-    return a instanceof Sym;
-  }
-
   public static Object get(Object record, Object key) {
     for (var entry : (List<Object>) record) {
       var entry1 = (List<Object>) entry;
       if (entry1.get(0).equals(key)) return entry1.get(1);
     }
     return 0;
-  }
-
-  public static boolean listp(Object a) {
-    return a instanceof List;
   }
 }
