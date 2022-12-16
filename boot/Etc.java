@@ -155,10 +155,26 @@ public class Etc {
     return list(s.getBytes(StandardCharsets.UTF_8));
   }
 
+  static double promoteDouble(Object a) {
+    if (a instanceof Boolean) return (boolean) a ? 1.0 : 0.0;
+    return (double) a;
+  }
+
+  static float promoteFloat(Object a) {
+    if (a instanceof Boolean) return (boolean) a ? 1.0f : 0.0f;
+    return (float) a;
+  }
+
+  static int promoteInt(Object a) {
+    if (a instanceof Boolean) return (boolean) a ? 1 : 0;
+    return (int) a;
+  }
+
   static Object eval2(Op2 op, Object a, Object b) {
-    if (a instanceof Double || b instanceof Double) return op.apply((double) a, (double) b);
-    if (a instanceof Float || b instanceof Float) return op.apply((float) a, (float) b);
-    if (a instanceof Integer || b instanceof Integer) return op.apply((int) a, (int) b);
+    if (a instanceof Double || b instanceof Double)
+      return op.apply(promoteDouble(a), promoteDouble(b));
+    if (a instanceof Float || b instanceof Float) return op.apply(promoteFloat(a), promoteFloat(b));
+    if (integerp(a) || integerp(b)) return op.apply(promoteInt(a), promoteInt(b));
     throw new IllegalArgumentException(a.toString() + ',' + b.toString());
   }
 
@@ -404,7 +420,7 @@ public class Etc {
   }
 
   public static boolean integerp(Object a) {
-    return a instanceof Integer;
+    return a instanceof Integer || a instanceof Boolean;
   }
 
   public static Object get(Object record, Object key) {
