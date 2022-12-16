@@ -700,10 +700,10 @@ def expr(env, a):
             print("Etc.mul")
             printArgs(env, s)
         case "==", *s:
-            print("Objects.equals")
+            print("Etc.eq")
             printArgs(env, s)
         case "!=", *s:
-            print("!Objects.equals")
+            print("!Etc.eq")
             printArgs(env, s)
         case "@", *s:
             print("Etc.cat")
@@ -802,13 +802,13 @@ def tmp(env, a):
 
 def checkCase(env, label, pattern, x):
     if isinstance(pattern, int):
-        print("if (!Objects.equals(")
+        print("if (!Etc.eq(")
         expr(env, x)
         print(f", {pattern})) break {label};")
         return
     match pattern:
         case "intern", ("List.of", *_):
-            print("if (!Objects.equals(")
+            print("if (!Etc.eq(")
             expr(env, x)
             print(",")
             expr(env, pattern)
@@ -830,7 +830,7 @@ def checkCase(env, label, pattern, x):
 
 
 def assignConst(env, pattern, x):
-    print("assert Objects.equals")
+    print("assert Etc.eq")
     printArgs(env, (pattern, x))
     print(";")
 

@@ -157,6 +157,8 @@ public class Etc {
 
   static double promoteDouble(Object a) {
     if (a instanceof Boolean) return (boolean) a ? 1.0 : 0.0;
+    if (a instanceof Integer) return (double) (int) a;
+    if (a instanceof Float) return (double) (float) a;
     return (double) a;
   }
 
@@ -168,6 +170,31 @@ public class Etc {
   static int promoteInt(Object a) {
     if (a instanceof Boolean) return (boolean) a ? 1 : 0;
     return (int) a;
+  }
+
+  static boolean numberp(Object a) {
+    return a instanceof Boolean
+        || a instanceof Integer
+        || a instanceof Float
+        || a instanceof Double;
+  }
+
+  public static boolean eq(Object a, Object b) {
+    if (a == b) return true;
+    if (a instanceof List) {
+      var a1 = (List<Object>) a;
+      if (!(b instanceof List)) return false;
+      var b1 = (List<Object>) b;
+      if (a1.size() != b1.size()) return false;
+      for (var i = 0; i < a1.size(); i++) if (!eq(a1.get(i), b1.get(i))) return false;
+      return true;
+    }
+    if (numberp(a) && numberp(b)) {
+      if (a instanceof Double || b instanceof Double) return promoteDouble(a) == promoteDouble(b);
+      if (a instanceof Float || b instanceof Float) return promoteFloat(a) == promoteFloat(b);
+      return promoteInt(a) == promoteInt(b);
+    }
+    return a.equals(b);
   }
 
   static Object eval2(Op2 op, Object a, Object b) {
@@ -420,7 +447,7 @@ public class Etc {
   }
 
   public static boolean integerp(Object a) {
-    return a instanceof Integer || a instanceof Boolean;
+    return a instanceof Boolean || a instanceof Integer;
   }
 
   public static Object get(Object record, Object key) {
