@@ -15,7 +15,7 @@ def do(file):
     src = [s.strip() for s in open(file).readlines()]
 
     # compile Aklo code
-    cmd = "java", "-ea", "a.java", file  # , r"C:\aklo\aklo"
+    cmd = "java", "-cp", r"C:\aklo\boot", "-ea", "a.java", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,
