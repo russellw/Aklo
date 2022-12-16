@@ -10,8 +10,6 @@ import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public class Etc {
-  static class OverrunException extends RuntimeException {}
-
   public static List<Object> args = new ArrayList<>();
   static int depth;
   static Set<String> tracing;
@@ -157,8 +155,37 @@ public class Etc {
     return list(s.getBytes(StandardCharsets.UTF_8));
   }
 
-  public static int add(Object a, Object b) {
-    return (int) a + (int) b;
+  static Object eval2(Op2 op, Object a, Object b) {
+    if (a instanceof Double || b instanceof Double) return op.apply((double) a, (double) b);
+    if (a instanceof Float || b instanceof Float) return op.apply((float) a, (float) b);
+    if (a instanceof Integer || b instanceof Integer) return op.apply((int) a, (int) b);
+    throw new IllegalArgumentException(a.toString() + ',' + b.toString());
+  }
+
+  public static int add(int a, int b) {
+    return a + b;
+  }
+
+  public static Object add(Object a, Object b) {
+    return eval2(
+        new Op2() {
+          @Override
+          Object apply(double a, double b) {
+            return a + b;
+          }
+
+          @Override
+          Object apply(float a, float b) {
+            return a + b;
+          }
+
+          @Override
+          Object apply(int a, int b) {
+            return a + b;
+          }
+        },
+        a,
+        b);
   }
 
   public static int rem(Object a, Object b) {
@@ -323,7 +350,29 @@ public class Etc {
     return ~(int) a;
   }
 
-  public static int sub(Object a, Object b) {
+  public static Object sub(Object a, Object b) {
+    return eval2(
+        new Op2() {
+          @Override
+          Object apply(double a, double b) {
+            return a - b;
+          }
+
+          @Override
+          Object apply(float a, float b) {
+            return a - b;
+          }
+
+          @Override
+          Object apply(int a, int b) {
+            return a - b;
+          }
+        },
+        a,
+        b);
+  }
+
+  public static int sub(int a, int b) {
     return (int) a - (int) b;
   }
 

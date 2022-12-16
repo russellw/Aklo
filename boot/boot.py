@@ -678,6 +678,12 @@ def expr(env, a):
         case "symp", x:
             expr(env, x)
             print("instanceof Sym")
+        case "floatp", x:
+            expr(env, x)
+            print("instanceof Float")
+        case "doublep", x:
+            expr(env, x)
+            print("instanceof Double")
         case "-", x:
             print("Etc.neg")
             printArgs(env, [x])
@@ -702,7 +708,7 @@ def expr(env, a):
         case "@", *s:
             print("Etc.cat")
             printArgs(env, s)
-        case ("rationalp", _) | ("floatp", _) | ("doublep", _):
+        case "rationalp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")
