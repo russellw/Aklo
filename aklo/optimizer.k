@@ -205,7 +205,7 @@ fn dataFlow(body)
 	g=cfg(body)
 
 	;in and out sets start off empty at all nodes
-	In=replicate(len(g),[])
+	In=replicate(len(body),[])
 	Out=In
 
 
@@ -237,7 +237,7 @@ fn dataFlow(body)
 		old=In,Out
 		In1=[]
 		Out1=[]
-		for i:range(g)
+		for i:range(body)
 			In1<<unions(map(\(j)(Out[j]),graph.predecessors(g,i)))
 			Out1<<trans(i,In[i])
 		In=In1
