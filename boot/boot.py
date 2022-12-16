@@ -616,6 +616,9 @@ print("import java.util.function.*;")
 print("class Main1 {")
 print("public static void main(String[] args) {")
 print("for (var s : args) Etc.args.add(Etc.encode(s));")
+for name in modules:
+    if name != "main":
+        print(name + ".run();")
 print("main.run();")
 print("}")
 print("}")
@@ -1132,11 +1135,6 @@ for modName, module in modules.items():
 
     # body
     print("static void run() {")
-    # TODO relocate?
-    if modName == "main":
-        for name in modules:
-            if name != "main":
-                print(name + ".run();")
     stmts(env1, module)
     print("}")
 
