@@ -613,7 +613,7 @@ for root, dirs, files in os.walk(here + "/../aklo"):
 # output
 print("import java.util.*;")
 print("import java.util.function.*;")
-print("class Main1 {")
+print("class Compiler {")
 print("public static void main(String[] args) {")
 print("for (var s : args) Etc.args.add(Etc.encode(s));")
 for name in modules:
