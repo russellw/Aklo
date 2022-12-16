@@ -42,10 +42,13 @@ fn redundantLoc(body)
 
 fn mapInputs(f,a)
 	case a
+		'if',test,label
+			^'if',f(test),label
 		'=',y,x
 			^'=',y,mapLeaves(f,x)
 		'call',@_
 		'xcall',@_
+		'^',x
 			^mapLeaves(f,a)
 	^a
 
