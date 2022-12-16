@@ -8,8 +8,7 @@ public class Sym {
   String name;
 
   // interned symbols
-  // TODO Does access need to be specified?
-  private Sym() {
+  Sym() {
     stem = null;
   }
 

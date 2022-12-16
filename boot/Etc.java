@@ -88,7 +88,7 @@ public class Etc {
     System.out.printf("<%s:%d: %s: %s\n", file, line, fname, repr(r));
   }
 
-  private static boolean tracing(String fname) {
+  static boolean tracing(String fname) {
     if (tracing == null) return false;
     if (tracing.isEmpty()) return true;
     return tracing.contains(fname);
