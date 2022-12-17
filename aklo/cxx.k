@@ -44,8 +44,17 @@ fn expr(a)
 		'*',x,y
 		'<',x,y
 		'<=',x,y
-		'==',x,y
 			binaryExpr(str(a[0]),x,y)
+		'==',x,y
+			if !types.compatible(types.of(x),types.of(y))
+				r@="false"
+				^
+			binaryExpr("==",x,y)
+		'!=',x,y
+			if !types.compatible(types.of(x),types.of(y))
+				r@="true"
+				^
+			binaryExpr("!=",x,y)
 		'!==',x,y
 		'===',x,y
 			binaryExpr(take(2,str(a[0])),x,y)

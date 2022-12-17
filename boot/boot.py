@@ -705,6 +705,9 @@ def expr(env, a):
         case "doublep", x:
             expr(env, x)
             print("instanceof Double")
+        case "boolp", x:
+            expr(env, x)
+            print("instanceof Boolean")
         case "-", x:
             print("Etc.neg")
             printArgs(env, [x])
