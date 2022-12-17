@@ -14,7 +14,16 @@ fn deadVar(F)
 	vars=filter(
 		\(a)(
 			_,x,@_=a
-			^varUse(body,x)
+
+			;Variable needs to be retained if it is defined anywhere
+			for b:body
+				case b
+					'=',y,_
+						if x==y
+							^1
+
+			;or if it is used anywhere - but then it should have been defined
+			assert!varUse(body,x)
 		)
 		vars
 	)
