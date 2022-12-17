@@ -19,7 +19,7 @@ def do(file):
     start = time.time()
 
     # compile Aklo code
-    cmd = "java", "-ea", "Compiler", file  # , r"C:\aklo\aklo"
+    cmd = "java", "-ea", "Compiler", "-O2", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,

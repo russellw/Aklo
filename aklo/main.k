@@ -1,25 +1,30 @@
 ;command line
-i=0
+optimize=0
 packages=[]
+
+i=0
 while i<len( args)
 	s=args[i++]
-	if s[0]=='-'
+	if startsWith(s,"-")
 		o=s
-		while o[0]=='-'
+		while startsWith(o,"-")
 			o=tail (o)
-		case o
+		case slice(o,0,1)
+			"O"
+				optimize=parseInt(tail(o),10)
 			"h"
-			"help"
-				prn("-h  Show help")
-				prn("-V  Show version")
+				prn("-h         Show help")
+				prn("-V         Show version")
+				prn("-O<level>  Optimize")
 				exit( 0)
 			"V"
-			"version"
+			"v"
 				prn("Aklo version 0")
 				exit( 0)
 			_
 				eprn (s@": unknown option")
 				exit (1)
+		continue
 	packages<<s
 if !packages
 	eprn("Usage: aklo [options] packages")
@@ -57,7 +62,7 @@ for  s :packages
 vars,fns=ast.norm(modules)
 
 ;optimize
-vars,fns=optimizer.optimize(vars,fns)
+vars,fns=optimizer.optimize(optimize, vars,fns)
 
 ;output
 writeFile("a.cc",cxx.compose(vars,fns))

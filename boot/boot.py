@@ -882,7 +882,7 @@ def assign(env, pattern, x):
                 assign(env, s[i], ("subscript", x, i))
         case "_":
             0
-        case "i" | "j" | "k":
+        case "i" | "j" | "k" | "level":
             print(pattern + "= (int)")
             expr(env, x)
             print(";")
@@ -1059,7 +1059,7 @@ def localVars(params, body, static=0):
             continue
         if static:
             print("static")
-        if a in ("i", "j", "k"):
+        if a in ("i", "j", "k", "level"):
             print("int")
         else:
             print("Object")

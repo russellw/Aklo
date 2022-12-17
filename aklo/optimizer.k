@@ -328,9 +328,11 @@ fn defUse(body,i)
 			r<<j
 	^r
 
-fn optimize(vars,fns)
+fn optimize(level,vars,fns)
 	dowhile old!=(vars,fns)
 		old=vars,fns
+		if !level--
+			break
 		fns=mapBody(redundantLoc,fns)
 		fns=mapBody(deadCode,fns)
 		fns=mapBody(redundantGoto,fns)
