@@ -159,6 +159,11 @@ fn parse  (file,text)
 
 			; punctuation
 			punct = [
+				;long
+				"!=="
+				"==="
+
+				;medium
 				"!="
 				":="
 				"**"
@@ -179,6 +184,8 @@ fn parse  (file,text)
 					i += len(s)
 					tok:= s
 					^
+
+			;short
 			i++
 			^
 
@@ -456,9 +463,11 @@ fn parse  (file,text)
 
 	prec--
 	makeOp("!=", 1)
+	makeOp("!==", 1)
 	makeOp("<", 1)
 	makeOp("<=", 1)
 	makeOp("==", 1)
+	makeOp("===", 1)
 	makeOp(">", 1)
 	makeOp(">=", 1)
 

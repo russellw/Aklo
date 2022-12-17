@@ -218,6 +218,10 @@ def parse(file):
 
             # punctuation
             punct = (
+                # long
+                "===",
+                "!==",
+                # medium
                 "!=",
                 ":=",
                 "**",
@@ -238,6 +242,8 @@ def parse(file):
                     i += len(s)
                     tok = s
                     return
+
+            # short
             i += 1
             return
 
@@ -420,9 +426,11 @@ def parse(file):
 
     prec -= 1
     makeOp("!=", 1)
+    makeOp("!==", 1)
     makeOp("<", 1)
     makeOp("<=", 1)
     makeOp("==", 1)
+    makeOp("===", 1)
     makeOp(">", 1)
     makeOp(">=", 1)
 
@@ -705,6 +713,12 @@ def expr(env, a):
         case "!=", *s:
             print("!Etc.eq")
             printArgs(env, s)
+        case "===", *s:
+            print("Objects.equals")
+            printArgs(env, s)
+        case "!==", *s:
+            print("!Objects.equals")
+            printArgs(env, s)
         case "@", *s:
             print("Etc.cat")
             printArgs(env, s)
@@ -802,13 +816,13 @@ def tmp(env, a):
 
 def checkCase(env, label, pattern, x):
     if isinstance(pattern, int):
-        print("if (!Etc.eq(")
+        print("if (!Objects.equals(")
         expr(env, x)
         print(f", {pattern})) break {label};")
         return
     match pattern:
         case "intern", ("List.of", *_):
-            print("if (!Etc.eq(")
+            print("if (!Objects.equals(")
             expr(env, x)
             print(",")
             expr(env, pattern)
@@ -830,7 +844,7 @@ def checkCase(env, label, pattern, x):
 
 
 def assignConst(env, pattern, x):
-    print("assert Etc.eq")
+    print("assert Objects.equals")
     printArgs(env, (pattern, x))
     print(";")
 
