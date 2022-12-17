@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import subprocess
+import time
 
 
 def search1(p, ss):
@@ -13,6 +14,9 @@ def search1(p, ss):
 def do(file):
     print(file)
     src = [s.strip() for s in open(file).readlines()]
+
+    # check how long the Aklo compiler takes to run
+    start = time.time()
 
     # compile Aklo code
     cmd = "java", "-ea", "Compiler", file  # , r"C:\aklo\aklo"
@@ -36,6 +40,9 @@ def do(file):
         raise Exception(stderr)
     if p.returncode:
         raise Exception(str(p.returncode))
+
+    # check how long the Aklo compiler takes to run
+    print(f"{time.time()-start:.3f} seconds")
 
     # compile C++ code
     subprocess.check_call("cl /nologo a.cc")

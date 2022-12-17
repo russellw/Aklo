@@ -180,6 +180,7 @@ public class Etc {
   }
 
   public static boolean eq(Object a, Object b) {
+    /*
     if (a == b) return true;
     if (a instanceof List) {
       var a1 = (List<Object>) a;
@@ -194,6 +195,8 @@ public class Etc {
       if (a instanceof Float || b instanceof Float) return promoteFloat(a) == promoteFloat(b);
       return promoteInt(a) == promoteInt(b);
     }
+
+     */
     return a.equals(b);
   }
 
@@ -272,7 +275,7 @@ public class Etc {
   }
 
   static void appendsb(StringBuilder sb, String s) {
-    if (sb.length() >= 4096) throw new OverrunException();
+    if (sb.length() >= 1000) throw new OverrunException();
     sb.append(s);
   }
 
