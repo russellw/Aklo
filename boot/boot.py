@@ -720,16 +720,16 @@ def expr(env, a):
         case "*", *s:
             print("Etc.mul")
             printArgs(env, s)
-        case "==", *s:
+        case "===", *s:
             print("Etc.eq")
             printArgs(env, s)
-        case "!=", *s:
+        case "!==", *s:
             print("!Etc.eq")
             printArgs(env, s)
-        case "===", *s:
+        case "==", *s:
             print("Objects.equals")
             printArgs(env, s)
-        case "!==", *s:
+        case "!=", *s:
             print("!Objects.equals")
             printArgs(env, s)
         case "@", *s:
