@@ -20,7 +20,7 @@ def do(file):
 
     # compile Aklo code
     # TODO -O commandline option
-    cmd = "java", "-ea", "Compiler", "-O2", file  # , r"C:\aklo\aklo"
+    cmd = "java", "-ea", "Compiler", "-O1", file  # , r"C:\aklo\aklo"
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,

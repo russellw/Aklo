@@ -48,7 +48,7 @@ fn expr(a)
 			binaryExpr(str(a[0]),x,y)
 		'!==',x,y
 		'===',x,y
-			binaryExpr(slice(str(a[0]),0,2),x,y)
+			binaryExpr(take(2,str(a[0])),x,y)
 		'//',x,y
 			;TODO what if args are inexact?
 			binaryExpr("/",x,y)

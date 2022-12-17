@@ -119,6 +119,7 @@ fn epr (s)
 		writeStream( stderr,s)
 
 fn take (i,s)
+	;TODO should slice take list last?
 	^ slice( s,0,i)
 
 fn drop (i,s)

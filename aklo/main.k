@@ -9,7 +9,7 @@ while i<len( args)
 		o=s
 		while startsWith(o,"-")
 			o=tail (o)
-		case slice(o,0,1)
+		case take(1,o)
 			"O"
 				optimize=parseInt(tail(o),10)
 			"h"
