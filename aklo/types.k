@@ -3,6 +3,10 @@ fn of(a)
 		^'bool'
 	if integer?(a)
 		^'integer'
+	if float?(a)
+		^'float'
+	if double?(a)
+		^'double'
 	^'any'
 
 fn compatible(type1,type2)
