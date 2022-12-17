@@ -28,7 +28,6 @@ def do(file):
     cmd = ["java", "-ea", "Compiler", file]  # , r"C:\aklo\aklo"
     if hasattr(args, "O"):
         cmd.append("-O" + str(args.O))
-    print(cmd)
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,
