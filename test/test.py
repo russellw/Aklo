@@ -92,6 +92,9 @@ else:
     here = os.path.dirname(os.path.realpath(__file__))
     for root, dirs, files in os.walk(here):
         for file in files:
+            # TODO skip this until functions are working
+            if file == "etc.k":
+                continue
             ext = os.path.splitext(file)[1]
             if ext == ".k":
                 do(os.path.join(root, file))
