@@ -5,6 +5,12 @@ import subprocess
 import time
 
 
+parser = argparse.ArgumentParser(description="Run test cases")
+parser.add_argument("files", nargs="*")
+parser.add_argument("-O", metavar="level", type=int, help="optimize")
+args = parser.parse_args()
+
+
 def search1(p, ss):
     for s in ss:
         if re.search(p, s):
@@ -19,8 +25,10 @@ def do(file):
     start = time.time()
 
     # compile Aklo code
-    # TODO -O commandline option
-    cmd = "java", "-ea", "Compiler", "-O1", file  # , r"C:\aklo\aklo"
+    cmd = ["java", "-ea", "Compiler", file]  # , r"C:\aklo\aklo"
+    if hasattr(args, "O"):
+        cmd.append("-O" + str(args.O))
+    print(cmd)
     p = subprocess.Popen(
         cmd,
         stderr=subprocess.PIPE,
@@ -82,9 +90,6 @@ def do(file):
             raise Exception()
 
 
-parser = argparse.ArgumentParser(description="Run test cases")
-parser.add_argument("files", nargs="*")
-args = parser.parse_args()
 if args.files:
     for file in args.files:
         do(file)
