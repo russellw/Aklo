@@ -286,6 +286,17 @@ def parse(file):
         return r
 
     def primary():
+        s = tok
+
+        # some primary expressions are indicated by specific tokens
+        match s:
+            case "false":
+                lex()
+                return False
+            case "true":
+                lex()
+                return True
+
         # symbol
         if tok.startswith("'"):
             s = unesc(tok[1:-1])
@@ -652,6 +663,8 @@ def truth(env, a):
 
 def expr(env, a):
     match a:
+        case False | True:
+            print(str(a).lower())
         case "compileTimeReadFiles", dir1:
             print(f'Etc.compileTimeReadFiles("{dir1}")')
         case "args" | "windowsp":

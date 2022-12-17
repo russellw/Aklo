@@ -315,15 +315,15 @@ fn parse  (file,text)
 			"windows?"
 				^r
 			"false"
-				^ 0
+				^ false
 			"true"
-				^ 1
+				^ true
 			"("
 				a = commas()
 				expect(")")
 				^ a
 			"["
-				^['list']@exprs("]")
+				^'list',@exprs("]")
 
 		; quoted symbol
 		if startsWith(s,"'")

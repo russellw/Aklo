@@ -473,7 +473,9 @@ fn norm (modules)
 					'<',@s
 					'<=',@s
 					'==',@s
+					'!=',@s
 					'===',@s
+					'!==',@s
 						s=map(rec,s)
 						r=makeVar("")
 						code<<'=',r,(a[0],@s)
