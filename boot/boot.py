@@ -794,9 +794,14 @@ def expr(env, a):
             printArgs(env, s)
         case f, *s:
             fref(env, f)
-            print(".apply(List.of")
-            printArgs(env, s)
-            print(")")
+            print(".apply(new Object[] {")
+            more = 0
+            for a in s:
+                if more:
+                    print(",")
+                more = 1
+                expr(env, a)
+            print("})")
         case _:
             if a in env:
                 fref(env, a)
@@ -804,12 +809,10 @@ def expr(env, a):
             match a:
                 case "intern":
                     print(
-                        "(Function<List<Object>, Object>)(List<Object> _s) -> Sym.intern(_s.get(0))"
+                        "(Function<Object[], Object>)(Object[] _s) -> Sym.intern(_s[0])"
                     )
                 case "str":
-                    print(
-                        "(Function<List<Object>, Object>)(List<Object> _s) -> Etc.str(_s.get(0))"
-                    )
+                    print("(Function<Object[], Object>)(Object[] _s) -> Etc.str(_s[0])")
                 case _:
                     print(a)
 
@@ -1110,11 +1113,11 @@ def fbody(env, fname, params, body):
             body.append(("^", 0))
 
     # body
-    print("public Object apply(List<Object> _args) {")
+    print("public Object apply(Object[] _args) {")
     print(f'Etc.enter("{file}", {line}, "{fname}", _args);')
-    print(f"assert _args.size() == {len(params)};")
+    print(f"assert _args.length == {len(params)};")
     for i in range(len(params)):
-        assign(env, params[i], f"_args.get({i})")
+        assign(env, params[i], f"_args[{i}]")
     stmts(env, body)
     print("}")
 
@@ -1124,13 +1127,13 @@ def fbody(env, fname, params, body):
 def fref(env, a):
     match a:
         case "\\", params, *body:
-            print("new Function<List<Object>, Object>() {")
+            print("new Function<Object[], Object>() {")
             fbody(env, "lambda", params, body)
         case [*_]:
             raise Exception(a)
         case _:
             if len(a) == 1:
-                print(f"((Function<List<Object>, Object>){a})")
+                print(f"((Function<Object[], Object>){a})")
                 return
             if a in ubiquitous:
                 print(f"new ubiquitous.{a}()")
@@ -1141,7 +1144,7 @@ def fref(env, a):
 def fn(env, fname, params, body):
     _, file, line, _ = body[0]
     print(f"// {file}:{line}")
-    print(f"class {fname} implements Function<List<Object>, Object> {{")
+    print(f"class {fname} implements Function<Object[], Object> {{")
     fbody(env, fname, params, body)
 
 

@@ -92,14 +92,14 @@ public class Etc {
     return tracing.contains(fname);
   }
 
-  public static void enter(String file, int line, String fname, List<Object> args) {
+  public static void enter(String file, int line, String fname, Object[] args) {
     if (!tracing(fname)) return;
     indent();
     depth++;
     System.out.printf(">%s:%d: %s: ", file, line, fname);
-    for (var i = 0; i < args.size(); i++) {
+    for (var i = 0; i < args.length; i++) {
       if (i > 0) System.out.print(", ");
-      System.out.print(repr(args.get(i)));
+      System.out.print(repr(args[i]));
     }
     System.out.println();
   }
