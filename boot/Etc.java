@@ -353,10 +353,6 @@ public class Etc {
     return List.ofArrayList(r);
   }
 
-  public static List cat(Object s, Object t) {
-    return ((List) s).cat(t);
-  }
-
   static Object exit(Object a) {
     throw new RuntimeException(a.toString());
   }

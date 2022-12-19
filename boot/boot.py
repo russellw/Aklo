@@ -735,17 +735,20 @@ def expr(env, a):
         case "!=", *s:
             print("!Objects.equals")
             printArgs(env, s)
-        case "@", *s:
-            print("Etc.cat")
-            printArgs(env, s)
+        case "@", s, t:
+            print("((List)")
+            expr(env, s)
+            print(").cat(")
+            expr(env, t)
+            print(")")
         case "rationalp", _:
             print("false")
         case "intern", *s:
             print("Sym.intern")
             printArgs(env, s)
-        case "len", x:
+        case "len", s:
             print("((List)")
-            expr(env, x)
+            expr(env, s)
             print(").len()")
         case "sym", *s:
             print("new Sym")
@@ -790,9 +793,9 @@ def expr(env, a):
             if s:
                 match s[-1]:
                     case "@", t:
-                        print("Etc.cat(List.of")
+                        print("List.of")
                         printArgs(env, s[:-1])
-                        print(",")
+                        print(".cat(")
                         expr(env, t)
                         print(")")
                         return
@@ -922,9 +925,9 @@ def stmt(env, a):
             print(");")
         case ">>", x, y:
             print(y + "=")
-            print("Etc.cat(List.of(")
+            print("List.of(")
             expr(env, x)
-            print("), ")
+            print(").cat(")
             expr(env, y)
             print(");")
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
