@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 public abstract class List {
   public static List of(Object... s) {
@@ -17,6 +19,11 @@ public abstract class List {
 
   public boolean isEmpty() {
     return len() == 0;
+  }
+
+  public List uniq() {
+    var r = new LinkedHashSet<>(Arrays.asList(toArray()));
+    return of(r.toArray());
   }
 
   public List slice(int i, int j) {

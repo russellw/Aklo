@@ -761,6 +761,10 @@ def expr(env, a):
             print("((List)")
             expr(env, s)
             print(").len()")
+        case "uniq", s:
+            print("((List)")
+            expr(env, s)
+            print(").uniq()")
         case "sym", *s:
             print("new Sym")
             printArgs(env, s)
