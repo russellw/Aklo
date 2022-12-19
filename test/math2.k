@@ -22,3 +22,4 @@ assert true===true
 assert 1===true
 assert 1.0f===true
 assert 1.0===true
+;TODO check hashcode and equality between integer and big integer
