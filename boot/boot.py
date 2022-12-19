@@ -743,12 +743,15 @@ def expr(env, a):
         case "intern", *s:
             print("Sym.intern")
             printArgs(env, s)
+        case "len", x:
+            print("((List)")
+            expr(env, x)
+            print(").len()")
         case "sym", *s:
             print("new Sym")
             printArgs(env, s)
         case (
-            ("len", *s)
-            | ("get", *s)
+            ("get", *s)
             | ("subscript", *s)
             | ("exit", *s)
             | ("slice", *s)
@@ -912,10 +915,11 @@ def stmt(env, a):
     global currentFName
     match a:
         case "<<", x, y:
-            print(x + "=")
-            print("Etc.append")
-            printArgs(env, (x, y))
-            print(";")
+            print(x + "= ((List)")
+            expr(env, x)
+            print(").append(")
+            expr(env, y)
+            print(");")
         case ">>", x, y:
             print(y + "=")
             print("Etc.cat(List.of(")

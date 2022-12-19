@@ -336,7 +336,7 @@ public class Etc {
 
   public static List range(Object i0, Object j0) {
     var i = (int) i0;
-    var j = j0 instanceof Integer ? (int) j0 : len(j0);
+    var j = j0 instanceof Integer ? (int) j0 : ((List) j0).len();
     var r = new ArrayList<>();
     while (i < j) r.add(i++);
     return List.ofArrayList(r);
@@ -355,14 +355,6 @@ public class Etc {
 
   public static List cat(Object s, Object t) {
     return ((List) s).cat(t);
-  }
-
-  public static List append(Object s, Object a) {
-    return ((List) s).append(a);
-  }
-
-  public static int len(Object s) {
-    return ((List) s).len();
   }
 
   static Object exit(Object a) {
