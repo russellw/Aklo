@@ -630,11 +630,11 @@ for root, dirs, files in os.walk(here + "/../aklo"):
 
 
 # output
-print("import java.util.*;")
+print("import java.util.Objects;")
 print("import java.util.function.*;")
 print("class Compiler {")
 print("public static void main(String[] args) {")
-print("for (var s : args) Etc.args.add(Etc.encode(s));")
+print("Etc.init(args);")
 for name in modules:
     if name != "main":
         print(name + ".run();")
@@ -787,8 +787,11 @@ def expr(env, a):
             if s:
                 match s[-1]:
                     case "@", t:
-                        print("Etc.cons")
-                        printArgs(env, s[:-1] + [t])
+                        print("Etc.cat(List.of")
+                        printArgs(env, s[:-1])
+                        print(",")
+                        expr(env, t)
+                        print(")")
                         return
             print("List.of")
             printArgs(env, s)
@@ -851,13 +854,13 @@ def checkCase(env, label, pattern, x):
             print(f"if (!({x} instanceof List)) break {label};")
             if isRest(s):
                 n = len(s) - 1
-                print(f"if (((List<Object>){x}).size() < {n}) break {label};")
+                print(f"if (((List){x}).len() < {n}) break {label};")
                 for i in range(n):
                     checkCase(env, label, s[i], ("subscript", x, i))
                 checkCase(env, label, s[n][1], ("drop", n, x))
                 return
             n = len(s)
-            print(f"if (((List<Object>){x}).size() != {n}) break {label};")
+            print(f"if (((List){x}).len() != {n}) break {label};")
             for i in range(n):
                 checkCase(env, label, s[i], ("subscript", x, i))
 
@@ -915,18 +918,20 @@ def stmt(env, a):
             print(";")
         case ">>", x, y:
             print(y + "=")
-            print("Etc.prepend")
-            printArgs(env, (x, y))
-            print(";")
+            print("Etc.cat(List.of(")
+            expr(env, x)
+            print("), ")
+            expr(env, y)
+            print(");")
         case ("+=", x, y) | ("-=", x, y) | ("@=", x, y):
             print(x + "=")
             expr(env, (a[0][0], x, y))
             print(";")
         case "for", y, s, *body:
             x = sym()
-            print(f"for (var {x}: (List)")
+            print(f"for (var {x}: ((List)")
             expr(env, s)
-            print(") {")
+            print(").toArray()) {")
             assign(env, y, x)
             stmts(env, body)
             print("}")

@@ -4,18 +4,21 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("unchecked")
 public class Etc {
-  public static List<Object> args = new ArrayList<>();
+  public static List args;
   static int depth;
   static Set<String> tracing;
   public static final boolean windowsp = System.getProperty("os.name").startsWith("Windows");
 
-  public static List<Object> compileTimeReadFiles(String dir) {
+  public static void init(String[] args1) {
+    var r = new Object[args1.length];
+    for (var i = 0; i < args1.length; i++) r[i] = encode(args1[i]);
+    args = List.of(r);
+  }
+
+  public static List compileTimeReadFiles(String dir) {
     // in the full language, compileTimeReadFiles works at compile time
     // thereby generating arbitrarily large compile-time constants
     // because they contain the full text of the files read
@@ -44,10 +47,10 @@ public class Etc {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return r;
+    return List.ofArrayList(r);
   }
 
-  static List<Object> listDir(Object dir0) {
+  static List listDir(Object dir0) {
     var dir = decode(dir0);
     var r = new ArrayList<>();
     try {
@@ -68,7 +71,7 @@ public class Etc {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return r;
+    return List.ofArrayList(r);
   }
 
   static boolean dirp(Object file) {
@@ -106,7 +109,7 @@ public class Etc {
 
   static Object writeStream(Object stream, Object s) {
     var stream1 = (PrintStream) stream;
-    for (var c : (List<Object>) s) stream1.write((int) c);
+    for (var c : ((List) s).toArray()) stream1.write((int) c);
     return null;
   }
 
@@ -114,7 +117,7 @@ public class Etc {
     return new String(bytes(s), StandardCharsets.UTF_8);
   }
 
-  public static List<Object> readFile(Object file) {
+  public static List readFile(Object file) {
     try {
       return list(Files.readAllBytes(Path.of(decode(file))));
     } catch (IOException e) {
@@ -139,19 +142,19 @@ public class Etc {
   }
 
   static byte[] bytes(Object s) {
-    var s1 = (List<Object>) s;
-    var r = new byte[s1.size()];
-    for (var i = 0; i < r.length; i++) r[i] = (byte) (int) s1.get(i);
+    var s1 = (List) s;
+    var r = new byte[s1.len()];
+    for (var i = 0; i < r.length; i++) r[i] = (byte) (int) s1.subscript(i);
     return r;
   }
 
-  static List<Object> list(byte[] s) {
+  static List list(byte[] s) {
     var r = new Object[s.length];
     for (var i = 0; i < r.length; i++) r[i] = (int) s[i] & 0xff;
     return List.of(r);
   }
 
-  public static List<Object> encode(String s) {
+  public static List encode(String s) {
     return list(s.getBytes(StandardCharsets.UTF_8));
   }
 
@@ -182,12 +185,10 @@ public class Etc {
 
   public static boolean eq(Object a, Object b) {
     if (a == b) return true;
-    if (a instanceof List) {
-      var a1 = (List<Object>) a;
-      if (!(b instanceof List)) return false;
-      var b1 = (List<Object>) b;
-      if (a1.size() != b1.size()) return false;
-      for (var i = 0; i < a1.size(); i++) if (!eq(a1.get(i), b1.get(i))) return false;
+    if (a instanceof List a1) {
+      if (!(b instanceof List b1)) return false;
+      if (a1.len() != b1.len()) return false;
+      for (var i = 0; i < a1.len(); i++) if (!eq(a1.subscript(i), b1.subscript(i))) return false;
       return true;
     }
     if (numberp(a) && numberp(b)) {
@@ -256,9 +257,9 @@ public class Etc {
     return (int) a >> (int) b;
   }
 
-  static boolean isAscii(List<Object> a) {
+  static boolean isAscii(List a) {
     if (a.isEmpty()) return false;
-    for (var c0 : a) {
+    for (var c0 : a.toArray()) {
       if (!(c0 instanceof Integer)) return false;
       var c = (int) c0;
       switch (c) {
@@ -278,14 +279,13 @@ public class Etc {
   }
 
   static void repr(Object a0, StringBuilder sb) {
-    if (!(a0 instanceof List)) {
+    if (!(a0 instanceof List a)) {
       appendsb(sb, a0.toString());
       return;
     }
-    var a = (List<Object>) a0;
     if (isAscii(a)) {
       appendsb(sb, "\"");
-      for (var c0 : a) {
+      for (var c0 : a.toArray()) {
         var c = (int) c0;
         switch (c) {
           case '\t' -> appendsb(sb, "\\t");
@@ -298,9 +298,9 @@ public class Etc {
       return;
     }
     appendsb(sb, "[");
-    for (var i = 0; i < a.size(); i++) {
+    for (var i = 0; i < a.len(); i++) {
       if (i > 0) appendsb(sb, ", ");
-      repr(a.get(i), sb);
+      repr(a.subscript(i), sb);
     }
     appendsb(sb, "]");
   }
@@ -323,63 +323,46 @@ public class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
-  public static List<Object> slice(Object s0, Object i0, Object j0) {
-    var s = (List<Object>) s0;
+  public static List slice(Object s0, Object i0, Object j0) {
+    // TODO call method directly
+    var s = (List) s0;
     var i = (int) i0;
     var j = (int) j0;
     i = Math.max(i, 0);
-    j = Math.min(j, s.size());
+    j = Math.min(j, s.len());
     if (i > j) return List.of();
-    return s.subList(i, j);
+    return s.slice(i, j);
   }
 
-  public static List<Object> range(Object i0, Object j0) {
+  public static List range(Object i0, Object j0) {
     var i = (int) i0;
     var j = j0 instanceof Integer ? (int) j0 : len(j0);
     var r = new ArrayList<>();
     while (i < j) r.add(i++);
-    return r;
+    return List.ofArrayList(r);
   }
 
   public static int mul(Object a, Object b) {
     return (int) a * (int) b;
   }
 
-  public static List<Object> str(Object a) {
+  public static List str(Object a) {
     var s = a.toString();
     var r = new ArrayList<>();
     for (var i = 0; i < s.length(); i++) r.add((int) s.charAt(i));
-    return r;
+    return List.ofArrayList(r);
   }
 
-  public static List<Object> cons(Object... s) {
-    var r = new ArrayList<>();
-    r.addAll(Arrays.asList(s).subList(0, s.length - 1));
-    r.addAll((List<Object>) s[s.length - 1]);
-    return r;
+  public static List cat(Object s, Object t) {
+    return ((List) s).cat(t);
   }
 
-  public static List<Object> cat(Object s, Object t) {
-    var r = new ArrayList<>((List<Object>) s);
-    r.addAll((List<Object>) t);
-    return r;
-  }
-
-  static List<Object> prepend(Object a, Object s) {
-    var r = new ArrayList<>();
-    r.add(a);
-    r.addAll((List<Object>) s);
-    return r;
-  }
-
-  public static List<Object> append(Object s, Object a) {
-    var r = new ArrayList<>((List<Object>) s);
-    r.add(a);
-    return r;
+  public static List append(Object s, Object a) {
+    return ((List) s).append(a);
   }
 
   public static int len(Object s) {
-    return ((List<Object>) s).size();
+    return ((List) s).len();
   }
 
   static Object exit(Object a) {
@@ -433,7 +416,7 @@ public class Etc {
   }
 
   public static Object subscript(Object s, Object i) {
-    return ((List<Object>) s).get((int) i);
+    return ((List) s).subscript((int) i);
   }
 
   public static boolean truth(boolean a) {
@@ -441,9 +424,10 @@ public class Etc {
   }
 
   public static boolean truth(Object a) {
-    if (a instanceof Integer) return (int) a != 0;
-    if (a instanceof List) return ((List<Object>) a).size() != 0;
     if (a instanceof Boolean) return (boolean) a;
+    if (a instanceof Integer) return (int) a != 0;
+    // TODO other numbers
+    if (a instanceof List) return !((List) a).isEmpty();
     return true;
   }
 
@@ -452,9 +436,10 @@ public class Etc {
   }
 
   public static Object get(Object record, Object key) {
-    for (var entry : (List<Object>) record) {
-      var entry1 = (List<Object>) entry;
-      if (entry1.get(0).equals(key)) return entry1.get(1);
+    // TODO this should be a method
+    for (var entry : ((List) record).toArray()) {
+      var entry1 = (List) entry;
+      if (entry1.subscript(0).equals(key)) return entry1.subscript(1);
     }
     return 0;
   }
