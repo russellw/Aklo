@@ -323,17 +323,6 @@ public class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
-  public static List slice(Object s0, Object i0, Object j0) {
-    // TODO call method directly
-    var s = (List) s0;
-    var i = (int) i0;
-    var j = (int) j0;
-    i = Math.max(i, 0);
-    j = Math.min(j, s.len());
-    if (i > j) return List.of();
-    return s.slice(i, j);
-  }
-
   public static List range(Object i0, Object j0) {
     var i = (int) i0;
     var j = j0 instanceof Integer ? (int) j0 : ((List) j0).len();

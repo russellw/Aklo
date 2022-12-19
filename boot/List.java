@@ -20,6 +20,9 @@ public abstract class List {
   }
 
   public List slice(int i, int j) {
+    i = Math.max(i, 0);
+    j = Math.min(j, len());
+    if (i > j) return List.of();
     var r = new Object[j - i];
     System.arraycopy(toArray(), i, r, 0, r.length);
     return of(r);

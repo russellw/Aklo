@@ -735,6 +735,11 @@ def expr(env, a):
         case "!=", *s:
             print("!Objects.equals")
             printArgs(env, s)
+        case "slice", s, i, j:
+            print("((List)")
+            expr(env, s)
+            print(").slice")
+            printArgs(env, (i, j))
         case "subscript", s, i:
             print("((List)")
             expr(env, s)
@@ -762,7 +767,6 @@ def expr(env, a):
         case (
             ("get", *s)
             | ("exit", *s)
-            | ("slice", *s)
             | ("range", *s)
             | ("writeStream", *s)
             | ("parseDouble", *s)
