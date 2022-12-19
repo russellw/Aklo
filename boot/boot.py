@@ -631,6 +631,7 @@ for root, dirs, files in os.walk(here + "/../aklo"):
 
 # output
 print("import java.util.Objects;")
+print("import java.util.Set;")
 print("import java.util.function.*;")
 print("class Compiler {")
 print("public static void main(String[] args) {")
