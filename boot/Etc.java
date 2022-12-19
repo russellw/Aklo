@@ -403,10 +403,6 @@ public class Etc {
     return (int) a <= (int) b;
   }
 
-  public static Object subscript(Object s, Object i) {
-    return ((List) s).subscript((int) i);
-  }
-
   public static boolean truth(boolean a) {
     return a;
   }
