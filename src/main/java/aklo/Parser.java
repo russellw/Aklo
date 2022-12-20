@@ -2,6 +2,7 @@ package aklo;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,9 @@ public final class Parser {
   private static final int STRING = -20;
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
+  private static final int INTEGER = -23;
+  private static final int FLOAT = -24;
+  private static final int DOUBLE = -25;
 
   // keywords
   private static final int ASSERT = -100;
@@ -105,6 +109,13 @@ public final class Parser {
   private void readc(StringBuilder sb) throws IOException {
     sb.append((char) c);
     readc();
+  }
+
+  private void doDigits(StringBuilder sb) throws IOException {
+    do {
+      if (c != '_') sb.append((char) c);
+      readc();
+    } while (isIdPart(c));
   }
 
   private void lexQuote() throws IOException {
@@ -186,7 +197,6 @@ public final class Parser {
             dedents++;
           }
           if (col != cols.get(cols.size() - 1)) throw err("inconsistent indent");
-          return;
         }
         case ' ', '\f', '\r', '\t' -> {
           readc();
@@ -364,6 +374,72 @@ public final class Parser {
           var k = keywords.get(tokString);
           if (k != null) tok = k;
         }
+        case '.' -> {
+          var sb = new StringBuilder();
+
+          // decimal part
+          readc(sb);
+          if (!Etc.isDigit(c)) return;
+          doDigits(sb);
+          tok = DOUBLE;
+
+          // exponent
+          switch (sb.charAt(sb.length() - 1)) {
+            case 'e', 'E' -> {
+              switch (c) {
+                case '+', '-' -> {
+                  doDigits(sb);
+                }
+              }
+            }
+          }
+
+          // suffix
+          switch (sb.charAt(sb.length() - 1)) {
+            case 'f', 'F' -> {
+              sb.deleteCharAt(sb.length() - 1);
+              tok = FLOAT;
+            }
+          }
+
+          tokString = sb.toString();
+        }
+        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+          var sb = new StringBuilder();
+
+          // integer part
+          doDigits(sb);
+          tok = INTEGER;
+
+          // decimal part
+          if (c == '.') {
+            doDigits(sb);
+            tok = DOUBLE;
+          }
+
+          // exponent
+          switch (sb.charAt(sb.length() - 1)) {
+            case 'e', 'E' -> {
+              switch (c) {
+                case '+', '-' -> {
+                  doDigits(sb);
+                  tok = DOUBLE;
+                }
+              }
+            }
+          }
+
+          // suffix
+          if (tok == DOUBLE)
+            switch (sb.charAt(sb.length() - 1)) {
+              case 'f', 'F' -> {
+                sb.deleteCharAt(sb.length() - 1);
+                tok = FLOAT;
+              }
+            }
+
+          tokString = sb.toString();
+        }
         default -> readc();
       }
       return;
@@ -378,6 +454,54 @@ public final class Parser {
   }
 
   // expressions
+  private Term primary() throws IOException {
+    // remember the line on which the primary expression started
+    var line1 = line;
+    var location = new Location(file, line1);
+
+    // unless there is an error, this token will definitely be consumed
+    var k = tok;
+    var s = tokString;
+    lex();
+
+    try {
+      switch (k) {
+        case TRUE -> {
+          return new True(location);
+        }
+        case FALSE -> {
+          return new False(location);
+        }
+        case FLOAT -> {
+          return new FloatConstant(location, Float.parseFloat(s));
+        }
+        case DOUBLE -> {
+          return new DoubleConstant(location, Double.parseDouble(s));
+        }
+        case INTEGER -> {
+          if (s.charAt(0) == '0' && s.length() > 1)
+            switch (s.charAt(1)) {
+              case 'b', 'B' -> {
+                return new IntegerConstant(location, new BigInteger(s.substring(2), 2));
+              }
+              case 'o', 'O' -> {
+                return new IntegerConstant(location, new BigInteger(s.substring(2), 8));
+              }
+              case 'x', 'X' -> {
+                return new IntegerConstant(location, new BigInteger(s.substring(2), 16));
+              }
+            }
+          return new IntegerConstant(location, new BigInteger(s));
+        }
+      }
+    } catch (NumberFormatException e) {
+      line = line1;
+      throw err(e.toString());
+    }
+
+    line = line1;
+    throw err("expected expression");
+  }
 
   // top level
   public Parser(String file, InputStream stream) {
