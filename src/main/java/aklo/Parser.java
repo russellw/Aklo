@@ -469,11 +469,15 @@ public final class Parser {
     return true;
   }
 
+  private void expect(char k) throws IOException {
+    if (!eat(k)) throw err(String.format("expected '%c'", k));
+  }
+
   // expressions
   private Term primary() throws IOException {
     // remember the line on which the primary expression started
     var line1 = line;
-    var location = new Loc(file, line1);
+    var loc = new Loc(file, line1);
 
     // unless there is an error, this token will definitely be consumed
     var k = tok;
@@ -482,32 +486,88 @@ public final class Parser {
 
     try {
       switch (k) {
+        case '(' -> {
+          var a = expr();
+          expect(')');
+          return a;
+        }
+        case ID -> {
+          switch (s) {
+            case "bitNot" -> {
+              expect('(');
+              var a = expr();
+              expect(')');
+              return new BitNot(loc, a);
+            }
+            case "bitAnd" -> {
+              expect('(');
+              var a = expr();
+              expect(',');
+              var b = expr();
+              expect(')');
+              return new BitAnd(loc, a, b);
+            }
+            case "bitOr" -> {
+              expect('(');
+              var a = expr();
+              expect(',');
+              var b = expr();
+              expect(')');
+              return new BitOr(loc, a, b);
+            }
+            case "bitXor" -> {
+              expect('(');
+              var a = expr();
+              expect(',');
+              var b = expr();
+              expect(')');
+              return new BitXor(loc, a, b);
+            }
+            case "shl" -> {
+              expect('(');
+              var a = expr();
+              expect(',');
+              var b = expr();
+              expect(')');
+              return new Shl(loc, a, b);
+            }
+            case "shr" -> {
+              expect('(');
+              var a = expr();
+              expect(',');
+              var b = expr();
+              expect(')');
+              return new Shr(loc, a, b);
+            }
+          }
+          return new Id(loc, s);
+        }
         case TRUE -> {
-          return new True(location);
+          return new True(loc);
         }
         case FALSE -> {
-          return new False(location);
+          return new False(loc);
         }
         case FLOAT -> {
-          return new FloatConst(location, Float.parseFloat(s));
+          return new FloatConst(loc, Float.parseFloat(s));
         }
         case DOUBLE -> {
-          return new DoubleConst(location, Double.parseDouble(s));
+          return new DoubleConst(loc, Double.parseDouble(s));
         }
         case INTEGER -> {
           if (s.charAt(0) == '0' && s.length() > 1)
             switch (s.charAt(1)) {
               case 'b', 'B' -> {
-                return new IntegerConst(location, new BigInteger(s.substring(2), 2));
+                return new IntegerConst(loc, new BigInteger(s.substring(2), 2));
               }
               case 'o', 'O' -> {
-                return new IntegerConst(location, new BigInteger(s.substring(2), 8));
+                return new IntegerConst(loc, new BigInteger(s.substring(2), 8));
               }
               case 'x', 'X' -> {
-                return new IntegerConst(location, new BigInteger(s.substring(2), 16));
+                return new IntegerConst(loc, new BigInteger(s.substring(2), 16));
               }
             }
-          return new IntegerConst(location, new BigInteger(s));
+          return new IntegerConst(loc, new BigInteger(s));
         }
       }
     } catch (NumberFormatException e) {
@@ -517,6 +577,53 @@ public final class Parser {
 
     line = line1;
     throw err("expected expression");
+  }
+
+  private Term postfix() throws IOException {
+    var a = primary();
+    for (; ; )
+      switch (tok) {
+        case INC -> {
+          var loc = new Loc(file, line);
+          lex();
+          return new PostInc(loc, a);
+        }
+        case DEC -> {
+          var loc = new Loc(file, line);
+          lex();
+          return new PostDec(loc, a);
+        }
+      }
+  }
+
+  private Term prefix() throws IOException {
+    switch (tok) {
+      case INC -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Inc(loc, primary());
+      }
+      case DEC -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Dec(loc, primary());
+      }
+      case '!' -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Not(loc, prefix());
+      }
+      case '-' -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Neg(loc, prefix());
+      }
+    }
+    return postfix();
+  }
+
+  private Term expr() throws IOException {
+    return primary();
   }
 
   // top level

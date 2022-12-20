@@ -48,4 +48,5 @@ public enum Tag {
   CALL,
   BREAK,
   CONTINUE,
+  ID,
 }
