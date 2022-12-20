@@ -2,22 +2,23 @@ package aklo;
 
 import java.util.Iterator;
 
-public abstract class Term1 extends Term {
-  public final Term arg;
+public abstract class Term2 extends Term {
+  public final Term arg0, arg1;
 
-  public Term1(Loc loc, Term arg) {
+  public Term2(Loc loc, Term arg0, Term arg1) {
     super(loc);
-    this.arg = arg;
+    this.arg0 = arg0;
+    this.arg1 = arg1;
   }
 
   @Override
   public Type type() {
-    return arg.type();
+    return arg0.type();
   }
 
   @Override
   public int size() {
-    return 1;
+    return 2;
   }
 
   @Override
@@ -27,14 +28,14 @@ public abstract class Term1 extends Term {
 
       @Override
       public boolean hasNext() {
-        return i == 0;
+        return i < 2;
       }
 
       @Override
       public Term next() {
         assert hasNext();
-        i++;
-        return arg;
+        if (i++ == 0) return arg0;
+        return arg1;
       }
     };
   }
