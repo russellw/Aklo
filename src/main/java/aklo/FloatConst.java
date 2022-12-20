@@ -1,9 +1,9 @@
 package aklo;
 
-public final class FloatConstant extends Term {
+public final class FloatConst extends Term {
   public final float value;
 
-  public FloatConstant(Location location, float value) {
+  public FloatConst(Location location, float value) {
     super(location);
     this.value = value;
   }

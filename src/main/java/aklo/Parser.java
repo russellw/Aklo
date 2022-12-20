@@ -489,25 +489,25 @@ public final class Parser {
           return new False(location);
         }
         case FLOAT -> {
-          return new FloatConstant(location, Float.parseFloat(s));
+          return new FloatConst(location, Float.parseFloat(s));
         }
         case DOUBLE -> {
-          return new DoubleConstant(location, Double.parseDouble(s));
+          return new DoubleConst(location, Double.parseDouble(s));
         }
         case INTEGER -> {
           if (s.charAt(0) == '0' && s.length() > 1)
             switch (s.charAt(1)) {
               case 'b', 'B' -> {
-                return new IntegerConstant(location, new BigInteger(s.substring(2), 2));
+                return new IntegerConst(location, new BigInteger(s.substring(2), 2));
               }
               case 'o', 'O' -> {
-                return new IntegerConstant(location, new BigInteger(s.substring(2), 8));
+                return new IntegerConst(location, new BigInteger(s.substring(2), 8));
               }
               case 'x', 'X' -> {
-                return new IntegerConstant(location, new BigInteger(s.substring(2), 16));
+                return new IntegerConst(location, new BigInteger(s.substring(2), 16));
               }
             }
-          return new IntegerConstant(location, new BigInteger(s));
+          return new IntegerConst(location, new BigInteger(s));
         }
       }
     } catch (NumberFormatException e) {
