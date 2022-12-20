@@ -111,11 +111,11 @@ public final class Parser {
     readc();
   }
 
-  private void doDigits(StringBuilder sb) throws IOException {
-    do {
+  private void digits(StringBuilder sb) throws IOException {
+    while (isIdPart(c)) {
       if (c != '_') sb.append((char) c);
       readc();
-    } while (isIdPart(c));
+    }
   }
 
   private void lexQuote() throws IOException {
@@ -374,46 +374,17 @@ public final class Parser {
           var k = keywords.get(tokString);
           if (k != null) tok = k;
         }
-        case '.' -> {
-          var sb = new StringBuilder();
-
-          // decimal part
-          readc(sb);
-          if (!Etc.isDigit(c)) return;
-          doDigits(sb);
-          tok = DOUBLE;
-
-          // exponent
-          switch (sb.charAt(sb.length() - 1)) {
-            case 'e', 'E' -> {
-              switch (c) {
-                case '+', '-' -> {
-                  doDigits(sb);
-                }
-              }
-            }
-          }
-
-          // suffix
-          switch (sb.charAt(sb.length() - 1)) {
-            case 'f', 'F' -> {
-              sb.deleteCharAt(sb.length() - 1);
-              tok = FLOAT;
-            }
-          }
-
-          tokString = sb.toString();
-        }
-        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
           var sb = new StringBuilder();
 
           // integer part
-          doDigits(sb);
+          digits(sb);
           tok = INTEGER;
 
           // decimal part
           if (c == '.') {
-            doDigits(sb);
+            readc(sb);
+            digits(sb);
             tok = DOUBLE;
           }
 
@@ -422,7 +393,8 @@ public final class Parser {
             case 'e', 'E' -> {
               switch (c) {
                 case '+', '-' -> {
-                  doDigits(sb);
+                  readc(sb);
+                  digits(sb);
                   tok = DOUBLE;
                 }
               }
