@@ -622,8 +622,81 @@ public final class Parser {
     return postfix();
   }
 
+  // operator precedence parser
+  private record Op(int prec, int left) {}
+
+  private static int prec = 99;
+  private static final Map<Integer, Op> ops = new HashMap<>();
+
+  private static void init(int k, int left) {
+    ops.put(k, new Op(prec, left));
+  }
+
+  static {
+    init(EXP, 0);
+
+    prec--;
+    init('*', 1);
+    init('/', 1);
+    init('%', 1);
+    init(IDIV, 1);
+
+    prec--;
+    init('+', 1);
+    init('-', 1);
+    init('@', 1);
+
+    prec--;
+    init('<', 1);
+    init(LE, 1);
+    init('>', 1);
+    init(GE, 1);
+    init(EQ, 1);
+    init(NE, 1);
+    init(NUMBER_EQ, 1);
+    init(NUMBER_NE, 1);
+
+    prec--;
+    init('&', 1);
+
+    prec--;
+    init('|', 1);
+  }
+
+  private Term infix(int prec) throws IOException {
+    var a = prefix();
+    for (; ; ) {
+      var k = tok;
+      var op = ops.get(k);
+      if (op == null || op.prec < prec) return a;
+      var loc = new Loc(file, line);
+      lex();
+      var b = infix(op.prec + op.left);
+      a =
+          switch (k) {
+            case EXP -> new Exp(loc, a, b);
+            case '*' -> new Mul(loc, a, b);
+            case '/' -> new Div(loc, a, b);
+            case '%' -> new Rem(loc, a, b);
+            case IDIV -> new IDiv(loc, a, b);
+            case '+' -> new Add(loc, a, b);
+            case '-' -> new Sub(loc, a, b);
+            case '@' -> new Cat(loc, a, b);
+            case '<' -> new Lt(loc, a, b);
+            case '>' -> new Lt(loc, b, a);
+            case LE -> new Le(loc, a, b);
+            case GE -> new Le(loc, b, a);
+            case EQ -> new Eq(loc, a, b);
+            case NE -> new Not(loc, new Eq(loc, a, b));
+            case '&' -> new And(loc, a, b);
+            case '|' -> new Or(loc, a, b);
+            default -> throw new IllegalArgumentException();
+          };
+    }
+  }
+
   private Term expr() throws IOException {
-    return primary();
+    return infix(1);
   }
 
   // top level
