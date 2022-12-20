@@ -3,7 +3,9 @@ package aklo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class Parser {
   // Tokens
@@ -29,6 +31,51 @@ public final class Parser {
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
 
+  // keywords
+  private static final int ASSERT = -100;
+  private static final int BREAK = -101;
+  private static final int CASE = -102;
+  private static final int CONTINUE = -102;
+  private static final int DBG = -104;
+  private static final int DOWHILE = -105;
+  private static final int ELIF = -106;
+  private static final int ELSE = -107;
+  private static final int FALSE = -108;
+  private static final int FN = -109;
+  private static final int FOR = -110;
+  private static final int GOTO = -111;
+  private static final int IF = -112;
+  private static final int THROW = -113;
+  private static final int TROFF = -114;
+  private static final int TRON = -115;
+  private static final int TRUE = -116;
+  private static final int VAR = -117;
+  private static final int WHILE = -118;
+
+  private static final Map<String, Integer> keywords = new HashMap<>();
+
+  static {
+    keywords.put("assert", ASSERT);
+    keywords.put("break", BREAK);
+    keywords.put("case", CASE);
+    keywords.put("continue", CONTINUE);
+    keywords.put("dbg", DBG);
+    keywords.put("dowhile", DOWHILE);
+    keywords.put("elif", ELIF);
+    keywords.put("else", ELSE);
+    keywords.put("false", FALSE);
+    keywords.put("fn", FN);
+    keywords.put("for", FOR);
+    keywords.put("goto", GOTO);
+    keywords.put("if", IF);
+    keywords.put("throw", THROW);
+    keywords.put("troff", TROFF);
+    keywords.put("tron", TRON);
+    keywords.put("true", TRUE);
+    keywords.put("var", VAR);
+    keywords.put("while", WHILE);
+  }
+
   // File state
   private final String file;
   private final InputStream stream;
@@ -36,7 +83,7 @@ public final class Parser {
   private int line = 1;
 
   private int dentc;
-  private List<Integer> cols = new ArrayList<>(List.of(0));
+  private final List<Integer> cols = new ArrayList<>(List.of(0));
   private int dedents;
 
   private int tok;
@@ -90,18 +137,17 @@ public final class Parser {
           continue;
         }
         case '{' -> {
-          // remember the starting line in case we need to report an error
           var line1 = line;
           do {
             readc();
             switch (c) {
-              case '\n' -> line++;
+              case '\n' -> line1++;
               case -1 -> {
-                line = line1;
                 throw err("unmatched '{'");
               }
             }
           } while (c != '}');
+          line = line1;
           continue;
         }
         case '\n' -> {
@@ -315,6 +361,8 @@ public final class Parser {
           while (isIdPart(c));
           tok = ID;
           tokString = sb.toString();
+          var k = keywords.get(tokString);
+          if (k != null) tok = k;
         }
         default -> readc();
       }
@@ -322,6 +370,16 @@ public final class Parser {
     }
   }
 
+  // parser
+  private boolean eat(int k) throws IOException {
+    if (tok != k) return false;
+    lex();
+    return true;
+  }
+
+  // expressions
+
+  // top level
   public Parser(String file, InputStream stream) {
     this.file = file;
     this.stream = stream;

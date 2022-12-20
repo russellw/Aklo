@@ -247,8 +247,7 @@ fn parse  (file,text)
 			^r
 
 	fn primary()
-		;remember the current location in case we need to report an error
-		file1=file
+		;remember the current line in case we need to report an error
 		line1=line
 
 		;unless there is an error, this token will definitely be consumed
@@ -365,7 +364,6 @@ fn parse  (file,text)
 			^parseDouble(s)
 
 		; none of the above
-		file:=file1
 		line:=line1
 		tok:=s
 		errTok("expected expression")
