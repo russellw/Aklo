@@ -112,9 +112,9 @@ public final class Parser {
   }
 
   private void digits(StringBuilder sb) throws IOException {
-    while (isIdPart(c)) {
-      if (c != '_') sb.append((char) c);
-      readc();
+    while (Etc.isDigit(c)) {
+      readc(sb);
+      if (c == '_') readc();
     }
   }
 
@@ -377,23 +377,67 @@ public final class Parser {
         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
           var sb = new StringBuilder();
 
-          // integer part
+          // leading digits
           digits(sb);
           tok = INTEGER;
 
-          // decimal part
-          if (c == '.') {
-            readc(sb);
-            digits(sb);
-            tok = DOUBLE;
-          }
+          // prefix
+          switch (c) {
+            case 'b', 'B', 'o', 'O' -> {
+              readc(sb);
 
-          // exponent
-          switch (sb.charAt(sb.length() - 1)) {
-            case 'e', 'E' -> {
+              // integer
+              digits(sb);
+            }
+            case 'x', 'X' -> {
+              readc(sb);
+
+              // integer part
+              while (Etc.isHexDigit(c)) {
+                readc(sb);
+                if (c == '_') readc();
+              }
+
+              // decimal part
+              if (c == '.') {
+                readc(sb);
+                digits(sb);
+                tok = DOUBLE;
+              }
+
+              // exponent
               switch (c) {
-                case '+', '-' -> {
+                case 'p', 'P' -> {
                   readc(sb);
+                  switch (c) {
+                    case '+', '-' -> readc(sb);
+                  }
+                  digits(sb);
+                  tok = DOUBLE;
+                }
+              }
+            }
+            default -> {
+              // integer part, if any, is already done
+              // decimal part
+              if (c == '.') {
+                readc(sb);
+                digits(sb);
+
+                // a decimal point with no digits before or after, is just a dot
+                if (sb.length() == 1) return;
+
+                // now we know we have a floating-point number, though not which precision
+                tok = DOUBLE;
+              }
+
+              // exponent
+              switch (c) {
+                case 'e', 'E' -> {
+                  readc(sb);
+                  switch (c) {
+                    case '+', '-' -> readc(sb);
+                  }
                   digits(sb);
                   tok = DOUBLE;
                 }

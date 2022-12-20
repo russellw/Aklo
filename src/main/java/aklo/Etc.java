@@ -7,6 +7,10 @@ public final class Etc {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }
 
+  public static boolean isHexDigit(int c) {
+    return isDigit(c) || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F';
+  }
+
   public static boolean isDigit(int c) {
     return '0' <= c && c <= '9';
   }
