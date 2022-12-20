@@ -2,10 +2,12 @@ package aklo;
 
 public abstract class Term {
   public final Location location;
-  public final Tag tag;
 
-  protected Term(Location location, Tag tag) {
+  public Term(Location location) {
     this.location = location;
-    this.tag = tag;
   }
+
+  public abstract Tag tag();
+
+  public abstract Type type();
 }
