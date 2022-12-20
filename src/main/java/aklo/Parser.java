@@ -20,13 +20,13 @@ public final class Parser {
   private static final int EXP = -9;
   private static final int GE = -10;
   private static final int ID = -11;
-  private static final int IDIV = -12;
+  private static final int DIV_INTEGERS = -12;
   private static final int INC = -13;
   private static final int INDENT = -14;
   private static final int LE = -15;
   private static final int NE = -16;
-  private static final int NUMBER_EQ = -17;
-  private static final int NUMBER_NE = -18;
+  private static final int EQ_NUMBERS = -17;
+  private static final int NE_NUMBERS = -18;
   private static final int PREPEND = -19;
   private static final int STRING = -20;
   private static final int SUB_ASSIGN = -21;
@@ -209,7 +209,7 @@ public final class Parser {
             tok = NE;
             if (c == '=') {
               readc();
-              tok = NUMBER_NE;
+              tok = NE_NUMBERS;
             }
           }
         }
@@ -234,7 +234,7 @@ public final class Parser {
             tok = EQ;
             if (c == '=') {
               readc();
-              tok = NUMBER_EQ;
+              tok = EQ_NUMBERS;
             }
           }
         }
@@ -249,7 +249,7 @@ public final class Parser {
           readc();
           if (c == '/') {
             readc();
-            tok = IDIV;
+            tok = DIV_INTEGERS;
           }
         }
         case '+' -> {
@@ -549,25 +549,25 @@ public final class Parser {
           return new False(loc);
         }
         case FLOAT -> {
-          return new FloatConst(loc, Float.parseFloat(s));
+          return new ConstFloat(loc, Float.parseFloat(s));
         }
         case DOUBLE -> {
-          return new DoubleConst(loc, Double.parseDouble(s));
+          return new ConstDouble(loc, Double.parseDouble(s));
         }
         case INTEGER -> {
           if (s.charAt(0) == '0' && s.length() > 1)
             switch (s.charAt(1)) {
               case 'b', 'B' -> {
-                return new IntegerConst(loc, new BigInteger(s.substring(2), 2));
+                return new ConstInteger(loc, new BigInteger(s.substring(2), 2));
               }
               case 'o', 'O' -> {
-                return new IntegerConst(loc, new BigInteger(s.substring(2), 8));
+                return new ConstInteger(loc, new BigInteger(s.substring(2), 8));
               }
               case 'x', 'X' -> {
-                return new IntegerConst(loc, new BigInteger(s.substring(2), 16));
+                return new ConstInteger(loc, new BigInteger(s.substring(2), 16));
               }
             }
-          return new IntegerConst(loc, new BigInteger(s));
+          return new ConstInteger(loc, new BigInteger(s));
         }
       }
     } catch (NumberFormatException e) {
@@ -639,7 +639,7 @@ public final class Parser {
     init('*', 1);
     init('/', 1);
     init('%', 1);
-    init(IDIV, 1);
+    init(DIV_INTEGERS, 1);
 
     prec--;
     init('+', 1);
@@ -653,8 +653,8 @@ public final class Parser {
     init(GE, 1);
     init(EQ, 1);
     init(NE, 1);
-    init(NUMBER_EQ, 1);
-    init(NUMBER_NE, 1);
+    init(EQ_NUMBERS, 1);
+    init(NE_NUMBERS, 1);
 
     prec--;
     init('&', 1);
@@ -678,7 +678,7 @@ public final class Parser {
             case '*' -> new Mul(loc, a, b);
             case '/' -> new Div(loc, a, b);
             case '%' -> new Rem(loc, a, b);
-            case IDIV -> new IDiv(loc, a, b);
+            case DIV_INTEGERS -> new DivIntegers(loc, a, b);
             case '+' -> new Add(loc, a, b);
             case '-' -> new Sub(loc, a, b);
             case '@' -> new Cat(loc, a, b);
@@ -687,7 +687,9 @@ public final class Parser {
             case LE -> new Le(loc, a, b);
             case GE -> new Le(loc, b, a);
             case EQ -> new Eq(loc, a, b);
+            case EQ_NUMBERS -> new EqNumbers(loc, a, b);
             case NE -> new Not(loc, new Eq(loc, a, b));
+            case NE_NUMBERS -> new Not(loc, new EqNumbers(loc, a, b));
             case '&' -> new And(loc, a, b);
             case '|' -> new Or(loc, a, b);
             default -> throw new IllegalArgumentException();

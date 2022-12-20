@@ -1,9 +1,9 @@
 package aklo;
 
-public final class DoubleConst extends Term {
+public final class ConstDouble extends Term {
   public final double val;
 
-  public DoubleConst(Loc loc, double val) {
+  public ConstDouble(Loc loc, double val) {
     super(loc);
     this.val = val;
   }

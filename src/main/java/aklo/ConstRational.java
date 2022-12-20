@@ -1,9 +1,9 @@
 package aklo;
 
-public final class RationalConst extends Term {
+public final class ConstRational extends Term {
   public final BigRational val;
 
-  public RationalConst(Loc loc, BigRational val) {
+  public ConstRational(Loc loc, BigRational val) {
     super(loc);
     this.val = val;
   }

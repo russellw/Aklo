@@ -2,10 +2,10 @@ package aklo;
 
 import java.math.BigInteger;
 
-public final class IntegerConst extends Term {
+public final class ConstInteger extends Term {
   public final BigInteger val;
 
-  public IntegerConst(Loc loc, BigInteger val) {
+  public ConstInteger(Loc loc, BigInteger val) {
     super(loc);
     this.val = val;
   }
