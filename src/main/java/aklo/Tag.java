@@ -50,4 +50,5 @@ public enum Tag {
   BREAK,
   CONTINUE,
   ID,
+  SUBSCRIPT,
 }

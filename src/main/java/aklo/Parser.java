@@ -597,6 +597,12 @@ public final class Parser {
     var a = primary();
     for (; ; )
       switch (tok) {
+        case '[' -> {
+          var loc = new Loc(file, line);
+          lex();
+          a = new Subscript(loc, a, expr());
+          expect(']');
+        }
         case '(' -> {
           var loc = new Loc(file, line);
           lex();
