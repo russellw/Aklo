@@ -1,11 +1,11 @@
 package aklo;
 
 public final class RationalConst extends Term {
-  public final BigRational value;
+  public final BigRational val;
 
-  public RationalConst(Loc loc, BigRational value) {
+  public RationalConst(Loc loc, BigRational val) {
     super(loc);
-    this.value = value;
+    this.val = val;
   }
 
   @Override

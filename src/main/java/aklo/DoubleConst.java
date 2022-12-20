@@ -1,11 +1,11 @@
 package aklo;
 
 public final class DoubleConst extends Term {
-  public final double value;
+  public final double val;
 
-  public DoubleConst(Loc loc, double value) {
+  public DoubleConst(Loc loc, double val) {
     super(loc);
-    this.value = value;
+    this.val = val;
   }
 
   @Override

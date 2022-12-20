@@ -1,11 +1,11 @@
 package aklo;
 
 public final class FloatConst extends Term {
-  public final float value;
+  public final float val;
 
-  public FloatConst(Loc loc, float value) {
+  public FloatConst(Loc loc, float val) {
     super(loc);
-    this.value = value;
+    this.val = val;
   }
 
   @Override

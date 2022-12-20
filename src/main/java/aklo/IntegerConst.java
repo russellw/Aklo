@@ -3,11 +3,11 @@ package aklo;
 import java.math.BigInteger;
 
 public final class IntegerConst extends Term {
-  public final BigInteger value;
+  public final BigInteger val;
 
-  public IntegerConst(Loc loc, BigInteger value) {
+  public IntegerConst(Loc loc, BigInteger val) {
     super(loc);
-    this.value = value;
+    this.val = val;
   }
 
   @Override
