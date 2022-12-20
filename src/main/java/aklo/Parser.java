@@ -473,6 +473,10 @@ public final class Parser {
     if (!eat(k)) throw err(String.format("expected '%c'", k));
   }
 
+  private void expectNewline() throws IOException {
+    if (!eat('\n')) throw err("expected newline");
+  }
+
   // expressions
   private Term primary() throws IOException {
     // remember the line on which the primary expression started
@@ -579,10 +583,27 @@ public final class Parser {
     throw err("expected expression");
   }
 
+  private void exprs(char end, List<Term> r) throws IOException {
+    if (eat(INDENT))
+      while (!eat(DEDENT)) {
+        r.add(expr());
+        expectNewline();
+      }
+    else if (tok != end) do r.add(expr()); while (eat(','));
+    expect(end);
+  }
+
   private Term postfix() throws IOException {
     var a = primary();
     for (; ; )
       switch (tok) {
+        case '(' -> {
+          var loc = new Loc(file, line);
+          lex();
+          var r = new ArrayList<>(List.of(a));
+          exprs(')', r);
+          a = new Call(loc, r);
+        }
         case INC -> {
           var loc = new Loc(file, line);
           lex();
@@ -700,6 +721,8 @@ public final class Parser {
   private Term expr() throws IOException {
     return infix(1);
   }
+
+  // statements
 
   // top level
   public Parser(String file, InputStream stream) {
