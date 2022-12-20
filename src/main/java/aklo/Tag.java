@@ -51,4 +51,5 @@ public enum Tag {
   CONTINUE,
   ID,
   SUBSCRIPT,
+  LIST_OF,
 }

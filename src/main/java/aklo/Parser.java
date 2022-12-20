@@ -478,8 +478,18 @@ public final class Parser {
   }
 
   // expressions
+  private void exprs(char end, List<Term> r) throws IOException {
+    if (eat(INDENT))
+      while (!eat(DEDENT)) {
+        r.add(expr());
+        expectNewline();
+      }
+    else if (tok != end) do r.add(expr()); while (eat(','));
+    expect(end);
+  }
+
   private Term primary() throws IOException {
-    // remember the line on which the primary expression started
+    // remember the line on which the expression started
     var line1 = line;
     var loc = new Loc(file, line1);
 
@@ -490,6 +500,11 @@ public final class Parser {
 
     try {
       switch (k) {
+        case '[' -> {
+          var r = new ArrayList<Term>();
+          exprs(']', r);
+          return new ListOf(loc, r);
+        }
         case '(' -> {
           var a = expr();
           expect(')');
@@ -581,16 +596,6 @@ public final class Parser {
 
     line = line1;
     throw err("expected expression");
-  }
-
-  private void exprs(char end, List<Term> r) throws IOException {
-    if (eat(INDENT))
-      while (!eat(DEDENT)) {
-        r.add(expr());
-        expectNewline();
-      }
-    else if (tok != end) do r.add(expr()); while (eat(','));
-    expect(end);
   }
 
   private Term postfix() throws IOException {
