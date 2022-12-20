@@ -1,8 +1,8 @@
 package aklo;
 
 public final class True extends Term {
-  public True(Location location) {
-    super(location);
+  public True(Loc loc) {
+    super(loc);
   }
 
   @Override

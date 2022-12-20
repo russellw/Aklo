@@ -3,8 +3,8 @@ package aklo;
 public final class RationalConst extends Term {
   public final BigRational value;
 
-  public RationalConst(Location location, BigRational value) {
-    super(location);
+  public RationalConst(Loc loc, BigRational value) {
+    super(loc);
     this.value = value;
   }
 

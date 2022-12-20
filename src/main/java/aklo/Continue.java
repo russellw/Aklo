@@ -1,8 +1,8 @@
 package aklo;
 
 public final class Continue extends Term {
-  public Continue(Location location) {
-    super(location);
+  public Continue(Loc loc) {
+    super(loc);
   }
 
   @Override

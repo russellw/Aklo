@@ -5,8 +5,8 @@ import java.math.BigInteger;
 public final class IntegerConst extends Term {
   public final BigInteger value;
 
-  public IntegerConst(Location location, BigInteger value) {
-    super(location);
+  public IntegerConst(Loc loc, BigInteger value) {
+    super(loc);
     this.value = value;
   }
 

@@ -1,10 +1,10 @@
 package aklo;
 
 public abstract class Term {
-  public final Location location;
+  public final Loc loc;
 
-  public Term(Location location) {
-    this.location = location;
+  public Term(Loc loc) {
+    this.loc = loc;
   }
 
   public abstract Tag tag();

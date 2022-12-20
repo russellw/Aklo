@@ -3,8 +3,8 @@ package aklo;
 public final class FloatConst extends Term {
   public final float value;
 
-  public FloatConst(Location location, float value) {
-    super(location);
+  public FloatConst(Loc loc, float value) {
+    super(loc);
     this.value = value;
   }
 

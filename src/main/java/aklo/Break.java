@@ -1,8 +1,8 @@
 package aklo;
 
 public final class Break extends Term {
-  public Break(Location location) {
-    super(location);
+  public Break(Loc loc) {
+    super(loc);
   }
 
   @Override

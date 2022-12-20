@@ -473,7 +473,7 @@ public final class Parser {
   private Term primary() throws IOException {
     // remember the line on which the primary expression started
     var line1 = line;
-    var location = new Location(file, line1);
+    var location = new Loc(file, line1);
 
     // unless there is an error, this token will definitely be consumed
     var k = tok;
