@@ -16,6 +16,11 @@ public abstract class Terms extends Term {
   }
 
   @Override
+  public Term get(int i) {
+    return terms[i];
+  }
+
+  @Override
   public final Iterator<Term> iterator() {
     return new Iterator<>() {
       private int i;

@@ -13,7 +13,11 @@ public abstract class Term extends AbstractCollection<Term> {
   public abstract Tag tag();
 
   public Type type() {
-    throw new IllegalArgumentException(toString());
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public Term get(int i) {
+    throw new UnsupportedOperationException(toString());
   }
 
   @Override
@@ -31,7 +35,7 @@ public abstract class Term extends AbstractCollection<Term> {
 
       @Override
       public Term next() {
-        throw new IllegalArgumentException();
+        throw new UnsupportedOperationException();
       }
     };
   }

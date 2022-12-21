@@ -594,6 +594,9 @@ public final class Parser {
             }
           return new ConstInteger(loc, new BigInteger(s));
         }
+        case STRING -> {
+          return ListOf.encode(loc, Etc.unesc(s));
+        }
       }
     } catch (NumberFormatException e) {
       line = line1;
@@ -737,7 +740,7 @@ public final class Parser {
             case NE_NUMBERS -> new Not(loc, new EqNumbers(loc, a, b));
             case '&' -> new And(loc, a, b);
             case '|' -> new Or(loc, a, b);
-            default -> throw new IllegalArgumentException();
+            default -> throw new IllegalStateException(Integer.toString(k));
           };
     }
   }

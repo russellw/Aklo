@@ -17,6 +17,13 @@ public abstract class Term2 extends Term {
   }
 
   @Override
+  public Term get(int i) {
+    assert 0 <= i && i < 2;
+    if (i == 0) return arg0;
+    return arg1;
+  }
+
+  @Override
   public int size() {
     return 2;
   }
@@ -33,7 +40,7 @@ public abstract class Term2 extends Term {
 
       @Override
       public Term next() {
-        assert hasNext();
+        assert 0 <= i && i < 2;
         if (i++ == 0) return arg0;
         return arg1;
       }

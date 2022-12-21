@@ -21,6 +21,12 @@ public abstract class Term1 extends Term {
   }
 
   @Override
+  public Term get(int i) {
+    assert i == 0;
+    return arg;
+  }
+
+  @Override
   public final Iterator<Term> iterator() {
     return new Iterator<>() {
       private int i;
@@ -32,7 +38,7 @@ public abstract class Term1 extends Term {
 
       @Override
       public Term next() {
-        assert hasNext();
+        assert i == 0;
         i++;
         return arg;
       }
