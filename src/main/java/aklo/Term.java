@@ -41,6 +41,10 @@ public abstract class Term extends AbstractCollection<Term> {
     throw new UnsupportedOperationException(toString());
   }
 
+  public int intValExact() {
+    throw new UnsupportedOperationException(toString());
+  }
+
   @Override
   public int size() {
     return 0;

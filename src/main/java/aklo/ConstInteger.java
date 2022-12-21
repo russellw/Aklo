@@ -36,6 +36,11 @@ public final class ConstInteger extends Term {
   }
 
   @Override
+  public int intValExact() {
+    return val.intValueExact();
+  }
+
+  @Override
   public Tag tag() {
     return Tag.INTEGER;
   }
