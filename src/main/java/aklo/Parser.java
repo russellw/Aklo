@@ -759,6 +759,12 @@ public final class Parser {
   }
 
   // statements
+  private Term opAssignment(Tag op, Term a) throws IOException {
+    var loc = new Loc(file, line);
+    lex();
+    return new OpAssign(loc, op, a, commas());
+  }
+
   private Term assignment() throws IOException {
     var a = commas();
     switch (tok) {
@@ -772,7 +778,58 @@ public final class Parser {
         lex();
         return new Def(loc, a, commas());
       }
+      case ADD_ASSIGN -> {
+        return opAssignment(Tag.ADD, a);
+      }
+      case SUB_ASSIGN -> {
+        return opAssignment(Tag.SUB, a);
+      }
+      case CAT_ASSIGN -> {
+        return opAssignment(Tag.CAT, a);
+      }
     }
+    return a;
+  }
+
+  private Term stmt() throws IOException {
+    var loc = new Loc(file, line);
+    Term a;
+    switch (tok) {
+      case ':' -> {
+        lex();
+        var name = id();
+        expectNewline();
+        return new Label(loc, name);
+      }
+      case GOTO -> {
+        lex();
+        var name = id();
+        expectNewline();
+        return new Goto(loc, name);
+      }
+      case '^' -> {
+        lex();
+        a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
+        expectNewline();
+        return new Ret(loc, a);
+      }
+      case BREAK -> {
+        lex();
+        expectNewline();
+        return new Break(loc);
+      }
+      case CONTINUE -> {
+        lex();
+        expectNewline();
+        return new Continue(loc);
+      }
+    }
+    a = assignment();
+    if (a instanceof Id) {
+      line = loc.line();
+      throw err("expected statement");
+    }
+    expectNewline();
     return a;
   }
 
