@@ -634,12 +634,12 @@ public final class Parser {
         case INC -> {
           var loc = new Loc(file, line);
           lex();
-          return new PostInc(loc, a);
+          return new PostInc(loc, a, 1);
         }
         case DEC -> {
           var loc = new Loc(file, line);
           lex();
-          return new PostDec(loc, a);
+          return new PostInc(loc, a, -1);
         }
       }
   }
@@ -649,12 +649,12 @@ public final class Parser {
       case INC -> {
         var loc = new Loc(file, line);
         lex();
-        return new Inc(loc, primary());
+        return new OpAssign(loc, Tag.ADD, primary(), new ConstInteger(loc, 1));
       }
       case DEC -> {
         var loc = new Loc(file, line);
         lex();
-        return new Dec(loc, primary());
+        return new OpAssign(loc, Tag.SUB, primary(), new ConstInteger(loc, 1));
       }
       case '!' -> {
         var loc = new Loc(file, line);
