@@ -1,5 +1,6 @@
 package aklo;
 
+import java.math.BigInteger;
 import java.util.AbstractCollection;
 import java.util.Iterator;
 
@@ -16,7 +17,27 @@ public abstract class Term extends AbstractCollection<Term> {
     throw new UnsupportedOperationException(toString());
   }
 
+  public Term eval() {
+    throw new UnsupportedOperationException(toString());
+  }
+
   public Term get(int i) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public double doubleVal() {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public float floatVal() {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public BigInteger integerVal() {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public BigRational rationalVal() {
     throw new UnsupportedOperationException(toString());
   }
 

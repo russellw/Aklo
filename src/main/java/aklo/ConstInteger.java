@@ -16,6 +16,26 @@ public final class ConstInteger extends Term {
   }
 
   @Override
+  public double doubleVal() {
+    return val.doubleValue();
+  }
+
+  @Override
+  public float floatVal() {
+    return val.floatValue();
+  }
+
+  @Override
+  public BigInteger integerVal() {
+    return val;
+  }
+
+  @Override
+  public BigRational rationalVal() {
+    return BigRational.of(val);
+  }
+
+  @Override
   public Tag tag() {
     return Tag.INTEGER;
   }

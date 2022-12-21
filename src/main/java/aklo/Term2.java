@@ -1,5 +1,6 @@
 package aklo;
 
+import java.math.BigInteger;
 import java.util.Iterator;
 
 public abstract class Term2 extends Term {
@@ -21,6 +22,33 @@ public abstract class Term2 extends Term {
     assert 0 <= i && i < 2;
     if (i == 0) return arg0;
     return arg1;
+  }
+
+  public double apply(double a, double b) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public float apply(float a, float b) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public BigInteger apply(BigInteger a, BigInteger b) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  public BigRational apply(BigRational a, BigRational b) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  @Override
+  public Term eval() {
+    if (arg0 instanceof ConstDouble || arg1 instanceof ConstDouble)
+      return new ConstDouble(loc, apply(arg0.doubleVal(), arg1.doubleVal()));
+    if (arg0 instanceof ConstFloat || arg1 instanceof ConstFloat)
+      return new ConstFloat(loc, apply(arg0.floatVal(), arg1.floatVal()));
+    if (arg0 instanceof ConstRational || arg1 instanceof ConstRational)
+      return new ConstRational(loc, apply(arg0.rationalVal(), arg1.rationalVal()));
+    return new ConstInteger(loc, apply(arg0.integerVal(), arg1.integerVal()));
   }
 
   @Override
