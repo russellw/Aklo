@@ -15,10 +15,4 @@ public final class Call extends Terms {
   public Tag tag() {
     return Tag.CALL;
   }
-
-  @Override
-  public Type type() {
-    // TODO
-    throw new IllegalArgumentException();
-  }
 }

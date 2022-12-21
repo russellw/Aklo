@@ -477,6 +477,12 @@ public final class Parser {
     if (!eat('\n')) throw err("expected newline");
   }
 
+  private String id() throws IOException {
+    var s = tokString;
+    if (!eat(ID)) throw err("expected identifier");
+    return s;
+  }
+
   // expressions
   private void exprs(char end, List<Term> r) throws IOException {
     if (eat(INDENT))
@@ -614,6 +620,13 @@ public final class Parser {
           var r = new ArrayList<>(List.of(a));
           exprs(')', r);
           a = new Call(loc, r);
+        }
+        case '.' -> {
+          if (!(a instanceof Id a1)) throw err("expected identifier");
+          var loc = new Loc(file, line);
+          var r = new ArrayList<>(List.of(a1.name));
+          while (eat('.')) r.add(id());
+          a = new Dot(loc, r);
         }
         case INC -> {
           var loc = new Loc(file, line);

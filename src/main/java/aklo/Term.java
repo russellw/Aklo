@@ -12,7 +12,9 @@ public abstract class Term extends AbstractCollection<Term> {
 
   public abstract Tag tag();
 
-  public abstract Type type();
+  public Type type() {
+    throw new IllegalArgumentException(toString());
+  }
 
   @Override
   public int size() {

@@ -12,9 +12,4 @@ public final class Id extends Term {
   public Tag tag() {
     return Tag.ID;
   }
-
-  @Override
-  public Type type() {
-    throw new IllegalArgumentException();
-  }
 }

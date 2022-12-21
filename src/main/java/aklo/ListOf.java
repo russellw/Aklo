@@ -15,9 +15,4 @@ public final class ListOf extends Terms {
   public Tag tag() {
     return Tag.LIST_OF;
   }
-
-  @Override
-  public Type type() {
-    throw new IllegalArgumentException();
-  }
 }

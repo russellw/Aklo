@@ -52,4 +52,7 @@ public enum Tag {
   ID,
   SUBSCRIPT,
   LIST_OF,
+  VAR,
+  FN,
+  DOT,
 }
