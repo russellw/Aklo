@@ -487,7 +487,7 @@ public final class Parser {
   private void exprs(char end, List<Term> r) throws IOException {
     if (eat(INDENT))
       while (!eat(DEDENT)) {
-        r.add(expr());
+        r.add(commas());
         expectNewline();
       }
     else if (tok != end) do r.add(expr()); while (eat(','));
@@ -512,7 +512,7 @@ public final class Parser {
           return new ListOf(loc, r);
         }
         case '(' -> {
-          var a = expr();
+          var a = commas();
           expect(')');
           return a;
         }
@@ -749,7 +749,32 @@ public final class Parser {
     return infix(1);
   }
 
+  private Term commas() throws IOException {
+    var a = expr();
+    if (tok != ',') return a;
+    var loc = new Loc(file, line);
+    var r = new ArrayList<>(List.of(a));
+    while (eat(',')) r.add(expr());
+    return new ListOf(loc, r);
+  }
+
   // statements
+  private Term assignment() throws IOException {
+    var a = commas();
+    switch (tok) {
+      case ASSIGN -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Assign(loc, a, commas());
+      }
+      case '=' -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Def(loc, a, commas());
+      }
+    }
+    return a;
+  }
 
   // top level
   public Parser(String file, InputStream stream) {

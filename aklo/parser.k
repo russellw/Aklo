@@ -496,7 +496,6 @@ fn parse  (file,text)
 	fn expr()
 		^ infix(1)
 
-	; statements
 	fn commas()
 		a = expr()
 		if tok != ","
@@ -506,6 +505,7 @@ fn parse  (file,text)
 					r<<expr()
 		^ r
 
+	; statements
 	fn assignment()
 		a = commas()
 		case tok
