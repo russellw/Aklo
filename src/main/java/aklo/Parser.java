@@ -648,8 +648,38 @@ public final class Parser {
       }
   }
 
+  private Var param() throws IOException {
+    var loc = new Loc(file, line);
+    return new Var(loc, id());
+  }
+
+  private void params(List<Var> r) throws IOException {
+    expect('(');
+    if (eat(INDENT))
+      while (!eat(DEDENT)) {
+        r.add(param());
+        expectNewline();
+      }
+    else if (tok != ')') do r.add(param()); while (eat(','));
+    expect(')');
+  }
+
   private Term prefix() throws IOException {
     switch (tok) {
+      case '\\' -> {
+        var loc = new Loc(file, line);
+        lex();
+        var a = new Fn(loc);
+
+        // parameters
+        params(a.params);
+
+        // body
+        if (eat(INDENT)) while (!eat(DEDENT)) a.body.add(stmt());
+        else if (tok != ')') a.body.add(new Ret(loc, commas()));
+        expect(')');
+        return a;
+      }
       case INC -> {
         var loc = new Loc(file, line);
         lex();
@@ -822,17 +852,24 @@ public final class Parser {
 
   private Term stmt() throws IOException {
     var loc = new Loc(file, line);
-    Term a;
     switch (tok) {
+      case FN -> {
+        lex();
+        var a = new Fn(loc);
+        a.name = id();
+        params(a.params);
+        stmts(a.body);
+        return a;
+      }
       case IF -> {
         return parseIf();
       }
       case VAR -> {
         lex();
-        var x = new Var(loc, id());
-        if (eat('=')) x.val = commas();
+        var a = new Var(loc, id());
+        if (eat('=')) a.val = commas();
         expectNewline();
-        return x;
+        return a;
       }
       case WHILE -> {
         lex();
@@ -860,7 +897,7 @@ public final class Parser {
       }
       case '^' -> {
         lex();
-        a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
+        var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
         expectNewline();
         return new Ret(loc, a);
       }
@@ -875,13 +912,13 @@ public final class Parser {
         return new Continue(loc);
       }
     }
-    a = assignment();
-    if (a instanceof Id) {
+    var b = assignment();
+    if (b instanceof Id) {
       line = loc.line();
       throw err("expected statement");
     }
     expectNewline();
-    return a;
+    return b;
   }
 
   // top level
