@@ -654,6 +654,7 @@ public final class Parser {
   }
 
   private void params(List<Var> r) throws IOException {
+    // TODO optional ()?
     expect('(');
     if (eat(INDENT))
       while (!eat(DEDENT)) {
