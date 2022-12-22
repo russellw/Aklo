@@ -800,16 +800,48 @@ public final class Parser {
     while (!eat(DEDENT)) r.add(stmt());
   }
 
+  private If parseIf() throws IOException {
+    assert tok == IF || tok == ELIF;
+    var loc = new Loc(file, line);
+    lex();
+    var r = new ArrayList<>(List.of(expr()));
+    stmts(r);
+    var then = r.size();
+    switch (tok) {
+      case ELSE -> {
+        lex();
+        stmts(r);
+      }
+      case ELIF -> {
+        lex();
+        r.add(parseIf());
+      }
+    }
+    return new If(loc, r, then);
+  }
+
   private Term stmt() throws IOException {
     var loc = new Loc(file, line);
     Term a;
     switch (tok) {
+      case IF -> {
+        return parseIf();
+      }
+      case VAR -> {
+        lex();
+        var x = new Var(loc, id());
+        if (eat('=')) x.val = commas();
+        expectNewline();
+        return x;
+      }
       case WHILE -> {
+        lex();
         var r = new ArrayList<>(List.of(expr()));
         stmts(r);
         return new While(loc, false, r);
       }
       case DOWHILE -> {
+        lex();
         var r = new ArrayList<>(List.of(expr()));
         stmts(r);
         return new While(loc, true, r);
