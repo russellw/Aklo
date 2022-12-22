@@ -84,6 +84,7 @@ public final class Parser {
   private final String file;
   private final Reader reader;
   private int c;
+  // TODO use LineNumberReader?
   private int line = 1;
 
   private int dentc;
