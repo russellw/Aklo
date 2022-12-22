@@ -50,4 +50,5 @@ public enum Tag {
   FN,
   DEF,
   DOT,
+  THROW,
 }

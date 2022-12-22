@@ -608,7 +608,7 @@ public final class Parser {
     }
 
     line = line1;
-    throw err("expected expression");
+    throw err(tok + ": expected expression");
   }
 
   private Term postfix() throws IOException {
@@ -854,6 +854,13 @@ public final class Parser {
   private Term stmt() throws IOException {
     var loc = new Loc(file, line);
     switch (tok) {
+      case ASSERT -> {
+        lex();
+        var cond = expr();
+        expectNewline();
+        // TODO throw string
+        return new If(loc, List.of(cond, new Throw(loc, cond)), 1);
+      }
       case FN -> {
         lex();
         var a = new Fn(loc);
