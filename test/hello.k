@@ -3,4 +3,4 @@ OUT
 Hello, world!
 }
 
-/puts("Hello, world!")
+println("Hello, world!")

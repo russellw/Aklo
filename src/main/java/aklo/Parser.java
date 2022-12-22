@@ -158,6 +158,7 @@ public final class Parser {
               }
             }
           } while (c != '}');
+          readc();
           line = line1;
           continue;
         }
@@ -933,6 +934,7 @@ public final class Parser {
   public Parser(String file, Reader reader, List<Term> r) throws IOException {
     this.file = file;
     this.reader = reader;
+    readc();
     lex();
     eat('\n');
     while (tok >= 0) r.add(stmt());
