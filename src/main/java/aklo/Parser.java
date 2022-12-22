@@ -98,10 +98,6 @@ public final class Parser {
   }
 
   // Tokenizer
-  private static boolean isIdPart(int c) {
-    return Etc.isAlnum(c) || c == '?' || c == '_' || c == '$';
-  }
-
   private void readc() throws IOException {
     c = reader.read();
   }
@@ -112,7 +108,7 @@ public final class Parser {
   }
 
   private void digits(StringBuilder sb) throws IOException {
-    while (Etc.isDigit(c)) {
+    while (Character.isDigit(c)) {
       readc(sb);
       if (c == '_') readc();
     }
@@ -369,7 +365,7 @@ public final class Parser {
             'z' -> {
           var sb = new StringBuilder();
           do readc(sb);
-          while (isIdPart(c));
+          while (Character.isJavaIdentifierPart(c) || c == '?');
           tok = ID;
           tokString = sb.toString();
           var k = keywords.get(tokString);
@@ -394,7 +390,7 @@ public final class Parser {
               readc(sb);
 
               // integer part
-              while (Etc.isHexDigit(c)) {
+              while (Character.digit(c, 16) >= 0) {
                 readc(sb);
                 if (c == '_') readc();
               }
