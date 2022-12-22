@@ -922,8 +922,11 @@ public final class Parser {
   }
 
   // top level
-  public Parser(String file, InputStream stream) {
+  public Parser(String file, InputStream stream, List<Term> r) throws IOException {
     this.file = file;
     this.stream = stream;
+    lex();
+    eat('\n');
+    while (tok >= 0) r.add(stmt());
   }
 }

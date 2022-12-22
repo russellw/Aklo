@@ -1,6 +1,8 @@
 package aklo;
 
 import java.io.IOException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Properties;
@@ -50,7 +52,7 @@ final class Main {
       System.err.println("Usage: aklo [options] packages");
       System.exit(1);
     }
-    var packages = new ArrayList<String>();
+    var packages = new ArrayList<Path>();
     for (var arg : args) {
       var s = arg;
       if (s.startsWith("-")) {
@@ -72,10 +74,31 @@ final class Main {
         System.err.println(arg + ": unknown option");
         System.exit(1);
       }
-      packages.add(s);
+      packages.add(Path.of(s));
     }
 
     // parse
-    System.out.println(packages);
+    var modules = new ArrayList<Module>();
+    for (var p : packages) {
+      var i = p.getNameCount() - 1;
+      Files.walkFileTree(
+          p,
+          new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+              var file = path.toString();
+              if (file.endsWith(".k")) {
+                var name = new String[path.getNameCount() - i];
+                for (var j = 0; j < name.length; j++) name[j] = path.getName(i + j).toString();
+                var j = name.length - 1;
+                name[j] = name[j].substring(0, name[j].length() - 2);
+                var module = new Module(name);
+                modules.add(module);
+              }
+              return FileVisitResult.CONTINUE;
+            }
+          });
+    }
+    Etc.dbg(modules);
   }
 }
