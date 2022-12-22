@@ -27,7 +27,6 @@ public enum Tag {
   SHR,
   IF,
   WHILE,
-  DOWHILE,
   TRON,
   TROFF,
   DBG,

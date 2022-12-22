@@ -473,6 +473,10 @@ public final class Parser {
     if (!eat(k)) throw err(String.format("expected '%c'", k));
   }
 
+  private void expectIndent() throws IOException {
+    if (!eat(INDENT)) throw err("expected indented block");
+  }
+
   private void expectNewline() throws IOException {
     if (!eat('\n')) throw err("expected newline");
   }
@@ -791,10 +795,25 @@ public final class Parser {
     return a;
   }
 
+  private void stmts(List<Term> r) throws IOException {
+    expectIndent();
+    while (!eat(DEDENT)) r.add(stmt());
+  }
+
   private Term stmt() throws IOException {
     var loc = new Loc(file, line);
     Term a;
     switch (tok) {
+      case WHILE -> {
+        var r = new ArrayList<>(List.of(expr()));
+        stmts(r);
+        return new While(loc, false, r);
+      }
+      case DOWHILE -> {
+        var r = new ArrayList<>(List.of(expr()));
+        stmts(r);
+        return new While(loc, true, r);
+      }
       case ':' -> {
         lex();
         var name = id();
