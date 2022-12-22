@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Properties;
@@ -84,27 +83,27 @@ final class Main {
     var modules = new ArrayList<Module>();
     for (var p : packages) {
       var i = p.getNameCount() - 1;
-      Files.walkFileTree(
-          p,
-          new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-              var file = path.toString();
-              if (file.endsWith(".k")) {
-                var name = new String[path.getNameCount() - i];
-                for (var j = 0; j < name.length; j++) name[j] = path.getName(i + j).toString();
-                var j = name.length - 1;
-                name[j] = name[j].substring(0, name[j].length() - 2);
-                var module = new Module(name);
-                try (var reader =
-                    new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-                  new Parser(file, reader, module.body);
-                }
-                modules.add(module);
-              }
-              return FileVisitResult.CONTINUE;
-            }
-          });
+      try (var files = Files.walk(p)) {
+        for (var path : files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
+          // module name runs from the package root to the file
+          var name = new String[path.getNameCount() - i];
+          for (var j = 0; j < name.length; j++) name[j] = path.getName(i + j).toString();
+          var j = name.length - 1;
+
+          // removing the extension from the file name
+          name[j] = name[j].substring(0, name[j].length() - 2);
+
+          // we will need the name as a string for later reporting anyway
+          var file = path.toString();
+
+          // parse the module
+          var module = new Module(name);
+          try (var reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+            new Parser(file, reader, module.body);
+          }
+          modules.add(module);
+        }
+      }
     }
     Etc.dbg(modules);
   }
