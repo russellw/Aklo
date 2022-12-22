@@ -1,7 +1,7 @@
 package aklo;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public final class Parser {
 
   // File state
   private final String file;
-  private final InputStream stream;
+  private final Reader reader;
   private int c;
   private int line = 1;
 
@@ -103,7 +103,7 @@ public final class Parser {
   }
 
   private void readc() throws IOException {
-    c = stream.read();
+    c = reader.read();
   }
 
   private void readc(StringBuilder sb) throws IOException {
@@ -922,9 +922,9 @@ public final class Parser {
   }
 
   // top level
-  public Parser(String file, InputStream stream, List<Term> r) throws IOException {
+  public Parser(String file, Reader reader, List<Term> r) throws IOException {
     this.file = file;
-    this.stream = stream;
+    this.reader = reader;
     lex();
     eat('\n');
     while (tok >= 0) r.add(stmt());

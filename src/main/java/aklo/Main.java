@@ -1,6 +1,9 @@
 package aklo;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -93,6 +96,10 @@ final class Main {
                 var j = name.length - 1;
                 name[j] = name[j].substring(0, name[j].length() - 2);
                 var module = new Module(name);
+                try (var reader =
+                    new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+                  new Parser(file, reader, module.body);
+                }
                 modules.add(module);
               }
               return FileVisitResult.CONTINUE;
