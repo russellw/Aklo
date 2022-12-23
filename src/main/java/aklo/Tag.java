@@ -51,4 +51,5 @@ public enum Tag {
   DEF,
   DOT,
   THROW,
+  INTERN,
 }

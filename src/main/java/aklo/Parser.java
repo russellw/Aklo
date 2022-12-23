@@ -526,12 +526,19 @@ public final class Parser {
           return a;
         }
         case ID -> {
+          // TODO factor out
           switch (s) {
             case "bitNot" -> {
               expect('(');
               var a = expr();
               expect(')');
               return new BitNot(loc, a);
+            }
+            case "intern" -> {
+              expect('(');
+              var a = expr();
+              expect(')');
+              return new Intern(loc, a);
             }
             case "bitAnd" -> {
               expect('(');
@@ -605,6 +612,9 @@ public final class Parser {
         }
         case STRING -> {
           return ListOf.encode(loc, Etc.unesc(s));
+        }
+        case SYM -> {
+          return new Intern(loc, ListOf.encode(loc, Etc.unesc(s)));
         }
         case RAW_STRING -> {
           return ListOf.encode(loc, s);
