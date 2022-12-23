@@ -8,6 +8,11 @@ public final class Neg extends Term1 {
   }
 
   @Override
+  public Term remake(Loc loc, Term arg) {
+    return new Neg(loc, arg);
+  }
+
+  @Override
   public double apply(double a) {
     return -a;
   }

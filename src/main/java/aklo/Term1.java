@@ -2,6 +2,7 @@ package aklo;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.function.Function;
 
 public abstract class Term1 extends Term {
   public final Term arg;
@@ -9,6 +10,14 @@ public abstract class Term1 extends Term {
   public Term1(Loc loc, Term arg) {
     super(loc);
     this.arg = arg;
+  }
+
+  public abstract Term remake(Loc loc, Term arg);
+
+  @Override
+  public Term map(Function<Term, Term> f) {
+    var a = f.apply(arg);
+    return remake(loc, a);
   }
 
   @Override

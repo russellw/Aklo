@@ -1,6 +1,11 @@
 package aklo;
 
 public final class Assign extends Term2 {
+  @Override
+  public Term remake(Loc loc, Term arg0, Term arg1) {
+    return new Assign(loc, arg0, arg1);
+  }
+
   public Assign(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }

@@ -12,4 +12,9 @@ public final class PostInc extends Term1 {
   public Tag tag() {
     return Tag.POST_INC;
   }
+
+  @Override
+  public Term remake(Loc loc, Term arg) {
+    return new PostInc(loc, arg, inc);
+  }
 }

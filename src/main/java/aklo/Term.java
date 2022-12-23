@@ -3,6 +3,7 @@ package aklo;
 import java.math.BigInteger;
 import java.util.AbstractCollection;
 import java.util.Iterator;
+import java.util.function.Function;
 
 public abstract class Term extends AbstractCollection<Term> {
   public final Loc loc;
@@ -48,6 +49,11 @@ public abstract class Term extends AbstractCollection<Term> {
   @Override
   public int size() {
     return 0;
+  }
+
+  public Term map(Function<Term, Term> f) {
+    assert isEmpty();
+    return this;
   }
 
   @Override

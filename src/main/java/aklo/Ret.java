@@ -11,6 +11,11 @@ public final class Ret extends Term1 {
   }
 
   @Override
+  public Term remake(Loc loc, Term arg) {
+    return new Ret(loc, arg);
+  }
+
+  @Override
   public Tag tag() {
     return Tag.RET;
   }

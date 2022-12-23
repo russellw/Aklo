@@ -4,6 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public final class ListOf extends Terms {
+  @Override
+  public Term remake(Loc loc, Term[] terms) {
+    return new ListOf(loc, terms);
+  }
+
   public ListOf(Loc loc, List<Term> terms) {
     super(loc, terms);
   }

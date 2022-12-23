@@ -16,6 +16,11 @@ public final class Rem extends Term2 {
   }
 
   @Override
+  public Term remake(Loc loc, Term arg0, Term arg1) {
+    return new Rem(loc, arg0, arg1);
+  }
+
+  @Override
   public BigRational apply(BigRational a, BigRational b) {
     return a.add(b);
   }

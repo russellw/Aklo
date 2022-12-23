@@ -8,6 +8,11 @@ public final class BitNot extends Term1 {
   }
 
   @Override
+  public Term remake(Loc loc, Term arg) {
+    return new BitNot(loc, arg);
+  }
+
+  @Override
   public BigInteger apply(BigInteger a) {
     return a.not();
   }
