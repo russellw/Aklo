@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class Fn extends Term {
+public class Fn extends Term {
   public String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype;
@@ -14,7 +14,7 @@ public final class Fn extends Term {
     super(loc);
   }
 
-  public void walkFns(Consumer<Fn> f) {
+  public final void walkFns(Consumer<Fn> f) {
     f.accept(this);
     for (var a : body)
       a.walk(

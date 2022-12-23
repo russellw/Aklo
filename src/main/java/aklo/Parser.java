@@ -95,10 +95,6 @@ public final class Parser {
   private int tok;
   private String tokString;
 
-  private ParseError err(String s) {
-    return new ParseError(String.format("%s:%d: %s", file, line, s));
-  }
-
   // Tokenizer
   private void readc() throws IOException {
     c = reader.read();
@@ -122,7 +118,7 @@ public final class Parser {
     readc();
     while (c != quote) {
       if (c == '\\') readc();
-      if (c < ' ') throw err("unclosed quote");
+      if (c < ' ') throw new CompileError(file, line, "unclosed quote");
       readc(sb);
     }
     readc();
@@ -151,9 +147,7 @@ public final class Parser {
             readc();
             switch (c) {
               case '\n' -> line1++;
-              case -1 -> {
-                throw err("unmatched '{'");
-              }
+              case -1 -> throw new CompileError(file, line, "unmatched '{'");
             }
           } while (c != '}');
           readc();
@@ -169,7 +163,8 @@ public final class Parser {
           var col = 0;
           while (c == '\t' || c == ' ') {
             if (c != dentc) {
-              if (dentc != 0) throw err("indented with tabs and spaces in same file");
+              if (dentc != 0)
+                throw new CompileError(file, line, "indented with tabs and spaces in same file");
               dentc = c;
             }
             readc();
@@ -195,7 +190,8 @@ public final class Parser {
             cols.remove(cols.size() - 1);
             dedents++;
           }
-          if (col != cols.get(cols.size() - 1)) throw err("inconsistent indent");
+          if (col != cols.get(cols.size() - 1))
+            throw new CompileError(file, line, "inconsistent indent");
         }
         case ' ', '\f', '\r', '\t' -> {
           readc();
@@ -305,7 +301,7 @@ public final class Parser {
         }
         case '#' -> {
           readc();
-          if (c != '"') throw err("stray '#'");
+          if (c != '"') throw new CompileError(file, line, "stray '#'");
           lexQuote();
           tok = RAW_STRING;
         }
@@ -475,20 +471,20 @@ public final class Parser {
   }
 
   private void expect(char k) throws IOException {
-    if (!eat(k)) throw err(String.format("expected '%c'", k));
+    if (!eat(k)) throw new CompileError(file, line, String.format("expected '%c'", k));
   }
 
   private void expectIndent() throws IOException {
-    if (!eat(INDENT)) throw err("expected indented block");
+    if (!eat(INDENT)) throw new CompileError(file, line, "expected indented block");
   }
 
   private void expectNewline() throws IOException {
-    if (!eat('\n')) throw err("expected newline");
+    if (!eat('\n')) throw new CompileError(file, line, "expected newline");
   }
 
   private String id() throws IOException {
     var s = tokString;
-    if (!eat(ID)) throw err("expected identifier");
+    if (!eat(ID)) throw new CompileError(file, line, "expected identifier");
     return s;
   }
 
@@ -504,11 +500,9 @@ public final class Parser {
   }
 
   private Term primary() throws IOException {
-    // remember the line on which the expression started
-    var line1 = line;
-    var loc = new Loc(file, line1);
+    var loc = new Loc(file, line);
 
-    // unless there is an error, this token will definitely be consumed
+    // having noted the current line, factor out the moving to the next token
     var k = tok;
     var s = tokString;
     lex();
@@ -621,12 +615,10 @@ public final class Parser {
         }
       }
     } catch (NumberFormatException e) {
-      line = line1;
-      throw err(e.toString());
+      throw new CompileError(loc, e.toString());
     }
 
-    line = line1;
-    throw err(k + ": expected expression");
+    throw new CompileError(loc, k + ": expected expression");
   }
 
   private Term postfix() throws IOException {
@@ -647,8 +639,8 @@ public final class Parser {
           a = new Call(loc, r);
         }
         case '.' -> {
-          if (!(a instanceof Id a1)) throw err("expected identifier");
           var loc = new Loc(file, line);
+          if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
           var r = new ArrayList<>(List.of(a1.name));
           while (eat('.')) r.add(id());
           a = new Dot(loc, r);
@@ -850,8 +842,8 @@ public final class Parser {
         return opAssignment(Tag.CAT, a);
       }
       case APPEND -> {
-        if (!(a instanceof Id)) throw err("'<<': expected identifier on left");
         var loc = new Loc(file, line);
+        if (!(a instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
         lex();
         var b = commas();
         return new Assign(loc, a, new Cat(loc, a, new ListOf(loc, new Term[] {b})));
@@ -984,10 +976,7 @@ public final class Parser {
       }
     }
     var b = assignment();
-    if (b instanceof Id) {
-      line = loc.line();
-      throw err("expected statement");
-    }
+    if (b instanceof Id) throw new CompileError(loc, "expected statement");
     expectNewline();
     return b;
   }
