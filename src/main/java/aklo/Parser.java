@@ -40,7 +40,7 @@ public final class Parser {
   private static final int ASSERT = -100;
   private static final int BREAK = -101;
   private static final int CASE = -102;
-  private static final int CONTINUE = -102;
+  private static final int CONTINUE = -103;
   private static final int DBG = -104;
   private static final int DOWHILE = -105;
   private static final int ELIF = -106;
@@ -495,10 +495,10 @@ public final class Parser {
   // expressions
   private void exprs(char end, List<Term> r) throws IOException {
     if (eat(INDENT))
-      while (!eat(DEDENT)) {
+      do {
         r.add(commas());
         expectNewline();
-      }
+      } while (!eat(DEDENT));
     else if (tok != end) do r.add(expr()); while (eat(','));
     expect(end);
   }
@@ -678,10 +678,10 @@ public final class Parser {
     // TODO optional ()?
     expect('(');
     if (eat(INDENT))
-      while (!eat(DEDENT)) {
+      do {
         r.add(param());
         expectNewline();
-      }
+      } while (!eat(DEDENT));
     else if (tok != ')') do r.add(param()); while (eat(','));
     expect(')');
   }
@@ -698,7 +698,7 @@ public final class Parser {
 
         // body
         expect('(');
-        if (eat(INDENT)) while (!eat(DEDENT)) a.body.add(stmt());
+        if (eat(INDENT)) do a.body.add(stmt()); while (!eat(DEDENT));
         else if (tok != ')') a.body.add(new Ret(loc, commas()));
         expect(')');
         return a;
@@ -855,7 +855,8 @@ public final class Parser {
 
   private void stmts(List<Term> r) throws IOException {
     expectIndent();
-    while (!eat(DEDENT)) r.add(stmt());
+    do r.add(stmt());
+    while (!eat(DEDENT));
   }
 
   private If parseIf() throws IOException {
@@ -905,6 +906,20 @@ public final class Parser {
         if (eat('=')) a.val = commas();
         expectNewline();
         return a;
+      }
+      case CASE -> {
+        lex();
+        var r = new ArrayList<>(List.of(commas()));
+        expectIndent();
+        do {
+          var cb = new ArrayList<Term>();
+          do cb.add(commas());
+          while (eat('\n'));
+          var cases = cb.size();
+          stmts(cb);
+          r.add(new CaseBlock(loc, cb, cases));
+        } while (!eat(DEDENT));
+        return new Case(loc, r);
       }
       case FOR -> {
         lex();

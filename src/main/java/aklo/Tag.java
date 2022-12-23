@@ -54,4 +54,5 @@ public enum Tag {
   INTERN,
   FOR,
   REST,
+  CASE,
 }
