@@ -172,6 +172,7 @@ public final class Parser {
               if (dentc != 0) throw err("indented with tabs and spaces in same file");
               dentc = c;
             }
+            readc();
             col++;
           }
 
