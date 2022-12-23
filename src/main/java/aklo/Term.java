@@ -3,6 +3,7 @@ package aklo;
 import java.math.BigInteger;
 import java.util.AbstractCollection;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class Term extends AbstractCollection<Term> {
@@ -13,6 +14,11 @@ public abstract class Term extends AbstractCollection<Term> {
   }
 
   public abstract Tag tag();
+
+  public final void walk(Consumer<Term> f) {
+    f.accept(this);
+    for (var a : this) a.walk(f);
+  }
 
   public Type type() {
     throw new UnsupportedOperationException(toString());
