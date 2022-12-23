@@ -34,6 +34,7 @@ public final class Parser {
   private static final int INTEGER = -23;
   private static final int FLOAT = -24;
   private static final int DOUBLE = -25;
+  private static final int RAW_STRING = -26;
 
   // keywords
   private static final int ASSERT = -100;
@@ -301,6 +302,12 @@ public final class Parser {
               tok = PREPEND;
             }
           }
+        }
+        case '#' -> {
+          readc();
+          if (c != '"') throw err("stray '#'");
+          lexQuote();
+          tok = RAW_STRING;
         }
         case '"' -> {
           lexQuote();
@@ -599,6 +606,9 @@ public final class Parser {
         case STRING -> {
           return ListOf.encode(loc, Etc.unesc(s));
         }
+        case RAW_STRING -> {
+          return ListOf.encode(loc, s);
+        }
       }
     } catch (NumberFormatException e) {
       line = line1;
@@ -677,6 +687,7 @@ public final class Parser {
         params(a.params);
 
         // body
+        expect('(');
         if (eat(INDENT)) while (!eat(DEDENT)) a.body.add(stmt());
         else if (tok != ')') a.body.add(new Ret(loc, commas()));
         expect(')');
