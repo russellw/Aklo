@@ -606,7 +606,7 @@ public final class Parser {
     }
 
     line = line1;
-    throw err(tok + ": expected expression");
+    throw err(k + ": expected expression");
   }
 
   private Term postfix() throws IOException {
@@ -642,6 +642,9 @@ public final class Parser {
           var loc = new Loc(file, line);
           lex();
           return new PostInc(loc, a, -1);
+        }
+        default -> {
+          return a;
         }
       }
   }
