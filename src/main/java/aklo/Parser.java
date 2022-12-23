@@ -849,6 +849,19 @@ public final class Parser {
       case CAT_ASSIGN -> {
         return opAssignment(Tag.CAT, a);
       }
+      case APPEND -> {
+        if (!(a instanceof Id)) throw err("'<<': expected identifier on left");
+        var loc = new Loc(file, line);
+        lex();
+        var b = commas();
+        return new Assign(loc, a, new Cat(loc, a, new ListOf(loc, new Term[] {b})));
+      }
+      case PREPEND -> {
+        var loc = new Loc(file, line);
+        lex();
+        var b = new Id(loc, id());
+        return new Assign(loc, b, new Cat(loc, new ListOf(loc, new Term[] {a}), b));
+      }
     }
     return a;
   }
