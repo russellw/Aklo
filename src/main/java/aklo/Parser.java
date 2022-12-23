@@ -162,7 +162,6 @@ public final class Parser {
         case '\n' -> {
           // next line
           readc();
-          if (c < 0) return;
           line++;
 
           // measure indent
