@@ -934,6 +934,6 @@ public final class Parser {
     readc();
     lex();
     eat('\n');
-    while (tok >= 0) r.add(stmt());
+    while (tok != -1) r.add(stmt());
   }
 }
