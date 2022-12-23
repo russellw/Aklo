@@ -723,6 +723,11 @@ public final class Parser {
         lex();
         return new Neg(loc, prefix());
       }
+      case '@' -> {
+        var loc = new Loc(file, line);
+        lex();
+        return new Rest(loc, prefix());
+      }
     }
     return postfix();
   }
@@ -900,6 +905,14 @@ public final class Parser {
         if (eat('=')) a.val = commas();
         expectNewline();
         return a;
+      }
+      case FOR -> {
+        lex();
+        var r = new ArrayList<>(List.of(commas()));
+        expect(':');
+        r.add(commas());
+        stmts(r);
+        return new For(loc, r);
       }
       case WHILE -> {
         lex();

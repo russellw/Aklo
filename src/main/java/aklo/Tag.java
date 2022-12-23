@@ -52,4 +52,6 @@ public enum Tag {
   DOT,
   THROW,
   INTERN,
+  FOR,
+  REST,
 }
