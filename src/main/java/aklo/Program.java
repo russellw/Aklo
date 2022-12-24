@@ -3,8 +3,19 @@ package aklo;
 import java.util.*;
 
 public final class Program {
-  private record Context(
-      Program.Context outer, String name, Block continueTarget, Block breakTarget) {}
+  private static final class Context {
+    final Context outer;
+    final String label;
+    final Block continueTarget;
+    final Block breakTarget;
+
+    Context(Context outer, String label, Block continueTarget, Block breakTarget) {
+      this.outer = outer;
+      this.label = label;
+      this.continueTarget = continueTarget;
+      this.breakTarget = breakTarget;
+    }
+  }
 
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
@@ -19,6 +30,32 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case BREAK -> {
+        var label = ((Break) a).label;
+        if (label == null) {
+          if (context == null) throw new CompileError(a.loc, "break without loop or case");
+        } else {
+          for (; context != null; context = context.outer) if (label.equals(context.label)) break;
+          if (context == null) throw new CompileError(a.loc, label + " not found");
+        }
+        add(new Goto(a.loc, context.breakTarget));
+        block = new Block(a.loc);
+      }
+      case CONTINUE -> {
+        var label = ((Continue) a).label;
+        if (label == null) {
+          for (; context != null; context = context.outer)
+            if (context.continueTarget != null) break;
+          if (context == null) throw new CompileError(a.loc, "continue without loop");
+        } else {
+          for (; context != null; context = context.outer) if (label.equals(context.label)) break;
+          if (context == null) throw new CompileError(a.loc, label + " not found");
+          if (context.continueTarget == null)
+            throw new CompileError(a.loc, label + " is not a loop");
+        }
+        add(new Goto(a.loc, context.continueTarget));
+        block = new Block(a.loc);
+      }
       case RETURN -> {
         a.set(0, term(context, a.get(0)));
         add(a);

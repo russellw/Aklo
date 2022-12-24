@@ -1,11 +1,11 @@
 package aklo;
 
 public final class Id extends Term {
-  public final String name;
+  public final String string;
 
-  public Id(Loc loc, String name) {
+  public Id(Loc loc, String string) {
     super(loc);
-    this.name = name;
+    this.string = string;
   }
 
   @Override

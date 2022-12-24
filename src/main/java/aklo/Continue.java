@@ -1,11 +1,11 @@
 package aklo;
 
 public final class Continue extends Term {
-  public final String name;
+  public final String label;
 
-  public Continue(Loc loc, String name) {
+  public Continue(Loc loc, String label) {
     super(loc);
-    this.name = name;
+    this.label = label;
   }
 
   @Override

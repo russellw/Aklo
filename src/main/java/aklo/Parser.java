@@ -641,7 +641,7 @@ public final class Parser {
         case '.' -> {
           var loc = new Loc(file, line);
           if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
-          var r = new ArrayList<>(List.of(a1.name));
+          var r = new ArrayList<>(List.of(a1.string));
           while (eat('.')) r.add(id());
           a = new Dot(loc, r);
         }
@@ -954,15 +954,15 @@ public final class Parser {
       }
       case BREAK -> {
         lex();
-        var name = tok == ID ? id() : null;
+        var label = tok == ID ? id() : null;
         expectNewline();
-        return new Break(loc, name);
+        return new Break(loc, label);
       }
       case CONTINUE -> {
         lex();
-        var name = tok == ID ? id() : null;
+        var label = tok == ID ? id() : null;
         expectNewline();
-        return new Continue(loc, name);
+        return new Continue(loc, label);
       }
     }
     var b = assignment();
@@ -972,7 +972,7 @@ public final class Parser {
             // TODO other statements
           case WHILE, DOWHILE -> {
             var a = (While) stmt();
-            a.label = b1.name;
+            a.label = b1.string;
             return a;
           }
           default -> throw new CompileError(loc, "expected loop or case after label");
