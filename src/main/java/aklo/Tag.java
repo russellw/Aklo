@@ -36,7 +36,6 @@ public enum Tag {
   LE,
   LT,
   GOTO,
-  LABEL,
   ASSIGN,
   OP_ASSIGN,
   CAT,

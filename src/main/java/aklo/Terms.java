@@ -21,6 +21,11 @@ public abstract class Terms extends Term {
     return remake(loc, r);
   }
 
+  @Override
+  public void set(int i, Term a) {
+    terms[i] = a;
+  }
+
   public Terms(Loc loc, List<Term> terms) {
     super(loc);
     this.terms = terms.toArray(new Term[0]);

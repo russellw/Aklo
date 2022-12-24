@@ -1,11 +1,11 @@
 package aklo;
 
 public final class Goto extends Term {
-  public final String name;
+  public final Block target;
 
-  public Goto(Loc loc, String name) {
+  public Goto(Loc loc, Block target) {
     super(loc);
-    this.name = name;
+    this.target = target;
   }
 
   @Override

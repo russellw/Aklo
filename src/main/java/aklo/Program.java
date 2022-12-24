@@ -3,26 +3,15 @@ package aklo;
 import java.util.*;
 
 public final class Program {
-  private static final class Context {
-    // unlabeled loops
-    final Block continueTarget;
-    final Block breakTarget;
-
-    // labeled loops
-    final Map<String, Block> continueLabels = new HashMap<>();
-    final Map<String, Block> breakLabels = new HashMap<>();
-
-    Context(Block continueTarget, Block breakTarget) {
-      this.continueTarget = continueTarget;
-      this.breakTarget = breakTarget;
-    }
-  }
+  private record Context(
+      Program.Context outer, String name, Block continueTarget, Block breakTarget) {}
 
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
 
   // convert to basic blocks
   private Block block;
+  private Fn fn;
 
   private void add(Term a) {
     block.insns.add(a);
@@ -31,6 +20,12 @@ public final class Program {
   private Term term(Context context, Term a) {
     switch (a.tag()) {
       case RETURN -> {
+        a.set(0, term(context, a.get(0)));
+        add(a);
+        block = new Block(a.loc);
+      }
+      default -> {
+        for (var i = 0; i < a.size(); i++) a.set(i, term(context, a.get(i)));
         add(a);
       }
     }

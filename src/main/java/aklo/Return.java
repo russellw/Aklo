@@ -1,11 +1,6 @@
 package aklo;
 
 public final class Return extends Term1 {
-  @Override
-  public Type type() {
-    return Type.VOID;
-  }
-
   public Return(Loc loc, Term arg) {
     super(loc, arg);
   }

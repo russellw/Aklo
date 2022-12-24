@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Block {
-  public final String name;
+  public final Loc loc;
   public final List<Term> insns = new ArrayList<>();
 
-  public Block(String name) {
-    this.name = name;
+  public Block(Loc loc) {
+    this.loc = loc;
   }
 }

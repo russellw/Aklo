@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public abstract class Term1 extends Term {
-  public final Term arg;
+  public Term arg;
 
   public Term1(Loc loc, Term arg) {
     super(loc);
@@ -28,6 +28,12 @@ public abstract class Term1 extends Term {
   @Override
   public int size() {
     return 1;
+  }
+
+  @Override
+  public void set(int i, Term a) {
+    assert i == 0;
+    arg = a;
   }
 
   @Override

@@ -20,6 +20,10 @@ public abstract class Term extends AbstractCollection<Term> {
     for (var a : this) a.walk(f);
   }
 
+  public void set(int i, Term a) {
+    throw new UnsupportedOperationException(toString());
+  }
+
   public Type type() {
     throw new UnsupportedOperationException(toString());
   }

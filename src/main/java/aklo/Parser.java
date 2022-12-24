@@ -946,18 +946,6 @@ public final class Parser {
         stmts(r);
         return new While(loc, true, r);
       }
-      case ':' -> {
-        lex();
-        var name = id();
-        expectNewline();
-        return new Label(loc, name);
-      }
-      case GOTO -> {
-        lex();
-        var name = id();
-        expectNewline();
-        return new Goto(loc, name);
-      }
       case '^' -> {
         lex();
         var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
@@ -966,17 +954,31 @@ public final class Parser {
       }
       case BREAK -> {
         lex();
+        var name = tok == ID ? id() : null;
         expectNewline();
-        return new Break(loc);
+        return new Break(loc, name);
       }
       case CONTINUE -> {
         lex();
+        var name = tok == ID ? id() : null;
         expectNewline();
-        return new Continue(loc);
+        return new Continue(loc, name);
       }
     }
     var b = assignment();
-    if (b instanceof Id) throw new CompileError(loc, "expected statement");
+    if (b instanceof Id b1) {
+      if (eat(':'))
+        switch (tok) {
+            // TODO other statements
+          case WHILE, DOWHILE -> {
+            var a = (While) stmt();
+            a.label = b1.name;
+            return a;
+          }
+          default -> throw new CompileError(loc, "expected loop or case after label");
+        }
+      throw new CompileError(loc, "expected statement");
+    }
     expectNewline();
     return b;
   }

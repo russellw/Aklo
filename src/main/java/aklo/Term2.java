@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 public abstract class Term2 extends Term {
-  public final Term arg0, arg1;
+  public Term arg0, arg1;
 
   public Term2(Loc loc, Term arg0, Term arg1) {
     super(loc);
@@ -16,6 +16,13 @@ public abstract class Term2 extends Term {
   @Override
   public Type type() {
     return arg0.type();
+  }
+
+  @Override
+  public void set(int i, Term a) {
+    assert 0 <= i && i < 2;
+    if (i == 0) arg0 = a;
+    else arg1 = a;
   }
 
   @Override
