@@ -8,6 +8,7 @@ public class Fn extends Term {
   public String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype;
+  public final List<Var> vars = new ArrayList<>();
   public final List<Term> body = new ArrayList<>();
 
   public Fn(Loc loc) {

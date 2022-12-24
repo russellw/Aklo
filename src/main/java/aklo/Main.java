@@ -105,6 +105,8 @@ final class Main {
         }
       }
     }
-    Etc.dbg(modules);
+
+    // convert to static single assignment
+    new Program(modules);
   }
 }
