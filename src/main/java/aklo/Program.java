@@ -30,30 +30,19 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
-      case BREAK -> {
-        var label = ((Break) a).label;
+      case JUMP -> {
+        var a1 = (Jump) a;
+        var label = a1.label;
         if (label == null) {
-          if (context == null) throw new CompileError(a.loc, "break without loop or case");
+          if (context == null) {
+            var s = a1.break1 ? "break" : "continue";
+            throw new CompileError(a.loc, s + " without loop or case");
+          }
         } else {
           for (; context != null; context = context.outer) if (label.equals(context.label)) break;
           if (context == null) throw new CompileError(a.loc, label + " not found");
         }
-        add(new Goto(a.loc, context.breakTarget));
-        block = new Block(a.loc);
-      }
-      case CONTINUE -> {
-        var label = ((Continue) a).label;
-        if (label == null) {
-          for (; context != null; context = context.outer)
-            if (context.continueTarget != null) break;
-          if (context == null) throw new CompileError(a.loc, "continue without loop");
-        } else {
-          for (; context != null; context = context.outer) if (label.equals(context.label)) break;
-          if (context == null) throw new CompileError(a.loc, label + " not found");
-          if (context.continueTarget == null)
-            throw new CompileError(a.loc, label + " is not a loop");
-        }
-        add(new Goto(a.loc, context.continueTarget));
+        add(new Goto(a.loc, a1.break1 ? context.breakTarget : context.continueTarget));
         block = new Block(a.loc);
       }
       case RETURN -> {

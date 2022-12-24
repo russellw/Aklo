@@ -956,13 +956,13 @@ public final class Parser {
         lex();
         var label = tok == ID ? id() : null;
         expectNewline();
-        return new Break(loc, label);
+        return new Jump(loc, true, label);
       }
       case CONTINUE -> {
         lex();
         var label = tok == ID ? id() : null;
         expectNewline();
-        return new Continue(loc, label);
+        return new Jump(loc, false, label);
       }
     }
     var b = assignment();
