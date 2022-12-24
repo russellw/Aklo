@@ -30,7 +30,7 @@ public enum Tag {
   TRON,
   TROFF,
   DBG,
-  RET,
+  RETURN,
   EQ,
   EQ_NUMBERS,
   LE,

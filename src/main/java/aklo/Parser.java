@@ -691,7 +691,7 @@ public final class Parser {
         // body
         expect('(');
         if (eat(INDENT)) do a.body.add(stmt()); while (!eat(DEDENT));
-        else if (tok != ')') a.body.add(new Ret(loc, commas()));
+        else if (tok != ')') a.body.add(new Return(loc, commas()));
         expect(')');
         return a;
       }
@@ -962,7 +962,7 @@ public final class Parser {
         lex();
         var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
         expectNewline();
-        return new Ret(loc, a);
+        return new Return(loc, a);
       }
       case BREAK -> {
         lex();

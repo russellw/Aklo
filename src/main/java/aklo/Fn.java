@@ -10,6 +10,7 @@ public class Fn extends Term {
   public Type rtype;
   public final List<Var> vars = new ArrayList<>();
   public final List<Term> body = new ArrayList<>();
+  public final List<Block> blocks = new ArrayList<>();
 
   public Fn(Loc loc) {
     super(loc);

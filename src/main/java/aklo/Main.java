@@ -106,7 +106,7 @@ final class Main {
       }
     }
 
-    // convert to static single assignment
+    // convert to basic blocks
     new Program(modules);
   }
 }

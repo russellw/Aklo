@@ -1,22 +1,22 @@
 package aklo;
 
-public final class Ret extends Term1 {
+public final class Return extends Term1 {
   @Override
   public Type type() {
     return Type.VOID;
   }
 
-  public Ret(Loc loc, Term arg) {
+  public Return(Loc loc, Term arg) {
     super(loc, arg);
   }
 
   @Override
   public Term remake(Loc loc, Term arg) {
-    return new Ret(loc, arg);
+    return new Return(loc, arg);
   }
 
   @Override
   public Tag tag() {
-    return Tag.RET;
+    return Tag.RETURN;
   }
 }
