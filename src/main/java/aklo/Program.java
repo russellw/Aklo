@@ -33,6 +33,28 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case IF -> {
+        var a1 = (IfStmt) a;
+        var trueBlock = new Block(a.loc);
+        var falseBlock = new Block(a.loc);
+        var afterBlock = new Block(a.loc);
+
+        // condition
+        add(new If(a.loc, term(context, a1.get(0)), trueBlock, falseBlock));
+
+        // true
+        block(trueBlock);
+        for (var i = 1; i < a1.elseIdx; i++) term(context, a1.get(i));
+        add(new Goto(a.loc, afterBlock));
+
+        // false
+        block(falseBlock);
+        for (var i = a1.elseIdx; i < a1.size(); i++) term(context, a1.get(i));
+        add(new Goto(a.loc, afterBlock));
+
+        // after
+        block(afterBlock);
+      }
       case WHILE -> {
         var a1 = (While) a;
         var bodyBlock = new Block(a.loc);
@@ -45,12 +67,12 @@ public final class Program {
 
         // body
         block(bodyBlock);
-        for (var i = 1; i < a.size(); i++) term(context, a.get(i));
+        for (var i = 1; i < a1.size(); i++) term(context, a1.get(i));
         add(new Goto(a.loc, condBlock));
 
         // condition
         block(condBlock);
-        add(new If(a.loc, term(context, a.get(0)), bodyBlock, afterBlock));
+        add(new If(a.loc, term(context, a1.get(0)), bodyBlock, afterBlock));
 
         // after
         block(afterBlock);
