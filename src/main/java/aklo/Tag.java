@@ -40,7 +40,6 @@ public enum Tag {
   OP_ASSIGN,
   CAT,
   CALL,
-  JUMP,
   ID,
   SUBSCRIPT,
   LIST_OF,

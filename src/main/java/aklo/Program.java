@@ -77,8 +77,8 @@ public final class Program {
         // after
         block(afterBlock);
       }
-      case JUMP -> {
-        var a1 = (Jump) a;
+      case GOTO -> {
+        var a1 = (ContinueBreak) a;
         var label = a1.label;
         if (label == null) {
           if (context == null) {

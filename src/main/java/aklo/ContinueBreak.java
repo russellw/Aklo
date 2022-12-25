@@ -1,10 +1,10 @@
 package aklo;
 
-public final class Jump extends Term {
+public final class ContinueBreak extends Term {
   public final boolean break1;
   public final String label;
 
-  public Jump(Loc loc, boolean break1, String label) {
+  public ContinueBreak(Loc loc, boolean break1, String label) {
     super(loc);
     this.break1 = break1;
     this.label = label;
@@ -12,6 +12,6 @@ public final class Jump extends Term {
 
   @Override
   public Tag tag() {
-    return Tag.JUMP;
+    return Tag.GOTO;
   }
 }
