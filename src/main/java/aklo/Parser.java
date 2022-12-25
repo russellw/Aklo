@@ -817,10 +817,10 @@ public final class Parser {
   }
 
   // statements
-  private Term opAssignment(Tag op, Term a) throws IOException {
+  private Term opAssignment(Fn f, Tag op, Term a) throws IOException {
     var loc = new Loc(file, line);
     lex();
-    return new OpAssign(loc, op, a, commas());
+    return new OpAssign(loc, op, a, assignment(f));
   }
 
   private Term assignment(Fn f) throws IOException {
@@ -829,27 +829,40 @@ public final class Parser {
       case ASSIGN -> {
         var loc = new Loc(file, line);
         lex();
-        return new Assign(loc, a, commas());
+        return new Assign(loc, a, assignment(f));
       }
       case '=' -> {
         var loc = new Loc(file, line);
         lex();
-        return new Def(loc, a, commas());
+        a.walk(
+            b -> {
+              switch (b.tag()) {
+                case DOT, REST, LIST_OF -> {}
+                case ID -> {
+                  var name = b.toString();
+                  for (var x : f.vars) if (x.name.equals(name)) return;
+                  f.vars.add(new Var(b.loc, name));
+                }
+                default -> throw new CompileError(b.loc, "invalid assignment");
+              }
+            });
+        return new Assign(loc, a, assignment(f));
       }
       case ADD_ASSIGN -> {
-        return opAssignment(Tag.ADD, a);
+        return opAssignment(f, Tag.ADD, a);
       }
       case SUB_ASSIGN -> {
-        return opAssignment(Tag.SUB, a);
+        return opAssignment(f, Tag.SUB, a);
       }
       case CAT_ASSIGN -> {
-        return opAssignment(Tag.CAT, a);
+        return opAssignment(f, Tag.CAT, a);
       }
       case APPEND -> {
         var loc = new Loc(file, line);
+        // TODO do we need this restriction?
         if (!(a instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
         lex();
-        var b = commas();
+        var b = assignment(f);
         return new Assign(loc, a, new Cat(loc, a, new ListOf(loc, new Term[] {b})));
       }
       case PREPEND -> {

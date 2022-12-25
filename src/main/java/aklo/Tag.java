@@ -45,7 +45,6 @@ public enum Tag {
   LIST_OF,
   VAR,
   FN,
-  DEF,
   DOT,
   THROW,
   INTERN,

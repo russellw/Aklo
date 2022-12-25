@@ -39,7 +39,7 @@ public final class Program {
         var r = new Var(a.loc, "postInc");
         fn.vars.add(r);
 
-        add(new Def(a.loc, r, term(context, a.get(0))));
+        add(new Assign(a.loc, r, term(context, a.get(0))));
 
         return r;
       }
@@ -50,12 +50,12 @@ public final class Program {
         var afterBlock = new Block(a.loc);
 
         // condition
-        add(new Def(a.loc, r, term(context, a.get(0))));
+        add(new Assign(a.loc, r, term(context, a.get(0))));
         add(new If(a.loc, r, afterBlock, falseBlock));
 
         // false
         block(falseBlock);
-        add(new Def(a.loc, r, term(context, a.get(1))));
+        add(new Assign(a.loc, r, term(context, a.get(1))));
         add(new Goto(a.loc, afterBlock));
 
         // after
@@ -69,12 +69,12 @@ public final class Program {
         var afterBlock = new Block(a.loc);
 
         // condition
-        add(new Def(a.loc, r, term(context, a.get(0))));
+        add(new Assign(a.loc, r, term(context, a.get(0))));
         add(new If(a.loc, r, trueBlock, afterBlock));
 
         // true
         block(trueBlock);
-        add(new Def(a.loc, r, term(context, a.get(1))));
+        add(new Assign(a.loc, r, term(context, a.get(1))));
         add(new Goto(a.loc, afterBlock));
 
         // after
@@ -93,12 +93,12 @@ public final class Program {
 
         // true
         block(trueBlock);
-        add(new Def(a.loc, r, new False(a.loc)));
+        add(new Assign(a.loc, r, new False(a.loc)));
         add(new Goto(a.loc, afterBlock));
 
         // false
         block(falseBlock);
-        add(new Def(a.loc, r, new True(a.loc)));
+        add(new Assign(a.loc, r, new True(a.loc)));
         add(new Goto(a.loc, afterBlock));
 
         // after
