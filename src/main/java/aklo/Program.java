@@ -34,6 +34,44 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case OR -> {
+        var r = new Var(a.loc, "or");
+        fn.vars.add(r);
+        var falseBlock = new Block(a.loc);
+        var afterBlock = new Block(a.loc);
+
+        // condition
+        add(new Def(a.loc, r, term(context, a.get(0))));
+        add(new If(a.loc, r, afterBlock, falseBlock));
+
+        // false
+        block(falseBlock);
+        add(new Def(a.loc, r, term(context, a.get(1))));
+        add(new Goto(a.loc, afterBlock));
+
+        // after
+        block(afterBlock);
+        return r;
+      }
+      case AND -> {
+        var r = new Var(a.loc, "and");
+        fn.vars.add(r);
+        var trueBlock = new Block(a.loc);
+        var afterBlock = new Block(a.loc);
+
+        // condition
+        add(new Def(a.loc, r, term(context, a.get(0))));
+        add(new If(a.loc, r, trueBlock, afterBlock));
+
+        // true
+        block(trueBlock);
+        add(new Def(a.loc, r, term(context, a.get(1))));
+        add(new Goto(a.loc, afterBlock));
+
+        // after
+        block(afterBlock);
+        return r;
+      }
       case NOT -> {
         var r = new Var(a.loc, "not");
         fn.vars.add(r);
@@ -56,6 +94,7 @@ public final class Program {
 
         // after
         block(afterBlock);
+        return r;
       }
       case IF -> {
         var a1 = (IfStmt) a;
