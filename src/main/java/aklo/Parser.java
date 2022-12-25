@@ -823,7 +823,7 @@ public final class Parser {
     return new OpAssign(loc, op, a, commas());
   }
 
-  private Term assignment() throws IOException {
+  private Term assignment(Fn f) throws IOException {
     var a = commas();
     switch (tok) {
       case ASSIGN -> {
@@ -908,13 +908,6 @@ public final class Parser {
       case IF -> {
         return parseIf(f);
       }
-      case VAR -> {
-        lex();
-        var a = new Var(loc, id());
-        if (eat('=')) a.val = commas();
-        expectNewline();
-        return a;
-      }
       case CASE -> {
         lex();
         var r = new ArrayList<>(List.of(commas()));
@@ -968,7 +961,7 @@ public final class Parser {
         return new ContinueBreak(loc, false, label);
       }
     }
-    var b = assignment();
+    var b = assignment(f);
     if (b instanceof Id b1) {
       if (eat(':'))
         switch (tok) {
