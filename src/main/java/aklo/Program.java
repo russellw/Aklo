@@ -34,6 +34,15 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case POST_INC -> {
+        var a1 = (PostInc) a;
+        var r = new Var(a.loc, "postInc");
+        fn.vars.add(r);
+
+        add(new Def(a.loc, r, term(context, a.get(0))));
+
+        return r;
+      }
       case OR -> {
         var r = new Var(a.loc, "or");
         fn.vars.add(r);
@@ -160,7 +169,9 @@ public final class Program {
         add(a);
         block(new Block(a.loc));
       }
+      case DOT -> {}
       default -> {
+        if (a.isEmpty()) return a;
         for (var i = 0; i < a.size(); i++) a.set(i, term(context, a.get(i)));
         add(a);
       }
