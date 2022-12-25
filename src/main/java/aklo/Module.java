@@ -3,15 +3,15 @@ package aklo;
 import java.util.Arrays;
 
 public final class Module extends Fn {
-  public final String[] modName;
+  public final String[] names;
 
-  public Module(String[] modName) {
-    super(new Loc(modName[modName.length - 1], 1));
-    this.modName = modName;
+  public Module(Loc loc, String[] names) {
+    super(loc, names[names.length - 1]);
+    this.names = names;
   }
 
   @Override
   public String toString() {
-    return Arrays.toString(modName);
+    return Arrays.toString(names);
   }
 }

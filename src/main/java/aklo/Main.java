@@ -85,21 +85,19 @@ final class Main {
       var i = p.getNameCount() - 1;
       try (var files = Files.walk(p)) {
         for (var path : files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
-          // module name runs from the package root to the file
-          var name = new String[path.getNameCount() - i];
-          for (var j = 0; j < name.length; j++) name[j] = path.getName(i + j).toString();
-          var j = name.length - 1;
-
-          // removing the extension from the file name
-          name[j] = name[j].substring(0, name[j].length() - 2);
-
-          // we will need the name as a string for later reporting anyway
           var file = path.toString();
+          var loc = new Loc(file, 1);
+
+          // module name runs from the package root to the file
+          var names = new String[path.getNameCount() - i];
+          for (var j = 0; j < names.length; j++) names[j] = path.getName(i + j).toString();
+          var j = names.length - 1;
+          names[j] = names[j].substring(0, names[j].length() - 2);
 
           // parse the module
-          var module = new Module(name);
+          var module = new Module(loc, names);
           try (var reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            new Parser(file, reader, module.body);
+            new Parser(file, reader, module);
           }
           modules.add(module);
         }
