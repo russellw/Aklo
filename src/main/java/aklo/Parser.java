@@ -661,20 +661,24 @@ public final class Parser {
       }
   }
 
-  private Var param() throws IOException {
+  private void param(Fn f) throws IOException {
     var loc = new Loc(file, line);
-    return new Var(loc, id());
+    var name = id();
+    // O(N^2) is fast when N is sufficiently small
+    for (var x : f.params)
+      if (x.name.equals(name)) throw new CompileError(loc, name + ": duplicate parameter name");
+    f.params.add(new Var(loc, name));
   }
 
-  private void params(List<Var> r) throws IOException {
+  private void params(Fn f) throws IOException {
     // TODO optional ()?
     expect('(');
     if (eat(INDENT))
       do {
-        r.add(param());
+        param(f);
         expectNewline();
       } while (!eat(DEDENT));
-    else if (tok != ')') do r.add(param()); while (eat(','));
+    else if (tok != ')') do param(f); while (eat(','));
     expect(')');
   }
 
@@ -686,7 +690,7 @@ public final class Parser {
         var f = new Fn(loc, "lambda");
 
         // parameters
-        params(f.params);
+        params(f);
 
         // body
         expect('(');
@@ -896,10 +900,10 @@ public final class Parser {
       }
       case FN -> {
         lex();
-        var a = new Fn(loc, id());
-        params(a.params);
-        stmts(f, a.body);
-        return a;
+        f = new Fn(loc, id());
+        params(f);
+        stmts(f, f.body);
+        return f;
       }
       case IF -> {
         return parseIf(f);
