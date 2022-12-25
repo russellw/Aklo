@@ -864,7 +864,7 @@ public final class Parser {
     while (!eat(DEDENT));
   }
 
-  private If parseIf() throws IOException {
+  private IfStmt parseIf() throws IOException {
     assert tok == IF || tok == ELIF;
     var loc = new Loc(file, line);
     lex();
@@ -881,7 +881,7 @@ public final class Parser {
         r.add(parseIf());
       }
     }
-    return new If(loc, r, then);
+    return new IfStmt(loc, r, then);
   }
 
   private Term stmt() throws IOException {
@@ -892,7 +892,7 @@ public final class Parser {
         var cond = expr();
         expectNewline();
         // TODO throw string
-        return new If(loc, List.of(cond, new Throw(loc, cond)), 1);
+        return new IfStmt(loc, List.of(cond, new Throw(loc, cond)), 1);
       }
       case FN -> {
         lex();

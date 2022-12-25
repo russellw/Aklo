@@ -25,6 +25,7 @@ public enum Tag {
   BIT_XOR,
   SHL,
   SHR,
+  IF_STMT,
   IF,
   WHILE,
   TRON,

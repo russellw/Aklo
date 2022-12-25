@@ -1,27 +1,21 @@
 package aklo;
 
-import java.util.List;
+public final class If extends Term1 {
+  public final Block trueTarget, falseTarget;
 
-public final class If extends Terms {
-  public final int then;
-
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new If(loc, terms, then);
-  }
-
-  public If(Loc loc, List<Term> terms, int then) {
-    super(loc, terms);
-    this.then = then;
-  }
-
-  public If(Loc loc, Term[] terms, int then) {
-    super(loc, terms);
-    this.then = then;
+  public If(Loc loc, Term cond, Block trueTarget, Block falseTarget) {
+    super(loc, cond);
+    this.trueTarget = trueTarget;
+    this.falseTarget = falseTarget;
   }
 
   @Override
   public Tag tag() {
     return Tag.IF;
+  }
+
+  @Override
+  public Term remake(Loc loc, Term arg) {
+    throw new UnsupportedOperationException(toString());
   }
 }

@@ -21,34 +21,59 @@ public final class Program {
   public final List<Fn> fns = new ArrayList<>();
 
   // convert to basic blocks
-  private Block block;
-  private Fn fn;
+  private final List<Block> blocks = new ArrayList<>();
+
+  private void block(Block block) {
+    blocks.add(block);
+  }
 
   private void add(Term a) {
-    block.insns.add(a);
+    blocks.get(blocks.size() - 1).insns.add(a);
   }
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case WHILE -> {
+        var a1 = (While) a;
+        var bodyBlock = new Block(a.loc);
+        var condBlock = new Block(a.loc);
+        var afterBlock = new Block(a.loc);
+        context = new Context(context, a1.label, condBlock, afterBlock);
+
+        // before
+        add(new Goto(a.loc, a1.doWhile ? bodyBlock : condBlock));
+
+        // body
+        block(bodyBlock);
+        for (var i = 1; i < a.size(); i++) term(context, a.get(i));
+        add(new Goto(a.loc, condBlock));
+
+        // condition
+        block(condBlock);
+        add(new If(a.loc, term(context, a.get(0)), bodyBlock, afterBlock));
+
+        // after
+        block(afterBlock);
+      }
       case JUMP -> {
         var a1 = (Jump) a;
         var label = a1.label;
         if (label == null) {
           if (context == null) {
             var s = a1.break1 ? "break" : "continue";
-            throw new CompileError(a.loc, s + " without loop or case");
+            throw new CompileError(a.loc, s + " without loop");
           }
         } else {
           for (; context != null; context = context.outer) if (label.equals(context.label)) break;
           if (context == null) throw new CompileError(a.loc, label + " not found");
         }
         add(new Goto(a.loc, a1.break1 ? context.breakTarget : context.continueTarget));
-        block = new Block(a.loc);
+        block(new Block(a.loc));
       }
       case RETURN -> {
         a.set(0, term(context, a.get(0)));
         add(a);
-        block = new Block(a.loc);
+        block(new Block(a.loc));
       }
       default -> {
         for (var i = 0; i < a.size(); i++) a.set(i, term(context, a.get(i)));
