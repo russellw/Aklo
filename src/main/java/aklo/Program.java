@@ -24,6 +24,12 @@ public final class Program {
   private final List<Block> blocks = new ArrayList<>();
   private Fn fn;
 
+  private Var var1(Loc loc) {
+    var x = new Var(loc);
+    fn.vars.add(x);
+    return x;
+  }
+
   private void block(Block block) {
     blocks.add(block);
   }
@@ -36,16 +42,14 @@ public final class Program {
     switch (a.tag()) {
       case POST_INC -> {
         var a1 = (PostInc) a;
-        var r = new Var(a.loc, "postInc");
-        fn.vars.add(r);
+        var r = var1(a.loc);
 
         add(new Assign(a.loc, r, term(context, a.get(0))));
 
         return r;
       }
       case OR -> {
-        var r = new Var(a.loc, "or");
-        fn.vars.add(r);
+        var r = var1(a.loc);
         var falseBlock = new Block(a.loc);
         var afterBlock = new Block(a.loc);
 
@@ -63,8 +67,7 @@ public final class Program {
         return r;
       }
       case AND -> {
-        var r = new Var(a.loc, "and");
-        fn.vars.add(r);
+        var r = var1(a.loc);
         var trueBlock = new Block(a.loc);
         var afterBlock = new Block(a.loc);
 
@@ -82,8 +85,7 @@ public final class Program {
         return r;
       }
       case NOT -> {
-        var r = new Var(a.loc, "not");
-        fn.vars.add(r);
+        var r = var1(a.loc);
         var trueBlock = new Block(a.loc);
         var falseBlock = new Block(a.loc);
         var afterBlock = new Block(a.loc);

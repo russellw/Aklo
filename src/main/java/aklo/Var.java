@@ -9,6 +9,11 @@ public final class Var extends Term {
     this.name = name;
   }
 
+  public Var(Loc loc) {
+    super(loc);
+    name = null;
+  }
+
   @Override
   public Tag tag() {
     return Tag.VAR;
