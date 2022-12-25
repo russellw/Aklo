@@ -22,6 +22,7 @@ public final class Program {
 
   // convert to basic blocks
   private final List<Block> blocks = new ArrayList<>();
+  private Fn fn;
 
   private void block(Block block) {
     blocks.add(block);
@@ -33,6 +34,29 @@ public final class Program {
 
   private Term term(Context context, Term a) {
     switch (a.tag()) {
+      case NOT -> {
+        var r = new Var(a.loc, "not");
+        fn.vars.add(r);
+        var trueBlock = new Block(a.loc);
+        var falseBlock = new Block(a.loc);
+        var afterBlock = new Block(a.loc);
+
+        // condition
+        add(new If(a.loc, term(context, a.get(0)), trueBlock, falseBlock));
+
+        // true
+        block(trueBlock);
+        add(new Def(a.loc, r, new False(a.loc)));
+        add(new Goto(a.loc, afterBlock));
+
+        // false
+        block(falseBlock);
+        add(new Def(a.loc, r, new True(a.loc)));
+        add(new Goto(a.loc, afterBlock));
+
+        // after
+        block(afterBlock);
+      }
       case IF -> {
         var a1 = (IfStmt) a;
         var trueBlock = new Block(a.loc);
