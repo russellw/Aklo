@@ -1,9 +1,6 @@
 package aklo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Fn extends Term {
@@ -43,7 +40,26 @@ public class Fn extends Term {
     }
   }
 
-  private record Loop(Fn.Loop outer, String label, Block continueTarget, Block breakTarget) {}
+  private static final class Loop {
+    final Loop outer;
+    final String label;
+    final Block continueTarget;
+    final Block breakTarget;
+
+    Loop(Loop outer, String label, Block continueTarget, Block breakTarget) {
+      this.outer = outer;
+      this.label = label;
+      this.continueTarget = continueTarget;
+      this.breakTarget = breakTarget;
+    }
+
+    // static because loop could be null
+    static Loop get(Loop loop, String label) {
+      if (label == null) return loop;
+      for (; loop != null; loop = loop.outer) if (label.equals(loop.label)) break;
+      return loop;
+    }
+  }
 
   private Var var1(Loc loc) {
     var x = new Var(loc);
@@ -181,14 +197,13 @@ public class Fn extends Term {
       case GOTO -> {
         var a1 = (LoopGoto) a;
         var label = a1.label;
-        if (label == null) {
-          if (loop == null) {
+        loop = Loop.get(loop, label);
+        if (loop == null) {
+          if (label == null) {
             var s = a1.break1 ? "break" : "continue";
             throw new CompileError(a.loc, s + " without loop");
           }
-        } else {
-          for (; loop != null; loop = loop.outer) if (label.equals(loop.label)) break;
-          if (loop == null) throw new CompileError(a.loc, label + " not found");
+          throw new CompileError(a.loc, label + " not found");
         }
         insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
         block(new Block(a.loc));
