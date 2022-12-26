@@ -965,13 +965,13 @@ public final class Parser {
         lex();
         var label = tok == ID ? id() : null;
         expectNewline();
-        return new ContinueBreak(loc, true, label);
+        return new LoopGoto(loc, true, label);
       }
       case CONTINUE -> {
         lex();
         var label = tok == ID ? id() : null;
         expectNewline();
-        return new ContinueBreak(loc, false, label);
+        return new LoopGoto(loc, false, label);
       }
     }
     var b = assignment(f);

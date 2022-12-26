@@ -168,7 +168,7 @@ public class Fn extends Term {
         block(afterBlock);
       }
       case GOTO -> {
-        var a1 = (ContinueBreak) a;
+        var a1 = (LoopGoto) a;
         var label = a1.label;
         if (label == null) {
           if (loop == null) {
