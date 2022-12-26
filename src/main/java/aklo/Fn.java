@@ -40,19 +40,7 @@ public class Fn extends Term {
     }
   }
 
-  private static final class Loop {
-    final Loop outer;
-    final String label;
-    final Block continueTarget;
-    final Block breakTarget;
-
-    Loop(Loop outer, String label, Block continueTarget, Block breakTarget) {
-      this.outer = outer;
-      this.label = label;
-      this.continueTarget = continueTarget;
-      this.breakTarget = breakTarget;
-    }
-
+  private record Loop(Fn.Loop outer, String label, Block continueTarget, Block breakTarget) {
     // static because loop could be null
     static Loop get(Loop loop, String label) {
       if (label == null) return loop;
