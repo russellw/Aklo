@@ -38,6 +38,14 @@ public class Fn extends Term {
     Env(Env outer) {
       this.outer = outer;
     }
+
+    Term get(String name) {
+      for (var env = this; env != null; env = env.outer) {
+        var a = env.locals.get(name);
+        if (a != null) return a;
+      }
+      return null;
+    }
   }
 
   private record Loop(Fn.Loop outer, String label, Block continueTarget, Block breakTarget) {
@@ -55,12 +63,16 @@ public class Fn extends Term {
     return x;
   }
 
-  private void block(Block block) {
+  private void addBlock(Block block) {
     blocks.add(block);
   }
 
+  private Block lastBlock() {
+    return blocks.get(blocks.size() - 1);
+  }
+
   private void insn(Term a) {
-    blocks.get(blocks.size() - 1).insns.add(a);
+    lastBlock().insns.add(a);
   }
 
   private void assign(Term a, Term b, Block fail) {
@@ -89,12 +101,12 @@ public class Fn extends Term {
         insn(new If(a.loc, r, afterBlock, falseBlock));
 
         // false
-        block(falseBlock);
+        addBlock(falseBlock);
         insn(new Assign(a.loc, r, term(loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
-        block(afterBlock);
+        addBlock(afterBlock);
         return r;
       }
       case AND -> {
@@ -107,12 +119,12 @@ public class Fn extends Term {
         insn(new If(a.loc, r, trueBlock, afterBlock));
 
         // true
-        block(trueBlock);
+        addBlock(trueBlock);
         insn(new Assign(a.loc, r, term(loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
-        block(afterBlock);
+        addBlock(afterBlock);
         return r;
       }
       case NOT -> {
@@ -125,17 +137,17 @@ public class Fn extends Term {
         insn(new If(a.loc, term(loop, a.get(0)), trueBlock, falseBlock));
 
         // true
-        block(trueBlock);
+        addBlock(trueBlock);
         insn(new Assign(a.loc, r, new False(a.loc)));
         insn(new Goto(a.loc, afterBlock));
 
         // false
-        block(falseBlock);
+        addBlock(falseBlock);
         insn(new Assign(a.loc, r, new True(a.loc)));
         insn(new Goto(a.loc, afterBlock));
 
         // after
-        block(afterBlock);
+        addBlock(afterBlock);
         return r;
       }
       case IF -> {
@@ -148,17 +160,17 @@ public class Fn extends Term {
         insn(new If(a.loc, term(loop, a1.get(0)), trueBlock, falseBlock));
 
         // true
-        block(trueBlock);
+        addBlock(trueBlock);
         for (var i = 1; i < a1.elseIdx; i++) term(loop, a1.get(i));
         insn(new Goto(a.loc, afterBlock));
 
         // false
-        block(falseBlock);
+        addBlock(falseBlock);
         for (var i = a1.elseIdx; i < a1.size(); i++) term(loop, a1.get(i));
         insn(new Goto(a.loc, afterBlock));
 
         // after
-        block(afterBlock);
+        addBlock(afterBlock);
       }
       case WHILE -> {
         var a1 = (While) a;
@@ -171,16 +183,16 @@ public class Fn extends Term {
         insn(new Goto(a.loc, a1.doWhile ? bodyBlock : condBlock));
 
         // body
-        block(bodyBlock);
+        addBlock(bodyBlock);
         for (var i = 1; i < a1.size(); i++) term(loop, a1.get(i));
         insn(new Goto(a.loc, condBlock));
 
         // condition
-        block(condBlock);
+        addBlock(condBlock);
         insn(new If(a.loc, term(loop, a1.get(0)), bodyBlock, afterBlock));
 
         // after
-        block(afterBlock);
+        addBlock(afterBlock);
       }
       case GOTO -> {
         var a1 = (LoopGoto) a;
@@ -194,12 +206,12 @@ public class Fn extends Term {
           throw new CompileError(a.loc, label + " not found");
         }
         insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
-        block(new Block(a.loc));
+        addBlock(new Block(a.loc));
       }
       case RETURN -> {
         a.set(0, term(loop, a.get(0)));
         insn(a);
-        block(new Block(a.loc));
+        addBlock(new Block(a.loc));
       }
       default -> {
         if (a.isEmpty()) return a;
@@ -210,5 +222,35 @@ public class Fn extends Term {
     return a;
   }
 
-  public void toBlocks() {}
+  private void toBlocks(Env outer) {
+    // environment of local variables and functions
+    var env = new Env(outer);
+    for (var x : vars) env.locals.put(x.name, x);
+    for (var a : body)
+      a.walk(
+          b -> {
+            if (b instanceof Fn b1) env.locals.put(b1.name, b);
+          });
+
+    // convert nested functions to basic blocks
+    for (var a : body)
+      a.walk(
+          b -> {
+            if (b instanceof Fn b1) b1.toBlocks(env);
+          });
+
+    // convert this function to basic blocks
+    addBlock(new Block(loc));
+    for (var a : body) term(null, a);
+
+    // default return 0
+    if (!lastBlock().hasTerminator()) {
+      var loc1 = body.isEmpty() ? loc : body.get(body.size() - 1).loc;
+      insn(new Return(loc1, new ConstInteger(loc1, 0)));
+    }
+  }
+
+  public void toBlocks() {
+    toBlocks(null);
+  }
 }

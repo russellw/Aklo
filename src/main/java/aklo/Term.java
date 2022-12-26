@@ -15,6 +15,10 @@ public abstract class Term extends AbstractCollection<Term> {
 
   public abstract Tag tag();
 
+  public boolean isTerminator() {
+    return false;
+  }
+
   public final void walk(Consumer<Term> f) {
     f.accept(this);
     for (var a : this) a.walk(f);

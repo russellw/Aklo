@@ -6,6 +6,11 @@ public final class Return extends Term1 {
   }
 
   @Override
+  public boolean isTerminator() {
+    return true;
+  }
+
+  @Override
   public Term remake(Loc loc, Term arg) {
     return new Return(loc, arg);
   }

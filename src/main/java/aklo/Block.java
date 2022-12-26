@@ -10,4 +10,10 @@ public final class Block {
   public Block(Loc loc) {
     this.loc = loc;
   }
+
+  public boolean hasTerminator() {
+    var n = insns.size();
+    if (n == 0) return false;
+    return insns.get(n - 1).isTerminator();
+  }
 }
