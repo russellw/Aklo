@@ -1,7 +1,9 @@
 package aklo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class Fn extends Term {
@@ -32,6 +34,15 @@ public class Fn extends Term {
   }
 
   // convert to basic blocks
+  private static final class Env {
+    final Env outer;
+    final Map<String, Term> locals = new HashMap<>();
+
+    Env(Env outer) {
+      this.outer = outer;
+    }
+  }
+
   private record Loop(Fn.Loop outer, String label, Block continueTarget, Block breakTarget) {}
 
   private Var var1(Loc loc) {
@@ -195,4 +206,6 @@ public class Fn extends Term {
     }
     return a;
   }
+
+  public void toBlocks() {}
 }
