@@ -10,6 +10,11 @@ public final class ConstInteger extends Term {
     this.val = val;
   }
 
+  @Override
+  public String toString() {
+    return val.toString();
+  }
+
   public ConstInteger(Loc loc, long val) {
     super(loc);
     this.val = BigInteger.valueOf(val);

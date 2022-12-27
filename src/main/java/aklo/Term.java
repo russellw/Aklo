@@ -19,6 +19,11 @@ public abstract class Term extends AbstractCollection<Term> {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return tag().name() + super.toString();
+  }
+
   public final void walk(Consumer<Term> f) {
     f.accept(this);
     for (var a : this) a.walk(f);

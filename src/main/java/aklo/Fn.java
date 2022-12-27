@@ -26,6 +26,11 @@ public class Fn extends Term {
   }
 
   @Override
+  public String toString() {
+    return name;
+  }
+
+  @Override
   public Tag tag() {
     return Tag.FN;
   }

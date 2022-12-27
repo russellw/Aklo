@@ -14,7 +14,10 @@ public final class Program {
   public final List<Fn> fns = new ArrayList<>();
 
   public Program(List<Module> modules) {
-    for (var module : modules) module.toBlocks();
+    for (var module : modules) {
+      module.toBlocks();
+      fns.add(module);
+    }
   }
 
   public void write() throws IOException {
@@ -22,14 +25,18 @@ public final class Program {
     cw.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
     cw.visitSource("a.java", null);
 
-    var mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
-    mv.visitCode();
-    Label label0 = new Label();
-    mv.visitLabel(label0);
-    mv.visitLineNumber(2, label0);
-    mv.visitInsn(RETURN);
-    mv.visitMaxs(1, 1);
-    mv.visitEnd();
+    for (var f : fns) {
+      Etc.dbg(f.blocks);
+      var mv =
+          cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+      mv.visitCode();
+      Label label0 = new Label();
+      mv.visitLabel(label0);
+      mv.visitLineNumber(2, label0);
+      mv.visitInsn(RETURN);
+      mv.visitMaxs(1, 1);
+      mv.visitEnd();
+    }
 
     cw.visitEnd();
     Files.write(Path.of("a.class"), cw.toByteArray());

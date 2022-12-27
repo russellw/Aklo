@@ -11,6 +11,11 @@ public final class Block {
     this.loc = loc;
   }
 
+  @Override
+  public String toString() {
+    return insns.toString();
+  }
+
   public boolean hasTerminator() {
     var n = insns.size();
     if (n == 0) return false;

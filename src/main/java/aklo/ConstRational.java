@@ -36,6 +36,11 @@ public final class ConstRational extends Term {
   }
 
   @Override
+  public String toString() {
+    return val.toString();
+  }
+
+  @Override
   public Type type() {
     return Type.RATIONAL;
   }

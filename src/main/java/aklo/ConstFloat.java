@@ -12,6 +12,11 @@ public final class ConstFloat extends Term {
   }
 
   @Override
+  public String toString() {
+    return Float.toString(val);
+  }
+
+  @Override
   public double doubleVal() {
     return val;
   }
