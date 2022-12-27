@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 
 public final class Program {
   public final List<Var> vars = new ArrayList<>();
@@ -19,7 +20,17 @@ public final class Program {
   public void write() throws IOException {
     ClassWriter cw = new ClassWriter(0);
     cw.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
-    cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "(Ljava/lang/String;)V", null, null).visitEnd();
+    cw.visitSource("a.java", null);
+
+    var mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+    mv.visitCode();
+    Label label0 = new Label();
+    mv.visitLabel(label0);
+    mv.visitLineNumber(2, label0);
+    mv.visitInsn(RETURN);
+    mv.visitMaxs(1, 1);
+    mv.visitEnd();
+
     cw.visitEnd();
     Files.write(Path.of("a.class"), cw.toByteArray());
   }
