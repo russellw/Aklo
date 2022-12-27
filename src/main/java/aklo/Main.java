@@ -1,7 +1,5 @@
 package aklo;
 
-import static org.objectweb.asm.Opcodes.*;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,7 +8,6 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Properties;
-import org.objectweb.asm.*;
 
 final class Main {
   private Main() {}
@@ -52,26 +49,6 @@ final class Main {
   }
 
   public static void main(String[] args) throws IOException {
-    ClassWriter cw = new ClassWriter(0);
-    cw.visit(
-        V1_5,
-        ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE,
-        "pkg/Comparable",
-        null,
-        "java/lang/Object",
-        new String[] {"pkg/Mesurable"});
-    cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "LESS", "I", null, new Integer(-1))
-        .visitEnd();
-    cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "EQUAL", "I", null, new Integer(0))
-        .visitEnd();
-    cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "GREATER", "I", null, new Integer(1))
-        .visitEnd();
-    cw.visitMethod(ACC_PUBLIC + ACC_ABSTRACT, "compareTo", "(Ljava/lang/Object;)I", null, null)
-        .visitEnd();
-    cw.visitEnd();
-    byte[] b = cw.toByteArray();
-    Files.write(Path.of("a.class"), b);
-
     // command line
     if (args.length == 0) {
       System.err.println("Usage: aklo [options] packages");
@@ -128,6 +105,9 @@ final class Main {
     }
 
     // convert to basic blocks
-    new Program(modules);
+    var program = new Program(modules);
+
+    // write class file
+    program.write();
   }
 }

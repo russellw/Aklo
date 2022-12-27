@@ -21,7 +21,7 @@ else:
 compiler = os.path.join(
     projectDir, "target", f"aklo-{version}-jar-with-dependencies.jar"
 )
-cmd = ["java", "-ea", "-jar", compiler]
+compiler = ["java", "-ea", "-jar", compiler]
 
 
 def search1(p, ss):
@@ -38,9 +38,9 @@ def do(file):
     start = time.time()
 
     # compile Aklo code
-    c = cmd + [file]
+    cmd = compiler + [file]
     p = subprocess.Popen(
-        c,
+        cmd,
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
@@ -62,6 +62,39 @@ def do(file):
 
     # check how long the Aklo compiler takes to run
     print(f"{time.time()-start:.3f} seconds")
+
+    # run the program
+    cmd = "java", "a"
+    p = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    stdout, stderr = p.communicate()
+    stdout = str(stdout, "utf-8")
+    stderr = str(stderr, "utf-8")
+    print(stdout, end="")
+
+    # not expecting a runtime error
+    if stderr:
+        raise Exception(stderr)
+    if p.returncode:
+        raise Exception(str(p.returncode))
+
+    # are we looking for particular output?
+    for i in range(len(src)):
+        if src[i] == "{" and src[i + 1] == "OUT":
+            r = ""
+            for s in src[i + 2 :]:
+                if s == "}":
+                    break
+                r += s + "\n"
+            stdout = stdout.replace("\r", "")
+            if stdout == r:
+                return
+            print(repr(r))
+            print(repr(stdout))
+            raise Exception()
 
 
 if args.files:
