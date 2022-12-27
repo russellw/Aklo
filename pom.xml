@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
   <groupId>aklo</groupId>
   <artifactId>aklo</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1-SNAPSHOT</version>
   <name>aklo</name>
   <url>https://github.com/russellw/aklo</url>
   <properties>

@@ -4,11 +4,24 @@ import re
 import subprocess
 import time
 
-
 parser = argparse.ArgumentParser(description="Run test cases")
 parser.add_argument("files", nargs="*")
-parser.add_argument("-O", metavar="level", type=int, help="optimize")
 args = parser.parse_args()
+
+here = os.path.dirname(os.path.realpath(__file__))
+
+projectDir = os.path.join(here, "..")
+for s in open(os.path.join(projectDir, "pom.xml")).readlines():
+    m = re.match(r"\s*<version>(.*)</version>", s)
+    if m:
+        version = m[1]
+        break
+else:
+    raise Exception()
+compiler = os.path.join(
+    projectDir, "target", f"aklo-{version}-jar-with-dependencies.jar"
+)
+cmd = ["java", "-ea", "-jar", compiler]
 
 
 def search1(p, ss):
@@ -25,11 +38,9 @@ def do(file):
     start = time.time()
 
     # compile Aklo code
-    cmd = ["java", "-ea", "Compiler", file]  # , r"C:\aklo\aklo"
-    if hasattr(args, "O"):
-        cmd.append("-O" + str(args.O))
+    c = cmd + [file]
     p = subprocess.Popen(
-        cmd,
+        c,
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
@@ -52,48 +63,11 @@ def do(file):
     # check how long the Aklo compiler takes to run
     print(f"{time.time()-start:.3f} seconds")
 
-    # compile C++ code
-    subprocess.check_call("cl /nologo a.cc")
-
-    # run the program
-    cmd = "a"
-    p = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    stdout, stderr = p.communicate()
-    stdout = str(stdout, "utf-8")
-    stderr = str(stderr, "utf-8")
-    print(stdout, end="")
-
-    # not expecting a runtime error
-    if stderr:
-        raise Exception(stderr)
-    if p.returncode:
-        raise Exception(str(p.returncode))
-
-    # are we looking for particular output?
-    for i in range(len(src)):
-        if src[i] == "{" and src[i + 1] == "OUT":
-            r = ""
-            for s in src[i + 2 :]:
-                if s == "}":
-                    break
-                r += s + "\n"
-            stdout = stdout.replace("\r", "")
-            if stdout == r:
-                return
-            print(repr(r))
-            print(repr(stdout))
-            raise Exception()
-
 
 if args.files:
     for file in args.files:
         do(file)
 else:
-    here = os.path.dirname(os.path.realpath(__file__))
     for root, dirs, files in os.walk(here):
         for file in files:
             # TODO skip this until functions are working
