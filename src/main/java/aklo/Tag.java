@@ -46,6 +46,7 @@ public enum Tag {
   VAR,
   FN,
   DOT,
+  INVOKE,
   THROW,
   INTERN,
   FOR,

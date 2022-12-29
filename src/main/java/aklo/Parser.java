@@ -1,5 +1,7 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
@@ -522,6 +524,12 @@ public final class Parser {
         case ID -> {
           // TODO factor out
           switch (s) {
+            case "exit" -> {
+              expect('(');
+              var a = expr();
+              expect(')');
+              return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", List.of(a));
+            }
             case "bitNot" -> {
               expect('(');
               var a = expr();
