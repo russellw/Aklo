@@ -20,17 +20,14 @@ public final class Program {
   }
 
   public void write() throws IOException {
-    var w = new ClassWriter(0);
+    var w = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
-    w.visitSource("a.java", null);
     for (var f : fns) {
       var v = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
       v.visitCode();
 
-      v.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "()V", false);
-
       v.visitInsn(RETURN);
-      v.visitMaxs(1, 1);
+      v.visitMaxs(0, 0);
       v.visitEnd();
     }
     w.visitEnd();
