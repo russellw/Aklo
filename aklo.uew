@@ -13,10 +13,8 @@ elif
 else
 fn
 for
-goto
 if
 throw
-var
 while
 /C2"red"
 false
@@ -26,6 +24,11 @@ dbg
 troff
 tron
 /C4"green"
+getfield
+getstatic
+invokespecial
+invokestatic
+invokevirtual
 /C5"brown"
 !
 #

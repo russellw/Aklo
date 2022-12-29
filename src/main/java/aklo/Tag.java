@@ -47,6 +47,8 @@ public enum Tag {
   FN,
   DOT,
   INVOKE,
+  GETSTATIC,
+  GETFIELD,
   THROW,
   INTERN,
   FOR,

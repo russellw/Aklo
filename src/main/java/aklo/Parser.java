@@ -30,7 +30,7 @@ public final class Parser {
   private static final int EQ_NUMBERS = -17;
   private static final int NE_NUMBERS = -18;
   private static final int PREPEND = -19;
-  private static final int STRING = -20;
+  private static final int STR = -20;
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
   private static final int INTEGER = -23;
@@ -39,6 +39,7 @@ public final class Parser {
   private static final int RAW_STRING = -26;
 
   // keywords
+  // TODO: do true/false need to be reserved?
   private static final int ASSERT = -100;
   private static final int BREAK = -101;
   private static final int CASE = -102;
@@ -309,7 +310,7 @@ public final class Parser {
         }
         case '"' -> {
           lexQuote();
-          tok = STRING;
+          tok = STR;
         }
         case '\'' -> {
           lexQuote();
@@ -490,6 +491,12 @@ public final class Parser {
     return s;
   }
 
+  private String str() throws IOException {
+    var s = tokString;
+    if (!eat(STR)) throw new CompileError(file, line, "expected string");
+    return s;
+  }
+
   // expressions
   private void exprs(char end, List<Term> r) throws IOException {
     if (eat(INDENT))
@@ -524,10 +531,73 @@ public final class Parser {
         case ID -> {
           // TODO factor out
           switch (s) {
+            case "getstatic" -> {
+              expect('(');
+              var owner = str();
+              expect(',');
+              var name = str();
+              expect(',');
+              var descriptor = str();
+              expect(')');
+              return new Getstatic(loc, owner, name, descriptor);
+            }
+            case "getfield" -> {
+              expect('(');
+              var owner = str();
+              expect(',');
+              var name = str();
+              expect(',');
+              var descriptor = str();
+              expect(',');
+              var a = expr();
+              expect(')');
+              return new Getfield(loc, owner, name, descriptor, a);
+            }
+            case "invokestatic" -> {
+              expect('(');
+              var owner = str();
+              expect(',');
+              var name = str();
+              expect(',');
+              var descriptor = str();
+              var r = new ArrayList<Term>();
+              while (eat(',')) r.add(expr());
+              expect(')');
+              return new Invoke(loc, INVOKESTATIC, owner, name, descriptor, r);
+            }
+            case "invokevirtual" -> {
+              expect('(');
+              var owner = str();
+              expect(',');
+              var name = str();
+              expect(',');
+              var descriptor = str();
+              expect(',');
+              var r = new ArrayList<Term>();
+              do r.add(expr());
+              while (eat(','));
+              expect(')');
+              return new Invoke(loc, INVOKEVIRTUAL, owner, name, descriptor, r);
+            }
+            case "invokespecial" -> {
+              expect('(');
+              var owner = str();
+              expect(',');
+              var name = str();
+              expect(',');
+              var descriptor = str();
+              expect(',');
+              var r = new ArrayList<Term>();
+              do r.add(expr());
+              while (eat(','));
+              expect(')');
+              return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
+            }
             case "exit" -> {
               expect('(');
               var a = expr();
               expect(')');
+              // TODO replace
               return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", List.of(a));
             }
             case "bitNot" -> {
@@ -612,7 +682,7 @@ public final class Parser {
             }
           return new ConstInteger(loc, new BigInteger(s));
         }
-        case STRING -> {
+        case STR -> {
           return ListOf.encode(loc, Etc.unesc(s));
         }
         case SYM -> {
