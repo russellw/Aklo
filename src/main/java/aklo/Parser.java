@@ -21,7 +21,7 @@ public final class Parser {
   private static final int EQ = -8;
   private static final int EXP = -9;
   private static final int GE = -10;
-  private static final int ID = -11;
+  private static final int WORD = -11;
   private static final int DIV_INTEGERS = -12;
   private static final int INC = -13;
   private static final int INDENT = -14;
@@ -37,52 +37,6 @@ public final class Parser {
   private static final int FLOAT = -24;
   private static final int DOUBLE = -25;
   private static final int RAW_STRING = -26;
-
-  // keywords
-  // TODO: do true/false need to be reserved?
-  private static final int ASSERT = -100;
-  private static final int BREAK = -101;
-  private static final int CASE = -102;
-  private static final int CONTINUE = -103;
-  private static final int DBG = -104;
-  private static final int DOWHILE = -105;
-  private static final int ELIF = -106;
-  private static final int ELSE = -107;
-  private static final int FALSE = -108;
-  private static final int FN = -109;
-  private static final int FOR = -110;
-  private static final int GOTO = -111;
-  private static final int IF = -112;
-  private static final int THROW = -113;
-  private static final int TROFF = -114;
-  private static final int TRON = -115;
-  private static final int TRUE = -116;
-  private static final int VAR = -117;
-  private static final int WHILE = -118;
-
-  private static final Map<String, Integer> keywords = new HashMap<>();
-
-  static {
-    keywords.put("assert", ASSERT);
-    keywords.put("break", BREAK);
-    keywords.put("case", CASE);
-    keywords.put("continue", CONTINUE);
-    keywords.put("dbg", DBG);
-    keywords.put("dowhile", DOWHILE);
-    keywords.put("elif", ELIF);
-    keywords.put("else", ELSE);
-    keywords.put("false", FALSE);
-    keywords.put("fn", FN);
-    keywords.put("for", FOR);
-    keywords.put("goto", GOTO);
-    keywords.put("if", IF);
-    keywords.put("throw", THROW);
-    keywords.put("troff", TROFF);
-    keywords.put("tron", TRON);
-    keywords.put("true", TRUE);
-    keywords.put("var", VAR);
-    keywords.put("while", WHILE);
-  }
 
   // File state
   private final String file;
@@ -373,10 +327,8 @@ public final class Parser {
           var sb = new StringBuilder();
           do readc(sb);
           while (Character.isJavaIdentifierPart(c) || c == '?');
-          tok = ID;
+          tok = WORD;
           tokString = sb.toString();
-          var k = keywords.get(tokString);
-          if (k != null) tok = k;
         }
         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
           var sb = new StringBuilder();
@@ -485,9 +437,9 @@ public final class Parser {
     if (!eat('\n')) throw new CompileError(file, line, "expected newline");
   }
 
-  private String id() throws IOException {
+  private String word() throws IOException {
     var s = tokString;
-    if (!eat(ID)) throw new CompileError(file, line, "expected identifier");
+    if (!eat(WORD)) throw new CompileError(file, line, "expected word");
     return s;
   }
 
@@ -528,7 +480,7 @@ public final class Parser {
           expect(')');
           return a;
         }
-        case ID -> {
+        case WORD -> {
           // TODO factor out
           switch (s) {
             case "getstatic" -> {
@@ -652,14 +604,14 @@ public final class Parser {
               expect(')');
               return new Shr(loc, a, b);
             }
+            case "true" -> {
+              return new True(loc);
+            }
+            case "false" -> {
+              return new False(loc);
+            }
           }
           return new Id(loc, s);
-        }
-        case TRUE -> {
-          return new True(loc);
-        }
-        case FALSE -> {
-          return new False(loc);
         }
         case FLOAT -> {
           return new ConstFloat(loc, Float.parseFloat(s));
@@ -720,7 +672,7 @@ public final class Parser {
           var loc = new Loc(file, line);
           if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
           var r = new ArrayList<>(List.of(a1.string));
-          while (eat('.')) r.add(id());
+          while (eat('.')) r.add(word());
           a = new Dot(loc, r);
         }
         case INC -> {
@@ -741,7 +693,7 @@ public final class Parser {
 
   private void param(Fn f) throws IOException {
     var loc = new Loc(file, line);
-    var name = id();
+    var name = word();
     // O(N^2) is fast when N is sufficiently small
     for (var x : f.params)
       if (x.name.equals(name)) throw new CompileError(loc, name + ": duplicate parameter name");
@@ -946,7 +898,7 @@ public final class Parser {
       case PREPEND -> {
         var loc = new Loc(file, line);
         lex();
-        var b = new Id(loc, id());
+        var b = new Id(loc, word());
         return new Assign(loc, b, new Cat(loc, new ListOf(loc, new Term[] {a}), b));
       }
     }
@@ -960,110 +912,117 @@ public final class Parser {
   }
 
   private IfStmt parseIf(Fn f) throws IOException {
-    assert tok == IF || tok == ELIF;
+    assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
     var loc = new Loc(file, line);
     lex();
     var r = new ArrayList<>(List.of(expr()));
     stmts(f, r);
     var then = r.size();
-    switch (tok) {
-      case ELSE -> {
-        lex();
-        stmts(f, r);
+    if (tok == WORD)
+      switch (tokString) {
+        case "else" -> {
+          lex();
+          stmts(f, r);
+        }
+        case "elif" -> {
+          lex();
+          r.add(parseIf(f));
+        }
       }
-      case ELIF -> {
-        lex();
-        r.add(parseIf(f));
-      }
-    }
     return new IfStmt(loc, r, then);
   }
 
   private Term stmt(Fn f) throws IOException {
     var loc = new Loc(file, line);
     switch (tok) {
-      case ASSERT -> {
-        lex();
-        var cond = expr();
-        expectNewline();
-        // TODO throw string
-        return new IfStmt(loc, List.of(cond, new Throw(loc, cond)), 1);
-      }
-      case FN -> {
-        lex();
-        f = new Fn(loc, id());
-        params(f);
-        stmts(f, f.body);
-        return f;
-      }
-      case IF -> {
-        return parseIf(f);
-      }
-      case CASE -> {
-        lex();
-        var r = new ArrayList<>(List.of(commas()));
-        expectIndent();
-        do {
-          var cb = new ArrayList<Term>();
-          do cb.add(commas());
-          while (eat('\n'));
-          var cases = cb.size();
-          stmts(f, cb);
-          r.add(new CaseBlock(loc, cb, cases));
-        } while (!eat(DEDENT));
-        return new Case(loc, r);
-      }
-      case FOR -> {
-        lex();
-        var r = new ArrayList<>(List.of(commas()));
-        expect(':');
-        r.add(commas());
-        stmts(f, r);
-        return new For(loc, r);
-      }
-      case WHILE -> {
-        lex();
-        var r = new ArrayList<>(List.of(expr()));
-        stmts(f, r);
-        return new While(loc, false, r);
-      }
-      case DOWHILE -> {
-        lex();
-        var r = new ArrayList<>(List.of(expr()));
-        stmts(f, r);
-        return new While(loc, true, r);
-      }
       case '^' -> {
         lex();
         var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
         expectNewline();
         return new Return(loc, a);
       }
-      case BREAK -> {
-        lex();
-        var label = tok == ID ? id() : null;
-        expectNewline();
-        return new LoopGoto(loc, true, label);
-      }
-      case CONTINUE -> {
-        lex();
-        var label = tok == ID ? id() : null;
-        expectNewline();
-        return new LoopGoto(loc, false, label);
+      case WORD -> {
+        switch (tokString) {
+          case "assert" -> {
+            lex();
+            var cond = expr();
+            expectNewline();
+            // TODO throw string
+            return new IfStmt(loc, List.of(cond, new Throw(loc, cond)), 1);
+          }
+          case "fn" -> {
+            lex();
+            f = new Fn(loc, word());
+            params(f);
+            stmts(f, f.body);
+            return f;
+          }
+          case "if" -> {
+            return parseIf(f);
+          }
+          case "case" -> {
+            lex();
+            var r = new ArrayList<>(List.of(commas()));
+            expectIndent();
+            do {
+              var cb = new ArrayList<Term>();
+              do cb.add(commas());
+              while (eat('\n'));
+              var cases = cb.size();
+              stmts(f, cb);
+              r.add(new CaseBlock(loc, cb, cases));
+            } while (!eat(DEDENT));
+            return new Case(loc, r);
+          }
+          case "for" -> {
+            lex();
+            var r = new ArrayList<>(List.of(commas()));
+            expect(':');
+            r.add(commas());
+            stmts(f, r);
+            return new For(loc, r);
+          }
+          case "while" -> {
+            lex();
+            var r = new ArrayList<>(List.of(expr()));
+            stmts(f, r);
+            return new While(loc, false, r);
+          }
+          case "dowhile" -> {
+            lex();
+            var r = new ArrayList<>(List.of(expr()));
+            stmts(f, r);
+            return new While(loc, true, r);
+          }
+          case "break" -> {
+            lex();
+            var label = tok == WORD ? word() : null;
+            expectNewline();
+            return new LoopGoto(loc, true, label);
+          }
+          case "continue" -> {
+            lex();
+            var label = tok == WORD ? word() : null;
+            expectNewline();
+            return new LoopGoto(loc, false, label);
+          }
+        }
       }
     }
     var b = assignment(f);
     if (b instanceof Id b1) {
-      if (eat(':'))
-        switch (tok) {
-            // TODO other statements
-          case WHILE, DOWHILE -> {
-            var a = (While) stmt(f);
-            a.label = b1.string;
-            return a;
+      if (eat(':')) {
+        if (tok == WORD)
+          switch (tokString) {
+              // TODO other statements
+            case "while", "dowhile" -> {
+              var a = (While) stmt(f);
+              a.label = b1.string;
+              return a;
+            }
           }
-          default -> throw new CompileError(loc, "expected loop after label");
-        }
+        throw new CompileError(loc, "expected loop after label");
+      }
       throw new CompileError(loc, "expected statement");
     }
     expectNewline();
