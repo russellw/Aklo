@@ -1,6 +1,5 @@
 package aklo;
 
-
 public final class Module extends Fn {
   public final String[] names;
 

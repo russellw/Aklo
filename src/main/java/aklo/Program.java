@@ -33,6 +33,9 @@ public final class Program {
       Label label0 = new Label();
       mv.visitLabel(label0);
       mv.visitLineNumber(2, label0);
+
+      mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "()V", false);
+
       mv.visitInsn(RETURN);
       mv.visitMaxs(1, 1);
       mv.visitEnd();

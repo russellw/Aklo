@@ -1,5 +1,8 @@
 package aklo;
 
+import java.math.BigInteger;
+import java.util.List;
+
 public final class Etc {
   private Etc() {}
 
@@ -65,6 +68,20 @@ public final class Etc {
       sb.append(c);
     }
     return sb.toString();
+  }
+
+  public static int intVal(Object a) {
+    if (a instanceof BigInteger a1) return a1.intValueExact();
+    throw new IllegalArgumentException(a.toString());
+  }
+
+  public static void println(Object a) {
+    print(a);
+    System.out.println();
+  }
+
+  public static void print(Object a) {
+    for (var b : (List) a) System.out.write(intVal(b));
   }
 
   public static void dbg(Object a) {

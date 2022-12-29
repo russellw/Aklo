@@ -21,7 +21,7 @@ public abstract class Term extends AbstractCollection<Term> {
 
   @Override
   public String toString() {
-    return tag().name() + super.toString();
+    return tag().name();
   }
 
   public final void walk(Consumer<Term> f) {
