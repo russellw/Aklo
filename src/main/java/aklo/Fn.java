@@ -258,4 +258,40 @@ public class Fn extends Term {
   public void toBlocks() {
     toBlocks(null);
   }
+
+  // debug output
+  void dbg() {
+    // header
+    System.out.printf("fn %s(", name);
+    for (var i = 0; i < params.size(); i++) {
+      if (i > 0) System.out.print(", ");
+      System.out.print(params.get(i).name);
+    }
+    System.out.println(')');
+
+    // which instructions are used as input to others, therefore needing reference numbers?
+    var used = new HashSet<Term>();
+    for (var block : blocks) for (var a : block.insns) used.addAll(a);
+
+    // assign reference numbers to instructions
+    var insns = new HashMap<Term, Integer>();
+    for (var block : blocks)
+      for (var a : block.insns) if (used.contains(a)) insns.put(a, insns.size());
+
+    // blocks
+    for (var block : blocks) {
+      if (block.name != null) System.out.printf("  %s:\n", block.name);
+      for (var a : block.insns) {
+        System.out.print("    ");
+        var r = insns.get(a);
+        if (r != null) System.out.printf("%%%d = ", r);
+        System.out.print(a);
+        for (var i = 0; i < params.size(); i++) {
+          if (i > 0) System.out.print(',');
+          System.out.print(' ' + params.get(i).toString());
+        }
+        System.out.println();
+      }
+    }
+  }
 }

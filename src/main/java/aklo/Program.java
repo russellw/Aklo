@@ -89,8 +89,10 @@ public final class Program {
 
     // functions
     for (var f : fns) {
+      f.dbg();
       mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
       mv.visitCode();
+      for (var block : f.blocks) {}
 
       mv.visitInsn(RETURN);
       mv.visitMaxs(0, 0);
