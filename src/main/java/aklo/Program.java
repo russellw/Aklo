@@ -22,6 +22,30 @@ public final class Program {
   public void write() throws IOException {
     var w = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
+
+    // represent nontrivial constants as static final fields
+    var consts = new HashMap<Object, Var>();
+    for (var f : fns)
+      for (var block : f.blocks)
+        for (var a : block.insns)
+          a.walk(
+              b -> {
+                switch (b.tag()) {
+                  case INTEGER, RATIONAL -> {
+                    var val = b.val();
+                    var x = consts.get(val);
+                    if (x == null) {
+                      x = new Var(b.loc, '$' + Integer.toString(consts.size()));
+                      x.type = b.type();
+                      x.val = val;
+                      consts.put(val, x);
+                      vars.add(x);
+                    }
+                  }
+                }
+              });
+
+    // functions
     for (var f : fns) {
       var v = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
       v.visitCode();
@@ -31,6 +55,8 @@ public final class Program {
       v.visitEnd();
     }
     w.visitEnd();
+
+    // write class file
     Files.write(Path.of("a.class"), w.toByteArray());
   }
 }

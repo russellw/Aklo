@@ -11,6 +11,11 @@ public final class ConstInteger extends Term {
   }
 
   @Override
+  public Object val() {
+    return val;
+  }
+
+  @Override
   public String toString() {
     return val.toString();
   }

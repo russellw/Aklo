@@ -24,6 +24,10 @@ public abstract class Term extends AbstractCollection<Term> {
     return tag().name();
   }
 
+  public Object val() {
+    throw new UnsupportedOperationException(toString());
+  }
+
   public final void walk(Consumer<Term> f) {
     f.accept(this);
     for (var a : this) a.walk(f);

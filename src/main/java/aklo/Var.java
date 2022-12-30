@@ -3,6 +3,7 @@ package aklo;
 public final class Var extends Term {
   public final String name;
   public Type type;
+  public Object val;
 
   public Var(Loc loc, String name) {
     super(loc);

@@ -36,6 +36,11 @@ public final class ConstRational extends Term {
   }
 
   @Override
+  public Object val() {
+    return val;
+  }
+
+  @Override
   public String toString() {
     return val.toString();
   }
