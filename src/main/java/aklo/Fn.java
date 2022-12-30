@@ -98,8 +98,8 @@ public class Fn extends Term {
       }
       case OR -> {
         var r = var1(a.loc);
-        var falseBlock = new Block(a.loc);
-        var afterBlock = new Block(a.loc);
+        var falseBlock = new Block(a.loc, "orFalse");
+        var afterBlock = new Block(a.loc, "orAfter");
 
         // condition
         insn(new Assign(a.loc, r, term(loop, a.get(0))));
@@ -116,8 +116,8 @@ public class Fn extends Term {
       }
       case AND -> {
         var r = var1(a.loc);
-        var trueBlock = new Block(a.loc);
-        var afterBlock = new Block(a.loc);
+        var trueBlock = new Block(a.loc, "andTrue");
+        var afterBlock = new Block(a.loc, "andAfter");
 
         // condition
         insn(new Assign(a.loc, r, term(loop, a.get(0))));
@@ -134,9 +134,9 @@ public class Fn extends Term {
       }
       case NOT -> {
         var r = var1(a.loc);
-        var trueBlock = new Block(a.loc);
-        var falseBlock = new Block(a.loc);
-        var afterBlock = new Block(a.loc);
+        var trueBlock = new Block(a.loc, "notTrue");
+        var falseBlock = new Block(a.loc, "notFalse");
+        var afterBlock = new Block(a.loc, "notAfter");
 
         // condition
         insn(new If(a.loc, term(loop, a.get(0)), trueBlock, falseBlock));
@@ -157,9 +157,9 @@ public class Fn extends Term {
       }
       case IF -> {
         var a1 = (IfStmt) a;
-        var trueBlock = new Block(a.loc);
-        var falseBlock = new Block(a.loc);
-        var afterBlock = new Block(a.loc);
+        var trueBlock = new Block(a.loc, "ifTrue");
+        var falseBlock = new Block(a.loc, "ifFalse");
+        var afterBlock = new Block(a.loc, "ifAfter");
 
         // condition
         insn(new If(a.loc, term(loop, a1.get(0)), trueBlock, falseBlock));
@@ -179,9 +179,9 @@ public class Fn extends Term {
       }
       case WHILE -> {
         var a1 = (While) a;
-        var bodyBlock = new Block(a.loc);
-        var condBlock = new Block(a.loc);
-        var afterBlock = new Block(a.loc);
+        var bodyBlock = new Block(a.loc, "whileBody");
+        var condBlock = new Block(a.loc, "whileCond");
+        var afterBlock = new Block(a.loc, "whileAfter");
         loop = new Loop(loop, a1.label, condBlock, afterBlock);
 
         // before
@@ -211,12 +211,12 @@ public class Fn extends Term {
           throw new CompileError(a.loc, label + " not found");
         }
         insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
-        addBlock(new Block(a.loc));
+        addBlock(new Block(a.loc, "gotoAfter"));
       }
       case RETURN -> {
         a.set(0, term(loop, a.get(0)));
         insn(a);
-        addBlock(new Block(a.loc));
+        addBlock(new Block(a.loc, "returnAfter"));
       }
       default -> {
         if (a.isEmpty()) return a;
@@ -245,7 +245,7 @@ public class Fn extends Term {
           });
 
     // convert this function to basic blocks
-    addBlock(new Block(loc));
+    addBlock(new Block(loc, null));
     for (var a : body) term(null, a);
 
     // default return 0

@@ -5,10 +5,12 @@ import java.util.List;
 
 public final class Block {
   public final Loc loc;
+  public final String name;
   public final List<Term> insns = new ArrayList<>();
 
-  public Block(Loc loc) {
+  public Block(Loc loc, String name) {
     this.loc = loc;
+    this.name = name;
   }
 
   @Override
