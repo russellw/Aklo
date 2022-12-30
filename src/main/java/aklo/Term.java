@@ -3,6 +3,8 @@ package aklo;
 import java.math.BigInteger;
 import java.util.AbstractCollection;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,7 +23,15 @@ public abstract class Term extends AbstractCollection<Term> {
 
   @Override
   public String toString() {
-    return tag().name();
+    return tag().name().toLowerCase(Locale.ROOT);
+  }
+
+  void dbg(Map<Term, Integer> refs) {
+    System.out.print(this);
+    for (var i = 0; i < size(); i++) {
+      if (i > 0) System.out.print(',');
+      System.out.print(' ' + get(i).toString());
+    }
   }
 
   public Object val() {

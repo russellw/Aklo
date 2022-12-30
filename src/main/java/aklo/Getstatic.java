@@ -5,6 +5,11 @@ public final class Getstatic extends Term {
   public final String name;
   public final String descriptor;
 
+  @Override
+  public String toString() {
+    return String.format("getstatic(\"%s\", \"%s\", \"%s\")", owner, name, descriptor);
+  }
+
   public Getstatic(Loc loc, String owner, String name, String descriptor) {
     super(loc);
     this.owner = owner;
