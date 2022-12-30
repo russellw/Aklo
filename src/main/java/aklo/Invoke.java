@@ -14,12 +14,15 @@ public final class Invoke extends Terms {
   @Override
   void dbg(Map<Term, Integer> refs) {
     System.out.print("invoke");
-    switch (opcode) {
-      case INVOKESTATIC -> System.out.print("static");
-      case INVOKEVIRTUAL -> System.out.print("virtual");
-      case INVOKESPECIAL -> System.out.print("special");
-      default -> throw new IllegalStateException(Integer.toString(opcode));
-    }
+    System.out.print(
+        switch (opcode) {
+          case INVOKESTATIC -> "static";
+          case INVOKEVIRTUAL -> "virtual";
+          case INVOKESPECIAL -> "special";
+          default -> throw new IllegalStateException(Integer.toString(opcode));
+        });
+    System.out.printf(" \"%s\", \"%s\", \"%s\"", owner, name, descriptor);
+    for (var a : this) System.out.print(", " + a);
   }
 
   public Invoke(
