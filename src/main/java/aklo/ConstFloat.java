@@ -2,6 +2,7 @@ package aklo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.objectweb.asm.MethodVisitor;
 
 public final class ConstFloat extends Term {
   public final float val;
@@ -9,6 +10,11 @@ public final class ConstFloat extends Term {
   public ConstFloat(Loc loc, float val) {
     super(loc);
     this.val = val;
+  }
+
+  @Override
+  public void emit(MethodVisitor mv) {
+    mv.visitLdcInsn(val);
   }
 
   @Override

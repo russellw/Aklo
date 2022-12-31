@@ -1,6 +1,9 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.math.BigInteger;
+import org.objectweb.asm.MethodVisitor;
 
 public final class ConstInteger extends Term {
   public final BigInteger val;
@@ -8,6 +11,25 @@ public final class ConstInteger extends Term {
   public ConstInteger(Loc loc, BigInteger val) {
     super(loc);
     this.val = val;
+  }
+
+  @Override
+  public void emit(MethodVisitor mv) {
+    try {
+      mv.visitLdcInsn(val.longValueExact());
+      mv.visitMethodInsn(
+          INVOKESTATIC, "java/math/BigInteger", "valueOf", "(J)Ljava/math/BigInteger;", false);
+    } catch (ArithmeticException e) {
+      // okay to use an exception for something that is not an error here
+      // because constant integers outside 2^63 are rare enough
+      // that there is no performance impact
+      mv.visitTypeInsn(NEW, "java/math/BigInteger");
+      mv.visitInsn(DUP);
+      mv.visitLdcInsn(val.toString(16));
+      mv.visitIntInsn(BIPUSH, 16);
+      mv.visitMethodInsn(
+          INVOKESPECIAL, "java/math/BigInteger", "<init>", "(Ljava/lang/String;I)V", false);
+    }
   }
 
   @Override

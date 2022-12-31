@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.objectweb.asm.MethodVisitor;
 
 public abstract class Term extends AbstractCollection<Term> {
   public final Loc loc;
@@ -21,6 +22,10 @@ public abstract class Term extends AbstractCollection<Term> {
     return false;
   }
 
+  public void emit(MethodVisitor mv) {
+    throw new UnsupportedOperationException(toString());
+  }
+
   @Override
   public String toString() {
     return tag().name().toLowerCase(Locale.ROOT);
@@ -30,7 +35,7 @@ public abstract class Term extends AbstractCollection<Term> {
     System.out.print(this);
     for (var i = 0; i < size(); i++) {
       if (i > 0) System.out.print(',');
-      System.out.print(' ' + get(i).toString());
+      System.out.print(' ' + refs.get(get(i)).toString());
     }
   }
 

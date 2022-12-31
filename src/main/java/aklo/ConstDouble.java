@@ -2,6 +2,7 @@ package aklo;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.objectweb.asm.MethodVisitor;
 
 public final class ConstDouble extends Term {
   public final double val;
@@ -14,6 +15,11 @@ public final class ConstDouble extends Term {
   @Override
   public double doubleVal() {
     return val;
+  }
+
+  @Override
+  public void emit(MethodVisitor mv) {
+    mv.visitLdcInsn(val);
   }
 
   @Override

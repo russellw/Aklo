@@ -219,7 +219,6 @@ public class Fn extends Term {
         addBlock(new Block(a.loc, "returnAfter"));
       }
       default -> {
-        if (a.isEmpty()) return a;
         for (var i = 0; i < a.size(); i++) a.set(i, term(loop, a.get(i)));
         insn(a);
       }
@@ -251,7 +250,9 @@ public class Fn extends Term {
     // default return 0
     if (!lastBlock().hasTerminator()) {
       var loc1 = body.isEmpty() ? loc : body.get(body.size() - 1).loc;
-      insn(new Return(loc1, new ConstInteger(loc1, 0)));
+      var r = new ConstInteger(loc1, 0);
+      insn(r);
+      insn(new Return(loc1, r));
     }
   }
 
