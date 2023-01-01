@@ -21,7 +21,6 @@ else:
 compiler = os.path.join(
     projectDir, "target", f"aklo-{version}-jar-with-dependencies.jar"
 )
-compiler = ["java", "-ea", "-jar", compiler]
 
 
 def search1(p, ss):
@@ -38,9 +37,8 @@ def do(file):
     start = time.time()
 
     # compile Aklo code
-    cmd = compiler + [file]
     p = subprocess.Popen(
-        cmd,
+        ("java", "-ea", "-jar", compiler, file),
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
@@ -64,9 +62,8 @@ def do(file):
     print(f"{time.time()-start:.3f} seconds")
 
     # run the program
-    cmd = "java", "a"
     p = subprocess.Popen(
-        cmd,
+        ("java", "-cp", ".;" + compiler, "-ea", "a"),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )

@@ -545,13 +545,6 @@ public final class Parser {
               expect(')');
               return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
             }
-            case "exit" -> {
-              expect('(');
-              var a = expr();
-              expect(')');
-              // TODO replace
-              return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", List.of(a));
-            }
             case "bitNot" -> {
               expect('(');
               var a = expr();
@@ -1005,6 +998,20 @@ public final class Parser {
             var label = tok == WORD ? word() : null;
             expectNewline();
             return new LoopGoto(loc, false, label);
+          }
+          case "exit" -> {
+            lex();
+            var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : expr();
+            expectNewline();
+            // TODO replace
+            return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", List.of(a));
+          }
+          case "print" -> {
+            lex();
+            var a = commas();
+            expectNewline();
+            return new Invoke(
+                loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", List.of(a));
           }
         }
       }
