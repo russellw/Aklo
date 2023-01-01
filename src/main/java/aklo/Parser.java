@@ -74,7 +74,7 @@ public final class Parser {
     var sb = new StringBuilder();
     readc();
     while (c != quote) {
-      if (c == '\\') readc();
+      if (c == '\\') readc(sb);
       if (c < ' ') throw new CompileError(file, line, "unclosed quote");
       readc(sb);
     }
