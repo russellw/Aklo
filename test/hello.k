@@ -4,5 +4,4 @@ Hello, world!
 }
 
 ;invokevirtual("java/io/PrintStream", "println", "()V",getstatic( "java/lang/System", "out", "Ljava/io/PrintStream;"))
-;print("Hello, world!\n")
-print("H\n")
+print("Hello, world!\n")

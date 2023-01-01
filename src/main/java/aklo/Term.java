@@ -1,5 +1,7 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.BIPUSH;
+
 import java.math.BigInteger;
 import java.util.AbstractCollection;
 import java.util.Iterator;
@@ -20,6 +22,11 @@ public abstract class Term extends AbstractCollection<Term> {
 
   public boolean isTerminator() {
     return false;
+  }
+
+  public final void emitInt(MethodVisitor mv, int n) {
+    // TODO
+    mv.visitIntInsn(BIPUSH, n);
   }
 
   public void emit(MethodVisitor mv) {
