@@ -14,6 +14,7 @@ public final class Invoke extends Terms {
 
   @Override
   public void emit(MethodVisitor mv) {
+    for (var a : this) a.load(mv);
     mv.visitMethodInsn(opcode, owner, name, descriptor, false);
   }
 
@@ -38,6 +39,12 @@ public final class Invoke extends Terms {
     this.owner = owner;
     this.name = name;
     this.descriptor = descriptor;
+  }
+
+  @Override
+  public Type type() {
+    var i = descriptor.lastIndexOf(')');
+    return Type.of(descriptor.substring(i + 1));
   }
 
   @Override

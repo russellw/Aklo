@@ -1,10 +1,6 @@
 package aklo;
 
 public abstract class Type {
-  public abstract Kind kind();
-
-  public abstract String descriptor();
-
   public static final Type BOOL =
       new Type() {
         @Override
@@ -77,4 +73,32 @@ public abstract class Type {
           return "Laklo/BigRational;";
         }
       };
+  public static final Type ANY =
+      new Type() {
+        @Override
+        public Kind kind() {
+          return Kind.ANY;
+        }
+
+        @Override
+        public String descriptor() {
+          return "Ljava/lang/Object;";
+        }
+      };
+
+  public abstract Kind kind();
+
+  public abstract String descriptor();
+
+  public static Type of(String descriptor) {
+    return switch (descriptor) {
+      case "V" -> VOID;
+      case "F" -> FLOAT;
+      case "D" -> DOUBLE;
+      case "Z" -> BOOL;
+      case "Laklo/BigRational;" -> RATIONAL;
+      case "Ljava/math/BigInteger;" -> INTEGER;
+      default -> throw new IllegalArgumentException(descriptor);
+    };
+  }
 }

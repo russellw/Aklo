@@ -1,6 +1,6 @@
 package aklo;
 
-import static org.objectweb.asm.Opcodes.BIPUSH;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
 import java.util.AbstractCollection;
@@ -13,6 +13,7 @@ import org.objectweb.asm.MethodVisitor;
 
 public abstract class Term extends AbstractCollection<Term> {
   public final Loc loc;
+  public int localVar = -1;
 
   public Term(Loc loc) {
     this.loc = loc;
@@ -61,6 +62,16 @@ public abstract class Term extends AbstractCollection<Term> {
 
   public Type type() {
     throw new UnsupportedOperationException(toString());
+  }
+
+  public final void load(MethodVisitor mv) {
+    assert localVar >= 0;
+    // TODO
+    switch (type().kind()) {
+      case VOID -> throw new UnsupportedOperationException(toString());
+      case DOUBLE -> mv.visitVarInsn(DLOAD, localVar);
+      default -> mv.visitVarInsn(ALOAD, localVar);
+    }
   }
 
   public Term eval() {

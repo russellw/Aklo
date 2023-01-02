@@ -11,6 +11,7 @@ public final class ListOf extends Terms {
   public void emit(MethodVisitor mv) {
     var n = size();
     if (n <= 10) {
+      for (var a : this) a.load(mv);
       mv.visitMethodInsn(
           INVOKESTATIC,
           "java/util/List",
@@ -21,12 +22,10 @@ public final class ListOf extends Terms {
     }
     emitInt(mv, n);
     mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
-    // TODO this is not quite correct as it stands, because the outer loop will already have emitted
-    // the arguments, but they need to be emitted after the new array, not before
     for (var i = 0; i < n; i++) {
       mv.visitInsn(DUP);
       emitInt(mv, i);
-      get(i).emit(mv);
+      get(i).load(mv);
       mv.visitInsn(AASTORE);
     }
     mv.visitMethodInsn(
@@ -54,6 +53,11 @@ public final class ListOf extends Terms {
 
   public ListOf(Loc loc, Term[] terms) {
     super(loc, terms);
+  }
+
+  @Override
+  public Type type() {
+    return Type.ANY;
   }
 
   @Override

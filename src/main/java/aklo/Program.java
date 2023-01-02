@@ -24,16 +24,35 @@ public final class Program {
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
     // functions
-    var stack = new ArrayList<Term>();
     for (var f : fns) {
       f.dbg();
+
+      // assign local variables
+      var i = 0;
+      for (var block : f.blocks)
+        for (var a : block.insns)
+          switch (a.type().kind()) {
+            case VOID -> {}
+            case DOUBLE -> {
+              // TODO long
+              a.localVar = i;
+              i += 2;
+            }
+            default -> a.localVar = i++;
+          }
+
+      // emit code
       var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
       mv.visitCode();
-      for (var block : f.blocks) {
+      for (var block : f.blocks)
         for (var a : block.insns) {
           a.emit(mv);
+          switch (a.type().kind()) {
+            case VOID -> {}
+            case DOUBLE -> mv.visitVarInsn(DSTORE, a.localVar);
+            default -> mv.visitVarInsn(ASTORE, a.localVar);
+          }
         }
-      }
       mv.visitInsn(RETURN);
       mv.visitMaxs(0, 0);
       mv.visitEnd();
