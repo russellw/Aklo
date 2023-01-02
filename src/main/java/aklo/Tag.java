@@ -33,6 +33,7 @@ public enum Tag {
   RETURN,
   EQ,
   EQ_NUMBER,
+  DO,
   LE,
   LT,
   GOTO,

@@ -88,12 +88,15 @@ public class Fn extends Term {
 
   private Term term(Loop loop, Term a) {
     switch (a.tag()) {
+      case DO -> {
+        Term r = null;
+        if (a.isEmpty()) r = new ConstInteger(a.loc, 0);
+        else for (var b : a) r = term(loop, b);
+        return r;
+      }
       case POST_INC -> {
-        var a1 = (PostInc) a;
         var r = var1(a.loc);
-
         insn(new Assign(a.loc, r, term(loop, a.get(0))));
-
         return r;
       }
       case OR -> {

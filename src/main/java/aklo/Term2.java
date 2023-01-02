@@ -19,16 +19,20 @@ public abstract class Term2 extends Term {
 
   @Override
   public void set(int i, Term a) {
-    assert 0 <= i && i < 2;
-    if (i == 0) arg0 = a;
-    else arg1 = a;
+    switch (i) {
+      case 0 -> arg0 = a;
+      case 1 -> arg1 = a;
+      default -> throw new IndexOutOfBoundsException(Integer.toString(i));
+    }
   }
 
   @Override
   public Term get(int i) {
-    assert 0 <= i && i < 2;
-    if (i == 0) return arg0;
-    return arg1;
+    return switch (i) {
+      case 0 -> arg0;
+      case 1 -> arg1;
+      default -> throw new IndexOutOfBoundsException(Integer.toString(i));
+    };
   }
 
   public double apply(double a, double b) {
@@ -70,14 +74,13 @@ public abstract class Term2 extends Term {
 
       @Override
       public boolean hasNext() {
+        assert i >= 0;
         return i < 2;
       }
 
       @Override
       public Term next() {
-        assert 0 <= i && i < 2;
-        if (i++ == 0) return arg0;
-        return arg1;
+        return get(i++);
       }
     };
   }
