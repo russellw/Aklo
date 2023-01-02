@@ -2,7 +2,6 @@ package aklo;
 
 import java.math.BigInteger;
 import java.util.Iterator;
-import java.util.function.Function;
 
 public abstract class Term2 extends Term {
   public Term arg0, arg1;
@@ -47,15 +46,6 @@ public abstract class Term2 extends Term {
   public BigRational apply(BigRational a, BigRational b) {
     throw new UnsupportedOperationException(toString());
   }
-
-  @Override
-  public Term map(Function<Term, Term> f) {
-    var a = f.apply(arg0);
-    var b = f.apply(arg1);
-    return remake(loc, a, b);
-  }
-
-  public abstract Term remake(Loc loc, Term arg0, Term arg1);
 
   @Override
   public Term eval() {

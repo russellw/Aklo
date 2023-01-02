@@ -19,9 +19,4 @@ public final class CaseBlock extends Terms {
   public Tag tag() {
     throw new UnsupportedOperationException(toString());
   }
-
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new CaseBlock(loc, terms, cases);
-  }
 }

@@ -9,9 +9,4 @@ public final class Intern extends Term1 {
   public Tag tag() {
     return Tag.INTERN;
   }
-
-  @Override
-  public Term remake(Loc loc, Term arg) {
-    return new Intern(loc, arg);
-  }
 }

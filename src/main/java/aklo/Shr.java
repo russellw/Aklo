@@ -13,11 +13,6 @@ public final class Shr extends Term2 {
   }
 
   @Override
-  public Term remake(Loc loc, Term arg0, Term arg1) {
-    return new Shr(loc, arg0, arg1);
-  }
-
-  @Override
   public Tag tag() {
     return Tag.SHR;
   }

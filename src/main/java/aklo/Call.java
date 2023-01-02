@@ -12,11 +12,6 @@ public final class Call extends Terms {
   }
 
   @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new Call(loc, terms);
-  }
-
-  @Override
   public Tag tag() {
     return Tag.CALL;
   }

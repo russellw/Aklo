@@ -23,11 +23,6 @@ public final class Mul extends Term2 {
   }
 
   @Override
-  public Term remake(Loc loc, Term arg0, Term arg1) {
-    return new Mul(loc, arg0, arg1);
-  }
-
-  @Override
   public BigRational apply(BigRational a, BigRational b) {
     return a.multiply(b);
   }

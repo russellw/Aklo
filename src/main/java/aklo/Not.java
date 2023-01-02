@@ -6,11 +6,6 @@ public final class Not extends Term1 {
   }
 
   @Override
-  public Term remake(Loc loc, Term arg) {
-    return new Not(loc, arg);
-  }
-
-  @Override
   public Tag tag() {
     return Tag.NOT;
   }

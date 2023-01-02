@@ -51,9 +51,4 @@ public final class Invoke extends Terms {
   public Tag tag() {
     return Tag.INVOKE;
   }
-
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return null;
-  }
 }

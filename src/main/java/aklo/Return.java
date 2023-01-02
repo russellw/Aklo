@@ -21,11 +21,6 @@ public final class Return extends Term1 {
   }
 
   @Override
-  public Term remake(Loc loc, Term arg) {
-    return new Return(loc, arg);
-  }
-
-  @Override
   public Tag tag() {
     return Tag.RETURN;
   }

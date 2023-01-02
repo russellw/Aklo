@@ -32,11 +32,6 @@ public final class ListOf extends Terms {
         INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
   }
 
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new ListOf(loc, terms);
-  }
-
   public ListOf(Loc loc, List<Term> terms) {
     super(loc, terms);
   }

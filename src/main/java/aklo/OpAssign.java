@@ -12,9 +12,4 @@ public final class OpAssign extends Term2 {
   public Tag tag() {
     return Tag.OP_ASSIGN;
   }
-
-  @Override
-  public Term remake(Loc loc, Term arg0, Term arg1) {
-    return new OpAssign(loc, op, arg0, arg1);
-  }
 }

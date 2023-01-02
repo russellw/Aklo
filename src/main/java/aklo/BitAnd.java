@@ -8,11 +8,6 @@ public final class BitAnd extends Term2 {
   }
 
   @Override
-  public Term remake(Loc loc, Term arg0, Term arg1) {
-    return new BitAnd(loc, arg0, arg1);
-  }
-
-  @Override
   public BigInteger apply(BigInteger a, BigInteger b) {
     return a.and(b);
   }

@@ -18,9 +18,4 @@ public final class If extends Term1 {
   public Tag tag() {
     return Tag.IF;
   }
-
-  @Override
-  public Term remake(Loc loc, Term arg) {
-    throw new UnsupportedOperationException(toString());
-  }
 }

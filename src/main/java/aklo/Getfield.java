@@ -16,9 +16,4 @@ public final class Getfield extends Term1 {
   public Tag tag() {
     return Tag.GETFIELD;
   }
-
-  @Override
-  public Term remake(Loc loc, Term arg) {
-    return null;
-  }
 }

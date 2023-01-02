@@ -15,9 +15,4 @@ public final class For extends Terms {
   public Tag tag() {
     return Tag.FOR;
   }
-
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new For(loc, terms);
-  }
 }

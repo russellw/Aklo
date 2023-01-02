@@ -11,11 +11,6 @@ public final class While extends Terms {
     this.doWhile = doWhile;
   }
 
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new While(loc, label, doWhile, terms);
-  }
-
   public While(Loc loc, String label, boolean doWhile, Term[] terms) {
     super(loc, terms);
     this.label = label;

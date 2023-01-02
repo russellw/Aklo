@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import org.objectweb.asm.MethodVisitor;
 
 public abstract class Term extends AbstractCollection<Term> {
@@ -105,11 +104,6 @@ public abstract class Term extends AbstractCollection<Term> {
   @Override
   public int size() {
     return 0;
-  }
-
-  public Term map(Function<Term, Term> f) {
-    assert isEmpty();
-    return this;
   }
 
   @Override

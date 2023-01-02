@@ -15,9 +15,4 @@ public final class Case extends Terms {
   public Tag tag() {
     return Tag.CASE;
   }
-
-  @Override
-  public Term remake(Loc loc, Term[] terms) {
-    return new Case(loc, terms);
-  }
 }
