@@ -87,20 +87,18 @@ public class Fn extends Term {
   }
 
   private Term term(Loop loop, Term a) {
+    var r = a;
     switch (a.tag()) {
       case DO -> {
-        Term r = null;
         if (a.isEmpty()) r = new ConstInteger(a.loc, 0);
         else for (var b : a) r = term(loop, b);
-        return r;
       }
       case POST_INC -> {
-        var r = var1(a.loc);
+        r = var1(a.loc);
         insn(new Assign(a.loc, r, term(loop, a.get(0))));
-        return r;
       }
       case OR -> {
-        var r = var1(a.loc);
+        r = var1(a.loc);
         var falseBlock = new Block(a.loc, "orFalse");
         var afterBlock = new Block(a.loc, "orAfter");
 
@@ -115,10 +113,9 @@ public class Fn extends Term {
 
         // after
         addBlock(afterBlock);
-        return r;
       }
       case AND -> {
-        var r = var1(a.loc);
+        r = var1(a.loc);
         var trueBlock = new Block(a.loc, "andTrue");
         var afterBlock = new Block(a.loc, "andAfter");
 
@@ -133,10 +130,9 @@ public class Fn extends Term {
 
         // after
         addBlock(afterBlock);
-        return r;
       }
       case NOT -> {
-        var r = var1(a.loc);
+        r = var1(a.loc);
         var trueBlock = new Block(a.loc, "notTrue");
         var falseBlock = new Block(a.loc, "notFalse");
         var afterBlock = new Block(a.loc, "notAfter");
@@ -156,7 +152,6 @@ public class Fn extends Term {
 
         // after
         addBlock(afterBlock);
-        return r;
       }
       case IF -> {
         var a1 = (IfStmt) a;
@@ -226,7 +221,7 @@ public class Fn extends Term {
         insn(a);
       }
     }
-    return a;
+    return r;
   }
 
   private void toBlocks(Env outer) {
