@@ -17,8 +17,8 @@ public final class Block {
 
   @Override
   public String toString() {
-    if (name != null) return name;
-    return "#" + hashCode();
+    assert name != null;
+    return name;
   }
 
   public boolean hasTerminator() {

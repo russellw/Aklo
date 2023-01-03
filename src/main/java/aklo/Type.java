@@ -4,7 +4,7 @@ public abstract class Type {
   public static final Type BOOL =
       new Type() {
         @Override
-        public String descriptor() {
+        public String toString() {
           return "Z";
         }
 
@@ -21,14 +21,14 @@ public abstract class Type {
         }
 
         @Override
-        public String descriptor() {
+        public String toString() {
           return "V";
         }
       };
   public static final Type FLOAT =
       new Type() {
         @Override
-        public String descriptor() {
+        public String toString() {
           return "F";
         }
 
@@ -40,7 +40,7 @@ public abstract class Type {
   public static final Type DOUBLE =
       new Type() {
         @Override
-        public String descriptor() {
+        public String toString() {
           return "D";
         }
 
@@ -57,7 +57,7 @@ public abstract class Type {
         }
 
         @Override
-        public String descriptor() {
+        public String toString() {
           return "Ljava/math/BigInteger;";
         }
       };
@@ -69,7 +69,7 @@ public abstract class Type {
         }
 
         @Override
-        public String descriptor() {
+        public String toString() {
           return "Laklo/BigRational;";
         }
       };
@@ -81,14 +81,12 @@ public abstract class Type {
         }
 
         @Override
-        public String descriptor() {
+        public String toString() {
           return "Ljava/lang/Object;";
         }
       };
 
   public abstract Kind kind();
-
-  public abstract String descriptor();
 
   public static Type of(String descriptor) {
     return switch (descriptor) {
