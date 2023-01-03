@@ -156,6 +156,7 @@ public class Fn extends Term {
         addBlock(afterBlock);
       }
       case IF -> {
+        r = var1(a.loc);
         var trueBlock = new Block(a.loc, "ifTrue");
         var falseBlock = new Block(a.loc, "ifFalse");
         var afterBlock = new Block(a.loc, "ifAfter");
@@ -165,12 +166,12 @@ public class Fn extends Term {
 
         // true
         addBlock(trueBlock);
-        term(loop, a.get(1));
+        insn(new Assign(a.loc, r, term(loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // false
         addBlock(falseBlock);
-        term(loop, a.get(2));
+        insn(new Assign(a.loc, r, term(loop, a.get(2))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
@@ -218,6 +219,7 @@ public class Fn extends Term {
         addBlock(new Block(a.loc, "returnAfter"));
       }
       default -> {
+        if (a.isEmpty()) break;
         for (var i = 0; i < a.size(); i++) a.set(i, term(loop, a.get(i)));
         insn(a);
       }
@@ -244,15 +246,7 @@ public class Fn extends Term {
 
     // convert this function to basic blocks
     addBlock(new Block(loc, null));
-    for (var a : body) term(null, a);
-
-    // default return 0
-    if (!lastBlock().hasTerminator()) {
-      var loc1 = body.isEmpty() ? loc : body.get(body.size() - 1).loc;
-      var r = new ConstInteger(loc1, BigInteger.ZERO);
-      insn(r);
-      insn(new Return(loc1, r));
-    }
+    insn(new Return(loc, term(null, body)));
   }
 
   public void toBlocks() {

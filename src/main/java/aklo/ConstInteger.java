@@ -14,7 +14,7 @@ public final class ConstInteger extends Term {
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  public void load(MethodVisitor mv) {
     try {
       mv.visitLdcInsn(val.longValueExact());
       mv.visitMethodInsn(

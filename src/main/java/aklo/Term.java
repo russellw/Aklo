@@ -42,10 +42,11 @@ public abstract class Term extends AbstractCollection<Term> {
     System.out.print(this);
     for (var i = 0; i < size(); i++) {
       if (i > 0) System.out.print(',');
+      System.out.print(' ');
       var a = get(i);
       var j = refs.get(a);
-      if (j == null) throw new IllegalStateException(String.format("%s: %s", refs, a));
-      System.out.print(" %" + j);
+      if (j == null) System.out.print(a);
+      else System.out.print("%" + j);
     }
   }
 
@@ -66,7 +67,7 @@ public abstract class Term extends AbstractCollection<Term> {
     throw new UnsupportedOperationException(toString());
   }
 
-  public final void load(MethodVisitor mv) {
+  public void load(MethodVisitor mv) {
     assert localVar >= 0;
     // TODO
     switch (type().kind()) {
