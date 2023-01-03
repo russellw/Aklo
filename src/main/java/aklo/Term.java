@@ -65,7 +65,7 @@ public abstract class Term extends AbstractCollection<Term> {
   }
 
   public void load(MethodVisitor mv) {
-    assert localVar >= 0;
+    if (localVar < 0) throw new IllegalStateException(toString());
     // TODO
     switch (type().kind()) {
       case VOID -> throw new UnsupportedOperationException(toString());

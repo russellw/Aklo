@@ -14,6 +14,8 @@ public final class Eq extends Term2 {
     arg0.load(mv);
     arg1.load(mv);
     mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+    mv.visitMethodInsn(
+        INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
   }
 
   @Override

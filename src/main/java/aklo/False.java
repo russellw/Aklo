@@ -1,10 +1,18 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.math.BigInteger;
+import org.objectweb.asm.MethodVisitor;
 
 public final class False extends Term {
   public False(Loc loc) {
     super(loc);
+  }
+
+  @Override
+  public void load(MethodVisitor mv) {
+    mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
   }
 
   @Override

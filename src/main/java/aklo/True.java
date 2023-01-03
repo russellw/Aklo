@@ -1,6 +1,9 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.math.BigInteger;
+import org.objectweb.asm.MethodVisitor;
 
 public final class True extends Term {
   public True(Loc loc) {
@@ -35,5 +38,10 @@ public final class True extends Term {
   @Override
   public Type type() {
     return Type.BOOL;
+  }
+
+  @Override
+  public void load(MethodVisitor mv) {
+    mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "TRUE", "Ljava/lang/Boolean;");
   }
 }
