@@ -11,7 +11,7 @@ public final class Assign extends Term2 {
 
   @Override
   public void emit(MethodVisitor mv) {
-    arg1.emit(mv);
+    arg1.load(mv);
     mv.visitVarInsn(ASTORE, arg0.localVar);
   }
 
