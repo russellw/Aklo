@@ -19,7 +19,7 @@ public final class Invoke extends Terms {
   }
 
   @Override
-  void dbg(Map<Term, Integer> refs) {
+  public void dbg(Map<Term, Integer> refs) {
     System.out.print("invoke");
     System.out.print(
         switch (opcode) {

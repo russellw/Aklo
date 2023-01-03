@@ -257,7 +257,7 @@ public class Fn extends Term {
   }
 
   // debug output
-  void dbg() {
+  public void dbg() {
     // make local names unique
     var names = new HashSet<String>();
     for (var block : blocks) {

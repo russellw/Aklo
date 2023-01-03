@@ -22,7 +22,7 @@ public final class If extends Term1 {
   }
 
   @Override
-  void dbg(Map<Term, Integer> refs) {
+  public void dbg(Map<Term, Integer> refs) {
     super.dbg(refs);
     System.out.printf(", %s, %s", trueTarget, falseTarget);
   }

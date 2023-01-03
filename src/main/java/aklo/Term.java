@@ -35,7 +35,7 @@ public abstract class Term extends AbstractCollection<Term> {
     return tag().name().toLowerCase(Locale.ROOT);
   }
 
-  void dbg(Map<Term, Integer> refs) {
+  public void dbg(Map<Term, Integer> refs) {
     System.out.print(this);
     for (var i = 0; i < size(); i++) {
       if (i > 0) System.out.print(',');
