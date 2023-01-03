@@ -258,6 +258,19 @@ public class Fn extends Term {
 
   // debug output
   void dbg() {
+    // make local names unique
+    var names = new HashSet<String>();
+    for (var block : blocks) {
+      if (names.add(block.name)) continue;
+      for (var i = 1; ; i++) {
+        var s = block.name + i;
+        if (names.add(s)) {
+          block.name = s;
+          break;
+        }
+      }
+    }
+
     // header
     System.out.printf("fn %s(", name);
     for (var i = 0; i < params.size(); i++) {

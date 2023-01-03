@@ -6,7 +6,7 @@ import org.objectweb.asm.Label;
 
 public final class Block {
   public final Loc loc;
-  public final String name;
+  public String name;
   public Label label;
   public final List<Term> insns = new ArrayList<>();
 
