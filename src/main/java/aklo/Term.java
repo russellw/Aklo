@@ -27,12 +27,24 @@ public abstract class Term extends AbstractCollection<Term> {
   }
 
   public void emit(MethodVisitor mv) {
-    throw new UnsupportedOperationException(toString());
+    throw new UnsupportedOperationException(str());
   }
 
   @Override
   public String toString() {
     return tag().name().toLowerCase(Locale.ROOT);
+  }
+
+  public final String str() {
+    var s = toString();
+    if (isEmpty()) return s;
+    var sb = new StringBuilder(s + '(');
+    for (var i = 0; i < size(); i++) {
+      if (i > 0) sb.append(", ");
+      sb.append(get(i).str());
+    }
+    sb.append(')');
+    return sb.toString();
   }
 
   public void dbg(Map<Term, Integer> refs) {
