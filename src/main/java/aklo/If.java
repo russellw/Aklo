@@ -1,11 +1,19 @@
 package aklo;
 
+import java.util.Map;
+
 public final class If extends Term1 {
   public final Block trueTarget, falseTarget;
 
   @Override
   public boolean isTerminator() {
     return true;
+  }
+
+  @Override
+  void dbg(Map<Term, Integer> refs) {
+    super.dbg(refs);
+    System.out.printf(", %s, %s", trueTarget, falseTarget);
   }
 
   public If(Loc loc, Term cond, Block trueTarget, Block falseTarget) {

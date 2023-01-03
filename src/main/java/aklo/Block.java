@@ -15,7 +15,8 @@ public final class Block {
 
   @Override
   public String toString() {
-    return insns.toString();
+    if (name != null) return name;
+    return "#" + hashCode();
   }
 
   public boolean hasTerminator() {

@@ -42,7 +42,10 @@ public abstract class Term extends AbstractCollection<Term> {
     System.out.print(this);
     for (var i = 0; i < size(); i++) {
       if (i > 0) System.out.print(',');
-      System.out.print(' ' + refs.get(get(i)).toString());
+      var a = get(i);
+      var j = refs.get(a);
+      if (j == null) throw new IllegalStateException(String.format("%s: %s", refs, a));
+      System.out.print(" %" + j);
     }
   }
 

@@ -273,8 +273,9 @@ public class Fn extends Term {
     var used = new HashSet<Term>();
     for (var block : blocks) for (var a : block.insns) used.addAll(a);
 
-    // assign reference numbers to instructions
+    // assign reference numbers to local variables and instructions
     var refs = new HashMap<Term, Integer>();
+    for (var x : vars) refs.put(x, refs.size());
     for (var block : blocks)
       for (var a : block.insns) if (used.contains(a)) refs.put(a, refs.size());
 

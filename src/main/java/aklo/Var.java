@@ -21,6 +21,12 @@ public final class Var extends Term {
   }
 
   @Override
+  public String toString() {
+    if (name != null) return name;
+    return "#" + hashCode();
+  }
+
+  @Override
   public Type type() {
     return type;
   }
