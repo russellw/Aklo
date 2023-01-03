@@ -17,7 +17,7 @@ public final class Cat extends Term2 {
         INVOKESTATIC,
         "aklo/Etc",
         "cat",
-        "(Ljava/util/List;Ljava/util/List;)Ljava/util/List;",
+        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
         false);
   }
 

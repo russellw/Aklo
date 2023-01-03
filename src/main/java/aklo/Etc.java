@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public final class Etc {
   private Etc() {}
 
@@ -71,6 +72,11 @@ public final class Etc {
     return sb.toString();
   }
 
+  public static List<Object> listVal(Object a) {
+    if (a instanceof List) return (List<Object>) a;
+    return List.of(a);
+  }
+
   public static int intVal(Object a) {
     if (a instanceof BigInteger a1) return a1.intValueExact();
     throw new IllegalArgumentException(a.toString());
@@ -80,9 +86,9 @@ public final class Etc {
     for (var b : (List) a) System.out.write(intVal(b));
   }
 
-  public static List<Object> cat(List<Object> s, List<Object> t) {
-    var r = new ArrayList<>(s);
-    r.addAll(t);
+  public static List<Object> cat(Object a, Object b) {
+    var r = new ArrayList<>(listVal(a));
+    r.addAll(listVal(b));
     return r;
   }
 
