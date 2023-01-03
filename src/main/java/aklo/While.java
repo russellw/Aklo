@@ -1,19 +1,12 @@
 package aklo;
 
-import java.util.List;
 
-public final class While extends Terms {
+public final class While extends Term2 {
   public String label;
   public final boolean doWhile;
 
-  public While(Loc loc, boolean doWhile, List<Term> terms) {
-    super(loc, terms);
-    this.doWhile = doWhile;
-  }
-
-  public While(Loc loc, String label, boolean doWhile, Term[] terms) {
-    super(loc, terms);
-    this.label = label;
+  public While(boolean doWhile, Term cond, Term body) {
+    super(cond.loc, cond, body);
     this.doWhile = doWhile;
   }
 

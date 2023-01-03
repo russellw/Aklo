@@ -1,14 +1,9 @@
 package aklo;
 
-import java.util.List;
 
-public final class For extends Terms {
-  public For(Loc loc, Term[] terms) {
-    super(loc, terms);
-  }
-
-  public For(Loc loc, List<Term> terms) {
-    super(loc, terms);
+public final class For extends Term3 {
+  public For(Term x, Term s, Term body) {
+    super(x.loc, x, s, body);
   }
 
   @Override

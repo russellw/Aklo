@@ -1,5 +1,6 @@
 package aklo;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -7,8 +8,9 @@ public class Fn extends Term {
   public final String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype;
+  public Term body;
+
   public final List<Var> vars = new ArrayList<>();
-  public final List<Term> body = new ArrayList<>();
   public final List<Block> blocks = new ArrayList<>();
 
   public Fn(Loc loc, String name) {
@@ -90,7 +92,7 @@ public class Fn extends Term {
     var r = a;
     switch (a.tag()) {
       case DO -> {
-        if (a.isEmpty()) r = new ConstInteger(a.loc, 0);
+        if (a.isEmpty()) r = new ConstInteger(a.loc, BigInteger.ZERO);
         else for (var b : a) r = term(loop, b);
       }
       case POST_INC -> {
@@ -154,22 +156,21 @@ public class Fn extends Term {
         addBlock(afterBlock);
       }
       case IF -> {
-        var a1 = (IfStmt) a;
         var trueBlock = new Block(a.loc, "ifTrue");
         var falseBlock = new Block(a.loc, "ifFalse");
         var afterBlock = new Block(a.loc, "ifAfter");
 
         // condition
-        insn(new If(a.loc, term(loop, a1.get(0)), trueBlock, falseBlock));
+        insn(new If(a.loc, term(loop, a.get(0)), trueBlock, falseBlock));
 
         // true
         addBlock(trueBlock);
-        for (var i = 1; i < a1.elseIdx; i++) term(loop, a1.get(i));
+        term(loop, a.get(1));
         insn(new Goto(a.loc, afterBlock));
 
         // false
         addBlock(falseBlock);
-        for (var i = a1.elseIdx; i < a1.size(); i++) term(loop, a1.get(i));
+        term(loop, a.get(2));
         insn(new Goto(a.loc, afterBlock));
 
         // after
@@ -187,12 +188,12 @@ public class Fn extends Term {
 
         // body
         addBlock(bodyBlock);
-        for (var i = 1; i < a1.size(); i++) term(loop, a1.get(i));
+        term(loop, a1.arg1);
         insn(new Goto(a.loc, condBlock));
 
         // condition
         addBlock(condBlock);
-        insn(new If(a.loc, term(loop, a1.get(0)), bodyBlock, afterBlock));
+        insn(new If(a.loc, term(loop, a1.arg0), bodyBlock, afterBlock));
 
         // after
         addBlock(afterBlock);
@@ -248,7 +249,7 @@ public class Fn extends Term {
     // default return 0
     if (!lastBlock().hasTerminator()) {
       var loc1 = body.isEmpty() ? loc : body.get(body.size() - 1).loc;
-      var r = new ConstInteger(loc1, 0);
+      var r = new ConstInteger(loc1, BigInteger.ZERO);
       insn(r);
       insn(new Return(loc1, r));
     }

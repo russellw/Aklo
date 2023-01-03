@@ -717,8 +717,7 @@ public final class Parser {
 
         // body
         expect('(');
-        if (eat(INDENT)) do f.body.add(stmt(f)); while (!eat(DEDENT));
-        else if (tok != ')') f.body.add(new Return(loc, commas()));
+        f.body = tok == INDENT ? block(f) : commas();
         expect(')');
         return f;
       }
@@ -898,31 +897,34 @@ public final class Parser {
     return a;
   }
 
-  private void stmts(Fn f, List<Term> r) throws IOException {
+  private Do block(Fn f) throws IOException {
+    var loc = new Loc(file, line);
     expectIndent();
+    var r = new ArrayList<Term>();
     do r.add(stmt(f));
     while (!eat(DEDENT));
+    return new Do(loc, r);
   }
 
   private IfStmt parseIf(Fn f) throws IOException {
     assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
-    var loc = new Loc(file, line);
     lex();
-    var r = new ArrayList<>(List.of(expr()));
-    stmts(f, r);
-    var then = r.size();
+    var cond = expr();
+    var yes = block(f);
+    Term no = null;
     if (tok == WORD)
       switch (tokString) {
         case "else" -> {
           lex();
-          stmts(f, r);
+          no = block(f);
         }
         case "elif" -> {
           lex();
-          r.add(parseIf(f));
+          no = parseIf(f);
         }
       }
-    return new IfStmt(loc, r, then);
+    if (no == null) no = new ConstInteger(cond.loc, BigInteger.ZERO);
+    return new IfStmt(cond, yes, no);
   }
 
   private Term stmt(Fn f) throws IOException {
@@ -941,13 +943,13 @@ public final class Parser {
             var cond = expr();
             expectNewline();
             // TODO throw string
-            return new IfStmt(loc, List.of(cond, new Throw(loc, cond)), 1);
+            return new IfStmt(cond, new Throw(loc, cond), null);
           }
           case "fn" -> {
             lex();
             f = new Fn(loc, word());
             params(f);
-            stmts(f, f.body);
+            f.body = block(f);
             return f;
           }
           case "if" -> {
@@ -958,34 +960,27 @@ public final class Parser {
             var r = new ArrayList<>(List.of(commas()));
             expectIndent();
             do {
-              var cb = new ArrayList<Term>();
-              do cb.add(commas());
+              var s = new ArrayList<Term>();
+              do s.add(commas());
               while (eat('\n'));
-              var cases = cb.size();
-              stmts(f, cb);
-              r.add(new CaseBlock(loc, cb, cases));
+              s.add(block(f));
+              r.add(new Case(s));
             } while (!eat(DEDENT));
-            return new Case(loc, r);
+            return new Case(r);
           }
           case "for" -> {
             lex();
-            var r = new ArrayList<>(List.of(commas()));
+            var x = commas();
             expect(':');
-            r.add(commas());
-            stmts(f, r);
-            return new For(loc, r);
+            return new For(x, commas(), block(f));
           }
           case "while" -> {
             lex();
-            var r = new ArrayList<>(List.of(expr()));
-            stmts(f, r);
-            return new While(loc, false, r);
+            return new While(false, expr(), block(f));
           }
           case "dowhile" -> {
             lex();
-            var r = new ArrayList<>(List.of(expr()));
-            stmts(f, r);
-            return new While(loc, true, r);
+            return new While(true, expr(), block(f));
           }
           case "break" -> {
             lex();
@@ -1043,6 +1038,11 @@ public final class Parser {
     readc();
     lex();
     eat('\n');
-    while (tok != -1) module.body.add(stmt(module));
+
+    var loc = new Loc(file, line);
+    var r = new ArrayList<Term>();
+    do r.add(stmt(module));
+    while (tok != -1);
+    module.body = new Do(loc, r);
   }
 }

@@ -1,18 +1,11 @@
 package aklo;
 
-import java.util.List;
+import java.math.BigInteger;
 
-public final class IfStmt extends Terms {
-  public final int elseIdx;
+public final class IfStmt extends Term3 {
 
-  public IfStmt(Loc loc, List<Term> terms, int elseIdx) {
-    super(loc, terms);
-    this.elseIdx = elseIdx;
-  }
-
-  public IfStmt(Loc loc, Term[] terms, int elseIdx) {
-    super(loc, terms);
-    this.elseIdx = elseIdx;
+  public IfStmt(Term cond, Term yes, Term no) {
+    super(cond.loc, cond, yes, no != null ? no : new ConstInteger(cond.loc, BigInteger.ZERO));
   }
 
   @Override
