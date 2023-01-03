@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 public class Fn extends Term {
   public final String name;
   public final List<Var> params = new ArrayList<>();
-  public Type rtype;
+  public Type rtype = Type.ANY;
   public Term body;
 
   public final List<Var> vars = new ArrayList<>();

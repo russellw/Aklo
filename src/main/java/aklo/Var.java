@@ -2,7 +2,7 @@ package aklo;
 
 public final class Var extends Term {
   public final String name;
-  public Type type;
+  public Type type = Type.ANY;
   public Object val;
 
   public Var(Loc loc, String name) {
