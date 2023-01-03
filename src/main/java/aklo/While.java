@@ -1,6 +1,5 @@
 package aklo;
 
-
 public final class While extends Term2 {
   public String label;
   public final boolean doWhile;

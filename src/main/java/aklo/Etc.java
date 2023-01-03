@@ -1,6 +1,7 @@
 package aklo;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Etc {
@@ -75,13 +76,14 @@ public final class Etc {
     throw new IllegalArgumentException(a.toString());
   }
 
-  public static void println(Object a) {
-    print(a);
-    System.out.println();
-  }
-
   public static void print(Object a) {
     for (var b : (List) a) System.out.write(intVal(b));
+  }
+
+  public static List<Object> cat(List<Object> s, List<Object> t) {
+    var r = new ArrayList<>(s);
+    r.addAll(t);
+    return r;
   }
 
   public static void dbg(Object a) {

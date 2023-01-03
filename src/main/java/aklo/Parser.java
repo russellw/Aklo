@@ -1008,6 +1008,14 @@ public final class Parser {
             return new Invoke(
                 loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", List.of(a));
           }
+          case "println" -> {
+            lex();
+            Term a = new ConstInteger(loc, BigInteger.TEN);
+            if (tok != '\n') a = new Cat(loc, commas(), a);
+            expectNewline();
+            return new Invoke(
+                loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", List.of(a));
+          }
         }
       }
     }
