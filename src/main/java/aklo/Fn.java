@@ -64,8 +64,8 @@ public class Fn extends Term {
     }
   }
 
-  private Var var1(Loc loc) {
-    var x = new Var(loc);
+  private Var var1(Loc loc, String name) {
+    var x = new Var(loc, name);
     vars.add(x);
     return x;
   }
@@ -96,11 +96,11 @@ public class Fn extends Term {
         else for (var b : a) r = term(loop, b);
       }
       case POST_INC -> {
-        r = var1(a.loc);
+        r = var1(a.loc, "old");
         insn(new Assign(a.loc, r, term(loop, a.get(0))));
       }
       case OR -> {
-        r = var1(a.loc);
+        r = var1(a.loc, "or");
         var falseBlock = new Block(a.loc, "orFalse");
         var afterBlock = new Block(a.loc, "orAfter");
 
@@ -117,7 +117,7 @@ public class Fn extends Term {
         addBlock(afterBlock);
       }
       case AND -> {
-        r = var1(a.loc);
+        r = var1(a.loc, "and");
         var trueBlock = new Block(a.loc, "andTrue");
         var afterBlock = new Block(a.loc, "andAfter");
 
@@ -134,7 +134,7 @@ public class Fn extends Term {
         addBlock(afterBlock);
       }
       case NOT -> {
-        r = var1(a.loc);
+        r = var1(a.loc, "not");
         var trueBlock = new Block(a.loc, "notTrue");
         var falseBlock = new Block(a.loc, "notFalse");
         var afterBlock = new Block(a.loc, "notAfter");
@@ -156,7 +156,7 @@ public class Fn extends Term {
         addBlock(afterBlock);
       }
       case IF -> {
-        r = var1(a.loc);
+        r = var1(a.loc, "if");
         var trueBlock = new Block(a.loc, "ifTrue");
         var falseBlock = new Block(a.loc, "ifFalse");
         var afterBlock = new Block(a.loc, "ifAfter");
@@ -266,6 +266,18 @@ public class Fn extends Term {
         var s = block.name + i;
         if (names.add(s)) {
           block.name = s;
+          break;
+        }
+      }
+    }
+
+    names = new HashSet<>();
+    for (var x : vars) {
+      if (names.add(x.name)) continue;
+      for (var i = 1; ; i++) {
+        var s = x.name + i;
+        if (names.add(s)) {
+          x.name = s;
           break;
         }
       }

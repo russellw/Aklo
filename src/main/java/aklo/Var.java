@@ -10,11 +10,6 @@ public final class Var extends Term {
     this.name = name;
   }
 
-  public Var(Loc loc) {
-    super(loc);
-    name = null;
-  }
-
   @Override
   public Tag tag() {
     return Tag.VAR;
@@ -22,8 +17,8 @@ public final class Var extends Term {
 
   @Override
   public String toString() {
-    if (name != null) return name;
-    return "#" + hashCode();
+    assert name != null;
+    return name;
   }
 
   @Override
