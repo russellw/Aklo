@@ -92,6 +92,14 @@ public final class Etc {
     return r;
   }
 
+  public static boolean truth(Object a) {
+    if (a instanceof Boolean) return (boolean) a;
+    if (a instanceof Integer) return (int) a != 0;
+    // TODO other numbers
+    if (a instanceof List) return !((List) a).isEmpty();
+    return true;
+  }
+
   public static void dbg(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }

@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 
 public final class Program {
   public final List<Var> vars = new ArrayList<>();
@@ -27,7 +28,10 @@ public final class Program {
     for (var f : fns) {
       f.dbg();
 
-      // assign local variables
+      // label blocks
+      for (var block : f.blocks) block.label = new Label();
+
+      // assign local variables to instructions
       var i = 0;
       for (var block : f.blocks)
         for (var a : block.insns)
@@ -44,7 +48,8 @@ public final class Program {
       // emit code
       var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
       mv.visitCode();
-      for (var block : f.blocks)
+      for (var block : f.blocks) {
+        mv.visitLabel(block.label);
         for (var a : block.insns) {
           a.emit(mv);
           switch (a.type().kind()) {
@@ -53,6 +58,7 @@ public final class Program {
             default -> mv.visitVarInsn(ASTORE, a.localVar);
           }
         }
+      }
       mv.visitInsn(RETURN);
       mv.visitMaxs(0, 0);
       mv.visitEnd();

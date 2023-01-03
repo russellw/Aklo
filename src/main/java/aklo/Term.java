@@ -3,10 +3,7 @@ package aklo;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
-import java.util.AbstractCollection;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
@@ -64,7 +61,7 @@ public abstract class Term extends AbstractCollection<Term> {
   }
 
   public Type type() {
-    throw new UnsupportedOperationException(toString());
+    return Type.VOID;
   }
 
   public void load(MethodVisitor mv) {

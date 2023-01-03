@@ -1,5 +1,6 @@
 package aklo;
 
+
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
@@ -198,6 +199,7 @@ public class Fn extends Term {
 
         // after
         addBlock(afterBlock);
+        return new ConstInteger(a.loc, BigInteger.ZERO);
       }
       case GOTO -> {
         var a1 = (LoopGoto) a;
@@ -212,11 +214,13 @@ public class Fn extends Term {
         }
         insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
         addBlock(new Block(a.loc, "gotoAfter"));
+        return new ConstInteger(a.loc, BigInteger.ZERO);
       }
-      case RETURN -> {
+      case RETURN, THROW -> {
         a.set(0, term(loop, a.get(0)));
         insn(a);
-        addBlock(new Block(a.loc, "returnAfter"));
+        addBlock(new Block(a.loc, "after"));
+        return new ConstInteger(a.loc, BigInteger.ZERO);
       }
       default -> {
         if (a.isEmpty()) break;
@@ -262,6 +266,9 @@ public class Fn extends Term {
       System.out.print(params.get(i).name);
     }
     System.out.println(')');
+
+    // local variables
+    for (var x : vars) System.out.printf("  var %s %s\n", x, x.type);
 
     // which instructions are used as input to others, therefore needing reference numbers?
     var used = new HashSet<Term>();

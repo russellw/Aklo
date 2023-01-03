@@ -2,10 +2,12 @@ package aklo;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.objectweb.asm.Label;
 
 public final class Block {
   public final Loc loc;
   public final String name;
+  public Label label;
   public final List<Term> insns = new ArrayList<>();
 
   public Block(Loc loc, String name) {

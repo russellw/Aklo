@@ -1,6 +1,9 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 public final class If extends Term1 {
   public final Block trueTarget, falseTarget;
@@ -8,6 +11,14 @@ public final class If extends Term1 {
   @Override
   public boolean isTerminator() {
     return true;
+  }
+
+  @Override
+  public void emit(MethodVisitor mv) {
+    arg.load(mv);
+    mv.visitMethodInsn(INVOKESTATIC, "a", "truth", "(Ljava/lang/Object;)Z", false);
+    mv.visitJumpInsn(IFNE, trueTarget.label);
+    mv.visitJumpInsn(GOTO, falseTarget.label);
   }
 
   @Override
