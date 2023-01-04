@@ -4,7 +4,23 @@ B
 false
 true
 1.5
+1.0
 0.5
+0.5
+0.5
+0.5
+1.0
+10.0
+2.0
+8.0
+80.0
+10.0
+2.0
+8.0
+80.0
+512.0
+512.0
+512.0
 true
 1000
 64
@@ -20,7 +36,23 @@ print(10)
 println false
 println true
 println 1.5
+println 1.
 println .5
+println .0005e3
+println .0005e+3
+println 0.0005e3
+println 1000e-3
+println 0x1.4p3
+println 0x.4p3
+println 0x1.p3
+println 0xa.p3
+println 0x1.4p+3
+println 0x.4p+3
+println 0x1.p+3
+println 0xa.p+3
+println 0x1000p-3
+println 0x1000.p-3
+println 0x1000.0p-3
 println str(true)
 println str(1000)
 println str(0o100)
