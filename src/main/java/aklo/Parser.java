@@ -450,6 +450,13 @@ public final class Parser {
   }
 
   // expressions
+  private Term args1() throws IOException {
+    expect('(');
+    var a = expr();
+    expect(')');
+    return a;
+  }
+
   private void exprs(char end, List<Term> r) throws IOException {
     if (eat(INDENT))
       do {
@@ -546,16 +553,10 @@ public final class Parser {
               return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
             }
             case "bitNot" -> {
-              expect('(');
-              var a = expr();
-              expect(')');
-              return new BitNot(loc, a);
+              return new BitNot(loc, args1());
             }
             case "intern" -> {
-              expect('(');
-              var a = expr();
-              expect(')');
-              return new Intern(loc, a);
+              return new Intern(loc, args1());
             }
             case "bitAnd" -> {
               expect('(');
