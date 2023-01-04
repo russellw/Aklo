@@ -97,6 +97,16 @@ public final class Etc {
     System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
+  public static List<Object> list(byte[] s) {
+    var r = new Object[s.length];
+    for (var i = 0; i < r.length; i++) r[i] = BigInteger.valueOf(s[i] & 0xff);
+    return List.of(r);
+  }
+
+  public static List<Object> str(Object a) {
+    return list(a.toString().getBytes(StandardCharsets.UTF_8));
+  }
+
   public static List<Object> cat(Object a, Object b) {
     var r = new ArrayList<>(listVal(a));
     r.addAll(listVal(b));

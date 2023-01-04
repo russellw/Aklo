@@ -560,23 +560,32 @@ public final class Parser {
               expect(')');
               return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
             }
-            case "bitNot" -> {
+            case "bitnot" -> {
               return new BitNot(loc, arg());
             }
             case "intern" -> {
               return new Intern(loc, arg());
             }
-            case "bitAnd" -> {
+            case "str" -> {
+              return new Invoke(
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "str",
+                  "(Ljava/lang/Object;)Ljava/util/List;",
+                  arg());
+            }
+            case "bitand" -> {
               var a = arg1();
               var b = argN();
               return new BitAnd(loc, a, b);
             }
-            case "bitOr" -> {
+            case "bitor" -> {
               var a = arg1();
               var b = argN();
               return new BitOr(loc, a, b);
             }
-            case "bitXor" -> {
+            case "bitxor" -> {
               var a = arg1();
               var b = argN();
               return new BitXor(loc, a, b);

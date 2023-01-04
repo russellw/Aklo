@@ -96,7 +96,7 @@ public abstract class Type {
       case "Z" -> BOOL;
       case "Laklo/BigRational;" -> RATIONAL;
       case "Ljava/math/BigInteger;" -> INTEGER;
-      default -> throw new IllegalArgumentException(descriptor);
+      default -> ANY;
     };
   }
 }
