@@ -10,6 +10,11 @@ public final class Assign extends Term2 {
   }
 
   @Override
+  public Type type() {
+    return Type.VOID;
+  }
+
+  @Override
   public void emit(MethodVisitor mv) {
     arg1.load(mv);
     if (arg0.localVar < 0) throw new IllegalStateException(str());

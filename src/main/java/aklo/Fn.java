@@ -88,16 +88,16 @@ public class Fn extends Term {
     }
   }
 
-  private Term term(Loop loop, Term a) {
+  private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
       case DO -> {
         if (a.isEmpty()) r = new ConstInteger(a.loc, BigInteger.ZERO);
-        else for (var b : a) r = term(loop, b);
+        else for (var b : a) r = term(env, loop, b);
       }
       case POST_INC -> {
         r = var1(a.loc, "old");
-        insn(new Assign(a.loc, r, term(loop, a.get(0))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(0))));
       }
       case OR -> {
         r = var1(a.loc, "or");
@@ -105,12 +105,12 @@ public class Fn extends Term {
         var afterBlock = new Block(a.loc, "orAfter");
 
         // condition
-        insn(new Assign(a.loc, r, term(loop, a.get(0))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(0))));
         insn(new If(a.loc, r, afterBlock, falseBlock));
 
         // false
         addBlock(falseBlock);
-        insn(new Assign(a.loc, r, term(loop, a.get(1))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
@@ -122,12 +122,12 @@ public class Fn extends Term {
         var afterBlock = new Block(a.loc, "andAfter");
 
         // condition
-        insn(new Assign(a.loc, r, term(loop, a.get(0))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(0))));
         insn(new If(a.loc, r, trueBlock, afterBlock));
 
         // true
         addBlock(trueBlock);
-        insn(new Assign(a.loc, r, term(loop, a.get(1))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
@@ -140,7 +140,7 @@ public class Fn extends Term {
         var afterBlock = new Block(a.loc, "notAfter");
 
         // condition
-        insn(new If(a.loc, term(loop, a.get(0)), trueBlock, falseBlock));
+        insn(new If(a.loc, term(env, loop, a.get(0)), trueBlock, falseBlock));
 
         // true
         addBlock(trueBlock);
@@ -162,16 +162,16 @@ public class Fn extends Term {
         var afterBlock = new Block(a.loc, "ifAfter");
 
         // condition
-        insn(new If(a.loc, term(loop, a.get(0)), trueBlock, falseBlock));
+        insn(new If(a.loc, term(env, loop, a.get(0)), trueBlock, falseBlock));
 
         // true
         addBlock(trueBlock);
-        insn(new Assign(a.loc, r, term(loop, a.get(1))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
         insn(new Goto(a.loc, afterBlock));
 
         // false
         addBlock(falseBlock);
-        insn(new Assign(a.loc, r, term(loop, a.get(2))));
+        insn(new Assign(a.loc, r, term(env, loop, a.get(2))));
         insn(new Goto(a.loc, afterBlock));
 
         // after
@@ -189,12 +189,12 @@ public class Fn extends Term {
 
         // body
         addBlock(bodyBlock);
-        term(loop, a1.arg1);
+        term(env, loop, a1.arg1);
         insn(new Goto(a.loc, condBlock));
 
         // condition
         addBlock(condBlock);
-        insn(new If(a.loc, term(loop, a1.arg0), bodyBlock, afterBlock));
+        insn(new If(a.loc, term(env, loop, a1.arg0), bodyBlock, afterBlock));
 
         // after
         addBlock(afterBlock);
@@ -216,14 +216,19 @@ public class Fn extends Term {
         return new ConstInteger(a.loc, BigInteger.ZERO);
       }
       case RETURN, THROW -> {
-        a.set(0, term(loop, a.get(0)));
+        a.set(0, term(env, loop, a.get(0)));
         insn(a);
         addBlock(new Block(a.loc, "after"));
         return new ConstInteger(a.loc, BigInteger.ZERO);
       }
+      case ID -> {
+        var s = a.toString();
+        r = env.get(s);
+        if (r == null) throw new CompileError(a.loc, s + " not found");
+      }
       default -> {
         if (a.isEmpty()) break;
-        for (var i = 0; i < a.size(); i++) a.set(i, term(loop, a.get(i)));
+        for (var i = 0; i < a.size(); i++) a.set(i, term(env, loop, a.get(i)));
         insn(a);
       }
     }
@@ -249,7 +254,7 @@ public class Fn extends Term {
 
     // convert this function to basic blocks
     addBlock(new Block(loc, "entry"));
-    insn(new Return(loc, term(null, body)));
+    insn(new Return(loc, term(env, null, body)));
   }
 
   public void toBlocks() {
