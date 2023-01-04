@@ -500,7 +500,6 @@ public final class Parser {
           return a;
         }
         case WORD -> {
-          // TODO factor out
           switch (s) {
             case "getstatic" -> {
               expect('(');
@@ -519,10 +518,7 @@ public final class Parser {
               var name = str();
               expect(',');
               var descriptor = str();
-              expect(',');
-              var a = expr();
-              expect(')');
-              return new Getfield(loc, owner, name, descriptor, a);
+              return new Getfield(loc, owner, name, descriptor, argN());
             }
             case "invokestatic" -> {
               expect('(');
