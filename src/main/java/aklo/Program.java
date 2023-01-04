@@ -31,8 +31,9 @@ public final class Program {
       // label blocks
       for (var block : f.blocks) block.label = new Label();
 
-      // assign local variables to instructions
+      // assign local variable numbers
       var i = 0;
+      for (var x : f.vars) x.localVar = i++;
       for (var block : f.blocks)
         for (var a : block.insns)
           switch (a.type().kind()) {
