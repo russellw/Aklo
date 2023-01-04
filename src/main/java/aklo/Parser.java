@@ -450,8 +450,20 @@ public final class Parser {
   }
 
   // expressions
-  private Term args1() throws IOException {
+  private Term arg() throws IOException {
     expect('(');
+    var a = expr();
+    expect(')');
+    return a;
+  }
+
+  private Term arg1() throws IOException {
+    expect('(');
+    return expr();
+  }
+
+  private Term argN() throws IOException {
+    expect(',');
     var a = expr();
     expect(')');
     return a;
@@ -553,49 +565,34 @@ public final class Parser {
               return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
             }
             case "bitNot" -> {
-              return new BitNot(loc, args1());
+              return new BitNot(loc, arg());
             }
             case "intern" -> {
-              return new Intern(loc, args1());
+              return new Intern(loc, arg());
             }
             case "bitAnd" -> {
-              expect('(');
-              var a = expr();
-              expect(',');
-              var b = expr();
-              expect(')');
+              var a = arg1();
+              var b = argN();
               return new BitAnd(loc, a, b);
             }
             case "bitOr" -> {
-              expect('(');
-              var a = expr();
-              expect(',');
-              var b = expr();
-              expect(')');
+              var a = arg1();
+              var b = argN();
               return new BitOr(loc, a, b);
             }
             case "bitXor" -> {
-              expect('(');
-              var a = expr();
-              expect(',');
-              var b = expr();
-              expect(')');
+              var a = arg1();
+              var b = argN();
               return new BitXor(loc, a, b);
             }
             case "shl" -> {
-              expect('(');
-              var a = expr();
-              expect(',');
-              var b = expr();
-              expect(')');
+              var a = arg1();
+              var b = argN();
               return new Shl(loc, a, b);
             }
             case "shr" -> {
-              expect('(');
-              var a = expr();
-              expect(',');
-              var b = expr();
-              expect(')');
+              var a = arg1();
+              var b = argN();
               return new Shr(loc, a, b);
             }
             case "true" -> {
