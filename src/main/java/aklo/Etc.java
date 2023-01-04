@@ -1,6 +1,7 @@
 package aklo;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +84,17 @@ public final class Etc {
   }
 
   public static void print(Object a) {
-    for (var b : (List) a) System.out.write(intVal(b));
+    if (a instanceof BigInteger) {
+      var a1 = ((BigInteger) a).intValueExact();
+      if (!(0 <= a1 && a1 <= 255)) throw new IllegalArgumentException(a.toString());
+      System.out.write(a1);
+      return;
+    }
+    if (a instanceof List) {
+      for (var b : (List) a) print(b);
+      return;
+    }
+    System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
   public static List<Object> cat(Object a, Object b) {
