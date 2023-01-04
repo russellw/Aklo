@@ -55,7 +55,7 @@ public final class Program {
           a.emit(mv);
           switch (a.type().kind()) {
             case VOID -> {}
-            case DOUBLE -> mv.visitVarInsn(DSTORE, a.localVar);
+              // case DOUBLE -> mv.visitVarInsn(DSTORE, a.localVar);
             default -> mv.visitVarInsn(ASTORE, a.localVar);
           }
         }

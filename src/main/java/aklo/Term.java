@@ -81,7 +81,7 @@ public abstract class Term extends AbstractCollection<Term> {
     // TODO
     switch (type().kind()) {
       case VOID -> throw new UnsupportedOperationException(toString());
-      case DOUBLE -> mv.visitVarInsn(DLOAD, localVar);
+        // case DOUBLE -> mv.visitVarInsn(DLOAD, localVar);
       default -> mv.visitVarInsn(ALOAD, localVar);
     }
   }
