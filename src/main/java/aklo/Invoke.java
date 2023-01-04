@@ -41,6 +41,14 @@ public final class Invoke extends Terms {
     this.descriptor = descriptor;
   }
 
+  public Invoke(Loc loc, int opcode, String owner, String name, String descriptor, Term... terms) {
+    super(loc, terms);
+    this.opcode = opcode;
+    this.owner = owner;
+    this.name = name;
+    this.descriptor = descriptor;
+  }
+
   @Override
   public Type type() {
     var i = descriptor.lastIndexOf(')');

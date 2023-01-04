@@ -1000,22 +1000,20 @@ public final class Parser {
             var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : expr();
             expectNewline();
             // TODO replace
-            return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", List.of(a));
+            return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", a);
           }
           case "print" -> {
             lex();
             var a = commas();
             expectNewline();
-            return new Invoke(
-                loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", List.of(a));
+            return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
           }
           case "println" -> {
             lex();
             Term a = new ConstInteger(loc, BigInteger.TEN);
             if (tok != '\n') a = new Cat(loc, commas(), a);
             expectNewline();
-            return new Invoke(
-                loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", List.of(a));
+            return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
           }
         }
       }
