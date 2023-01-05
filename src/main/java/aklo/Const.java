@@ -34,21 +34,18 @@ public final class Const extends Term {
       }
       return;
     }
-    if (val instanceof Float) {
-      mv.visitLdcInsn(val);
-      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
-      return;
-    }
-    if (val instanceof Double) {
-      mv.visitLdcInsn(val);
-      mv.visitMethodInsn(
-          INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-      return;
-    }
     if (val instanceof BigRational x) {
       throw new UnsupportedOperationException(toString());
     }
     mv.visitLdcInsn(val);
+    if (val instanceof Float) {
+      mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
+      return;
+    }
+    if (val instanceof Double) {
+      mv.visitMethodInsn(
+          INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+    }
   }
 
   @Override
