@@ -2,7 +2,6 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
 
 public final class False extends Term {
@@ -13,26 +12,6 @@ public final class False extends Term {
   @Override
   public void load(MethodVisitor mv) {
     mv.visitFieldInsn(GETSTATIC, "java/lang/Boolean", "FALSE", "Ljava/lang/Boolean;");
-  }
-
-  @Override
-  public double doubleVal() {
-    return 0.0;
-  }
-
-  @Override
-  public float floatVal() {
-    return 0.0f;
-  }
-
-  @Override
-  public BigInteger integerVal() {
-    return BigInteger.ZERO;
-  }
-
-  @Override
-  public BigRational rationalVal() {
-    return BigRational.ZERO;
   }
 
   @Override

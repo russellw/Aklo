@@ -92,7 +92,7 @@ public class Fn extends Term {
     var r = a;
     switch (a.tag()) {
       case DO -> {
-        if (a.isEmpty()) r = new ConstInteger(a.loc, BigInteger.ZERO);
+        if (a.isEmpty()) r = new Const(a.loc, BigInteger.ZERO);
         else for (var b : a) r = term(env, loop, b);
       }
       case POST_INC -> {
@@ -198,7 +198,7 @@ public class Fn extends Term {
 
         // after
         addBlock(afterBlock);
-        return new ConstInteger(a.loc, BigInteger.ZERO);
+        return new Const(a.loc, BigInteger.ZERO);
       }
       case GOTO -> {
         var a1 = (LoopGoto) a;
@@ -213,13 +213,13 @@ public class Fn extends Term {
         }
         insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
         addBlock(new Block(a.loc, "gotoAfter"));
-        return new ConstInteger(a.loc, BigInteger.ZERO);
+        return new Const(a.loc, BigInteger.ZERO);
       }
       case RETURN, THROW -> {
         a.set(0, term(env, loop, a.get(0)));
         insn(a);
         addBlock(new Block(a.loc, "after"));
-        return new ConstInteger(a.loc, BigInteger.ZERO);
+        return new Const(a.loc, BigInteger.ZERO);
       }
       case ID -> {
         var s = a.toString();

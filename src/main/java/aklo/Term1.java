@@ -50,14 +50,6 @@ public abstract class Term1 extends Term {
   }
 
   @Override
-  public Term eval() {
-    if (arg instanceof ConstDouble) return new ConstDouble(loc, apply(arg.doubleVal()));
-    if (arg instanceof ConstFloat) return new ConstFloat(loc, apply(arg.floatVal()));
-    if (arg instanceof ConstRational) return new ConstRational(loc, apply(arg.rationalVal()));
-    return new ConstInteger(loc, apply(arg.integerVal()));
-  }
-
-  @Override
   public final Iterator<Term> iterator() {
     return new Iterator<>() {
       private int i;

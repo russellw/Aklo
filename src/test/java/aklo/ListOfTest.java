@@ -11,16 +11,16 @@ public class ListOfTest {
     byte[] bytes = new byte[] {1, 2, 3};
     var r = ListOf.of(null, bytes);
 
-    var a = (ConstInteger) r.get(0);
+    var a = (Const) r.get(0);
     assertEquals(a.val, BigInteger.ONE);
 
-    a = (ConstInteger) r.get(1);
+    a = (Const) r.get(1);
     assertEquals(a.val, BigInteger.TWO);
 
     bytes[0] = -1;
     r = ListOf.of(null, bytes);
 
-    a = (ConstInteger) r.get(0);
+    a = (Const) r.get(0);
     assertEquals(a.val, BigInteger.valueOf(255));
   }
 
@@ -28,10 +28,10 @@ public class ListOfTest {
   public void encode() {
     var r = ListOf.encode(null, "ABC");
 
-    var a = (ConstInteger) r.get(0);
+    var a = (Const) r.get(0);
     assertEquals(a.val, BigInteger.valueOf(65));
 
-    a = (ConstInteger) r.get(1);
+    a = (Const) r.get(1);
     assertEquals(a.val, BigInteger.valueOf(66));
   }
 }

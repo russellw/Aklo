@@ -51,17 +51,6 @@ public abstract class Term2 extends Term {
     throw new UnsupportedOperationException(toString());
   }
 
-  @Override
-  public Term eval() {
-    if (arg0 instanceof ConstDouble || arg1 instanceof ConstDouble)
-      return new ConstDouble(loc, apply(arg0.doubleVal(), arg1.doubleVal()));
-    if (arg0 instanceof ConstFloat || arg1 instanceof ConstFloat)
-      return new ConstFloat(loc, apply(arg0.floatVal(), arg1.floatVal()));
-    if (arg0 instanceof ConstRational || arg1 instanceof ConstRational)
-      return new ConstRational(loc, apply(arg0.rationalVal(), arg1.rationalVal()));
-    return new ConstInteger(loc, apply(arg0.integerVal(), arg1.integerVal()));
-  }
-
   public static Object run(Term2 op, Object a, Object b) {
     if (a instanceof BigInteger a1) {
       // most likely case is operands of the same type

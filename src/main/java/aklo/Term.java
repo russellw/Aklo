@@ -2,7 +2,6 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
@@ -59,10 +58,6 @@ public abstract class Term extends AbstractCollection<Term> {
     }
   }
 
-  public Object val() {
-    throw new UnsupportedOperationException(toString());
-  }
-
   public final void walk(Consumer<Term> f) {
     f.accept(this);
     for (var a : this) a.walk(f);
@@ -86,31 +81,7 @@ public abstract class Term extends AbstractCollection<Term> {
     }
   }
 
-  public Term eval() {
-    throw new UnsupportedOperationException(toString());
-  }
-
   public Term get(int i) {
-    throw new UnsupportedOperationException(toString());
-  }
-
-  public double doubleVal() {
-    throw new UnsupportedOperationException(toString());
-  }
-
-  public float floatVal() {
-    throw new UnsupportedOperationException(toString());
-  }
-
-  public BigInteger integerVal() {
-    throw new UnsupportedOperationException(toString());
-  }
-
-  public BigRational rationalVal() {
-    throw new UnsupportedOperationException(toString());
-  }
-
-  public int intValExact() {
     throw new UnsupportedOperationException(toString());
   }
 

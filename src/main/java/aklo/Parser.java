@@ -551,25 +551,25 @@ public final class Parser {
           return new Id(loc, s);
         }
         case FLOAT -> {
-          return new ConstFloat(loc, Float.parseFloat(s));
+          return new Const(loc, Float.parseFloat(s));
         }
         case DOUBLE -> {
-          return new ConstDouble(loc, Double.parseDouble(s));
+          return new Const(loc, Double.parseDouble(s));
         }
         case INTEGER -> {
           if (s.charAt(0) == '0' && s.length() > 1)
             switch (s.charAt(1)) {
               case 'b', 'B' -> {
-                return new ConstInteger(loc, new BigInteger(s.substring(2), 2));
+                return new Const(loc, new BigInteger(s.substring(2), 2));
               }
               case 'o', 'O' -> {
-                return new ConstInteger(loc, new BigInteger(s.substring(2), 8));
+                return new Const(loc, new BigInteger(s.substring(2), 8));
               }
               case 'x', 'X' -> {
-                return new ConstInteger(loc, new BigInteger(s.substring(2), 16));
+                return new Const(loc, new BigInteger(s.substring(2), 16));
               }
             }
-          return new ConstInteger(loc, new BigInteger(s));
+          return new Const(loc, new BigInteger(s));
         }
         case STR -> {
           return ListOf.encode(loc, Etc.unesc(s));
@@ -668,12 +668,12 @@ public final class Parser {
       case INC -> {
         var loc = new Loc(file, line);
         lex();
-        return new OpAssign(loc, Tag.ADD, postfix(), new ConstInteger(loc, 1));
+        return new OpAssign(loc, Tag.ADD, postfix(), new Const(loc, BigInteger.ONE));
       }
       case DEC -> {
         var loc = new Loc(file, line);
         lex();
-        return new OpAssign(loc, Tag.SUB, postfix(), new ConstInteger(loc, 1));
+        return new OpAssign(loc, Tag.SUB, postfix(), new Const(loc, BigInteger.ONE));
       }
       case '!' -> {
         var loc = new Loc(file, line);
@@ -867,7 +867,7 @@ public final class Parser {
           no = parseIf(f);
         }
       }
-    if (no == null) no = new ConstInteger(cond.loc, BigInteger.ZERO);
+    if (no == null) no = new Const(cond.loc, BigInteger.ZERO);
     return new IfStmt(cond, yes, no);
   }
 
@@ -876,7 +876,7 @@ public final class Parser {
     switch (tok) {
       case '^' -> {
         lex();
-        var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : commas();
+        var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : commas();
         expectNewline();
         return new Return(loc, a);
       }
@@ -940,7 +940,7 @@ public final class Parser {
           }
           case "exit" -> {
             lex();
-            var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : expr();
+            var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : expr();
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a);
           }
@@ -952,7 +952,7 @@ public final class Parser {
           }
           case "println" -> {
             lex();
-            Term a = new ConstInteger(loc, BigInteger.TEN);
+            Term a = new Const(loc, BigInteger.TEN);
             if (tok != '\n') a = new Cat(loc, commas(), a);
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
