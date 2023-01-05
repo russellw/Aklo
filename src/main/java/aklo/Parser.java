@@ -1001,8 +1001,7 @@ public final class Parser {
             lex();
             var a = tok == '\n' ? new ConstInteger(loc, BigInteger.ZERO) : expr();
             expectNewline();
-            // TODO replace
-            return new Invoke(loc, INVOKESTATIC, "java/lang/System", "exit", "(I)V", a);
+            return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a);
           }
           case "print" -> {
             lex();

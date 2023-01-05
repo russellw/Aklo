@@ -83,6 +83,10 @@ public final class Etc {
     throw new IllegalArgumentException(a.toString());
   }
 
+  public static void exit(Object a) {
+    System.exit(intVal(a));
+  }
+
   public static void print(Object a) {
     if (a instanceof BigInteger) {
       var a1 = ((BigInteger) a).intValueExact();

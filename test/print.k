@@ -99,3 +99,5 @@ println 0xa.p+3f
 println 0x1000p-3f
 println 0x1000.p-3f
 println 0x1000.0p-3f
+
+exit 0
