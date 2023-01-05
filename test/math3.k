@@ -48,6 +48,12 @@ OUT
 5.0
 5.0
 5.0
+1.5
+1.5
+1.5
+1.5
+1.5
+1.5
 }
 
 ;addition
@@ -112,3 +118,14 @@ println str(true*5.0)
 println str(true*5.0f)
 println str(5.0*true)
 println str(5.0f*true)
+
+;division
+;println str(3/2)
+println str(3/2.0)
+println str(3.0/2)
+println str(3.0/2.0)
+
+;println str(3/2)
+println str(3/2.0f)
+println str(3.0f/2)
+println str(3.0f/2.0f)
