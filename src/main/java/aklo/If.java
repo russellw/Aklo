@@ -16,7 +16,7 @@ public final class If extends Term1 {
   @Override
   public void emit(MethodVisitor mv) {
     arg.load(mv);
-    mv.visitMethodInsn(INVOKESTATIC, "a", "truth", "(Ljava/lang/Object;)Z", false);
+    mv.visitMethodInsn(INVOKESTATIC, "aklo/Etc", "truth", "(Ljava/lang/Object;)Z", false);
     mv.visitJumpInsn(IFNE, trueTarget.label);
     mv.visitJumpInsn(GOTO, falseTarget.label);
   }

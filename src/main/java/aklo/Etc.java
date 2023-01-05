@@ -110,6 +110,17 @@ public final class Etc {
     System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
+  public static String decode(Object s) {
+    return new String(bytes(s), StandardCharsets.UTF_8);
+  }
+
+  public static byte[] bytes(Object s) {
+    var s1 = (List) s;
+    var r = new byte[s1.size()];
+    for (var i = 0; i < r.length; i++) r[i] = (byte) ((BigInteger) s1.get(i)).intValue();
+    return r;
+  }
+
   public static List<Object> list(byte[] s) {
     var r = new Object[s.length];
     for (var i = 0; i < r.length; i++) r[i] = BigInteger.valueOf(s[i] & 0xff);

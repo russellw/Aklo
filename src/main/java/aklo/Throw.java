@@ -19,7 +19,8 @@ public final class Throw extends Term1 {
     mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
     mv.visitInsn(DUP);
     arg.load(mv);
-    // TODO: convert to String
+    mv.visitMethodInsn(
+        INVOKESTATIC, "aklo/Etc", "decode", "(Ljava/lang/Object;)Ljava/lang/String;", false);
     mv.visitMethodInsn(
         INVOKESPECIAL, "java/lang/RuntimeException", "<init>", "(Ljava/lang/String;)V", false);
     mv.visitInsn(ATHROW);

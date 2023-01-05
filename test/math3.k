@@ -152,5 +152,7 @@ println str(-30.0)
 println str(-30.0f)
 println str(-2/3)
 
+assert -(-100)==100
+
 ;comparison
-;assert cmp(10,20)
+;assert cmp(10,20)==-1
