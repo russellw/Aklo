@@ -501,65 +501,6 @@ public final class Parser {
         }
         case WORD -> {
           switch (s) {
-            case "getstatic" -> {
-              expect('(');
-              var owner = str();
-              expect(',');
-              var name = str();
-              expect(',');
-              var descriptor = str();
-              expect(')');
-              return new Getstatic(loc, owner, name, descriptor);
-            }
-            case "getfield" -> {
-              expect('(');
-              var owner = str();
-              expect(',');
-              var name = str();
-              expect(',');
-              var descriptor = str();
-              return new Getfield(loc, owner, name, descriptor, argN());
-            }
-            case "invokestatic" -> {
-              expect('(');
-              var owner = str();
-              expect(',');
-              var name = str();
-              expect(',');
-              var descriptor = str();
-              var r = new ArrayList<Term>();
-              while (eat(',')) r.add(expr());
-              expect(')');
-              return new Invoke(loc, INVOKESTATIC, owner, name, descriptor, r);
-            }
-            case "invokevirtual" -> {
-              expect('(');
-              var owner = str();
-              expect(',');
-              var name = str();
-              expect(',');
-              var descriptor = str();
-              expect(',');
-              var r = new ArrayList<Term>();
-              do r.add(expr());
-              while (eat(','));
-              expect(')');
-              return new Invoke(loc, INVOKEVIRTUAL, owner, name, descriptor, r);
-            }
-            case "invokespecial" -> {
-              expect('(');
-              var owner = str();
-              expect(',');
-              var name = str();
-              expect(',');
-              var descriptor = str();
-              expect(',');
-              var r = new ArrayList<Term>();
-              do r.add(expr());
-              while (eat(','));
-              expect(')');
-              return new Invoke(loc, INVOKESPECIAL, owner, name, descriptor, r);
-            }
             case "bitnot" -> {
               return new BitNot(loc, arg());
             }
