@@ -51,7 +51,7 @@ public abstract class Term2 extends Term {
     throw new UnsupportedOperationException(toString());
   }
 
-  public static Object run(Term2 op, Object a, Object b) {
+  public static Object eval(Term2 op, Object a, Object b) {
     if (a instanceof BigInteger a1) {
       // most likely case is operands of the same type
       if (b instanceof BigInteger b1) return op.apply(a1, b1);

@@ -17,13 +17,13 @@ public final class Mul extends Term2 {
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Mul",
-        "run",
+        "eval",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
   }
 
-  public static Object run(Object a, Object b) {
-    return Term2.run(new Mul(null, null, null), a, b);
+  public static Object eval(Object a, Object b) {
+    return Term2.eval(new Mul(null, null, null), a, b);
   }
 
   @Override
