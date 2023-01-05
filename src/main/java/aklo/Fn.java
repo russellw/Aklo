@@ -201,7 +201,7 @@ public class Fn extends Term {
         return new Const(a.loc, BigInteger.ZERO);
       }
       case GOTO -> {
-        var a1 = (LoopGoto) a;
+        var a1 = (ContinueBreak) a;
         var label = a1.label;
         loop = Loop.get(loop, label);
         if (loop == null) {

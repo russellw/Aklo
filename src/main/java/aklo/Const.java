@@ -60,7 +60,7 @@ public final class Const extends Term {
 
   @Override
   public Tag tag() {
-    return Tag.INTEGER;
+    return Tag.CONST;
   }
 
   @Override

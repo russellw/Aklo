@@ -930,13 +930,13 @@ public final class Parser {
             lex();
             var label = tok == WORD ? word() : null;
             expectNewline();
-            return new LoopGoto(loc, true, label);
+            return new ContinueBreak(loc, true, label);
           }
           case "continue" -> {
             lex();
             var label = tok == WORD ? word() : null;
             expectNewline();
-            return new LoopGoto(loc, false, label);
+            return new ContinueBreak(loc, false, label);
           }
           case "exit" -> {
             lex();

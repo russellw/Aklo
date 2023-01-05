@@ -1,12 +1,7 @@
 package aklo;
 
 public enum Tag {
-  FLOAT,
-  DOUBLE,
-  TRUE,
-  FALSE,
-  INTEGER,
-  RATIONAL,
+  CONST,
   ADD,
   SUB,
   MUL,
