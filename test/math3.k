@@ -57,6 +57,7 @@ OUT
 1.5
 1.5
 3
+2
 }
 
 ;addition
@@ -135,3 +136,6 @@ println str(3.0f/2.0f)
 
 ;integer division
 println str(20//6)
+
+;remainder
+println str(20%6)
