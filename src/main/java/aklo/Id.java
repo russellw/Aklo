@@ -1,16 +1,16 @@
 package aklo;
 
 public final class Id extends Term {
-  public final String string;
+  public final String name;
 
   @Override
   public String toString() {
-    return string;
+    return name;
   }
 
-  public Id(Loc loc, String string) {
+  public Id(Loc loc, String name) {
     super(loc);
-    this.string = string;
+    this.name = name;
   }
 
   @Override

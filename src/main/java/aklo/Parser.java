@@ -507,30 +507,23 @@ public final class Parser {
                   "(Ljava/lang/Object;)Ljava/util/List;",
                   arg());
             }
+            case "cmp" -> {
+              return new Cmp(loc, arg1(), argN());
+            }
             case "bitand" -> {
-              var a = arg1();
-              var b = argN();
-              return new BitAnd(loc, a, b);
+              return new BitAnd(loc, arg1(), argN());
             }
             case "bitor" -> {
-              var a = arg1();
-              var b = argN();
-              return new BitOr(loc, a, b);
+              return new BitOr(loc, arg1(), argN());
             }
             case "bitxor" -> {
-              var a = arg1();
-              var b = argN();
-              return new BitXor(loc, a, b);
+              return new BitXor(loc, arg1(), argN());
             }
             case "shl" -> {
-              var a = arg1();
-              var b = argN();
-              return new Shl(loc, a, b);
+              return new Shl(loc, arg1(), argN());
             }
             case "shr" -> {
-              var a = arg1();
-              var b = argN();
-              return new Shr(loc, a, b);
+              return new Shr(loc, arg1(), argN());
             }
             case "true" -> {
               return new Const(loc, true);
@@ -600,7 +593,7 @@ public final class Parser {
         case '.' -> {
           var loc = new Loc(file, line);
           if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
-          var r = new ArrayList<>(List.of(a1.string));
+          var r = new ArrayList<>(List.of(a1.name));
           while (eat('.')) r.add(word());
           a = new Dot(loc, r);
         }
@@ -961,7 +954,7 @@ public final class Parser {
               // TODO other statements
             case "while", "dowhile" -> {
               var a = (While) stmt(f);
-              a.label = b1.string;
+              a.label = b1.name;
               return a;
             }
           }
