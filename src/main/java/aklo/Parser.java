@@ -403,9 +403,9 @@ public final class Parser {
 
           // suffix
           if (tok == DOUBLE)
-            switch (sb.charAt(sb.length() - 1)) {
+            switch (c) {
               case 'f', 'F' -> {
-                sb.deleteCharAt(sb.length() - 1);
+                readc();
                 tok = FLOAT;
               }
             }

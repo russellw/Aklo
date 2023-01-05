@@ -1,5 +1,7 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
@@ -13,8 +15,9 @@ public final class ConstFloat extends Term {
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  public void load(MethodVisitor mv) {
     mv.visitLdcInsn(val);
+    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
   }
 
   @Override
