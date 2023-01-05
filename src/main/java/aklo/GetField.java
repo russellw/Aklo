@@ -1,11 +1,11 @@
 package aklo;
 
-public final class Get_field extends Term1 {
+public final class GetField extends Term1 {
   public final String owner;
   public final String name;
   public final String descriptor;
 
-  public Get_field(Loc loc, String owner, String name, String descriptor, Term arg) {
+  public GetField(Loc loc, String owner, String name, String descriptor, Term arg) {
     super(loc, arg);
     this.owner = owner;
     this.name = name;
