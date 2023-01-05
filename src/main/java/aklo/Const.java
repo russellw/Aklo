@@ -34,6 +34,11 @@ public final class Const extends Term {
       }
       return;
     }
+    if (val instanceof Boolean x) {
+      mv.visitFieldInsn(
+          GETSTATIC, "java/lang/Boolean", x ? "TRUE" : "FALSE", "Ljava/lang/Boolean;");
+      return;
+    }
     if (val instanceof BigRational x) {
       throw new UnsupportedOperationException(toString());
     }

@@ -542,10 +542,10 @@ public final class Parser {
               return new Shr(loc, a, b);
             }
             case "true" -> {
-              return new True(loc);
+              return new Const(loc, true);
             }
             case "false" -> {
-              return new False(loc);
+              return new Const(loc, false);
             }
           }
           return new Id(loc, s);

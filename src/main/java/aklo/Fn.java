@@ -144,12 +144,12 @@ public class Fn extends Term {
 
         // true
         addBlock(trueBlock);
-        insn(new Assign(a.loc, r, new False(a.loc)));
+        insn(new Assign(a.loc, r, new Const(a.loc, false)));
         insn(new Goto(a.loc, afterBlock));
 
         // false
         addBlock(falseBlock);
-        insn(new Assign(a.loc, r, new True(a.loc)));
+        insn(new Assign(a.loc, r, new Const(a.loc, true)));
         insn(new Goto(a.loc, afterBlock));
 
         // after
