@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class Getstatic extends Term {
+public final class Get_static extends Term {
   public final String owner;
   public final String name;
   public final String descriptor;
@@ -19,7 +19,7 @@ public final class Getstatic extends Term {
     mv.visitFieldInsn(GETSTATIC, owner, name, descriptor);
   }
 
-  public Getstatic(Loc loc, String owner, String name, String descriptor) {
+  public Get_static(Loc loc, String owner, String name, String descriptor) {
     super(loc);
     this.owner = owner;
     this.name = name;
@@ -28,6 +28,6 @@ public final class Getstatic extends Term {
 
   @Override
   public Tag tag() {
-    return Tag.GETSTATIC;
+    return Tag.GET_STATIC;
   }
 }
