@@ -5,10 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class Parser {
   // Tokens
@@ -328,7 +325,7 @@ public final class Parser {
           do readc(sb);
           while (Character.isJavaIdentifierPart(c) || c == '?');
           tok = WORD;
-          tokString = sb.toString();
+          tokString = sb.toString().toLowerCase(Locale.ROOT);
         }
         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
           var sb = new StringBuilder();
@@ -440,12 +437,6 @@ public final class Parser {
   private String word() throws IOException {
     var s = tokString;
     if (!eat(WORD)) throw new CompileError(file, line, "expected word");
-    return s;
-  }
-
-  private String str() throws IOException {
-    var s = tokString;
-    if (!eat(STR)) throw new CompileError(file, line, "expected string");
     return s;
   }
 
@@ -586,7 +577,7 @@ public final class Parser {
       throw new CompileError(loc, e.toString());
     }
 
-    throw new CompileError(loc, k + ": expected expression");
+    throw new CompileError(loc, "expected expression");
   }
 
   private Term postfix() throws IOException {
