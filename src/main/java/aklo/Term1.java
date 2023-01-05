@@ -33,6 +33,20 @@ public abstract class Term1 extends Term {
     return arg;
   }
 
+  public static Object eval(Term1 op, Object a) {
+    // most likely case is integers
+    if (a instanceof BigInteger a1) return op.apply(a1);
+
+    // floating-point numbers are more common than exact rationals
+    if (a instanceof Float a1) return op.apply(a1);
+    if (a instanceof Double a1) return op.apply(a1);
+    if (a instanceof BigRational a1) return op.apply(a1);
+
+    // allow Boolean operands for convenience
+    if (a instanceof Boolean a1) return op.apply(a1 ? BigInteger.ONE : BigInteger.ZERO);
+    throw new IllegalArgumentException(String.format("%s(%s)", op, a));
+  }
+
   public double apply(double a) {
     throw new UnsupportedOperationException(toString());
   }

@@ -45,6 +45,7 @@ public enum Tag {
   INVOKE,
   GET_STATIC,
   GET_FIELD,
+  CMP,
   THROW,
   INTERN,
   FOR,

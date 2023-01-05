@@ -58,6 +58,11 @@ OUT
 1.5
 3
 2
+-30
+30
+-30.0
+-30.0
+-2/3
 }
 
 ;addition
@@ -139,3 +144,13 @@ println str(20//6)
 
 ;remainder
 println str(20%6)
+
+;negate
+println str(-30)
+println str(-(-30))
+println str(-30.0)
+println str(-30.0f)
+println str(-2/3)
+
+;comparison
+;assert cmp(10,20)
