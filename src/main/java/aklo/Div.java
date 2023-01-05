@@ -37,8 +37,8 @@ public final class Div extends Term2 {
   }
 
   @Override
-  public BigInteger apply(BigInteger a, BigInteger b) {
-    throw new UnsupportedOperationException();
+  public Object apply(BigInteger a, BigInteger b) {
+    return BigRational.of(a, b);
   }
 
   @Override

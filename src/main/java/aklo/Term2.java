@@ -43,7 +43,7 @@ public abstract class Term2 extends Term {
     throw new UnsupportedOperationException(toString());
   }
 
-  public BigInteger apply(BigInteger a, BigInteger b) {
+  public Object apply(BigInteger a, BigInteger b) {
     throw new UnsupportedOperationException(toString());
   }
 

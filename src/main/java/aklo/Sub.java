@@ -21,7 +21,7 @@ public final class Sub extends Term2 {
   }
 
   @Override
-  public BigInteger apply(BigInteger a, BigInteger b) {
+  public Object apply(BigInteger a, BigInteger b) {
     return a.subtract(b);
   }
 
