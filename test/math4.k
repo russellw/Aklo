@@ -16,3 +16,15 @@ assert cmp(10,20)==-1
 assert cmp(10,10)==0
 assert cmp(20,10)==1
 assert cmp(20,[10,10,10])==[1,1,1]
+
+assert (10===10)==true
+assert (10===20)==false
+assert ([10,20,30]===[20,20,20])==[false,true,false]
+
+assert 1<2
+assert !(1<1)
+assert !(2<1)
+
+assert 1<=2
+assert (1<=1)
+assert !(2<=1)
