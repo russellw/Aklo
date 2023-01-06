@@ -226,8 +226,8 @@ public class Fn extends Term {
         r = env.get(s);
         if (r == null) throw new CompileError(a.loc, s + " not found");
       }
+      case CONST -> {}
       default -> {
-        if (a.isEmpty()) break;
         for (var i = 0; i < a.size(); i++) a.set(i, term(env, loop, a.get(i)));
         insn(a);
       }
