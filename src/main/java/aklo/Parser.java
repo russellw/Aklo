@@ -495,6 +495,9 @@ public final class Parser {
             case "bitnot" -> {
               return new BitNot(loc, arg());
             }
+            case "len" -> {
+              return new Len(loc, arg());
+            }
             case "intern" -> {
               return new Intern(loc, arg());
             }

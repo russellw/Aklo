@@ -80,6 +80,7 @@ public final class Etc {
 
   public static int intVal(Object a) {
     if (a instanceof BigInteger a1) return a1.intValueExact();
+    if (a instanceof Boolean a1) return a1 ? 1 : 0;
     throw new IllegalArgumentException(a.toString());
   }
 

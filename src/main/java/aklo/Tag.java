@@ -46,6 +46,7 @@ public enum Tag {
   GET_STATIC,
   GET_FIELD,
   CMP,
+  LEN,
   THROW,
   INTERN,
   FOR,

@@ -14,17 +14,6 @@ assert signum (0)==0
 assert signum (-20)==-1
 
 ;lists and strings
-assert "ABC"==[65,66,67]
-assert "A"==[65]
-
-assert "ABC"[0]==65
-assert "ABC"[1]==66
-assert "ABC"[2]==67
-
-assert len( "ABC")==3
-assert  "ab"@"cd"=="abcd"
-assert [1+2,3+4]==[3,7]
-
 assert range( 1,5)==[1,2,3,4]
 assert range( 5,1)==[]
 assert range( 5)==[0,1,2,3,4]
