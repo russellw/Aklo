@@ -1,7 +1,9 @@
 package aklo;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class Term1 extends Term {
   public Term arg;
@@ -44,6 +46,13 @@ public abstract class Term1 extends Term {
 
     // allow Boolean operands for convenience
     if (a instanceof Boolean a1) return op.apply(a1 ? BigInteger.ONE : BigInteger.ZERO);
+
+    // extend to lists
+    if (a instanceof List a1) {
+      var r = new Object[a1.size()];
+      for (var i = 0; i < r.length; i++) r[i] = eval(op, a1.get(i));
+      return Arrays.asList(r);
+    }
     throw new IllegalArgumentException(String.format("%s(%s)", op, a));
   }
 

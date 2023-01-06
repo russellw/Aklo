@@ -74,7 +74,7 @@ public final class Etc {
   }
 
   public static List<Object> listVal(Object a) {
-    if (a instanceof List) return (List<Object>) a;
+    if (a instanceof List a1) return a1;
     return List.of(a);
   }
 
@@ -97,14 +97,14 @@ public final class Etc {
   }
 
   public static void print(Object a) {
-    if (a instanceof BigInteger) {
-      var a1 = ((BigInteger) a).intValueExact();
+    if (a instanceof BigInteger a0) {
+      var a1 = a0.intValueExact();
       if (!(0 <= a1 && a1 <= 255)) throw new IllegalArgumentException(a.toString());
       System.out.write(a1);
       return;
     }
-    if (a instanceof List) {
-      for (var b : (List) a) print(b);
+    if (a instanceof List a1) {
+      for (var b : a1) print(b);
       return;
     }
     System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
@@ -141,7 +141,7 @@ public final class Etc {
     if (a instanceof Boolean) return (boolean) a;
     if (a instanceof Integer) return (int) a != 0;
     // TODO other numbers
-    if (a instanceof List) return !((List) a).isEmpty();
+    if (a instanceof List a1) return !a1.isEmpty();
     return true;
   }
 
