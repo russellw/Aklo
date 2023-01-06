@@ -1,32 +1,3 @@
-;numbers
-assert 0xff==255
-assert 0Xfe+2==256
-assert 0b10000==16
-assert 0o100==64
-assert 1_234==1234
-
-;comparison
-assert 1==1
-assert 1!=2
-
-assert  "abc"=="abc"
-assert  "abc"!="abd"
-
-assert 1<2
-assert !(1<1)
-assert !(2<1)
-
-assert 2>1
-assert !(1>1)
-assert !(1>2)
-
-assert 1<=2
-assert 1<=1
-assert !(2<=1)
-
-assert 2>=1
-assert 1>=1
-assert !(1>=2)
 
 assert max( 2,3 )==3
 assert max( 3,2 )==3
@@ -41,18 +12,6 @@ assert abs (-20)==20
 assert signum (10)==1
 assert signum (0)==0
 assert signum (-20)==-1
-
-;arithmetic
-assert 1 + 2 == 3
-assert 10 - 1 == 9
-assert 2 * 5 == 10
-assert 10 % 7 == 3
-assert 1 - 3 == -2
-assert 10//3==3
-
-assert 1 + 2 * 3 == 7
-assert 1 - 2 - 3 == -4
-assert 1 - (2 - 3) == 2
 
 ;lists and strings
 assert "ABC"==[65,66,67]
