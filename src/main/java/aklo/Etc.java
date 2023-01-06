@@ -59,6 +59,10 @@ public final class Etc {
     return Float.parseFloat(decode(s));
   }
 
+  public static Sym intern(Object name) {
+    return Sym.intern(decode(name));
+  }
+
   public static Double parseDouble(Object s) {
     return Double.parseDouble(decode(s));
   }

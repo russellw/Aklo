@@ -609,7 +609,8 @@ public final class Parser {
               return new Len(loc, arg());
             }
             case "intern" -> {
-              return new Intern(loc, arg());
+              return new Invoke(
+                  loc, INVOKESTATIC, "aklo/Etc", "intern", "(Ljava/lang/Object;)Laklo/Sym;", arg());
             }
             case "str" -> {
               return new Invoke(
