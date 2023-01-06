@@ -91,6 +91,9 @@ public class Fn extends Term {
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
+      case ASSIGN -> {
+        var fail = new Block(a.loc, "assignFail");
+      }
       case DO -> {
         if (a.isEmpty()) r = new Const(a.loc, BigInteger.ZERO);
         else for (var b : a) r = term(env, loop, b);
@@ -101,103 +104,103 @@ public class Fn extends Term {
       }
       case OR -> {
         r = var1(a.loc, "or");
-        var falseBlock = new Block(a.loc, "orFalse");
-        var afterBlock = new Block(a.loc, "orAfter");
+        var no = new Block(a.loc, "orFalse");
+        var after = new Block(a.loc, "orAfter");
 
         // condition
         insn(new Assign(a.loc, r, term(env, loop, a.get(0))));
-        insn(new If(a.loc, r, afterBlock, falseBlock));
+        insn(new If(a.loc, r, after, no));
 
         // false
-        addBlock(falseBlock);
+        addBlock(no);
         insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // after
-        addBlock(afterBlock);
+        addBlock(after);
       }
       case AND -> {
         r = var1(a.loc, "and");
-        var trueBlock = new Block(a.loc, "andTrue");
-        var afterBlock = new Block(a.loc, "andAfter");
+        var yes = new Block(a.loc, "andTrue");
+        var after = new Block(a.loc, "andAfter");
 
         // condition
         insn(new Assign(a.loc, r, term(env, loop, a.get(0))));
-        insn(new If(a.loc, r, trueBlock, afterBlock));
+        insn(new If(a.loc, r, yes, after));
 
         // true
-        addBlock(trueBlock);
+        addBlock(yes);
         insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // after
-        addBlock(afterBlock);
+        addBlock(after);
       }
       case NOT -> {
         r = var1(a.loc, "not");
-        var trueBlock = new Block(a.loc, "notTrue");
-        var falseBlock = new Block(a.loc, "notFalse");
-        var afterBlock = new Block(a.loc, "notAfter");
+        var yes = new Block(a.loc, "notTrue");
+        var no = new Block(a.loc, "notFalse");
+        var after = new Block(a.loc, "notAfter");
 
         // condition
-        insn(new If(a.loc, term(env, loop, a.get(0)), trueBlock, falseBlock));
+        insn(new If(a.loc, term(env, loop, a.get(0)), yes, no));
 
         // true
-        addBlock(trueBlock);
+        addBlock(yes);
         insn(new Assign(a.loc, r, new Const(a.loc, false)));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // false
-        addBlock(falseBlock);
+        addBlock(no);
         insn(new Assign(a.loc, r, new Const(a.loc, true)));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // after
-        addBlock(afterBlock);
+        addBlock(after);
       }
       case IF -> {
         r = var1(a.loc, "if");
-        var trueBlock = new Block(a.loc, "ifTrue");
-        var falseBlock = new Block(a.loc, "ifFalse");
-        var afterBlock = new Block(a.loc, "ifAfter");
+        var yes = new Block(a.loc, "ifTrue");
+        var no = new Block(a.loc, "ifFalse");
+        var after = new Block(a.loc, "ifAfter");
 
         // condition
-        insn(new If(a.loc, term(env, loop, a.get(0)), trueBlock, falseBlock));
+        insn(new If(a.loc, term(env, loop, a.get(0)), yes, no));
 
         // true
-        addBlock(trueBlock);
+        addBlock(yes);
         insn(new Assign(a.loc, r, term(env, loop, a.get(1))));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // false
-        addBlock(falseBlock);
+        addBlock(no);
         insn(new Assign(a.loc, r, term(env, loop, a.get(2))));
-        insn(new Goto(a.loc, afterBlock));
+        insn(new Goto(a.loc, after));
 
         // after
-        addBlock(afterBlock);
+        addBlock(after);
       }
       case WHILE -> {
         var a1 = (While) a;
-        var bodyBlock = new Block(a.loc, "whileBody");
-        var condBlock = new Block(a.loc, "whileCond");
-        var afterBlock = new Block(a.loc, "whileAfter");
-        loop = new Loop(loop, a1.label, condBlock, afterBlock);
+        var body = new Block(a.loc, "whileBody");
+        var cond = new Block(a.loc, "whileCond");
+        var after = new Block(a.loc, "whileAfter");
+        loop = new Loop(loop, a1.label, cond, after);
 
         // before
-        insn(new Goto(a.loc, a1.doWhile ? bodyBlock : condBlock));
+        insn(new Goto(a.loc, a1.doWhile ? body : cond));
 
         // body
-        addBlock(bodyBlock);
+        addBlock(body);
         term(env, loop, a1.arg1);
-        insn(new Goto(a.loc, condBlock));
+        insn(new Goto(a.loc, cond));
 
         // condition
-        addBlock(condBlock);
-        insn(new If(a.loc, term(env, loop, a1.arg0), bodyBlock, afterBlock));
+        addBlock(cond);
+        insn(new If(a.loc, term(env, loop, a1.arg0), body, after));
 
         // after
-        addBlock(afterBlock);
+        addBlock(after);
         return new Const(a.loc, BigInteger.ZERO);
       }
       case GOTO -> {

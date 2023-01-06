@@ -3,7 +3,5 @@ OUT
 A
 }
 
-a=99
-a=65
-b=a
-println(b)
+a,b=65,66
+println(a)
