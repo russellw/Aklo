@@ -50,7 +50,34 @@ public final class Const extends Term {
     }
 
     // list
-    if (a instanceof List a1) {}
+    if (a instanceof List a1) {
+      var n = a1.size();
+      if (n <= 10) {
+        for (var b : a1) load(mv, b);
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            "java/util/List",
+            "of",
+            '(' + "Ljava/lang/Object;".repeat(n) + ")Ljava/util/List;",
+            true);
+        return;
+      }
+      emitInt(mv, n);
+      mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+      for (var i = 0; i < n; i++) {
+        mv.visitInsn(DUP);
+        emitInt(mv, i);
+        load(mv, a1.get(i));
+        mv.visitInsn(AASTORE);
+      }
+      mv.visitMethodInsn(
+          INVOKESTATIC,
+          "java/util/Arrays",
+          "asList",
+          "([Ljava/lang/Object;)Ljava/util/List;",
+          false);
+      return;
+    }
 
     // floating point is directly supported apart from the conversion to object reference
     mv.visitLdcInsn(a);

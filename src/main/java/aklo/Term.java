@@ -20,7 +20,7 @@ public abstract class Term extends AbstractCollection<Term> {
     return false;
   }
 
-  public final void emitInt(MethodVisitor mv, int n) {
+  public static void emitInt(MethodVisitor mv, int n) {
     // TODO
     mv.visitIntInsn(BIPUSH, n);
   }
