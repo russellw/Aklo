@@ -27,12 +27,12 @@ public final class Mul extends Term2 {
   }
 
   @Override
-  public double apply(double a, double b) {
+  public Object apply(double a, double b) {
     return a * b;
   }
 
   @Override
-  public float apply(float a, float b) {
+  public Object apply(float a, float b) {
     return a * b;
   }
 
@@ -42,7 +42,7 @@ public final class Mul extends Term2 {
   }
 
   @Override
-  public BigRational apply(BigRational a, BigRational b) {
+  public Object apply(BigRational a, BigRational b) {
     return a.multiply(b);
   }
 

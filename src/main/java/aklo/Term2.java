@@ -39,11 +39,11 @@ public abstract class Term2 extends Term {
     };
   }
 
-  public double apply(double a, double b) {
+  public Object apply(double a, double b) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public float apply(float a, float b) {
+  public Object apply(float a, float b) {
     throw new UnsupportedOperationException(toString());
   }
 
@@ -51,7 +51,7 @@ public abstract class Term2 extends Term {
     throw new UnsupportedOperationException(toString());
   }
 
-  public BigRational apply(BigRational a, BigRational b) {
+  public Object apply(BigRational a, BigRational b) {
     throw new UnsupportedOperationException(toString());
   }
 
