@@ -10,6 +10,7 @@ public final class Etc {
   private Etc() {}
 
   public static String unesc(String s) {
+    // TODO move to Parser
     var sb = new StringBuilder();
     for (var i = 0; i < s.length(); ) {
       var c = s.charAt(i++);
@@ -128,8 +129,12 @@ public final class Etc {
     return List.of(r);
   }
 
+  public static List<Object> encode(String s) {
+    return list(s.getBytes(StandardCharsets.UTF_8));
+  }
+
   public static List<Object> str(Object a) {
-    return list(a.toString().getBytes(StandardCharsets.UTF_8));
+    return encode(a.toString());
   }
 
   public static List<Object> cat(Object a, Object b) {

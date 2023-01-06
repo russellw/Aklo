@@ -3,6 +3,7 @@ package aklo;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
+import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 public final class Const extends Term {
@@ -16,9 +17,14 @@ public final class Const extends Term {
 
   @Override
   public void load(MethodVisitor mv) {
-    if (val instanceof BigInteger x) {
+    load(mv, val);
+  }
+
+  private static void load(MethodVisitor mv, Object a) {
+    // scalars with special logic
+    if (a instanceof BigInteger a1) {
       try {
-        mv.visitLdcInsn(x.longValueExact());
+        mv.visitLdcInsn(a1.longValueExact());
         mv.visitMethodInsn(
             INVOKESTATIC, "java/math/BigInteger", "valueOf", "(J)Ljava/math/BigInteger;", false);
       } catch (ArithmeticException e) {
@@ -27,30 +33,33 @@ public final class Const extends Term {
         // that there is no performance impact
         mv.visitTypeInsn(NEW, "java/math/BigInteger");
         mv.visitInsn(DUP);
-        mv.visitLdcInsn(x.toString(16));
+        mv.visitLdcInsn(a1.toString(16));
         mv.visitIntInsn(BIPUSH, 16);
         mv.visitMethodInsn(
             INVOKESPECIAL, "java/math/BigInteger", "<init>", "(Ljava/lang/String;I)V", false);
       }
       return;
     }
-    if (val instanceof Boolean x) {
+    if (a instanceof Boolean a1) {
       mv.visitFieldInsn(
-          GETSTATIC, "java/lang/Boolean", x ? "TRUE" : "FALSE", "Ljava/lang/Boolean;");
+          GETSTATIC, "java/lang/Boolean", a1 ? "TRUE" : "FALSE", "Ljava/lang/Boolean;");
       return;
     }
-    if (val instanceof BigRational x) {
-      throw new UnsupportedOperationException(toString());
+    if (a instanceof BigRational a1) {
+      throw new UnsupportedOperationException(a.toString());
     }
-    mv.visitLdcInsn(val);
-    if (val instanceof Float) {
+
+    // list
+    if (a instanceof List a1) {}
+
+    // floating point is directly supported apart from the conversion to object reference
+    mv.visitLdcInsn(a);
+    if (a instanceof Float) {
       mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
       return;
     }
-    if (val instanceof Double) {
-      mv.visitMethodInsn(
-          INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
-    }
+    assert a instanceof Double;
+    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
   }
 
   @Override

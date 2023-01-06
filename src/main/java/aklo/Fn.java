@@ -91,9 +91,11 @@ public class Fn extends Term {
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
-      case ASSIGN -> {
-        var fail = new Block(a.loc, "assignFail");
-      }
+        /*
+        case ASSIGN -> {
+          var fail = new Block(a.loc, "assignFail");
+        }
+         */
       case DO -> {
         if (a.isEmpty()) r = new Const(a.loc, BigInteger.ZERO);
         else for (var b : a) r = term(env, loop, b);

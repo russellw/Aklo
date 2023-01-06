@@ -559,8 +559,7 @@ public final class Parser {
           return new Const(loc, new BigInteger(s));
         }
         case STR -> {
-          // TODO replace with const
-          return ListOf.encode(loc, Etc.unesc(s));
+          return new Const(loc, Etc.encode(Etc.unesc(s)));
         }
         case SYM -> {
           return new Intern(loc, ListOf.encode(loc, Etc.unesc(s)));
