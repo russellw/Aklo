@@ -3,6 +3,9 @@ OUT
 1.5
 }
 
+assert true!=1
+assert 1.0!=1.0f
+
 assert true+2==3
 assert true+2===3
 
@@ -69,3 +72,22 @@ assert 10//3==3
 assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
+
+;parsing numbers
+assert parseint("1000")==1000
+assert parseint("1000",9+1)==1000
+assert parseint("1000",15+1)==4096
+
+assert parsefloat("1.5")==1.5f
+assert parsedouble("1.5")==1.5
+
+assert parserat("2/3")==2/3
+assert parserat("2/1")==2/1
+
+;big numbers
+a=100000000000000000000000000000000000000000000000000000000000000000000
+b=99999999999999999999999999999999999999999999999999999999999999999999
+assert a==b+1
+
+s="100000000000000000000000000000000000000000000000000000000000000000000"
+assert str(a)==s

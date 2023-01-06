@@ -47,6 +47,26 @@ public final class Etc {
     System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
+  public static BigInteger parseInteger(Object s) {
+    return new BigInteger(decode(s));
+  }
+
+  public static BigRational parseRational(Object s) {
+    return BigRational.of(decode(s));
+  }
+
+  public static Float parseFloat(Object s) {
+    return Float.parseFloat(decode(s));
+  }
+
+  public static Double parseDouble(Object s) {
+    return Double.parseDouble(decode(s));
+  }
+
+  public static BigInteger parseInteger(Object s, Object base) {
+    return new BigInteger(decode(s), intVal(base));
+  }
+
   public static String decode(Object s) {
     return new String(bytes(s), StandardCharsets.UTF_8);
   }

@@ -556,6 +556,52 @@ public final class Parser {
         }
         case WORD -> {
           switch (s) {
+            case "parserat" -> {
+              return new Invoke(
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "parseRational",
+                  "(Ljava/lang/Object;)Laklo/BigRational;",
+                  arg());
+            }
+            case "parsefloat" -> {
+              return new Invoke(
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "parseFloat",
+                  "(Ljava/lang/Object;)Ljava/lang/Float;",
+                  arg());
+            }
+            case "parsedouble" -> {
+              return new Invoke(
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "parseDouble",
+                  "(Ljava/lang/Object;)Ljava/lang/Double;",
+                  arg());
+            }
+            case "parseint" -> {
+              var t = arg1();
+              if (eat(')'))
+                return new Invoke(
+                    loc,
+                    INVOKESTATIC,
+                    "aklo/Etc",
+                    "parseInteger",
+                    "(Ljava/lang/Object;)Ljava/math/BigInteger;",
+                    t);
+              return new Invoke(
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "parseInteger",
+                  "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/math/BigInteger;",
+                  t,
+                  argN());
+            }
             case "bitnot" -> {
               return new BitNot(loc, arg());
             }
