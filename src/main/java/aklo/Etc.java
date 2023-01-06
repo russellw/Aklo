@@ -88,7 +88,7 @@ public final class Etc {
   }
 
   public static BigInteger toInteger(Object a) {
-    if (a instanceof BigInteger) return (BigInteger) a;
+    if (a instanceof BigInteger a1) return a1;
     return (boolean) a ? BigInteger.ONE : BigInteger.ZERO;
   }
 
@@ -138,8 +138,8 @@ public final class Etc {
   }
 
   public static boolean truth(Object a) {
-    if (a instanceof Boolean) return (boolean) a;
-    if (a instanceof Integer) return (int) a != 0;
+    if (a instanceof Boolean a1) return a1;
+    if (a instanceof BigInteger a1) return a1.signum() != 0;
     // TODO other numbers
     if (a instanceof List a1) return !a1.isEmpty();
     return true;
