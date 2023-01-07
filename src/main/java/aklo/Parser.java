@@ -1051,6 +1051,12 @@ public final class Parser {
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
           }
+          case "throw" -> {
+            lex();
+            var a = commas();
+            expectNewline();
+            return new Throw(loc, a);
+          }
           case "println" -> {
             lex();
             Term a = new Const(loc, BigInteger.TEN);
