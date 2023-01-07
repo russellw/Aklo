@@ -33,11 +33,17 @@ public final class Const extends Term {
         // that there is no performance impact
         mv.visitTypeInsn(NEW, "java/math/BigInteger");
         mv.visitInsn(DUP);
-        mv.visitLdcInsn(a1.toString(16));
-        mv.visitIntInsn(BIPUSH, 16);
+        mv.visitLdcInsn(a1.toString(Character.MAX_RADIX));
+        mv.visitIntInsn(BIPUSH, Character.MAX_RADIX);
         mv.visitMethodInsn(
             INVOKESPECIAL, "java/math/BigInteger", "<init>", "(Ljava/lang/String;I)V", false);
       }
+      return;
+    }
+    if (a instanceof Sym) {
+      mv.visitLdcInsn(a.toString());
+      mv.visitMethodInsn(
+          INVOKESTATIC, "aklo/Sym", "intern", "(Ljava/lang/String;)Laklo/Sym;", false);
       return;
     }
     if (a instanceof Boolean a1) {

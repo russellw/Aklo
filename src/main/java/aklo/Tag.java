@@ -48,7 +48,6 @@ public enum Tag {
   CMP,
   LEN,
   THROW,
-  INTERN,
   FOR,
   REST,
   CASE,

@@ -33,7 +33,7 @@ public final class Parser {
   private static final int INTEGER = -23;
   private static final int FLOAT = -24;
   private static final int DOUBLE = -25;
-  private static final int RAW_STRING = -26;
+  private static final int RAW = -26;
 
   // File state
   private final String file;
@@ -321,7 +321,7 @@ public final class Parser {
           readc();
           if (c != '"') throw new CompileError(file, line, "stray '#'");
           lexQuote();
-          tok = RAW_STRING;
+          tok = RAW;
         }
         case '"' -> {
           lexQuote();
@@ -673,10 +673,10 @@ public final class Parser {
           return new Const(loc, Etc.encode(unesc(s)));
         }
         case SYM -> {
-          return new Intern(loc, ListOf.encode(loc, unesc(s)));
+          return new Const(loc, Sym.intern(unesc(s)));
         }
-        case RAW_STRING -> {
-          return ListOf.encode(loc, s);
+        case RAW -> {
+          return new Const(loc, Etc.encode(s));
         }
       }
     } catch (NumberFormatException e) {

@@ -84,7 +84,7 @@ public class Fn extends Term {
 
   private void assign(Term a, Term b, Block fail) {
     switch (a.tag()) {
-      case INTERN -> {}
+      case CONST -> {}
     }
   }
 
