@@ -43,8 +43,7 @@ public final class Exp extends Term2 {
 
   @Override
   public Object apply(BigRational a, BigRational b) {
-    // TODO
-    throw new UnsupportedOperationException();
+    return Math.pow(a.doubleValue(), b.doubleValue());
   }
 
   @Override

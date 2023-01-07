@@ -80,6 +80,8 @@ assert 2.0f**3.0f===8.0
 
 assert 2**3==8
 
+assert (2/1)**(3/1)===8
+
 ;parsing numbers
 assert parseint("1000")==1000
 assert parseint("1000",9+1)==1000
