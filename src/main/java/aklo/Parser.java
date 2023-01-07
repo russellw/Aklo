@@ -556,6 +556,12 @@ public final class Parser {
         }
         case WORD -> {
           switch (s) {
+            case "slice" -> {
+              var t = arg1();
+              expect(',');
+              var i = expr();
+              return new Slice(loc, t, i, argN());
+            }
             case "parserat" -> {
               return new Invoke(
                   loc,

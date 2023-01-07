@@ -22,3 +22,7 @@ assert (w,e)==('w','e')
 
 "foo",s="foo","bar"
 assert s=="bar"
+
+a,@b="ABC"
+assert a==65
+;assert b=="BC"

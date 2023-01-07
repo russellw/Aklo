@@ -49,6 +49,7 @@ public enum Tag {
   LEN,
   THROW,
   FOR,
+  SLICE,
   REST,
   CASE,
 }

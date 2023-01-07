@@ -14,3 +14,5 @@ assert len( "ABC")==3
 
 assert  "ab"@"cd"=="abcd"
 assert [1+2,3+4]==[3,7]
+
+assert slice("abcd",1,3)=="bc"

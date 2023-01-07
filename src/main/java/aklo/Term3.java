@@ -33,6 +33,11 @@ public abstract class Term3 extends Term {
   }
 
   @Override
+  public Type type() {
+    return Type.ANY;
+  }
+
+  @Override
   public int size() {
     return 3;
   }
