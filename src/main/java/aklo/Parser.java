@@ -524,16 +524,6 @@ public final class Parser {
     return a;
   }
 
-  private void exprs(char end, List<Term> r) throws IOException {
-    if (eat(INDENT))
-      do {
-        r.add(commas());
-        expectNewline();
-      } while (!eat(DEDENT));
-    else if (tok != end) do r.add(expr()); while (eat(','));
-    expect(end);
-  }
-
   private Term primary() throws IOException {
     var loc = new Loc(file, line);
 
@@ -732,7 +722,21 @@ public final class Parser {
           var loc = new Loc(file, line);
           lex();
           var r = new ArrayList<>(List.of(a));
-          exprs(')', r);
+          switch (tok) {
+            case INDENT -> {
+              lex();
+              do {
+                r.add(commas());
+                expectNewline();
+              } while (!eat(DEDENT));
+            }
+            case ')' -> {}
+            default -> {
+              do r.add(expr());
+              while (eat(','));
+            }
+          }
+          expect(')');
           a = new Call(loc, r);
         }
         case '.' -> {
