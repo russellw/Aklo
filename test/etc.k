@@ -434,41 +434,10 @@ assert commonPrefix(("ab","ab","b"))==""
 assert commonPrefix(["ab"])=="ab"
 
 ;pattern matching assignment
-a=1,2,3
-assert a==[1,2,3]
-
-a,b,c=1,2,3
-assert a==1
-assert b==2
-assert c==3
-
-a,(b,c),d=1,(2,3),4
-assert a==1
-assert b==2
-assert c==3
-assert d==4
-
-a,@s=1,2,3
-assert a==1
-assert s==[2,3]
 
 b=a,@s
 assert b==[1,2,3]
 
-a=[
-	1
-	2
-	3
-]
-assert a==[1,2,3]
-
-1,a,b=1,2,3
-assert a==2
-assert b==3
-
-a,b=2,3,4
-assert a==2
-assert b==3
 
 ;case
 case '+',1,2

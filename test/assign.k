@@ -26,3 +26,36 @@ assert s=="bar"
 a,@b="ABC"
 assert a==65
 assert b=="BC"
+
+a,b=2,3,4
+assert a==2
+assert b==3
+
+a=1,2,3
+assert a==[1,2,3]
+
+a,b,c=1,2,3
+assert a==1
+assert b==2
+assert c==3
+
+a,(b,c),d=1,(2,3),4
+assert a==1
+assert b==2
+assert c==3
+assert d==4
+
+a,@s=1,2,3
+assert a==1
+assert s==[2,3]
+
+a=[
+	1
+	2
+	3
+]
+assert a==[1,2,3]
+
+1,a,b=1,2,3
+assert a==2
+assert b==3
