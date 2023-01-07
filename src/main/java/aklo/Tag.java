@@ -50,6 +50,6 @@ public enum Tag {
   THROW,
   FOR,
   SLICE,
-  REST,
+  LIST_REST,
   CASE,
 }

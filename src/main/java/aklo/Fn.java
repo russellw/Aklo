@@ -102,17 +102,16 @@ public class Fn extends Term {
       case ID -> insn(new Assign(loc, term(env, loop, y), x));
       case LIST_OF -> {
         var n = y.size();
-        if (n == 0) break;
+        for (var i = 0; i < n; i++) assignSubscript(env, loop, y, x, fail, i);
+      }
+      case LIST_REST -> {
+        var n = y.size();
         for (var i = 0; i < n - 1; i++) assignSubscript(env, loop, y, x, fail, i);
-        if (y.get(n - 1) instanceof Rest rest) {
-          var len = new Len(loc, x);
-          insn(len);
-          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n - 1)), len);
-          insn(slice);
-          assign(env, loop, rest.arg, slice, fail);
-          break;
-        }
-        assignSubscript(env, loop, y, x, fail, n - 1);
+        var len = new Len(loc, x);
+        insn(len);
+        var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n - 1)), len);
+        insn(slice);
+        assign(env, loop, y.get(n - 1), slice, fail);
       }
       default -> throw new CompileError(loc, y + ": invalid assignment");
     }

@@ -546,7 +546,33 @@ public final class Parser {
       switch (k) {
         case '[' -> {
           var r = new ArrayList<Term>();
-          exprs(']', r);
+          switch (tok) {
+            case INDENT -> {
+              lex();
+              do {
+                if (eat('@')) {
+                  r.add(commas());
+                  expectNewline();
+                  expect(']');
+                  return new ListRest(loc, r);
+                }
+                r.add(commas());
+                expectNewline();
+              } while (!eat(DEDENT));
+            }
+            case ']' -> {}
+            default -> {
+              do {
+                if (eat('@')) {
+                  r.add(expr());
+                  expect(']');
+                  return new ListRest(loc, r);
+                }
+                r.add(expr());
+              } while (eat(','));
+            }
+          }
+          expect(']');
           return new ListOf(loc, r);
         }
         case '(' -> {
@@ -789,11 +815,6 @@ public final class Parser {
         lex();
         return new Neg(loc, prefix());
       }
-      case '@' -> {
-        var loc = new Loc(file, line);
-        lex();
-        return new Rest(loc, prefix());
-      }
     }
     return postfix();
   }
@@ -882,7 +903,13 @@ public final class Parser {
     if (tok != ',') return a;
     var loc = new Loc(file, line);
     var r = new ArrayList<>(List.of(a));
-    while (eat(',')) r.add(expr());
+    while (eat(',')) {
+      if (eat('@')) {
+        r.add(expr());
+        return new ListRest(loc, r);
+      }
+      r.add(expr());
+    }
     return new ListOf(loc, r);
   }
 
