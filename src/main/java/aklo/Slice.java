@@ -20,7 +20,7 @@ public final class Slice extends Term3 {
         INVOKESTATIC,
         "aklo/Slice",
         "eval",
-        "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/List;",
+        "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
         false);
   }
 

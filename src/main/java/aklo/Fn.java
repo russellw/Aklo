@@ -103,7 +103,12 @@ public class Fn extends Term {
       case LIST_OF -> {
         var n = y.size();
         for (var i = 0; i < n - 1; i++) assignSubscript(env, loop, y, x, fail, i);
-        if (n > 0 && y.get(n - 1) instanceof Rest) {
+        if (n > 0 && y.get(n - 1) instanceof Rest rest) {
+          var len = new Len(loc, x);
+          insn(len);
+          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n - 1)), len);
+          insn(slice);
+          assign(env, loop, rest.arg, slice, fail);
           break;
         }
         assignSubscript(env, loop, y, x, fail, n - 1);

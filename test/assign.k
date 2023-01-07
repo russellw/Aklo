@@ -25,4 +25,4 @@ assert s=="bar"
 
 a,@b="ABC"
 assert a==65
-;assert b=="BC"
+assert b=="BC"
