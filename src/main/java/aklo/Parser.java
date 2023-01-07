@@ -572,6 +572,21 @@ public final class Parser {
         }
         case WORD -> {
           switch (s) {
+            case "bool?" -> {
+              return new InstanceOf(loc, arg(), Type.BOOL);
+            }
+            case "int?" -> {
+              return new InstanceOf(loc, arg(), Type.INTEGER);
+            }
+            case "float?" -> {
+              return new InstanceOf(loc, arg(), Type.FLOAT);
+            }
+            case "double?" -> {
+              return new InstanceOf(loc, arg(), Type.DOUBLE);
+            }
+            case "rat?" -> {
+              return new InstanceOf(loc, arg(), Type.RATIONAL);
+            }
             case "slice" -> {
               var t = arg1();
               expect(',');

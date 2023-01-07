@@ -52,4 +52,5 @@ public enum Tag {
   SLICE,
   LIST_REST,
   CASE,
+  INSTANCE_OF,
 }
