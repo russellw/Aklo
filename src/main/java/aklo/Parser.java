@@ -900,14 +900,10 @@ public final class Parser {
         lex();
         a.walk(
             b -> {
-              switch (b.tag()) {
-                case DOT, REST, LIST_OF -> {}
-                case ID -> {
-                  var name = b.toString();
-                  for (var x : f.vars) if (x.name.equals(name)) return;
-                  f.vars.add(new Var(b.loc, name));
-                }
-                default -> throw new CompileError(b.loc, "invalid assignment");
+              if (b instanceof Id b1) {
+                var name = b1.name;
+                for (var x : f.vars) if (x.name.equals(name)) return;
+                f.vars.add(new Var(b.loc, name));
               }
             });
         return new Assign(loc, a, assignment(f));

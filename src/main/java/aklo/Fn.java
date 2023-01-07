@@ -108,7 +108,7 @@ public class Fn extends Term {
         }
         assignSubscript(env, loop, y, x, fail, n - 1);
       }
-      default -> throw new CompileError(loc, "invalid assignment");
+      default -> throw new CompileError(loc, y + ": invalid assignment");
     }
   }
 
