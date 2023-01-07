@@ -73,6 +73,13 @@ assert 1 + 2 * 3 == 7
 assert 1 - 2 - 3 == -4
 assert 1 - (2 - 3) == 2
 
+assert 2.0**3.0==8.0
+assert 2.0f**3.0===8.0
+assert 2.0**3.0f===8.0
+assert 2.0f**3.0f===8.0
+
+assert 2**3==8
+
 ;parsing numbers
 assert parseint("1000")==1000
 assert parseint("1000",9+1)==1000
