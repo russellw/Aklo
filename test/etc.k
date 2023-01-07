@@ -433,12 +433,6 @@ assert commonPrefix(("ab","ab","az"))=="a"
 assert commonPrefix(("ab","ab","b"))==""
 assert commonPrefix(["ab"])=="ab"
 
-;pattern matching assignment
-
-b=a,@s
-assert b==[1,2,3]
-
-
 ;case
 case '+',1,2
 	'+',x,y

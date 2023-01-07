@@ -105,13 +105,13 @@ public class Fn extends Term {
         for (var i = 0; i < n; i++) assignSubscript(env, loop, y, x, fail, i);
       }
       case LIST_REST -> {
-        var n = y.size();
-        for (var i = 0; i < n - 1; i++) assignSubscript(env, loop, y, x, fail, i);
+        var n = y.size() - 1;
+        for (var i = 0; i < n; i++) assignSubscript(env, loop, y, x, fail, i);
         var len = new Len(loc, x);
         insn(len);
-        var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n - 1)), len);
+        var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
         insn(slice);
-        assign(env, loop, y.get(n - 1), slice, fail);
+        assign(env, loop, y.get(n), slice, fail);
       }
       default -> throw new CompileError(loc, y + ": invalid assignment");
     }
@@ -120,6 +120,22 @@ public class Fn extends Term {
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
+      case LIST_REST -> {
+        var n = a.size() - 1;
+
+        // elements
+        var s = new Term[n];
+        for (var i = 0; i < n; i++) s[i] = term(env, loop, a.get(i));
+        var s1 = new ListOf(a.loc, s);
+        insn(s1);
+
+        // rest
+        var t = term(env, loop, a.get(n));
+
+        // concatenate
+        r = new Cat(a.loc, s1, t);
+        insn(r);
+      }
       case ASSIGN -> {
         var fail = new Block(a.loc, "assignFail");
         var after = new Block(a.loc, "assignAfter");
