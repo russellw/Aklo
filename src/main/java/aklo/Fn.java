@@ -102,8 +102,9 @@ public class Fn extends Term {
       case ID -> insn(new Assign(loc, term(env, loop, y), x));
       case LIST_OF -> {
         var n = y.size();
+        if (n == 0) break;
         for (var i = 0; i < n - 1; i++) assignSubscript(env, loop, y, x, fail, i);
-        if (n > 0 && y.get(n - 1) instanceof Rest rest) {
+        if (y.get(n - 1) instanceof Rest rest) {
           var len = new Len(loc, x);
           insn(len);
           var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n - 1)), len);
