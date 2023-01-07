@@ -986,7 +986,9 @@ public final class Parser {
             expectNewline();
             var s = String.format("%s:%d: %s: %s", loc.file(), loc.line(), f.name, cond.toString());
             return new IfStmt(
-                cond, new Const(loc, BigInteger.ZERO), new Throw(loc, ListOf.encode(loc, s)));
+                cond,
+                new Const(loc, BigInteger.ZERO),
+                new Throw(loc, new Const(loc, Etc.encode(s))));
           }
           case "fn" -> {
             lex();
