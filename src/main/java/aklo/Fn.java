@@ -82,20 +82,56 @@ public class Fn extends Term {
     lastBlock().insns.add(a);
   }
 
-  private void assign(Term a, Term b, Block fail) {
-    switch (a.tag()) {
-      case CONST -> {}
+  private void assignSubscript(Env env, Loop loop, Term y, Term x, Block fail, int i) {
+    y = y.get(i);
+    x = new Subscript(x.loc, x, new Const(x.loc, BigInteger.valueOf(i)));
+    insn(x);
+    assign(env, loop, y, x, fail);
+  }
+
+  private void assign(Env env, Loop loop, Term y, Term x, Block fail) {
+    var loc = y.loc;
+    switch (y.tag()) {
+      case CONST -> {
+        var eq = new Eq(loc, y, x);
+        insn(eq);
+        var after = new Block(loc, "assignCheckAfter");
+        insn(new If(loc, eq, after, fail));
+        addBlock(after);
+      }
+      case ID -> insn(new Assign(loc, term(env, loop, y), x));
+      case LIST_OF -> {
+        var n = y.size();
+        for (var i = 0; i < n - 1; i++) assignSubscript(env, loop, y, x, fail, i);
+        if (n > 0 && y.get(n - 1) instanceof Rest) {
+          break;
+        }
+        assignSubscript(env, loop, y, x, fail, n - 1);
+      }
+      default -> throw new CompileError(loc, "invalid assignment");
     }
   }
 
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
-        /*
-        case ASSIGN -> {
-          var fail = new Block(a.loc, "assignFail");
-        }
-         */
+      case ASSIGN -> {
+        var fail = new Block(a.loc, "assignFail");
+        var after = new Block(a.loc, "assignAfter");
+
+        // assign
+        var y = a.get(0);
+        var x = term(env, loop, a.get(1));
+        assign(env, loop, y, x, fail);
+        insn(new Goto(a.loc, after));
+
+        // fail
+        addBlock(fail);
+        insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
+
+        // after
+        addBlock(after);
+      }
       case DO -> {
         if (a.isEmpty()) r = new Const(a.loc, BigInteger.ZERO);
         else for (var b : a) r = term(env, loop, b);
