@@ -16,3 +16,15 @@ assert  "ab"@"cd"=="abcd"
 assert [1+2,3+4]==[3,7]
 
 assert slice("abcd",1,3)=="bc"
+
+s="abc"
+s@="de"
+assert s=="abcde"
+
+s="BC"
+s<<68
+assert s=="BCD"
+
+s="BC"
+65>>s
+assert s=="ABC"

@@ -987,13 +987,13 @@ public final class Parser {
       }
       case CAT_ASSIGN -> {
         var loc = new Loc(file, line);
+        if (!(y instanceof Id)) throw new CompileError(loc, "@=: expected identifier on left");
         lex();
         var x = assignment(f);
         return new Assign(loc, y, new Cat(loc, y, x));
       }
       case APPEND -> {
         var loc = new Loc(file, line);
-        // TODO do we need this restriction?
         if (!(y instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
         lex();
         var x = assignment(f);
