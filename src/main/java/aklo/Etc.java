@@ -24,15 +24,6 @@ public final class Etc {
     System.exit(intVal(a));
   }
 
-  public static BigInteger toInteger(Object a) {
-    if (a instanceof BigInteger a1) return a1;
-    return (boolean) a ? BigInteger.ONE : BigInteger.ZERO;
-  }
-
-  public static boolean isInteger(Object a) {
-    return a instanceof BigInteger || a instanceof Boolean;
-  }
-
   public static void print(Object a) {
     if (a instanceof BigInteger a0) {
       var a1 = a0.intValueExact();
