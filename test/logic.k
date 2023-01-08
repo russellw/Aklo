@@ -6,6 +6,15 @@ assert !!9
 assert "a"
 assert !""
 
+assert !0.0
+assert 1.0
+
+assert !0.0f
+assert 1.0f
+
+assert !(0/10)
+assert (1/10)
+
 assert !(0 | 0)
 assert 0 | 1
 assert 1 | 0

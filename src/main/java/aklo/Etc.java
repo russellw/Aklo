@@ -96,8 +96,10 @@ public final class Etc {
   public static boolean truth(Object a) {
     if (a instanceof Boolean a1) return a1;
     if (a instanceof BigInteger a1) return a1.signum() != 0;
-    // TODO other numbers
     if (a instanceof List a1) return !a1.isEmpty();
+    if (a instanceof Float a1) return a1 != 0.0f;
+    if (a instanceof Double a1) return a1 != 0.0;
+    if (a instanceof BigRational a1) return a1.signum() != 0;
     return true;
   }
 
