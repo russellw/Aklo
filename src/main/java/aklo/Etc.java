@@ -47,11 +47,11 @@ public final class Etc {
     System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
-  public static BigInteger parseInteger(Object s) {
+  public static BigInteger parseInt(Object s) {
     return new BigInteger(decode(s));
   }
 
-  public static BigRational parseRational(Object s) {
+  public static BigRational parseRat(Object s) {
     return BigRational.of(decode(s));
   }
 
@@ -67,7 +67,7 @@ public final class Etc {
     return Double.parseDouble(decode(s));
   }
 
-  public static BigInteger parseInteger(Object s, Object base) {
+  public static BigInteger parseInt(Object s, Object base) {
     return new BigInteger(decode(s), intVal(base));
   }
 

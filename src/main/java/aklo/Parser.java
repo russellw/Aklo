@@ -604,7 +604,7 @@ public final class Parser {
                   loc,
                   INVOKESTATIC,
                   "aklo/Etc",
-                  "parseRational",
+                  "parseRat",
                   "(Ljava/lang/Object;)Laklo/BigRational;",
                   arg());
             }
@@ -633,14 +633,14 @@ public final class Parser {
                     loc,
                     INVOKESTATIC,
                     "aklo/Etc",
-                    "parseInteger",
+                    "parseInt",
                     "(Ljava/lang/Object;)Ljava/math/BigInteger;",
                     t);
               return new Invoke(
                   loc,
                   INVOKESTATIC,
                   "aklo/Etc",
-                  "parseInteger",
+                  "parseInt",
                   "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/math/BigInteger;",
                   t,
                   argN());
