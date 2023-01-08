@@ -12,7 +12,7 @@ public final class Var extends Term {
 
   public Var(Loc loc) {
     super(loc);
-    this.name = null;
+    name = null;
   }
 
   @Override

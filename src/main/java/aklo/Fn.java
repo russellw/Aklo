@@ -320,7 +320,7 @@ public class Fn extends Term {
 
   // debug output
   public void dbg() {
-    // make local names unique
+    // make block names unique
     var names = new HashSet<String>();
     for (var block : blocks) {
       if (names.add(block.name)) continue;
@@ -333,23 +333,11 @@ public class Fn extends Term {
       }
     }
 
-    names = new HashSet<>();
-    for (var x : vars) {
-      if (names.add(x.name)) continue;
-      for (var i = 1; ; i++) {
-        var s = x.name + i;
-        if (names.add(s)) {
-          x.name = s;
-          break;
-        }
-      }
-    }
-
     // header
     System.out.printf("fn %s(", name);
     for (var i = 0; i < params.size(); i++) {
       if (i > 0) System.out.print(", ");
-      System.out.print(params.get(i).name);
+      System.out.print(params.get(i));
     }
     System.out.println(')');
 
