@@ -107,6 +107,6 @@ public final class Const extends Term {
 
   @Override
   public Type type() {
-    return Type.INTEGER;
+    return Type.INT;
   }
 }

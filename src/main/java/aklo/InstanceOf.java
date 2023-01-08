@@ -10,8 +10,7 @@ public final class InstanceOf extends Term1 {
   @Override
   public void emit(MethodVisitor mv) {
     arg.load(mv);
-    var s = type.toString();
-    mv.visitTypeInsn(INSTANCEOF, s.substring(1, s.length() - 1));
+    mv.visitTypeInsn(INSTANCEOF, type.toString());
     mv.visitMethodInsn(
         INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
   }

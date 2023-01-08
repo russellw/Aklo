@@ -5,7 +5,7 @@ public abstract class Type {
       new Type() {
         @Override
         public String toString() {
-          return "Z";
+          return "java/lang/Boolean";
         }
 
         @Override
@@ -29,7 +29,7 @@ public abstract class Type {
       new Type() {
         @Override
         public String toString() {
-          return "F";
+          return "java/lang/Float";
         }
 
         @Override
@@ -41,7 +41,7 @@ public abstract class Type {
       new Type() {
         @Override
         public String toString() {
-          return "D";
+          return "java/lang/Double";
         }
 
         @Override
@@ -49,28 +49,28 @@ public abstract class Type {
           return Kind.DOUBLE;
         }
       };
-  public static final Type INTEGER =
+  public static final Type INT =
       new Type() {
         @Override
         public Kind kind() {
-          return Kind.INTEGER;
+          return Kind.INT;
         }
 
         @Override
         public String toString() {
-          return "Ljava/math/BigInteger;";
+          return "java/math/BigInteger";
         }
       };
-  public static final Type RATIONAL =
+  public static final Type RAT =
       new Type() {
         @Override
         public Kind kind() {
-          return Kind.RATIONAL;
+          return Kind.RAT;
         }
 
         @Override
         public String toString() {
-          return "Laklo/BigRational;";
+          return "aklo/BigRational";
         }
       };
   public static final Type ANY =
@@ -82,21 +82,48 @@ public abstract class Type {
 
         @Override
         public String toString() {
-          return "Ljava/lang/Object;";
+          return "java/lang/Object";
+        }
+      };
+  public static final Type LIST =
+      new Type() {
+        @Override
+        public Kind kind() {
+          return Kind.LIST;
+        }
+
+        @Override
+        public String toString() {
+          return "java/util/List";
+        }
+      };
+  public static final Type SYM =
+      new Type() {
+        @Override
+        public Kind kind() {
+          return Kind.SYM;
+        }
+
+        @Override
+        public String toString() {
+          return "aklo/Sym";
         }
       };
 
   public abstract Kind kind();
 
-  public static Type of(String descriptor) {
-    return switch (descriptor) {
+  public static Type of(String s) {
+    return switch (s) {
       case "V" -> VOID;
-      case "F" -> FLOAT;
-      case "D" -> DOUBLE;
-      case "Z" -> BOOL;
-      case "Laklo/BigRational;" -> RATIONAL;
-      case "Ljava/math/BigInteger;" -> INTEGER;
-      default -> ANY;
+      case "java/lang/Float" -> FLOAT;
+      case "java/lang/Double" -> DOUBLE;
+      case "java/lang/Boolean" -> BOOL;
+      case "aklo/BigRational" -> RAT;
+      case "java/math/BigInteger" -> INT;
+      case "java/util/List" -> LIST;
+      case "java/lang/Object" -> ANY;
+      case "aklo/Sym" -> SYM;
+      default -> throw new IllegalArgumentException(s);
     };
   }
 }

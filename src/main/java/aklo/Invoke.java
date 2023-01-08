@@ -52,7 +52,9 @@ public final class Invoke extends Terms {
   @Override
   public Type type() {
     var i = descriptor.lastIndexOf(')');
-    return Type.of(descriptor.substring(i + 1));
+    // TODO
+    // return Type.of(descriptor.substring(i + 1));
+    return descriptor.endsWith("V") ? Type.VOID : Type.ANY;
   }
 
   @Override

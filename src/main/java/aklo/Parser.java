@@ -576,7 +576,7 @@ public final class Parser {
               return new InstanceOf(loc, arg(), Type.BOOL);
             }
             case "int?" -> {
-              return new InstanceOf(loc, arg(), Type.INTEGER);
+              return new InstanceOf(loc, arg(), Type.INT);
             }
             case "float?" -> {
               return new InstanceOf(loc, arg(), Type.FLOAT);
@@ -585,7 +585,13 @@ public final class Parser {
               return new InstanceOf(loc, arg(), Type.DOUBLE);
             }
             case "rat?" -> {
-              return new InstanceOf(loc, arg(), Type.RATIONAL);
+              return new InstanceOf(loc, arg(), Type.RAT);
+            }
+            case "list?" -> {
+              return new InstanceOf(loc, arg(), Type.LIST);
+            }
+            case "sym?" -> {
+              return new InstanceOf(loc, arg(), Type.SYM);
             }
             case "slice" -> {
               var t = arg1();
