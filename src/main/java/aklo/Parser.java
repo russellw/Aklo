@@ -900,7 +900,7 @@ public final class Parser {
             case '*' -> new Mul(loc, a, b);
             case '/' -> new Div(loc, a, b);
             case '%' -> new Rem(loc, a, b);
-            case DIV_INTEGERS -> new DivInteger(loc, a, b);
+            case DIV_INTEGERS -> new DivInt(loc, a, b);
             case '+' -> new Add(loc, a, b);
             case '-' -> new Sub(loc, a, b);
             case '@' -> new Cat(loc, a, b);
@@ -909,9 +909,9 @@ public final class Parser {
             case LE -> new Le(loc, a, b);
             case GE -> new Le(loc, b, a);
             case EQ -> new Eq(loc, a, b);
-            case EQ_NUMBERS -> new EqNumber(loc, a, b);
+            case EQ_NUMBERS -> new EqNum(loc, a, b);
             case NE -> new Not(loc, new Eq(loc, a, b));
-            case NE_NUMBERS -> new Not(loc, new EqNumber(loc, a, b));
+            case NE_NUMBERS -> new Not(loc, new EqNum(loc, a, b));
             case '&' -> new And(loc, a, b);
             case '|' -> new Or(loc, a, b);
             default -> throw new IllegalStateException(Integer.toString(k));
