@@ -56,7 +56,6 @@ j = --i
 assert i == 0
 assert j == 0
 
-{
 j = i++
 assert i == 1
 assert j == 0
@@ -64,4 +63,3 @@ assert j == 0
 j = i--
 assert i == 0
 assert j == 1
-}

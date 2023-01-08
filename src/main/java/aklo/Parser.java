@@ -505,26 +505,26 @@ public final class Parser {
   }
 
   // expressions
-  private Term arg() throws IOException {
+  private Term arg(Fn f) throws IOException {
     expect('(');
-    var a = expr();
+    var a = expr(f);
     expect(')');
     return a;
   }
 
-  private Term arg1() throws IOException {
+  private Term arg1(Fn f) throws IOException {
     expect('(');
-    return expr();
+    return expr(f);
   }
 
-  private Term argN() throws IOException {
+  private Term argN(Fn f) throws IOException {
     expect(',');
-    var a = expr();
+    var a = expr(f);
     expect(')');
     return a;
   }
 
-  private Term primary() throws IOException {
+  private Term primary(Fn f) throws IOException {
     var loc = new Loc(file, line);
 
     // having noted the current line, factor out the moving to the next token
@@ -541,12 +541,12 @@ public final class Parser {
               lex();
               do {
                 if (eat('@')) {
-                  r.add(commas());
+                  r.add(commas(f));
                   expectNewline();
                   expect(']');
                   return new ListRest(loc, r);
                 }
-                r.add(commas());
+                r.add(commas(f));
                 expectNewline();
               } while (!eat(DEDENT));
             }
@@ -554,11 +554,11 @@ public final class Parser {
             default -> {
               do {
                 if (eat('@')) {
-                  r.add(expr());
+                  r.add(expr(f));
                   expect(']');
                   return new ListRest(loc, r);
                 }
-                r.add(expr());
+                r.add(expr(f));
               } while (eat(','));
             }
           }
@@ -566,38 +566,38 @@ public final class Parser {
           return new ListOf(loc, r);
         }
         case '(' -> {
-          var a = commas();
+          var a = commas(f);
           expect(')');
           return a;
         }
         case WORD -> {
           switch (s) {
             case "bool?" -> {
-              return new InstanceOf(loc, arg(), Type.BOOL);
+              return new InstanceOf(loc, arg(f), Type.BOOL);
             }
             case "int?" -> {
-              return new InstanceOf(loc, arg(), Type.INT);
+              return new InstanceOf(loc, arg(f), Type.INT);
             }
             case "float?" -> {
-              return new InstanceOf(loc, arg(), Type.FLOAT);
+              return new InstanceOf(loc, arg(f), Type.FLOAT);
             }
             case "double?" -> {
-              return new InstanceOf(loc, arg(), Type.DOUBLE);
+              return new InstanceOf(loc, arg(f), Type.DOUBLE);
             }
             case "rat?" -> {
-              return new InstanceOf(loc, arg(), Type.RAT);
+              return new InstanceOf(loc, arg(f), Type.RAT);
             }
             case "list?" -> {
-              return new InstanceOf(loc, arg(), Type.LIST);
+              return new InstanceOf(loc, arg(f), Type.LIST);
             }
             case "sym?" -> {
-              return new InstanceOf(loc, arg(), Type.SYM);
+              return new InstanceOf(loc, arg(f), Type.SYM);
             }
             case "slice" -> {
-              var t = arg1();
+              var t = arg1(f);
               expect(',');
-              var i = expr();
-              return new Slice(loc, t, i, argN());
+              var i = expr(f);
+              return new Slice(loc, t, i, argN(f));
             }
             case "parserat" -> {
               return new Invoke(
@@ -606,7 +606,7 @@ public final class Parser {
                   "aklo/Etc",
                   "parseRat",
                   "(Ljava/lang/Object;)Laklo/BigRational;",
-                  arg());
+                  arg(f));
             }
             case "parsefloat" -> {
               return new Invoke(
@@ -615,7 +615,7 @@ public final class Parser {
                   "aklo/Etc",
                   "parseFloat",
                   "(Ljava/lang/Object;)Ljava/lang/Float;",
-                  arg());
+                  arg(f));
             }
             case "parsedouble" -> {
               return new Invoke(
@@ -624,10 +624,10 @@ public final class Parser {
                   "aklo/Etc",
                   "parseDouble",
                   "(Ljava/lang/Object;)Ljava/lang/Double;",
-                  arg());
+                  arg(f));
             }
             case "parseint" -> {
-              var t = arg1();
+              var t = arg1(f);
               if (eat(')'))
                 return new Invoke(
                     loc,
@@ -643,17 +643,22 @@ public final class Parser {
                   "parseInt",
                   "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/math/BigInteger;",
                   t,
-                  argN());
+                  argN(f));
             }
             case "bitnot" -> {
-              return new BitNot(loc, arg());
+              return new BitNot(loc, arg(f));
             }
             case "len" -> {
-              return new Len(loc, arg());
+              return new Len(loc, arg(f));
             }
             case "intern" -> {
               return new Invoke(
-                  loc, INVOKESTATIC, "aklo/Etc", "intern", "(Ljava/lang/Object;)Laklo/Sym;", arg());
+                  loc,
+                  INVOKESTATIC,
+                  "aklo/Etc",
+                  "intern",
+                  "(Ljava/lang/Object;)Laklo/Sym;",
+                  arg(f));
             }
             case "str" -> {
               return new Invoke(
@@ -662,25 +667,25 @@ public final class Parser {
                   "aklo/Etc",
                   "str",
                   "(Ljava/lang/Object;)Ljava/util/List;",
-                  arg());
+                  arg(f));
             }
             case "cmp" -> {
-              return new Cmp(loc, arg1(), argN());
+              return new Cmp(loc, arg1(f), argN(f));
             }
             case "bitand" -> {
-              return new BitAnd(loc, arg1(), argN());
+              return new BitAnd(loc, arg1(f), argN(f));
             }
             case "bitor" -> {
-              return new BitOr(loc, arg1(), argN());
+              return new BitOr(loc, arg1(f), argN(f));
             }
             case "bitxor" -> {
-              return new BitXor(loc, arg1(), argN());
+              return new BitXor(loc, arg1(f), argN(f));
             }
             case "shl" -> {
-              return new Shl(loc, arg1(), argN());
+              return new Shl(loc, arg1(f), argN(f));
             }
             case "shr" -> {
-              return new Shr(loc, arg1(), argN());
+              return new Shr(loc, arg1(f), argN(f));
             }
             case "true" -> {
               return new Const(loc, true);
@@ -729,14 +734,22 @@ public final class Parser {
     throw new CompileError(loc, "expected expression");
   }
 
-  private Term postfix() throws IOException {
-    var a = primary();
+  private Term postInc(Fn f, Term y, Term x) throws IOException {
+    var loc = x.loc;
+    lex();
+    var old = new Var(loc);
+    f.vars.add(old);
+    return new Do(loc, List.of(new Assign(loc, old, y), new Assign(loc, y, x), old));
+  }
+
+  private Term postfix(Fn f) throws IOException {
+    var a = primary(f);
     for (; ; )
       switch (tok) {
         case '[' -> {
           var loc = new Loc(file, line);
           lex();
-          a = new Subscript(loc, a, expr());
+          a = new Subscript(loc, a, expr(f));
           expect(']');
         }
         case '(' -> {
@@ -747,13 +760,13 @@ public final class Parser {
             case INDENT -> {
               lex();
               do {
-                r.add(commas());
+                r.add(commas(f));
                 expectNewline();
               } while (!eat(DEDENT));
             }
             case ')' -> {}
             default -> {
-              do r.add(expr());
+              do r.add(expr(f));
               while (eat(','));
             }
           }
@@ -769,13 +782,11 @@ public final class Parser {
         }
         case INC -> {
           var loc = new Loc(file, line);
-          lex();
-          return new PostInc(loc, a, 1);
+          return postInc(f, a, new Add(loc, a, new Const(loc, BigInteger.ONE)));
         }
         case DEC -> {
           var loc = new Loc(file, line);
-          lex();
-          return new PostInc(loc, a, -1);
+          return postInc(f, a, new Sub(loc, a, new Const(loc, BigInteger.ONE)));
         }
         default -> {
           return a;
@@ -804,46 +815,46 @@ public final class Parser {
     expect(')');
   }
 
-  private Term prefix() throws IOException {
+  private Term prefix(Fn f) throws IOException {
     switch (tok) {
       case '\\' -> {
         var loc = new Loc(file, line);
         lex();
-        var f = new Fn(loc, "lambda");
+        f = new Fn(loc, "lambda");
 
         // parameters
         params(f);
 
         // body
         expect('(');
-        f.body = tok == INDENT ? block(f) : commas();
+        f.body = tok == INDENT ? block(f) : commas(f);
         expect(')');
         return f;
       }
       case INC -> {
         var loc = new Loc(file, line);
         lex();
-        var y = postfix();
+        var y = postfix(f);
         return new Assign(loc, y, new Add(loc, y, new Const(loc, BigInteger.ONE)));
       }
       case DEC -> {
         var loc = new Loc(file, line);
         lex();
-        var y = postfix();
+        var y = postfix(f);
         return new Assign(loc, y, new Sub(loc, y, new Const(loc, BigInteger.ONE)));
       }
       case '!' -> {
         var loc = new Loc(file, line);
         lex();
-        return new Not(loc, prefix());
+        return new Not(loc, prefix(f));
       }
       case '-' -> {
         var loc = new Loc(file, line);
         lex();
-        return new Neg(loc, prefix());
+        return new Neg(loc, prefix(f));
       }
     }
-    return postfix();
+    return postfix(f);
   }
 
   // operator precedence parser
@@ -887,15 +898,15 @@ public final class Parser {
     init('|', 1);
   }
 
-  private Term infix(int prec) throws IOException {
-    var a = prefix();
+  private Term infix(Fn f, int prec) throws IOException {
+    var a = prefix(f);
     for (; ; ) {
       var k = tok;
       var op = ops.get(k);
       if (op == null || op.prec < prec) return a;
       var loc = new Loc(file, line);
       lex();
-      var b = infix(op.prec + op.left);
+      var b = infix(f, op.prec + op.left);
       a =
           switch (k) {
             case EXP -> new Exp(loc, a, b);
@@ -921,28 +932,28 @@ public final class Parser {
     }
   }
 
-  private Term expr() throws IOException {
-    return infix(1);
+  private Term expr(Fn f) throws IOException {
+    return infix(f, 1);
   }
 
-  private Term commas() throws IOException {
-    var a = expr();
+  private Term commas(Fn f) throws IOException {
+    var a = expr(f);
     if (tok != ',') return a;
     var loc = new Loc(file, line);
     var r = new ArrayList<>(List.of(a));
     while (eat(',')) {
       if (eat('@')) {
-        r.add(expr());
+        r.add(expr(f));
         return new ListRest(loc, r);
       }
-      r.add(expr());
+      r.add(expr(f));
     }
     return new ListOf(loc, r);
   }
 
   // statements
   private Term assignment(Fn f) throws IOException {
-    var y = commas();
+    var y = commas(f);
     switch (tok) {
       case ASSIGN -> {
         var loc = new Loc(file, line);
@@ -1010,7 +1021,7 @@ public final class Parser {
   private IfStmt parseIf(Fn f) throws IOException {
     assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
     lex();
-    var cond = expr();
+    var cond = expr(f);
     var yes = block(f);
     Term no = null;
     if (tok == WORD)
@@ -1033,7 +1044,7 @@ public final class Parser {
     switch (tok) {
       case '^' -> {
         lex();
-        var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : commas();
+        var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : commas(f);
         expectNewline();
         return new Return(loc, a);
       }
@@ -1041,7 +1052,7 @@ public final class Parser {
         switch (tokString) {
           case "assert" -> {
             lex();
-            var cond = expr();
+            var cond = expr(f);
             expectNewline();
             var s = String.format("%s:%d: %s: %s", loc.file(), loc.line(), f.name, cond.toString());
             return new IfStmt(
@@ -1061,11 +1072,11 @@ public final class Parser {
           }
           case "case" -> {
             lex();
-            var r = new ArrayList<>(List.of(commas()));
+            var r = new ArrayList<>(List.of(commas(f)));
             expectIndent();
             do {
               var s = new ArrayList<Term>();
-              do s.add(commas());
+              do s.add(commas(f));
               while (eat('\n'));
               s.add(block(f));
               r.add(new Case(s));
@@ -1074,17 +1085,17 @@ public final class Parser {
           }
           case "for" -> {
             lex();
-            var x = commas();
+            var x = commas(f);
             expect(':');
-            return new For(x, commas(), block(f));
+            return new For(x, commas(f), block(f));
           }
           case "while" -> {
             lex();
-            return new While(false, expr(), block(f));
+            return new While(false, expr(f), block(f));
           }
           case "dowhile" -> {
             lex();
-            return new While(true, expr(), block(f));
+            return new While(true, expr(f), block(f));
           }
           case "break" -> {
             lex();
@@ -1100,26 +1111,26 @@ public final class Parser {
           }
           case "exit" -> {
             lex();
-            var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : expr();
+            var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : expr(f);
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a);
           }
           case "print" -> {
             lex();
-            var a = commas();
+            var a = commas(f);
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
           }
           case "throw" -> {
             lex();
-            var a = commas();
+            var a = commas(f);
             expectNewline();
             return new Throw(loc, a);
           }
           case "println" -> {
             lex();
             Term a = new Const(loc, BigInteger.TEN);
-            if (tok != '\n') a = new Cat(loc, commas(), a);
+            if (tok != '\n') a = new Cat(loc, commas(f), a);
             expectNewline();
             return new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a);
           }

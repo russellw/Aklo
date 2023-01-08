@@ -9,7 +9,6 @@ public enum Tag {
   DIV_INT,
   NEG,
   EXP,
-  POST_INC,
   REM,
   AND,
   OR,
