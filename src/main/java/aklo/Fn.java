@@ -150,9 +150,8 @@ public class Fn extends Term {
         var after = new Block(a.loc, "assignAfter");
 
         // assign
-        var y = a.get(0);
-        var x = term(env, loop, a.get(1));
-        assign(env, loop, y, x, fail);
+        r = term(env, loop, a.get(1));
+        assign(env, loop, a.get(0), r, fail);
         insn(new Goto(a.loc, after));
 
         // fail

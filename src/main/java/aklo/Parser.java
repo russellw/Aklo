@@ -823,12 +823,14 @@ public final class Parser {
       case INC -> {
         var loc = new Loc(file, line);
         lex();
-        return new OpAssign(loc, Tag.ADD, postfix(), new Const(loc, BigInteger.ONE));
+        var y = postfix();
+        return new Assign(loc, y, new Add(loc, y, new Const(loc, BigInteger.ONE)));
       }
       case DEC -> {
         var loc = new Loc(file, line);
         lex();
-        return new OpAssign(loc, Tag.SUB, postfix(), new Const(loc, BigInteger.ONE));
+        var y = postfix();
+        return new Assign(loc, y, new Sub(loc, y, new Const(loc, BigInteger.ONE)));
       }
       case '!' -> {
         var loc = new Loc(file, line);

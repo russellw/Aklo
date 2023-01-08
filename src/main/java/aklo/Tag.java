@@ -33,7 +33,6 @@ public enum Tag {
   LT,
   GOTO,
   ASSIGN,
-  OP_ASSIGN,
   CAT,
   CALL,
   ID,
