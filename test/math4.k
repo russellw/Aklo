@@ -41,6 +41,12 @@ j = i
 assert i == 42
 assert j == 42
 
+a,b,c=1,2,3
+a,b,c+=9
+assert(a,b,c)==(10,11,12)
+
+{
+
 ;increment and decrement
 i = 0
 
@@ -59,3 +65,4 @@ assert j == 0
 j = i--
 assert i == 0
 assert j == 1
+}

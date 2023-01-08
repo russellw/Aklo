@@ -91,6 +91,14 @@ public class Fn extends Term {
 
   private void assign(Env env, Loop loop, Term y, Term x, Block fail) {
     var loc = y.loc;
+    // it is possible for y to be a variable
+    // i.e. already resolved as a reference to a Var object, instead of still just an Id
+    // because of op-assignments
+    // y += x
+    // desugars to
+    // y = y + x
+    // this means y occurs twice, and is first resolved on the right-hand side
+    // so when the left-hand side is processed, identifiers are already resolved
     switch (y.tag()) {
       case CONST -> {
         var eq = new Eq(loc, y, x);
@@ -99,6 +107,7 @@ public class Fn extends Term {
         insn(new If(loc, eq, after, fail));
         addBlock(after);
       }
+      case VAR -> insn(new Assign(loc, y, x));
       case ID -> insn(new Assign(loc, term(env, loop, y), x));
       case LIST_OF -> {
         var n = y.size();

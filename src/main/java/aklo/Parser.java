@@ -939,58 +939,61 @@ public final class Parser {
   }
 
   // statements
-  private Term opAssignment(Fn f, Tag op, Term a) throws IOException {
-    var loc = new Loc(file, line);
-    lex();
-    return new OpAssign(loc, op, a, assignment(f));
-  }
-
   private Term assignment(Fn f) throws IOException {
-    var a = commas();
+    var y = commas();
     switch (tok) {
       case ASSIGN -> {
         var loc = new Loc(file, line);
         lex();
-        return new Assign(loc, a, assignment(f));
+        return new Assign(loc, y, assignment(f));
       }
       case '=' -> {
         var loc = new Loc(file, line);
         lex();
-        a.walk(
-            b -> {
-              if (b instanceof Id b1) {
-                var name = b1.name;
-                for (var x : f.vars) if (x.name.equals(name)) return;
-                f.vars.add(new Var(b.loc, name));
+        y.walk(
+            z -> {
+              if (z instanceof Id z1) {
+                var name = z1.name;
+                for (var a : f.vars) if (a.name.equals(name)) return;
+                f.vars.add(new Var(z.loc, name));
               }
             });
-        return new Assign(loc, a, assignment(f));
+        return new Assign(loc, y, assignment(f));
       }
       case ADD_ASSIGN -> {
-        return opAssignment(f, Tag.ADD, a);
+        var loc = new Loc(file, line);
+        lex();
+        var x = assignment(f);
+        return new Assign(loc, y, new Add(loc, y, x));
       }
       case SUB_ASSIGN -> {
-        return opAssignment(f, Tag.SUB, a);
+        var loc = new Loc(file, line);
+        lex();
+        var x = assignment(f);
+        return new Assign(loc, y, new Sub(loc, y, x));
       }
       case CAT_ASSIGN -> {
-        return opAssignment(f, Tag.CAT, a);
+        var loc = new Loc(file, line);
+        lex();
+        var x = assignment(f);
+        return new Assign(loc, y, new Cat(loc, y, x));
       }
       case APPEND -> {
         var loc = new Loc(file, line);
         // TODO do we need this restriction?
-        if (!(a instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
+        if (!(y instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
         lex();
-        var b = assignment(f);
-        return new Assign(loc, a, new Cat(loc, a, new ListOf(loc, new Term[] {b})));
+        var x = assignment(f);
+        return new Assign(loc, y, new Cat(loc, y, new ListOf(loc, new Term[] {x})));
       }
       case PREPEND -> {
         var loc = new Loc(file, line);
         lex();
-        var b = new Id(loc, word());
-        return new Assign(loc, b, new Cat(loc, new ListOf(loc, new Term[] {a}), b));
+        var x = new Id(loc, word());
+        return new Assign(loc, x, new Cat(loc, new ListOf(loc, new Term[] {y}), x));
       }
     }
-    return a;
+    return y;
   }
 
   private Do block(Fn f) throws IOException {
