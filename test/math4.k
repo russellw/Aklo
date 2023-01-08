@@ -63,3 +63,5 @@ assert j == 0
 j = i--
 assert i == 0
 assert j == 1
+
+q=9

@@ -967,7 +967,7 @@ public final class Parser {
             z -> {
               if (z instanceof Id z1) {
                 var name = z1.name;
-                for (var a : f.vars) if (a.name.equals(name)) return;
+                for (var a : f.vars) if (name.equals(a.name)) return;
                 f.vars.add(new Var(z.loc, name));
               }
             });
