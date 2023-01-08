@@ -116,60 +116,14 @@ assert lines("")==[""]
 
 assert unlines(["ab","cd"])=="ab\ncd\n"
 
-a=1
-b=[2]
-[a]=b
-assert a==2
 
 ;sets
 assert uniq("abcab")=="abc"
 assert union  ("abc","bcd")=="abcd"
 assert intersection  ("abc","bcd")=="bc"
 
-;variables
-x = 5
-assert x == 5
-x = 6
-assert x == 6
-y = 7
-assert y == 7
-
-;augmented assignment
-i = 3
-i += 4
-assert i == 7
-i -= 1
-assert i == 6
-i=32
-i += 10
-j = i
-assert i == 42
-assert j == 42
-
-;increment and decrement
-i = 0
-
-j = ++i
-assert i == 1
-assert j == 1
-
-j = --i
-assert i == 0
-assert j == 0
-
-j = i++
-assert i == 1
-assert j == 0
-
-j = i--
-assert i == 0
-assert j == 1
 
 ;symbols
-assert 'a'=='a'
-assert 'a'!='b'
-
-assert 'a'==intern("a")
 
 a=sym("foo")
 b=sym("foo")

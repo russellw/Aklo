@@ -62,3 +62,8 @@ assert a==[1,2,3]
 1,a,b=1,2,3
 assert a==2
 assert b==3
+
+a=1
+b=[2]
+[a]=b
+assert a==2
