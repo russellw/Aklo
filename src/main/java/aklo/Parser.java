@@ -402,6 +402,7 @@ public final class Parser {
           switch (c) {
             case 'b', 'B', 'o', 'O' -> {
               readc(sb);
+              if (c == '_') readc();
 
               // integer
               digits(sb);
