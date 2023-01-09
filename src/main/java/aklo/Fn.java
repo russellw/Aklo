@@ -64,7 +64,7 @@ public class Fn extends Term {
     }
   }
 
-  private Var var1(Loc loc) {
+  private Var mkVar(Loc loc) {
     var x = new Var(loc);
     vars.add(x);
     return x;
@@ -157,7 +157,7 @@ public class Fn extends Term {
         else for (var b : a) r = term(env, loop, b);
       }
       case OR -> {
-        r = var1(a.loc);
+        r = mkVar(a.loc);
         var no = new Block(a.loc, "orFalse");
         var after = new Block(a.loc, "orAfter");
 
@@ -174,7 +174,7 @@ public class Fn extends Term {
         addBlock(after);
       }
       case AND -> {
-        r = var1(a.loc);
+        r = mkVar(a.loc);
         var yes = new Block(a.loc, "andTrue");
         var after = new Block(a.loc, "andAfter");
 
@@ -191,7 +191,7 @@ public class Fn extends Term {
         addBlock(after);
       }
       case NOT -> {
-        r = var1(a.loc);
+        r = mkVar(a.loc);
         var yes = new Block(a.loc, "notTrue");
         var no = new Block(a.loc, "notFalse");
         var after = new Block(a.loc, "notAfter");
@@ -213,7 +213,7 @@ public class Fn extends Term {
         addBlock(after);
       }
       case IF -> {
-        r = var1(a.loc);
+        r = mkVar(a.loc);
         var yes = new Block(a.loc, "ifTrue");
         var no = new Block(a.loc, "ifFalse");
         var after = new Block(a.loc, "ifAfter");
