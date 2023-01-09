@@ -37,7 +37,7 @@ assert 0Xfe+2==256
 assert 0b10000==16
 assert 0o100==64
 assert 1_234==1234
-assert 0xff_ff==65535
+assert 0x_ff_ff==65535
 
 ;comparison
 assert 1==1

@@ -408,6 +408,7 @@ public final class Parser {
             }
             case 'x', 'X' -> {
               readc(sb);
+              if (c == '_') readc();
 
               // integer part
               while (Character.digit(c, 16) >= 0) {
