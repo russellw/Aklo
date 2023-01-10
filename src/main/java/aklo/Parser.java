@@ -124,6 +124,7 @@ public final class Parser {
   }
 
   private void digits(StringBuilder sb) throws IOException {
+    // TODO
     while (Character.isDigit(c)) {
       readc(sb);
       if (c == '_') readc();
@@ -1078,26 +1079,47 @@ public final class Parser {
       return r;
     }
 
-    IfStmt parseIf() throws IOException {
-      // TODO
+    Term xif() throws IOException {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
+      var loc = new Loc(file, line);
       lex();
-      var cond = expr();
-      var yes = block();
-      Term no = null;
-      if (tok == WORD)
-        switch (tokString) {
-          case "else" -> {
-            lex();
-            no = block();
+      var r = mkVar(loc);
+      var yes = new Block(loc, "ifTrue");
+      var no = new Block(loc, "ifFalse");
+      var after = new Block(loc, "ifAfter");
+
+      // condition
+      insn(new If(loc, expr(), yes, no));
+
+      // true
+      addBlock(yes);
+      insn(new Assign(loc, r, block()));
+      insn(new Goto(loc, after));
+
+      // false
+      addBlock(no);
+      elx:
+      //noinspection ConstantConditions
+      do {
+        if (tok == WORD)
+          switch (tokString) {
+            case "else" -> {
+              lex();
+              insn(new Assign(loc, r, block()));
+              break elx;
+            }
+            case "elif" -> {
+              insn(new Assign(loc, r, xif()));
+              break elx;
+            }
           }
-          case "elif" -> {
-            lex();
-            no = parseIf();
-          }
-        }
-      if (no == null) no = new Const(cond.loc, BigInteger.ZERO);
-      return new IfStmt(cond, yes, no);
+        insn(new Assign(loc, r, Const.ZERO));
+      } while (false);
+      insn(new Goto(loc, after));
+
+      // after
+      addBlock(after);
+      return r;
     }
 
     void xwhile(String label, boolean doWhile) throws IOException {
@@ -1150,13 +1172,14 @@ public final class Parser {
             case "fn" -> {
               lex();
               var f = new Fn(loc, word());
+              // TODO rename
               var context = new Context(f);
               context.params();
               context.insn(new Return(loc, context.block()));
               return f;
             }
             case "if" -> {
-              return parseIf();
+              return xif();
             }
             case "case" -> {
               lex();
