@@ -1100,6 +1100,30 @@ public final class Parser {
       return new IfStmt(cond, yes, no);
     }
 
+    void xwhile(String label, boolean doWhile) throws IOException {
+      var loc = new Loc(file, line);
+      lex();
+      var body = new Block(loc, "whileBody");
+      var cond = new Block(loc, "whileCond");
+      var after = new Block(loc, "whileAfter");
+      var c = new Context(this, label, cond, after);
+
+      // before
+      insn(new Goto(loc, doWhile ? body : cond));
+
+      // condition
+      addBlock(cond);
+      insn(new If(loc, c.expr(), body, after));
+
+      // body
+      addBlock(body);
+      c.block();
+      insn(new Goto(loc, cond));
+
+      // after
+      addBlock(after);
+    }
+
     Term stmt() throws IOException {
       var loc = new Loc(file, line);
       switch (tok) {
@@ -1154,12 +1178,12 @@ public final class Parser {
               return new For(x, commas(), block());
             }
             case "while" -> {
-              lex();
-              return new While(false, expr(), block());
+              xwhile(null, false);
+              return Const.ZERO;
             }
             case "dowhile" -> {
-              lex();
-              return new While(true, expr(), block());
+              xwhile(null, true);
+              return Const.ZERO;
             }
             case "break" -> {
               lex();
@@ -1245,20 +1269,22 @@ public final class Parser {
       }
       var b = assignment();
       if (b instanceof Id b1) {
-        // TODO
-        if (eat(':')) {
-          if (tok == WORD)
-            switch (tokString) {
-                // TODO other statements
-              case "while", "dowhile" -> {
-                var a = (While) stmt();
-                a.label = b1.name;
-                return a;
-              }
+        if (!eat(':')) throw new CompileError(loc, "expected statement");
+        if (tok == WORD) {
+          var label = b1.name;
+          switch (tokString) {
+              // TODO other statements
+            case "dowhile" -> {
+              xwhile(label, true);
+              return Const.ZERO;
             }
-          throw new CompileError(loc, "expected loop after label");
+            case "while" -> {
+              xwhile(label, false);
+              return Const.ZERO;
+            }
+          }
         }
-        throw new CompileError(loc, "expected statement");
+        throw new CompileError(loc, "expected loop after label");
       }
       expectNewline();
       return b;

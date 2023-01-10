@@ -219,44 +219,6 @@ public class Fn extends Term {
         // after
         addBlock(after);
       }
-      case WHILE -> {
-        var a1 = (While) a;
-        var body = new Block(a.loc, "whileBody");
-        var cond = new Block(a.loc, "whileCond");
-        var after = new Block(a.loc, "whileAfter");
-        loop = new Loop(loop, a1.label, cond, after);
-
-        // before
-        insn(new Goto(a.loc, a1.doWhile ? body : cond));
-
-        // body
-        addBlock(body);
-        term(env, loop, a1.arg1);
-        insn(new Goto(a.loc, cond));
-
-        // condition
-        addBlock(cond);
-        insn(new If(a.loc, term(env, loop, a1.arg0), body, after));
-
-        // after
-        addBlock(after);
-        return new Const(a.loc, BigInteger.ZERO);
-      }
-      case GOTO -> {
-        var a1 = (ContinueBreak) a;
-        var label = a1.label;
-        loop = Loop.get(loop, label);
-        if (loop == null) {
-          if (label == null) {
-            var s = a1.break1 ? "break" : "continue";
-            throw new CompileError(a.loc, s + " without loop");
-          }
-          throw new CompileError(a.loc, label + " not found");
-        }
-        insn(new Goto(a.loc, a1.break1 ? loop.breakTarget : loop.continueTarget));
-        addBlock(new Block(a.loc, "gotoAfter"));
-        return new Const(a.loc, BigInteger.ZERO);
-      }
       case RETURN, THROW -> {
         a.set(0, term(env, loop, a.get(0)));
         insn(a);

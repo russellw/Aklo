@@ -20,7 +20,6 @@ public enum Tag {
   SHL,
   SHR,
   IF,
-  WHILE,
   TRON,
   TROFF,
   DBG,
