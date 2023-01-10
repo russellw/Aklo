@@ -501,6 +501,11 @@ public final class Parser {
     if (!eat('\n')) throw new CompileError(file, line, "expected newline");
   }
 
+  private String currentWord() throws IOException {
+    if (tok == WORD) return tokString;
+    return "";
+  }
+
   private String word() throws IOException {
     var s = tokString;
     if (!eat(WORD)) throw new CompileError(file, line, "expected word");
@@ -1098,23 +1103,18 @@ public final class Parser {
 
       // false
       addBlock(no);
-      elx:
-      //noinspection ConstantConditions
-      do {
-        if (tok == WORD)
-          switch (tokString) {
-            case "else" -> {
-              lex();
-              insn(new Assign(loc, r, block()));
-              break elx;
-            }
-            case "elif" -> {
-              insn(new Assign(loc, r, xif()));
-              break elx;
-            }
-          }
-        insn(new Assign(loc, r, Const.ZERO));
-      } while (false);
+      insn(
+          new Assign(
+              loc,
+              r,
+              switch (currentWord()) {
+                case "else" -> {
+                  lex();
+                  yield block();
+                }
+                case "elif" -> insn(new Assign(loc, r, xif()));
+                default -> Const.ZERO;
+              }));
       insn(new Goto(loc, after));
 
       // after
@@ -1150,6 +1150,7 @@ public final class Parser {
       var loc = new Loc(file, line);
       switch (tok) {
         case '^' -> {
+          // TODO change to return?
           lex();
           var a = tok == '\n' ? Const.ZERO : commas();
           expectNewline();
@@ -1265,6 +1266,7 @@ public final class Parser {
               return Const.ZERO;
             }
             case "print" -> {
+              // TODO change to printn?
               lex();
               var a = commas();
               expectNewline();
