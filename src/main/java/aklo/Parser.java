@@ -1175,7 +1175,7 @@ public final class Parser {
               lex();
               var x = commas();
               expect(':');
-              return new For(x, commas(), block());
+              // TODO
             }
             case "while" -> {
               xwhile(null, false);

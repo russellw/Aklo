@@ -45,7 +45,6 @@ public enum Tag {
   CMP,
   LEN,
   THROW,
-  FOR,
   SLICE,
   LIST_REST,
   CASE,

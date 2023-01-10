@@ -137,10 +137,6 @@ public class Fn extends Term {
         // after
         addBlock(after);
       }
-      case DO -> {
-        if (a.isEmpty()) r = new Const(a.loc, BigInteger.ZERO);
-        else for (var b : a) r = term(env, loop, b);
-      }
       case OR -> {
         r = mkVar(a.loc);
         var no = new Block(a.loc, "orFalse");
@@ -219,18 +215,11 @@ public class Fn extends Term {
         // after
         addBlock(after);
       }
-      case RETURN, THROW -> {
-        a.set(0, term(env, loop, a.get(0)));
-        insn(a);
-        addBlock(new Block(a.loc, "after"));
-        return new Const(a.loc, BigInteger.ZERO);
-      }
       case ID -> {
         var s = a.toString();
         r = env.get(s);
         if (r == null) throw new CompileError(a.loc, s + " not found");
       }
-      case CONST, VAR -> {}
       default -> {
         for (var i = 0; i < a.size(); i++) a.set(i, term(env, loop, a.get(i)));
         insn(a);
