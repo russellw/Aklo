@@ -1013,8 +1013,42 @@ public final class Parser {
                 // TODO
               case NE -> new Not(loc, new Eq(loc, a, b));
               case NE_NUM -> new Not(loc, new EqNum(loc, a, b));
-              case '&' -> new And(loc, a, b);
-              case '|' -> new Or(loc, a, b);
+              case '&' -> {
+                var r = mkVar(a.loc);
+                var yes = new Block(a.loc, "andTrue");
+                var after = new Block(a.loc, "andAfter");
+
+                // condition
+                insn(new Assign(a.loc, r, a));
+                insn(new If(a.loc, r, yes, after));
+
+                // true
+                addBlock(yes);
+                insn(new Assign(a.loc, r, b));
+                insn(new Goto(a.loc, after));
+
+                // after
+                addBlock(after);
+                yield r;
+              }
+              case '|' -> {
+                var r = mkVar(a.loc);
+                var no = new Block(a.loc, "orFalse");
+                var after = new Block(a.loc, "orAfter");
+
+                // condition
+                insn(new Assign(a.loc, r, a));
+                insn(new If(a.loc, r, after, no));
+
+                // false
+                addBlock(no);
+                insn(new Assign(a.loc, r, b));
+                insn(new Goto(a.loc, after));
+
+                // after
+                addBlock(after);
+                yield r;
+              }
               default -> throw new IllegalStateException(Integer.toString(k));
             };
       }
