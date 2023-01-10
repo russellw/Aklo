@@ -877,6 +877,30 @@ public final class Parser {
       expect(')');
     }
 
+    Term not(Loc loc, Term a) {
+      var r = mkVar(loc);
+      var yes = new Block(loc, "notTrue");
+      var no = new Block(loc, "notFalse");
+      var after = new Block(loc, "notAfter");
+
+      // condition
+      insn(new If(loc, a, yes, no));
+
+      // true
+      addBlock(yes);
+      insn(new Assign(loc, r, new Const(loc, false)));
+      insn(new Goto(loc, after));
+
+      // false
+      addBlock(no);
+      insn(new Assign(loc, r, new Const(loc, true)));
+      insn(new Goto(loc, after));
+
+      // after
+      addBlock(after);
+      return r;
+    }
+
     Term prefix() throws IOException {
       switch (tok) {
         case '\\' -> {
@@ -913,27 +937,7 @@ public final class Parser {
         case '!' -> {
           var loc = new Loc(file, line);
           lex();
-          var r = mkVar(loc);
-          var yes = new Block(loc, "notTrue");
-          var no = new Block(loc, "notFalse");
-          var after = new Block(loc, "notAfter");
-
-          // condition
-          insn(new If(loc, prefix(), yes, no));
-
-          // true
-          addBlock(yes);
-          insn(new Assign(loc, r, new Const(loc, false)));
-          insn(new Goto(loc, after));
-
-          // false
-          addBlock(no);
-          insn(new Assign(loc, r, new Const(loc, true)));
-          insn(new Goto(loc, after));
-
-          // after
-          addBlock(after);
-          return r;
+          return not(loc, prefix());
         }
         case '-' -> {
           var loc = new Loc(file, line);
@@ -1010,9 +1014,8 @@ public final class Parser {
               case GE -> insn(new Le(loc, b, a));
               case EQ -> insn(new Eq(loc, a, b));
               case EQ_NUM -> insn(new EqNum(loc, a, b));
-                // TODO
-              case NE -> new Not(loc, new Eq(loc, a, b));
-              case NE_NUM -> new Not(loc, new EqNum(loc, a, b));
+              case NE -> not(loc, insn(new Eq(loc, a, b)));
+              case NE_NUM -> not(loc, insn(new EqNum(loc, a, b)));
               case '&' -> {
                 var r = mkVar(a.loc);
                 var yes = new Block(a.loc, "andTrue");
