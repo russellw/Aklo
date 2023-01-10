@@ -883,14 +883,14 @@ public final class Parser {
           var loc = new Loc(file, line);
           lex();
           var f = new Fn(loc, "lambda");
-          var context = new Context(f);
+          var c = new Context(f);
 
           // parameters
-          context.params();
+          c.params();
 
           // body
           expect('(');
-          var r = tok == INDENT ? context.block() : context.commas();
+          var r = tok == INDENT ? c.block() : c.commas();
           loc = new Loc(file, line);
           insn(new Return(loc, r));
           expect(')');
@@ -1173,10 +1173,9 @@ public final class Parser {
             case "fn" -> {
               lex();
               var f = new Fn(loc, word());
-              // TODO rename
-              var context = new Context(f);
-              context.params();
-              context.insn(new Return(loc, context.block()));
+              var c = new Context(f);
+              c.params();
+              c.insn(new Return(loc, c.block()));
               return f;
             }
             case "if" -> {
@@ -1298,7 +1297,7 @@ public final class Parser {
         if (tok == WORD) {
           var label = b1.name;
           switch (tokString) {
-              // TODO other statements
+              // TODO for, case
             case "dowhile" -> {
               xwhile(label, true);
               return Const.ZERO;
@@ -1309,7 +1308,7 @@ public final class Parser {
             }
           }
         }
-        throw new CompileError(loc, "expected loop after label");
+        throw new CompileError(loc, "expected statement after label");
       }
       expectNewline();
       return b;
@@ -1324,9 +1323,9 @@ public final class Parser {
     lex();
     eat('\n');
 
-    var context = new Context(module);
+    var c = new Context(module);
     Term r = Const.ZERO;
-    while (tok != -1) r = context.stmt();
-    context.insn(new Return(module.loc, r));
+    while (tok != -1) r = c.stmt();
+    c.insn(new Return(module.loc, r));
   }
 }
