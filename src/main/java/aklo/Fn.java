@@ -171,28 +171,6 @@ public class Fn extends Term {
         // after
         addBlock(after);
       }
-      case NOT -> {
-        r = mkVar(a.loc);
-        var yes = new Block(a.loc, "notTrue");
-        var no = new Block(a.loc, "notFalse");
-        var after = new Block(a.loc, "notAfter");
-
-        // condition
-        insn(new If(a.loc, term(env, loop, a.get(0)), yes, no));
-
-        // true
-        addBlock(yes);
-        insn(new Assign(a.loc, r, new Const(a.loc, false)));
-        insn(new Goto(a.loc, after));
-
-        // false
-        addBlock(no);
-        insn(new Assign(a.loc, r, new Const(a.loc, true)));
-        insn(new Goto(a.loc, after));
-
-        // after
-        addBlock(after);
-      }
       case ID -> {
         var s = a.toString();
         r = env.get(s);

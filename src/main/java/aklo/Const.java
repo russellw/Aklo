@@ -13,6 +13,7 @@ public final class Const extends Term {
 
   public Const(Loc loc, Object val) {
     // TODO does this need location?
+    // or is this class even necessary?
     super(loc);
     assert !(val instanceof Integer);
     this.val = val;

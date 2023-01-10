@@ -1,5 +1,6 @@
 package aklo;
 
+// TODO can we reuse JVM opcodes for some cases?
 public enum Tag {
   CONST,
   ADD,

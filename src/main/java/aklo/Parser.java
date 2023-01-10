@@ -913,8 +913,27 @@ public final class Parser {
         case '!' -> {
           var loc = new Loc(file, line);
           lex();
-          // TODO
-          return new Not(loc, prefix());
+          var r = mkVar(loc);
+          var yes = new Block(loc, "notTrue");
+          var no = new Block(loc, "notFalse");
+          var after = new Block(loc, "notAfter");
+
+          // condition
+          insn(new If(loc, prefix(), yes, no));
+
+          // true
+          addBlock(yes);
+          insn(new Assign(loc, r, new Const(loc, false)));
+          insn(new Goto(loc, after));
+
+          // false
+          addBlock(no);
+          insn(new Assign(loc, r, new Const(loc, true)));
+          insn(new Goto(loc, after));
+
+          // after
+          addBlock(after);
+          return r;
         }
         case '-' -> {
           var loc = new Loc(file, line);
