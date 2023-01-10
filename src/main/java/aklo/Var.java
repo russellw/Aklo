@@ -6,6 +6,7 @@ public final class Var extends Term {
   public Object val;
 
   public Var(Loc loc, String name) {
+    // TODO does this need location?
     super(loc);
     this.name = name;
   }

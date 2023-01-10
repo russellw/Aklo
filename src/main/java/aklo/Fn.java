@@ -16,6 +16,7 @@ public class Fn extends Term {
   public Fn(Loc loc, String name) {
     super(loc);
     this.name = name;
+    addBlock(new Block(loc, "entry"));
   }
 
   public final void walkFns(Consumer<Fn> f) {
@@ -120,22 +121,6 @@ public class Fn extends Term {
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
-      case LIST_REST -> {
-        var n = a.size() - 1;
-
-        // elements
-        var s = new Term[n];
-        for (var i = 0; i < n; i++) s[i] = term(env, loop, a.get(i));
-        var s1 = new ListOf(a.loc, s);
-        insn(s1);
-
-        // rest
-        var t = term(env, loop, a.get(n));
-
-        // concatenate
-        r = new Cat(a.loc, s1, t);
-        insn(r);
-      }
       case ASSIGN -> {
         var fail = new Block(a.loc, "assignFail");
         var after = new Block(a.loc, "assignAfter");

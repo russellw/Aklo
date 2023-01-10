@@ -7,9 +7,12 @@ import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 public final class Const extends Term {
+  public static final Const ZERO = new Const(null, BigInteger.ZERO);
+  public static final Const ONE = new Const(null, BigInteger.ONE);
   public final Object val;
 
   public Const(Loc loc, Object val) {
+    // TODO does this need location?
     super(loc);
     assert !(val instanceof Integer);
     this.val = val;
