@@ -68,14 +68,6 @@ public class Fn extends Term {
     blocks.add(block);
   }
 
-  private Block lastBlock() {
-    return blocks.get(blocks.size() - 1);
-  }
-
-  private void insn(Term a) {
-    lastBlock().insns.add(a);
-  }
-
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
@@ -86,7 +78,6 @@ public class Fn extends Term {
       }
       default -> {
         for (var i = 0; i < a.size(); i++) a.set(i, term(env, loop, a.get(i)));
-        insn(a);
       }
     }
     return r;
@@ -108,10 +99,6 @@ public class Fn extends Term {
           b -> {
             if (b instanceof Fn b1) b1.toBlocks(env);
           });
-
-    // convert this function to basic blocks
-    addBlock(new Block(loc, "entry"));
-    insn(new Return(loc, term(env, null, body)));
   }
 
   public void toBlocks() {

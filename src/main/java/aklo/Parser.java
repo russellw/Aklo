@@ -544,6 +544,7 @@ public final class Parser {
     }
 
     Term insn(Term a) {
+      // TODO block should be an instruction constructor parameter
       lastBlock().insns.add(a);
       return a;
     }
@@ -1112,11 +1113,10 @@ public final class Parser {
     }
 
     Term assign(Loc loc, Term y, Term x) {
-      var fail = new Block(loc, "assignFail");
-      var after = new Block(loc, "assignAfter");
-
       // assign
+      var fail = new Block(loc, "assignFail");
       assign(y, x, fail);
+      var after = new Block(loc, "assignAfter");
       insn(new Goto(loc, after));
 
       // fail
@@ -1130,7 +1130,6 @@ public final class Parser {
 
     Term assignment() throws IOException {
       var y = commas();
-      // TODO
       switch (tok) {
         case ASSIGN -> {
           var loc = new Loc(file, line);
@@ -1153,24 +1152,25 @@ public final class Parser {
         case ADD_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, new Add(loc, y, assignment()));
+          return assign(loc, y, insn(new Add(loc, y, assignment())));
         }
         case SUB_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, new Sub(loc, y, assignment()));
+          return assign(loc, y, insn(new Sub(loc, y, assignment())));
         }
         case CAT_ASSIGN -> {
           var loc = new Loc(file, line);
           if (!(y instanceof Id)) throw new CompileError(loc, "@=: expected identifier on left");
           lex();
-          return assign(loc, y, new Cat(loc, y, assignment()));
+          return assign(loc, y, insn(new Cat(loc, y, assignment())));
         }
         case APPEND -> {
           var loc = new Loc(file, line);
           if (!(y instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
           lex();
-          return assign(loc, y, new Cat(loc, y, new ListOf(loc, List.of(assignment()))));
+          return assign(
+              loc, y, insn(new Cat(loc, y, insn(new ListOf(loc, List.of(assignment()))))));
         }
       }
       return y;
