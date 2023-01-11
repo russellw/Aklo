@@ -1263,12 +1263,27 @@ public final class Parser {
               lex();
               var cond = expr();
               expectNewline();
-              var s =
-                  String.format("%s:%d: %s: %s", loc.file(), loc.line(), fn.name, cond.toString());
-              return new IfStmt(
-                  cond,
-                  new Const(loc, BigInteger.ZERO),
-                  new Throw(loc, new Const(loc, Etc.encode(s))));
+              var no = new Block(loc, "ifFalse");
+              var after = new Block(loc, "ifAfter");
+
+              // condition
+              insn(new If(loc, cond, after, no));
+
+              // false
+              addBlock(no);
+              insn(
+                  new Throw(
+                      loc,
+                      new Const(
+                          loc,
+                          Etc.encode(
+                              String.format(
+                                  "%s:%d: %s: %s",
+                                  loc.file(), loc.line(), fn.name, cond.toString())))));
+
+              // after
+              addBlock(after);
+              return new Const(loc, BigInteger.ZERO);
             }
             case "fn" -> {
               lex();
