@@ -789,13 +789,70 @@ public final class Parser {
       throw new CompileError(loc, "expected expression");
     }
 
+    void assignSubscript(Term y, Term x, Block fail, int i) {
+      y = y.get(i);
+      var loc = fail.loc;
+      x = new Subscript(loc, x, new Const(x.loc, BigInteger.valueOf(i)));
+      insn(x);
+      assign(y, x, fail);
+    }
+
+    void assign(Term y, Term x, Block fail) {
+      var loc = fail.loc;
+      switch (y.tag()) {
+        case CONST -> {
+          var eq = new Eq(loc, y, x);
+          insn(eq);
+          var after = new Block(loc, "assignCheckAfter");
+          insn(new If(loc, eq, after, fail));
+          addBlock(after);
+        }
+          // TODO Var is impossible here?
+        case ID, VAR -> insn(new Assign(loc, y, x));
+        case LIST_OF -> {
+          var n = y.size();
+          for (var i = 0; i < n; i++) assignSubscript(y, x, fail, i);
+        }
+        case CAT -> {
+          // head atoms
+          if (!(y.get(0) instanceof ListOf s))
+            throw new CompileError(loc, y + ": invalid assignment");
+          var n = s.size();
+          for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
+
+          // rest of the list
+          var len = new Len(loc, x);
+          insn(len);
+          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
+          insn(slice);
+          assign(y.get(1), slice, fail);
+        }
+        default -> throw new CompileError(loc, y + ": invalid assignment");
+      }
+    }
+
+    Term assign(Loc loc, Term y, Term x) {
+      // assign
+      var fail = new Block(loc, "assignFail");
+      assign(y, x, fail);
+      var after = new Block(loc, "assignAfter");
+      insn(new Goto(loc, after));
+
+      // fail
+      addBlock(fail);
+      insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
+
+      // after
+      addBlock(after);
+      return x;
+    }
+
     Term postInc(Term y, Term x) throws IOException {
       var loc = x.loc;
       lex();
       var old = mkVar(loc);
       insn(new Assign(loc, old, y));
-      // TODO
-      // return new Do(loc, List.of(, new Assign(loc, y, x), old));
+      assign(loc, y, x);
       return old;
     }
 
@@ -1068,64 +1125,6 @@ public final class Parser {
     }
 
     // statements
-    void assignSubscript(Term y, Term x, Block fail, int i) {
-      y = y.get(i);
-      var loc = fail.loc;
-      x = new Subscript(loc, x, new Const(x.loc, BigInteger.valueOf(i)));
-      insn(x);
-      assign(y, x, fail);
-    }
-
-    void assign(Term y, Term x, Block fail) {
-      var loc = fail.loc;
-      switch (y.tag()) {
-        case CONST -> {
-          var eq = new Eq(loc, y, x);
-          insn(eq);
-          var after = new Block(loc, "assignCheckAfter");
-          insn(new If(loc, eq, after, fail));
-          addBlock(after);
-        }
-          // TODO Var is impossible here?
-        case ID, VAR -> insn(new Assign(loc, y, x));
-        case LIST_OF -> {
-          var n = y.size();
-          for (var i = 0; i < n; i++) assignSubscript(y, x, fail, i);
-        }
-        case CAT -> {
-          // head atoms
-          if (!(y.get(0) instanceof ListOf s))
-            throw new CompileError(loc, y + ": invalid assignment");
-          var n = s.size();
-          for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
-
-          // rest of the list
-          var len = new Len(loc, x);
-          insn(len);
-          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
-          insn(slice);
-          assign(y.get(1), slice, fail);
-        }
-        default -> throw new CompileError(loc, y + ": invalid assignment");
-      }
-    }
-
-    Term assign(Loc loc, Term y, Term x) {
-      // assign
-      var fail = new Block(loc, "assignFail");
-      assign(y, x, fail);
-      var after = new Block(loc, "assignAfter");
-      insn(new Goto(loc, after));
-
-      // fail
-      addBlock(fail);
-      insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
-
-      // after
-      addBlock(after);
-      return x;
-    }
-
     Term assignment() throws IOException {
       var y = commas();
       switch (tok) {
