@@ -26,7 +26,6 @@ public final class Parser {
   private static final int NE = -16;
   private static final int EQ_NUM = -17;
   private static final int NE_NUM = -18;
-  private static final int PREPEND = -19;
   private static final int STR = -20;
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
@@ -307,15 +306,9 @@ public final class Parser {
         }
         case '>' -> {
           readc();
-          switch (c) {
-            case '=' -> {
-              readc();
-              tok = GE;
-            }
-            case '>' -> {
-              readc();
-              tok = PREPEND;
-            }
+          if (c == '=') {
+            readc();
+            tok = GE;
           }
         }
         case '#' -> {
@@ -541,6 +534,7 @@ public final class Parser {
       return x;
     }
 
+    // TODO rename?
     void addBlock(Block block) {
       fn.blocks.add(block);
     }
@@ -973,6 +967,7 @@ public final class Parser {
       init('@', 1);
 
       prec--;
+      // TODO chained comparisons like Python?
       init('<', 1);
       init(LE, 1);
       init('>', 1);
@@ -1074,6 +1069,65 @@ public final class Parser {
     }
 
     // statements
+    void assignSubscript(Term y, Term x, Block fail, int i) {
+      y = y.get(i);
+      var loc = fail.loc;
+      x = new Subscript(loc, x, new Const(x.loc, BigInteger.valueOf(i)));
+      insn(x);
+      assign(y, x, fail);
+    }
+
+    void assign(Term y, Term x, Block fail) {
+      var loc = fail.loc;
+      switch (y.tag()) {
+        case CONST -> {
+          var eq = new Eq(loc, y, x);
+          insn(eq);
+          var after = new Block(loc, "assignCheckAfter");
+          insn(new If(loc, eq, after, fail));
+          addBlock(after);
+        }
+          // TODO Var is impossible here?
+        case ID, VAR -> insn(new Assign(loc, y, x));
+        case LIST_OF -> {
+          var n = y.size();
+          for (var i = 0; i < n; i++) assignSubscript(y, x, fail, i);
+        }
+        case CAT -> {
+          // head atoms
+          if (!(y.get(0) instanceof ListOf s))
+            throw new CompileError(loc, y + ": invalid assignment");
+          var n = s.size();
+          for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
+
+          // rest of the list
+          var len = new Len(loc, x);
+          insn(len);
+          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
+          insn(slice);
+          assign(y.get(1), slice, fail);
+        }
+        default -> throw new CompileError(loc, y + ": invalid assignment");
+      }
+    }
+
+    Term assign(Loc loc, Term y, Term x) {
+      var fail = new Block(loc, "assignFail");
+      var after = new Block(loc, "assignAfter");
+
+      // assign
+      assign(y, x, fail);
+      insn(new Goto(loc, after));
+
+      // fail
+      addBlock(fail);
+      insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
+
+      // after
+      addBlock(after);
+      return x;
+    }
+
     Term assignment() throws IOException {
       var y = commas();
       // TODO
@@ -1081,7 +1135,7 @@ public final class Parser {
         case ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return new Assign(loc, y, assignment());
+          return assign(loc, y, assignment());
         }
         case '=' -> {
           var loc = new Loc(file, line);
@@ -1094,39 +1148,29 @@ public final class Parser {
                   fn.vars.add(new Var(z.loc, name));
                 }
               });
-          return new Assign(loc, y, assignment());
+          return assign(loc, y, assignment());
         }
         case ADD_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          var x = assignment();
-          return new Assign(loc, y, new Add(loc, y, x));
+          return assign(loc, y, new Add(loc, y, assignment()));
         }
         case SUB_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          var x = assignment();
-          return new Assign(loc, y, new Sub(loc, y, x));
+          return assign(loc, y, new Sub(loc, y, assignment()));
         }
         case CAT_ASSIGN -> {
           var loc = new Loc(file, line);
           if (!(y instanceof Id)) throw new CompileError(loc, "@=: expected identifier on left");
           lex();
-          var x = assignment();
-          return new Assign(loc, y, new Cat(loc, y, x));
+          return assign(loc, y, new Cat(loc, y, assignment()));
         }
         case APPEND -> {
           var loc = new Loc(file, line);
           if (!(y instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
           lex();
-          var x = assignment();
-          return new Assign(loc, y, new Cat(loc, y, new ListOf(loc, new Term[] {x})));
-        }
-        case PREPEND -> {
-          var loc = new Loc(file, line);
-          lex();
-          var x = new Id(loc, word());
-          return new Assign(loc, x, new Cat(loc, new ListOf(loc, new Term[] {y}), x));
+          return assign(loc, y, new Cat(loc, y, new ListOf(loc, List.of(assignment()))));
         }
       }
       return y;

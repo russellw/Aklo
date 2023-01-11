@@ -88,6 +88,7 @@ public final class Etc {
   }
 
   public static List<Object> cat(Object a, Object b) {
+    // TODO should this accept atoms?
     var r = new ArrayList<>(listVal(a));
     r.addAll(listVal(b));
     return r;

@@ -1,6 +1,5 @@
 package aklo;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -65,12 +64,6 @@ public class Fn extends Term {
     }
   }
 
-  private Var mkVar(Loc loc) {
-    var x = new Var(loc);
-    vars.add(x);
-    return x;
-  }
-
   private void addBlock(Block block) {
     blocks.add(block);
   }
@@ -83,60 +76,9 @@ public class Fn extends Term {
     lastBlock().insns.add(a);
   }
 
-  private void assignSubscript(Env env, Loop loop, Term y, Term x, Block fail, int i) {
-    y = y.get(i);
-    x = new Subscript(x.loc, x, new Const(x.loc, BigInteger.valueOf(i)));
-    insn(x);
-    assign(env, loop, y, x, fail);
-  }
-
-  private void assign(Env env, Loop loop, Term y, Term x, Block fail) {
-    var loc = y.loc;
-    switch (y.tag()) {
-      case CONST -> {
-        var eq = new Eq(loc, y, x);
-        insn(eq);
-        var after = new Block(loc, "assignCheckAfter");
-        insn(new If(loc, eq, after, fail));
-        addBlock(after);
-      }
-      case ID, VAR -> insn(new Assign(loc, term(env, loop, y), x));
-      case LIST_OF -> {
-        var n = y.size();
-        for (var i = 0; i < n; i++) assignSubscript(env, loop, y, x, fail, i);
-      }
-      case LIST_REST -> {
-        var n = y.size() - 1;
-        for (var i = 0; i < n; i++) assignSubscript(env, loop, y, x, fail, i);
-        var len = new Len(loc, x);
-        insn(len);
-        var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
-        insn(slice);
-        assign(env, loop, y.get(n), slice, fail);
-      }
-      default -> throw new CompileError(loc, y + ": invalid assignment");
-    }
-  }
-
   private Term term(Env env, Loop loop, Term a) {
     var r = a;
     switch (a.tag()) {
-      case ASSIGN -> {
-        var fail = new Block(a.loc, "assignFail");
-        var after = new Block(a.loc, "assignAfter");
-
-        // assign
-        r = term(env, loop, a.get(1));
-        assign(env, loop, a.get(0), r, fail);
-        insn(new Goto(a.loc, after));
-
-        // fail
-        addBlock(fail);
-        insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
-
-        // after
-        addBlock(after);
-      }
       case ID -> {
         var s = a.toString();
         r = env.get(s);

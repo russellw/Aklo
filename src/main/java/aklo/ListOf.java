@@ -48,6 +48,7 @@ public final class ListOf extends Terms {
   }
 
   public ListOf(Loc loc, Term[] terms) {
+    // TODO do we need two constructors?
     super(loc, terms);
   }
 
