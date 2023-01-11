@@ -919,15 +919,13 @@ public final class Parser {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          // TODO
-          return new Assign(loc, y, new Add(loc, y, Const.ONE));
+          return assign(loc, y, insn(new Add(loc, y, Const.ONE)));
         }
         case DEC -> {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          // TODO
-          return new Assign(loc, y, new Sub(loc, y, Const.ONE));
+          return assign(loc, y, insn(new Sub(loc, y, Const.ONE)));
         }
         case '!' -> {
           var loc = new Loc(file, line);
