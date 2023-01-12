@@ -1395,7 +1395,7 @@ public final class Parser {
             case "println" -> {
               lex();
               Term a = new Const(loc, BigInteger.TEN);
-              if (tok != '\n') a = new Cat(loc, commas(), a);
+              if (tok != '\n') a = insn(new Cat(loc, commas(), a));
               expectNewline();
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
               return Const.ZERO;
@@ -1404,20 +1404,20 @@ public final class Parser {
         }
       }
       var b = assignment();
-      if (b instanceof Id b1) {
-        if (!eat(':')) throw new CompileError(loc, "expected statement");
-        if (tok == WORD) {
-          var label = b1.name;
-          switch (tokString) {
-              // TODO for, case
-            case "dowhile" -> {
-              xwhile(label, true);
-              return Const.ZERO;
-            }
-            case "while" -> {
-              xwhile(label, false);
-              return Const.ZERO;
-            }
+      // TODO this accepts assignments with an identifier on the right-hand side as labels
+      // the ideal way to prevent this would be to look ahead one token
+      if (eat(':')) {
+        var b1 = (Id) b;
+        var label = b1.name;
+        switch (currentWord()) {
+            // TODO for, case
+          case "dowhile" -> {
+            xwhile(label, true);
+            return Const.ZERO;
+          }
+          case "while" -> {
+            xwhile(label, false);
+            return Const.ZERO;
           }
         }
         throw new CompileError(loc, "expected statement after label");

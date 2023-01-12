@@ -72,7 +72,7 @@ public abstract class Term extends AbstractCollection<Term> {
   }
 
   public void load(MethodVisitor mv) {
-    if (localVar < 0) throw new IllegalStateException(toString());
+    if (localVar < 0) throw new IllegalStateException(String.format("%s: %s", loc, this));
     // TODO
     switch (type().kind()) {
       case VOID -> throw new UnsupportedOperationException(toString());
