@@ -743,10 +743,10 @@ public final class Parser {
                 return insn(new Shr(loc, arg1(), argN()));
               }
               case "true" -> {
-                return insn(new Const(loc, true));
+                return new Const(loc, true);
               }
               case "false" -> {
-                return insn(new Const(loc, false));
+                return new Const(loc, false);
               }
             }
             return new Id(loc, s);
