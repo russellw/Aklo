@@ -1,14 +1,11 @@
 package aklo;
 
 import java.util.*;
-import java.util.function.Consumer;
 
-public class Fn extends Term {
+public final class Fn extends Term {
   public final String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype = Type.ANY;
-  public Term body;
-
   public final List<Var> vars = new ArrayList<>();
   public final List<Block> blocks = new ArrayList<>();
 
@@ -16,15 +13,6 @@ public class Fn extends Term {
     super(loc);
     this.name = name;
     addBlock(new Block(loc, "entry"));
-  }
-
-  public final void walkFns(Consumer<Fn> f) {
-    f.accept(this);
-    for (var a : body)
-      a.walk(
-          b -> {
-            if (b instanceof Fn b1) b1.walkFns(f);
-          });
   }
 
   @Override
@@ -37,75 +25,10 @@ public class Fn extends Term {
     return Tag.FN;
   }
 
-  // convert to basic blocks
-  private static final class Env {
-    final Env outer;
-    final Map<String, Term> locals = new HashMap<>();
-
-    Env(Env outer) {
-      this.outer = outer;
-    }
-
-    Term get(String name) {
-      for (var env = this; env != null; env = env.outer) {
-        var a = env.locals.get(name);
-        if (a != null) return a;
-      }
-      return null;
-    }
-  }
-
-  private record Loop(Fn.Loop outer, String label, Block continueTarget, Block breakTarget) {
-    // static because loop could be null
-    static Loop get(Loop loop, String label) {
-      if (label == null) return loop;
-      for (; loop != null; loop = loop.outer) if (label.equals(loop.label)) break;
-      return loop;
-    }
-  }
-
   private void addBlock(Block block) {
     blocks.add(block);
   }
 
-  private Term term(Env env, Loop loop, Term a) {
-    var r = a;
-    switch (a.tag()) {
-      case ID -> {
-        var s = a.toString();
-        r = env.get(s);
-        if (r == null) throw new CompileError(a.loc, s + " not found");
-      }
-      default -> {
-        for (var i = 0; i < a.size(); i++) a.set(i, term(env, loop, a.get(i)));
-      }
-    }
-    return r;
-  }
-
-  private void toBlocks(Env outer) {
-    // environment of local variables and functions
-    var env = new Env(outer);
-    for (var x : vars) if (x.name != null) env.locals.put(x.name, x);
-    for (var a : body)
-      a.walk(
-          b -> {
-            if (b instanceof Fn b1) env.locals.put(b1.name, b);
-          });
-
-    // convert nested functions to basic blocks
-    for (var a : body)
-      a.walk(
-          b -> {
-            if (b instanceof Fn b1) b1.toBlocks(env);
-          });
-  }
-
-  public void toBlocks() {
-    toBlocks(null);
-  }
-
-  // debug output
   public void dbg() {
     // make block names unique
     var names = new HashSet<String>();

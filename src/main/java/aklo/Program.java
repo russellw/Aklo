@@ -13,9 +13,35 @@ public final class Program {
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
 
+  private static final class LinkLocals {
+    final LinkLocals outer;
+    final Map<String, Term> locals = new HashMap<>();
+
+    Term get(String name) {
+      for (var l = this; ; l = l.outer) {
+        if (l == null) return null;
+        var r = l.locals.get(name);
+        if (r != null) return r;
+      }
+    }
+
+    LinkLocals(LinkLocals outer, Fn f) {
+      this.outer = outer;
+      for (var x : f.vars) if (x.name != null) locals.put(x.name, x);
+      for (var block : f.blocks)
+        for (var a : block.insns)
+          for (var i = 0; i < a.size(); i++)
+            if (a.get(i) instanceof Id id) {
+              var x = get(id.name);
+              if (x == null) throw new CompileError(a.loc, id + " not found");
+              a.set(i, x);
+            }
+    }
+  }
+
   public Program(Map<List<String>, Fn> modules) {
     for (var module : modules.values()) {
-      module.toBlocks();
+      new LinkLocals(null, module);
       fns.add(module);
     }
   }
