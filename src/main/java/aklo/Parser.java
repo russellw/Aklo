@@ -1428,7 +1428,7 @@ public final class Parser {
   }
 
   // top level
-  public Parser(String file, Reader reader, Module module) throws IOException {
+  public Parser(String file, Reader reader, Fn module) throws IOException {
     this.file = file;
     this.reader = reader;
     readc();

@@ -5,9 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 
 final class Main {
   private Main() {}
@@ -48,6 +46,12 @@ final class Main {
         System.getProperty("os.arch"));
   }
 
+  private static String withoutExt(String file) {
+    var i = file.indexOf('.');
+    if (i < 0) return file;
+    return file.substring(0, i);
+  }
+
   public static void main(String[] args) throws IOException {
     // command line
     if (args.length == 0) {
@@ -80,7 +84,7 @@ final class Main {
     }
 
     // parse
-    var modules = new ArrayList<Module>();
+    var modules = new HashMap<List<String>, Fn>();
     for (var p : packages) {
       var i = p.getNameCount() - 1;
       try (var files = Files.walk(p)) {
@@ -89,17 +93,16 @@ final class Main {
           var loc = new Loc(file, 1);
 
           // module name runs from the package root to the file
-          var names = new String[path.getNameCount() - i];
-          for (var j = 0; j < names.length; j++) names[j] = path.getName(i + j).toString();
-          var j = names.length - 1;
-          names[j] = names[j].substring(0, names[j].length() - 2);
+          var names = new ArrayList<String>();
+          for (var j = i; j < path.getNameCount(); j++)
+            names.add(withoutExt(path.getName(j).toString()));
 
           // parse the module
-          var module = new Module(loc, names);
+          var module = new Fn(loc, names.get(names.size() - 1));
           try (var reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             new Parser(file, reader, module);
           }
-          modules.add(module);
+          modules.put(names, module);
         }
       }
     }

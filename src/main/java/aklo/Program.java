@@ -13,8 +13,8 @@ public final class Program {
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
 
-  public Program(List<Module> modules) {
-    for (var module : modules) {
+  public Program(Map<List<String>, Fn> modules) {
+    for (var module : modules.values()) {
       module.toBlocks();
       fns.add(module);
     }
