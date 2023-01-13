@@ -1,18 +1,21 @@
 package aklo;
 
+import java.util.List;
+
 public final class Var extends Term {
   public String name;
   public Type type = Type.ANY;
 
-  public Var(String name) {
+  public Var(String name, List<Var> s) {
     super(null);
     this.name = name;
+    s.add(this);
   }
 
-  public Var(Fn f) {
+  public Var(List<Var> s) {
     super(null);
     name = null;
-    f.vars.add(this);
+    s.add(this);
   }
 
   @Override
