@@ -58,8 +58,6 @@ public final class Program {
 
     // functions
     for (var f : fns) {
-      f.dbg();
-
       // label blocks
       for (var block : f.blocks) block.label = new Label();
 
