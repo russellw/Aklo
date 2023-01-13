@@ -1,10 +1,7 @@
 package aklo;
 
-
 import static org.objectweb.asm.Opcodes.*;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -37,15 +34,16 @@ public final class Parser {
 
   // File state
   private final String file;
-  private final Reader reader;
-  private int c;
-  // TODO use LineNumberReader?
+  private final byte[] text;
+  private int ti;
   private int line = 1;
 
+  // indentation
   private int dentc;
   private final List<Integer> cols = new ArrayList<>(List.of(0));
   private int dedents;
 
+  // current token
   private int tok;
   private String tokString;
 
@@ -145,83 +143,80 @@ public final class Parser {
   }
 
   // Tokenizer
-  private void readc() throws IOException {
-    c = reader.read();
+  private void readc(StringBuilder sb) {
+    sb.append((char) text[ti]);
+    ti++;
   }
 
-  private void readc(StringBuilder sb) throws IOException {
-    sb.append((char) c);
-    readc();
-  }
-
-  private void digits(StringBuilder sb) throws IOException {
-    while (isDigit(c)) {
+  private void digits(StringBuilder sb) {
+    while (isDigit(text[ti])) {
       readc(sb);
-      if (c == '_') readc();
+      if (text[ti] == '_') ti++;
     }
   }
 
-  private void lexQuote() throws IOException {
-    var quote = c;
+  private void lexQuote() {
+    var quote = text[ti];
     var sb = new StringBuilder();
-    readc();
-    while (c != quote) {
-      if (c == '\\') readc(sb);
-      if (c < ' ') throw new CompileError(file, line, "unclosed quote");
+    ti++;
+    while (text[ti] != quote) {
+      if (text[ti] == '\\') readc(sb);
+      if (text[ti] < ' ') throw new CompileError(file, line, "unclosed quote");
       readc(sb);
     }
-    readc();
+    ti++;
     tokString = sb.toString();
   }
 
-  private void lex() throws IOException {
+  private void lex() {
     // a single newline can produce multiple dedent tokens
     if (dedents > 0) {
       dedents--;
       tok = DEDENT;
       return;
     }
-    for (; ; ) {
+    while (ti < text.length) {
       // the simplest tokens are just one character
-      tok = c;
-      switch (c) {
+      tok = text[ti];
+      switch (text[ti]) {
         case ';' -> {
-          do readc();
-          while (c != '\n' && c >= 0);
+          do ti++;
+          while (text[ti] != '\n' && text[ti] >= 0);
           continue;
         }
         case '{' -> {
           var line1 = line;
           do {
-            readc();
-            switch (c) {
+            ti++;
+            switch (text[ti]) {
               case '\n' -> line1++;
               case -1 -> throw new CompileError(file, line, "unmatched '{'");
             }
-          } while (c != '}');
-          readc();
+          } while (text[ti] != '}');
+          ti++;
           line = line1;
           continue;
         }
         case '\n' -> {
           // next line
-          readc();
+          ti++;
+          if (ti == text.length) return;
           line++;
 
           // measure indent
           var col = 0;
-          while (c == '\t' || c == ' ') {
-            if (c != dentc) {
+          while (text[ti] == '\t' || text[ti] == ' ') {
+            if (text[ti] != dentc) {
               if (dentc != 0)
                 throw new CompileError(file, line, "indented with tabs and spaces in same file");
-              dentc = c;
+              dentc = text[ti];
             }
-            readc();
+            ti++;
             col++;
           }
 
           // nothing important on this line, keep going
-          switch (c) {
+          switch (text[ti]) {
             case '\n', ';', '{' -> {
               continue;
             }
@@ -243,108 +238,108 @@ public final class Parser {
             throw new CompileError(file, line, "inconsistent indent");
         }
         case ' ', '\f', '\r', '\t' -> {
-          readc();
+          ti++;
           continue;
         }
         case '!' -> {
-          readc();
-          if (c == '=') {
-            readc();
+          ti++;
+          if (text[ti] == '=') {
+            ti++;
             tok = NE;
-            if (c == '=') {
-              readc();
+            if (text[ti] == '=') {
+              ti++;
               tok = NE_NUM;
             }
           }
         }
         case ':' -> {
-          readc();
-          if (c == '=') {
-            readc();
+          ti++;
+          if (text[ti] == '=') {
+            ti++;
             tok = ASSIGN;
           }
         }
         case '@' -> {
-          readc();
-          if (c == '=') {
-            readc();
+          ti++;
+          if (text[ti] == '=') {
+            ti++;
             tok = CAT_ASSIGN;
           }
         }
         case '=' -> {
-          readc();
-          if (c == '=') {
-            readc();
+          ti++;
+          if (text[ti] == '=') {
+            ti++;
             tok = EQ;
-            if (c == '=') {
-              readc();
+            if (text[ti] == '=') {
+              ti++;
               tok = EQ_NUM;
             }
           }
         }
         case '*' -> {
-          readc();
-          if (c == '*') {
-            readc();
+          ti++;
+          if (text[ti] == '*') {
+            ti++;
             tok = EXP;
           }
         }
         case '/' -> {
-          readc();
-          if (c == '/') {
-            readc();
+          ti++;
+          if (text[ti] == '/') {
+            ti++;
             tok = DIV_INT;
           }
         }
         case '+' -> {
-          readc();
-          switch (c) {
+          ti++;
+          switch (text[ti]) {
             case '=' -> {
-              readc();
+              ti++;
               tok = ADD_ASSIGN;
             }
             case '+' -> {
-              readc();
+              ti++;
               tok = INC;
             }
           }
         }
         case '-' -> {
-          readc();
-          switch (c) {
+          ti++;
+          switch (text[ti]) {
             case '=' -> {
-              readc();
+              ti++;
               tok = SUB_ASSIGN;
             }
             case '-' -> {
-              readc();
+              ti++;
               tok = DEC;
             }
           }
         }
         case '<' -> {
-          readc();
-          switch (c) {
+          ti++;
+          switch (text[ti]) {
             case '=' -> {
-              readc();
+              ti++;
               tok = LE;
             }
             case '<' -> {
-              readc();
+              ti++;
               tok = APPEND;
             }
           }
         }
         case '>' -> {
-          readc();
-          if (c == '=') {
-            readc();
+          ti++;
+          if (text[ti] == '=') {
+            ti++;
             tok = GE;
           }
         }
         case '#' -> {
-          readc();
-          if (c != '"') throw new CompileError(file, line, "stray '#'");
+          ti++;
+          if (text[ti] != '"') throw new CompileError(file, line, "stray '#'");
           lexQuote();
           tok = RAW;
         }
@@ -412,7 +407,7 @@ public final class Parser {
             'z' -> {
           var sb = new StringBuilder();
           do readc(sb);
-          while (isWord(c));
+          while (isWord(text[ti]));
           tok = WORD;
           tokString = sb.toString().toLowerCase(Locale.ROOT);
         }
@@ -424,36 +419,36 @@ public final class Parser {
           tok = INTEGER;
 
           // prefix
-          switch (c) {
+          switch (text[ti]) {
             case 'b', 'B', 'o', 'O' -> {
               readc(sb);
-              if (c == '_') readc();
+              if (text[ti] == '_') ti++;
 
               // integer
               digits(sb);
             }
             case 'x', 'X' -> {
               readc(sb);
-              if (c == '_') readc();
+              if (text[ti] == '_') ti++;
 
               // integer part
-              while (digit(c) < 16) {
+              while (digit(text[ti]) < 16) {
                 readc(sb);
-                if (c == '_') readc();
+                if (text[ti] == '_') ti++;
               }
 
               // decimal part
-              if (c == '.') {
+              if (text[ti] == '.') {
                 readc(sb);
                 digits(sb);
                 tok = DOUBLE;
               }
 
               // exponent
-              switch (c) {
+              switch (text[ti]) {
                 case 'p', 'P' -> {
                   readc(sb);
-                  switch (c) {
+                  switch (text[ti]) {
                     case '+', '-' -> readc(sb);
                   }
                   digits(sb);
@@ -464,7 +459,7 @@ public final class Parser {
             default -> {
               // integer part, if any, is already done
               // decimal part
-              if (c == '.') {
+              if (text[ti] == '.') {
                 readc(sb);
                 digits(sb);
 
@@ -476,10 +471,10 @@ public final class Parser {
               }
 
               // exponent
-              switch (c) {
+              switch (text[ti]) {
                 case 'e', 'E' -> {
                   readc(sb);
-                  switch (c) {
+                  switch (text[ti]) {
                     case '+', '-' -> readc(sb);
                   }
                   digits(sb);
@@ -491,46 +486,47 @@ public final class Parser {
 
           // suffix
           if (tok == DOUBLE)
-            switch (c) {
+            switch (text[ti]) {
               case 'f', 'F' -> {
-                readc();
+                ti++;
                 tok = FLOAT;
               }
             }
 
           tokString = sb.toString();
         }
-        default -> readc();
+        default -> ti++;
       }
       return;
     }
+    tok = DEDENT;
   }
 
   // parser
-  private boolean eat(int k) throws IOException {
+  private boolean eat(int k) {
     if (tok != k) return false;
     lex();
     return true;
   }
 
-  private void expect(char k) throws IOException {
+  private void expect(char k) {
     if (!eat(k)) throw new CompileError(file, line, String.format("expected '%c'", k));
   }
 
-  private void expectIndent() throws IOException {
+  private void expectIndent() {
     if (!eat(INDENT)) throw new CompileError(file, line, "expected indented block");
   }
 
-  private void expectNewline() throws IOException {
+  private void expectNewline() {
     if (!eat('\n')) throw new CompileError(file, line, "expected newline");
   }
 
-  private String currentWord() throws IOException {
+  private String currentWord() {
     if (tok == WORD) return tokString;
     return "";
   }
 
-  private String word() throws IOException {
+  private String word() {
     var s = tokString;
     if (!eat(WORD)) throw new CompileError(file, line, "expected word");
     return s;
@@ -581,19 +577,19 @@ public final class Parser {
     }
 
     // expressions
-    Term arg() throws IOException {
+    Term arg() {
       expect('(');
       var a = expr();
       expect(')');
       return a;
     }
 
-    Term arg1() throws IOException {
+    Term arg1() {
       expect('(');
       return expr();
     }
 
-    Term argN() throws IOException {
+    Term argN() {
       expect(',');
       var a = expr();
       expect(')');
@@ -604,7 +600,7 @@ public final class Parser {
       return insn(new Cat(loc, insn(new ListOf(loc, s)), t));
     }
 
-    Term primary() throws IOException {
+    Term primary() {
       var loc = new Loc(file, line);
 
       // having noted the current line, factor out the moving to the next token
@@ -878,7 +874,7 @@ public final class Parser {
       return x;
     }
 
-    Term postInc(Term y, Term x) throws IOException {
+    Term postInc(Term y, Term x) {
       var loc = x.loc;
       lex();
       var old = mkVar(loc);
@@ -887,7 +883,7 @@ public final class Parser {
       return old;
     }
 
-    Term postfix() throws IOException {
+    Term postfix() {
       var a = primary();
       for (; ; )
         switch (tok) {
@@ -939,7 +935,7 @@ public final class Parser {
         }
     }
 
-    void param() throws IOException {
+    void param() {
       var loc = new Loc(file, line);
       var name = word();
       // O(N^2) is fast when N is sufficiently small
@@ -948,7 +944,7 @@ public final class Parser {
       fn.params.add(new Var(loc, name));
     }
 
-    void params() throws IOException {
+    void params() {
       // TODO optional ()?
       expect('(');
       if (eat(INDENT))
@@ -984,7 +980,7 @@ public final class Parser {
       return r;
     }
 
-    Term prefix() throws IOException {
+    Term prefix() {
       switch (tok) {
         case '\\' -> {
           var loc = new Loc(file, line);
@@ -1072,7 +1068,7 @@ public final class Parser {
       init('|', 1);
     }
 
-    Term infix(int prec) throws IOException {
+    Term infix(int prec) {
       var a = prefix();
       for (; ; ) {
         var k = tok;
@@ -1140,11 +1136,11 @@ public final class Parser {
       }
     }
 
-    Term expr() throws IOException {
+    Term expr() {
       return infix(1);
     }
 
-    Term commas() throws IOException {
+    Term commas() {
       var a = expr();
       if (tok != ',') return a;
       var loc = new Loc(file, line);
@@ -1157,7 +1153,7 @@ public final class Parser {
     }
 
     // statements
-    Term assignment() throws IOException {
+    Term assignment() {
       var y = commas();
       switch (tok) {
         case ASSIGN -> {
@@ -1205,7 +1201,7 @@ public final class Parser {
       return y;
     }
 
-    Term block() throws IOException {
+    Term block() {
       expectIndent();
       Term r;
       do r = stmt();
@@ -1213,7 +1209,7 @@ public final class Parser {
       return r;
     }
 
-    Term xif() throws IOException {
+    Term xif() {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       var loc = new Loc(file, line);
       lex();
@@ -1251,7 +1247,7 @@ public final class Parser {
       return r;
     }
 
-    void xwhile(String label, boolean doWhile) throws IOException {
+    void xwhile(String label, boolean doWhile) {
       var loc = new Loc(file, line);
       lex();
       var body = new Block(loc, "whileBody");
@@ -1275,7 +1271,7 @@ public final class Parser {
       addBlock(after);
     }
 
-    Term stmt() throws IOException {
+    Term stmt() {
       var loc = new Loc(file, line);
       switch (tok) {
         case '^' -> {
@@ -1461,16 +1457,23 @@ public final class Parser {
   }
 
   // top level
-  public Parser(String file, Reader reader, Fn module) throws IOException {
+  public Parser(String file, byte[] text, Fn module) {
+    // init
     this.file = file;
-    this.reader = reader;
-    readc();
+    if (!(text.length > 0 && text[text.length - 1] == '\n')) {
+      var r = new byte[text.length + 1];
+      System.arraycopy(text, 0, r, 0, text.length);
+      r[text.length] = '\n';
+      text = r;
+    }
+    this.text = text;
     lex();
     eat('\n');
 
+    // parse
     var c = new Context(module);
     Term r = Const.ZERO;
-    while (tok != -1) r = c.stmt();
+    while (tok != DEDENT) r = c.stmt();
     c.insn(new Return(module.loc, r));
     module.initVars();
   }
