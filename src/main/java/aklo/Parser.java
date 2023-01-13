@@ -181,7 +181,7 @@ public final class Parser {
       switch (text[ti]) {
         case ';' -> {
           do ti++;
-          while (text[ti] != '\n' && text[ti] >= 0);
+          while (text[ti] != '\n');
           continue;
         }
         case '{' -> {
