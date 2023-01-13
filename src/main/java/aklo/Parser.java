@@ -511,6 +511,24 @@ public final class Parser {
     tok = DEDENT;
   }
 
+  private int lookahead() {
+    var ti = this.ti;
+    for (; ; )
+      switch (text[ti]) {
+        case ' ', '\f', '\r', '\t' -> ti++;
+        case '{' -> {
+          do {
+            ti++;
+            if (ti == text.length) return this.ti;
+          } while (text[ti] != '}');
+          ti++;
+        }
+        default -> {
+          return ti;
+        }
+      }
+  }
+
   // parser
   private boolean eat(int k) {
     if (tok != k) return false;
@@ -1436,28 +1454,39 @@ public final class Parser {
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
               return Const.ZERO;
             }
+            default -> {
+              // labeling a statement needs a second token of lookahead
+              // It's the only thing in the entire language that does
+              // so instead of providing a general lookahead facility
+              // it is simpler to provide a limited one that just works for this
+              var i = lookahead();
+              switch (text[i]) {
+                case ':' -> {
+                  if (text[i + 1] == '=') break;
+                  var label = tokString;
+                  lex();
+                  assert tok == ':';
+                  lex();
+                  switch (currentWord()) {
+                      // TODO for, case
+                    case "dowhile" -> {
+                      xwhile(label, true);
+                      return Const.ZERO;
+                    }
+                    case "while" -> {
+                      xwhile(label, false);
+                      return Const.ZERO;
+                    }
+                  }
+                  throw new CompileError(loc, "expected statement after label");
+                }
+                case '\n' -> throw new CompileError(loc, "expected statement");
+              }
+            }
           }
         }
       }
       var b = assignment();
-      // TODO this accepts assignments with an identifier on the right-hand side as labels
-      // the ideal way to prevent this would be to look ahead one token
-      if (eat(':')) {
-        var b1 = (Id) b;
-        var label = b1.name;
-        switch (currentWord()) {
-            // TODO for, case
-          case "dowhile" -> {
-            xwhile(label, true);
-            return Const.ZERO;
-          }
-          case "while" -> {
-            xwhile(label, false);
-            return Const.ZERO;
-          }
-        }
-        throw new CompileError(loc, "expected statement after label");
-      }
       expectNewline();
       return b;
     }
