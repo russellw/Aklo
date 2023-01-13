@@ -1,5 +1,6 @@
 package aklo;
 
+
 import static org.objectweb.asm.Opcodes.*;
 
 import java.io.IOException;
@@ -48,6 +49,37 @@ public final class Parser {
   private int tok;
   private String tokString;
 
+  private static boolean isDigit(int c) {
+    return '0' <= c && c <= '9';
+  }
+
+  private static boolean isLower(int c) {
+    return 'a' <= c && c <= 'z';
+  }
+
+  private static boolean isUpper(int c) {
+    return 'A' <= c && c <= 'Z';
+  }
+
+  private static boolean isAlpha(int c) {
+    return isLower(c) || isUpper(c);
+  }
+
+  private static boolean isAlnum(int c) {
+    return isAlpha(c) || isDigit(c);
+  }
+
+  private static boolean isWord(int c) {
+    return isAlnum(c) || c == '_' || c == '?';
+  }
+
+  private static int digit(int c) {
+    if (isDigit(c)) return c - '0';
+    if (isLower(c)) return c - 'a' + 10;
+    if (isUpper(c)) return c - 'A' + 10;
+    return 99;
+  }
+
   private static String unesc(String s) {
     var sb = new StringBuilder();
     for (var i = 0; i < s.length(); ) {
@@ -67,8 +99,8 @@ public final class Parser {
             i--;
             var n = 0;
             for (int j = 0; j < 3 && i < s.length(); j++) {
-              var d = Character.digit(s.charAt(i), 8);
-              if (d < 0) break;
+              var d = digit(s.charAt(i));
+              if (d >= 8) break;
               i++;
               n = n * 8 + d;
             }
@@ -77,8 +109,8 @@ public final class Parser {
           case 'u' -> {
             var n = 0;
             for (int j = 0; j < 4 && i < s.length(); j++) {
-              var d = Character.digit(s.charAt(i), 16);
-              if (d < 0) break;
+              var d = digit(s.charAt(i));
+              if (d >= 16) break;
               i++;
               n = n * 16 + d;
             }
@@ -87,8 +119,8 @@ public final class Parser {
           case 'x' -> {
             var n = 0;
             for (int j = 0; j < 2 && i < s.length(); j++) {
-              var d = Character.digit(s.charAt(i), 16);
-              if (d < 0) break;
+              var d = digit(s.charAt(i));
+              if (d >= 16) break;
               i++;
               n = n * 16 + d;
             }
@@ -97,8 +129,8 @@ public final class Parser {
           case 'U' -> {
             var n = 0;
             for (int j = 0; j < 8 && i < s.length(); j++) {
-              var d = Character.digit(s.charAt(i), 16);
-              if (d < 0) break;
+              var d = digit(s.charAt(i));
+              if (d >= 16) break;
               i++;
               n = n * 16 + d;
             }
@@ -123,8 +155,7 @@ public final class Parser {
   }
 
   private void digits(StringBuilder sb) throws IOException {
-    // TODO
-    while (Character.isDigit(c)) {
+    while (isDigit(c)) {
       readc(sb);
       if (c == '_') readc();
     }
@@ -381,7 +412,7 @@ public final class Parser {
             'z' -> {
           var sb = new StringBuilder();
           do readc(sb);
-          while (Character.isJavaIdentifierPart(c) || c == '?');
+          while (isWord(c));
           tok = WORD;
           tokString = sb.toString().toLowerCase(Locale.ROOT);
         }
@@ -406,7 +437,7 @@ public final class Parser {
               if (c == '_') readc();
 
               // integer part
-              while (Character.digit(c, 16) >= 0) {
+              while (digit(c) < 16) {
                 readc(sb);
                 if (c == '_') readc();
               }
