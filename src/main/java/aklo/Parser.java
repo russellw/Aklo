@@ -412,6 +412,7 @@ public final class Parser {
             'x',
             'y',
             'z' -> {
+          // TODO optimize?
           var sb = new StringBuilder();
           do readc(sb);
           while (isWord(text[ti]));
@@ -419,7 +420,39 @@ public final class Parser {
           tokString = sb.toString().toLowerCase(Locale.ROOT);
           return;
         }
-        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
+        case '.' -> {
+          if (!isDigit(text[ti + 1])) break;
+
+          var sb = new StringBuilder();
+          tok = DOUBLE;
+
+          // decimal part
+          readc(sb);
+          digits(sb);
+
+          // exponent
+          switch (text[ti]) {
+            case 'e', 'E' -> {
+              readc(sb);
+              switch (text[ti]) {
+                case '+', '-' -> readc(sb);
+              }
+              digits(sb);
+            }
+          }
+
+          // suffix
+          switch (text[ti]) {
+            case 'f', 'F' -> {
+              ti++;
+              tok = FLOAT;
+            }
+          }
+
+          tokString = sb.toString();
+          return;
+        }
+        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
           var sb = new StringBuilder();
 
           // leading digits
@@ -427,6 +460,7 @@ public final class Parser {
           tok = INTEGER;
 
           // prefix
+          // TODO refactor
           switch (text[ti]) {
             case 'b', 'B', 'o', 'O' -> {
               readc(sb);
@@ -470,9 +504,6 @@ public final class Parser {
               if (text[ti] == '.') {
                 readc(sb);
                 digits(sb);
-
-                // a decimal point with no digits before or after, is just a dot
-                if (sb.length() == 1) return;
 
                 // now we know we have a floating-point number, though not which precision
                 tok = DOUBLE;
@@ -942,6 +973,7 @@ public final class Parser {
             a = insn(new Call(loc, r));
           }
           case '.' -> {
+            // TODO this should probably be primary
             var loc = new Loc(file, line);
             if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
             var r = new ArrayList<>(List.of(a1.name));
