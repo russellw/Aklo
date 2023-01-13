@@ -970,6 +970,7 @@ public final class Parser {
           loc = new Loc(file, line);
           insn(new Return(loc, r));
           expect(')');
+          f.initVars();
           return f;
         }
         case INC -> {
@@ -1288,6 +1289,7 @@ public final class Parser {
               var c = new Context(f);
               c.params();
               c.insn(new Return(loc, c.block()));
+              f.initVars();
               return f;
             }
             case "if" -> {
@@ -1439,5 +1441,6 @@ public final class Parser {
     Term r = Const.ZERO;
     while (tok != -1) r = c.stmt();
     c.insn(new Return(module.loc, r));
+    module.initVars();
   }
 }

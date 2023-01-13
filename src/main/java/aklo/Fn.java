@@ -15,6 +15,12 @@ public final class Fn extends Term {
     addBlock(new Block(loc, "entry"));
   }
 
+  public void initVars() {
+    var r = new ArrayList<Term>();
+    for (var x : vars) r.add(new Assign(loc, x, Const.ZERO));
+    blocks.get(0).insns.addAll(0, r);
+  }
+
   @Override
   public String toString() {
     return name;
