@@ -311,8 +311,8 @@ assert str('xyz')=="xyz"
 assert upper?( 65)
 assert !upper?( 97)
 
-assert print?(65)
-assert !print?(10)
+assert printn?(65)
+assert !printn?(10)
 
 assert ascii?("abc")
 assert !ascii?("abc\0")

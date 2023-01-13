@@ -1413,8 +1413,7 @@ public final class Parser {
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a));
               return Const.ZERO;
             }
-            case "print" -> {
-              // TODO change to printn?
+            case "printn" -> {
               lex();
               var a = commas();
               expectNewline();
@@ -1429,7 +1428,7 @@ public final class Parser {
               add(new Block(loc, "throwAfter"));
               return Const.ZERO;
             }
-            case "println" -> {
+            case "print" -> {
               lex();
               Term a = new Const(loc, BigInteger.TEN);
               if (tok != '\n') a = insn(new Cat(loc, commas(), a));

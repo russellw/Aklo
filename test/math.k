@@ -29,7 +29,7 @@ assert 1===true
 assert 1.0f===true
 assert 1.0===true
 
-println str(1.0+0.5)
+print str(1.0+0.5)
 
 ;numbers
 assert 0xff==255

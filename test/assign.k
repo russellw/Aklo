@@ -4,7 +4,7 @@ A
 }
 
 a,b=65,66
-println(a)
+print(a)
 
 a,2=1,2
 assert a==1
