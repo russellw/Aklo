@@ -585,8 +585,8 @@ public final class Parser {
     }
 
     void check(int line, String name, Object x) {
-      if (locals.put(name, x) != x)
-        throw new CompileError(new Loc(file, line), name + ": duplicate name");
+      if (locals.put(name, x) != null)
+        throw new CompileError(new Loc(file, line), name + " defined twice");
     }
 
     void add(Block block) {

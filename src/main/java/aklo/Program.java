@@ -25,17 +25,23 @@ public final class Program {
       }
     }
 
+    @SuppressWarnings("ConstantConditions")
+    void link(Term a) {
+      for (var i = 0; i < a.size(); i++)
+        if (a.get(i) instanceof Id id) {
+          var x = get(id.name);
+          if (x == null) throw new CompileError(a.loc, id + " not found");
+          a.set(i, x);
+        }
+      if (a instanceof Assign && a.get(0) instanceof Fn)
+        throw new CompileError(a.loc, a.get(0) + ": assigning a function");
+    }
+
     LinkLocals(LinkLocals outer, Fn f) {
       this.outer = outer;
       for (var x : f.vars) if (x.name != null) locals.put(x.name, x);
-      for (var block : f.blocks)
-        for (var a : block.insns)
-          for (var i = 0; i < a.size(); i++)
-            if (a.get(i) instanceof Id id) {
-              var x = get(id.name);
-              if (x == null) throw new CompileError(a.loc, id + " not found");
-              a.set(i, x);
-            }
+      for (var x : f.fns) if (x.name != null) locals.put(x.name, x);
+      for (var block : f.blocks) for (var a : block.insns) link(a);
     }
   }
 

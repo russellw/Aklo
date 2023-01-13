@@ -1,4 +1,4 @@
-;ERR both a function and a variable
+;ERR assigning a function
 
 fn f(a)
 	^a+1

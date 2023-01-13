@@ -1,4 +1,4 @@
-;ERR duplicate
+;ERR assigning a function
 
 fn f(a)
 	^a+1
