@@ -1,4 +1,4 @@
-;ERR both a function and a variable
+;ERR duplicate
 
 fn f(a)
 	^a+1

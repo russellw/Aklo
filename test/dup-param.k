@@ -1,4 +1,4 @@
-;ERR duplicate parameter name
+;ERR duplicate
 
 fn add(a,a)
 	^a+a

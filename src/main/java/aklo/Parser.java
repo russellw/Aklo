@@ -566,6 +566,8 @@ public final class Parser {
     final Block continueTarget;
     final Block breakTarget;
 
+    final Map<String, Object> locals = new HashMap<>();
+
     Context(Fn fn) {
       outer = null;
       this.fn = fn;
@@ -580,6 +582,11 @@ public final class Parser {
       this.label = label;
       this.continueTarget = continueTarget;
       this.breakTarget = breakTarget;
+    }
+
+    void check(int line, String name, Object x) {
+      if (locals.put(name, x) != x)
+        throw new CompileError(new Loc(file, line), name + ": duplicate name");
     }
 
     void add(Block block) {
@@ -956,12 +963,9 @@ public final class Parser {
     }
 
     void param() {
-      var loc = new Loc(file, line);
+      var line1 = line;
       var name = word();
-      // O(N^2) is fast when N is sufficiently small
-      for (var x : fn.params)
-        if (x.name.equals(name)) throw new CompileError(loc, name + ": duplicate parameter name");
-      new Var(name, fn.params);
+      check(line1, name, new Var(name, fn.params));
     }
 
     void params() {
@@ -1018,6 +1022,7 @@ public final class Parser {
           insn(new Return(loc, r));
           expect(')');
           f.initVars();
+          fn.fns.add(f);
           return f;
         }
         case INC -> {
@@ -1188,8 +1193,7 @@ public final class Parser {
               z -> {
                 if (z instanceof Id z1) {
                   var name = z1.name;
-                  for (var a : fn.vars) if (name.equals(a.name)) return;
-                  new Var(name, fn.vars);
+                  if (!locals.containsKey(name)) locals.put(name, new Var(name, fn.vars));
                 }
               });
           return assign(loc, y, assignment());
@@ -1332,11 +1336,14 @@ public final class Parser {
             }
             case "fn" -> {
               lex();
-              var f = new Fn(loc, word());
+              var name = word();
+              var f = new Fn(loc, name);
+              check(loc.line(), name, f);
               var c = new Context(f);
               c.params();
               c.insn(new Return(loc, c.block()));
               f.initVars();
+              fn.fns.add(f);
               return f;
             }
             case "if" -> {
