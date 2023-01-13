@@ -570,8 +570,7 @@ public final class Parser {
       return x;
     }
 
-    // TODO rename?
-    void addBlock(Block block) {
+    void add(Block block) {
       fn.blocks.add(block);
     }
 
@@ -841,7 +840,7 @@ public final class Parser {
           insn(eq);
           var after = new Block(loc, "assignCheckAfter");
           insn(new If(loc, eq, after, fail));
-          addBlock(after);
+          add(after);
         }
           // TODO Var is impossible here?
         case ID, VAR -> insn(new Assign(loc, y, x));
@@ -875,11 +874,11 @@ public final class Parser {
       insn(new Goto(loc, after));
 
       // fail
-      addBlock(fail);
+      add(fail);
       insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
 
       // after
-      addBlock(after);
+      add(after);
       return x;
     }
 
@@ -975,17 +974,17 @@ public final class Parser {
       insn(new If(loc, a, yes, no));
 
       // true
-      addBlock(yes);
+      add(yes);
       insn(new Assign(loc, r, new Const(loc, false)));
       insn(new Goto(loc, after));
 
       // false
-      addBlock(no);
+      add(no);
       insn(new Assign(loc, r, new Const(loc, true)));
       insn(new Goto(loc, after));
 
       // after
-      addBlock(after);
+      add(after);
       return r;
     }
 
@@ -1114,12 +1113,12 @@ public final class Parser {
                 insn(new If(a.loc, r, yes, after));
 
                 // true
-                addBlock(yes);
+                add(yes);
                 insn(new Assign(a.loc, r, b));
                 insn(new Goto(a.loc, after));
 
                 // after
-                addBlock(after);
+                add(after);
                 yield r;
               }
               case '|' -> {
@@ -1132,12 +1131,12 @@ public final class Parser {
                 insn(new If(a.loc, r, after, no));
 
                 // false
-                addBlock(no);
+                add(no);
                 insn(new Assign(a.loc, r, b));
                 insn(new Goto(a.loc, after));
 
                 // after
-                addBlock(after);
+                add(after);
                 yield r;
               }
               default -> throw new IllegalStateException(Integer.toString(k));
@@ -1231,12 +1230,12 @@ public final class Parser {
       insn(new If(loc, expr(), yes, no));
 
       // true
-      addBlock(yes);
+      add(yes);
       insn(new Assign(loc, r, block()));
       insn(new Goto(loc, after));
 
       // false
-      addBlock(no);
+      add(no);
       insn(
           new Assign(
               loc,
@@ -1252,7 +1251,7 @@ public final class Parser {
       insn(new Goto(loc, after));
 
       // after
-      addBlock(after);
+      add(after);
       return r;
     }
 
@@ -1268,16 +1267,16 @@ public final class Parser {
       insn(new Goto(loc, doWhile ? body : cond));
 
       // condition
-      addBlock(cond);
+      add(cond);
       insn(new If(loc, c.expr(), body, after));
 
       // body
-      addBlock(body);
+      add(body);
       c.block();
       insn(new Goto(loc, cond));
 
       // after
-      addBlock(after);
+      add(after);
     }
 
     Term stmt() {
@@ -1304,7 +1303,7 @@ public final class Parser {
               insn(new If(loc, cond, after, no));
 
               // false
-              addBlock(no);
+              add(no);
               insn(
                   new Throw(
                       loc,
@@ -1316,7 +1315,7 @@ public final class Parser {
                                   loc.file(), loc.line(), fn.name, cond.toString())))));
 
               // after
-              addBlock(after);
+              add(after);
               return new Const(loc, BigInteger.ZERO);
             }
             case "fn" -> {
@@ -1379,7 +1378,7 @@ public final class Parser {
                 }
               expectNewline();
               insn(new Goto(loc, target));
-              addBlock(new Block(loc, "breakAfter"));
+              add(new Block(loc, "breakAfter"));
               return Const.ZERO;
             }
             case "continue" -> {
@@ -1403,7 +1402,7 @@ public final class Parser {
                 }
               expectNewline();
               insn(new Goto(loc, target));
-              addBlock(new Block(loc, "continueAfter"));
+              add(new Block(loc, "continueAfter"));
               return Const.ZERO;
             }
             case "exit" -> {
@@ -1427,7 +1426,7 @@ public final class Parser {
               var a = commas();
               expectNewline();
               insn(new Throw(loc, a));
-              addBlock(new Block(loc, "throwAfter"));
+              add(new Block(loc, "throwAfter"));
               return Const.ZERO;
             }
             case "println" -> {
