@@ -982,11 +982,11 @@ public final class Parser {
           }
           case INC -> {
             var loc = new Loc(file, line);
-            return postInc(a, new Add(loc, a, Const.ONE));
+            return postInc(a, insn(new Add(loc, a, Const.ONE)));
           }
           case DEC -> {
             var loc = new Loc(file, line);
-            return postInc(a, new Sub(loc, a, Const.ONE));
+            return postInc(a, insn(new Sub(loc, a, Const.ONE)));
           }
           default -> {
             return a;

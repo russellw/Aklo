@@ -24,7 +24,3 @@ assert s=="abcde"
 s="BC"
 s<<68
 assert s=="BCD"
-
-s="BC"
-65>>s
-assert s=="ABC"

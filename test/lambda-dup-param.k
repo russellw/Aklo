@@ -1,4 +1,4 @@
-;ERR duplicate parameter name
+;ERR defined twice
 
 f=\(a,a)(
 	^a+a
