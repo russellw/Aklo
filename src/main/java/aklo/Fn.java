@@ -6,7 +6,10 @@ public final class Fn extends Term {
   public final String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype = Type.ANY;
+
   public final List<Var> vars = new ArrayList<>();
+  public final List<Fn> fns = new ArrayList<>();
+
   public final List<Block> blocks = new ArrayList<>();
 
   public Fn(Loc loc, String name) {

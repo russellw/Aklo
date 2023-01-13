@@ -582,12 +582,6 @@ public final class Parser {
       this.breakTarget = breakTarget;
     }
 
-    Var mkVar(Loc loc) {
-      var x = new Var(loc);
-      fn.vars.add(x);
-      return x;
-    }
-
     void add(Block block) {
       fn.blocks.add(block);
     }
@@ -903,7 +897,7 @@ public final class Parser {
     Term postInc(Term y, Term x) {
       var loc = x.loc;
       lex();
-      var old = mkVar(loc);
+      var old = new Var(fn);
       insn(new Assign(loc, old, y));
       assign(loc, y, x);
       return old;
@@ -967,7 +961,7 @@ public final class Parser {
       // O(N^2) is fast when N is sufficiently small
       for (var x : fn.params)
         if (x.name.equals(name)) throw new CompileError(loc, name + ": duplicate parameter name");
-      fn.params.add(new Var(loc, name));
+      fn.params.add(new Var(name));
     }
 
     void params() {
@@ -983,7 +977,7 @@ public final class Parser {
     }
 
     Term not(Loc loc, Term a) {
-      var r = mkVar(loc);
+      var r = new Var(fn);
       var yes = new Block(loc, "notTrue");
       var no = new Block(loc, "notFalse");
       var after = new Block(loc, "notAfter");
@@ -1122,7 +1116,7 @@ public final class Parser {
               case NE -> not(loc, insn(new Eq(loc, a, b)));
               case NE_NUM -> not(loc, insn(new EqNum(loc, a, b)));
               case '&' -> {
-                var r = mkVar(a.loc);
+                var r = new Var(fn);
                 var yes = new Block(a.loc, "andTrue");
                 var after = new Block(a.loc, "andAfter");
 
@@ -1140,7 +1134,7 @@ public final class Parser {
                 yield r;
               }
               case '|' -> {
-                var r = mkVar(a.loc);
+                var r = new Var(fn);
                 var no = new Block(a.loc, "orFalse");
                 var after = new Block(a.loc, "orAfter");
 
@@ -1195,7 +1189,7 @@ public final class Parser {
                 if (z instanceof Id z1) {
                   var name = z1.name;
                   for (var a : fn.vars) if (name.equals(a.name)) return;
-                  fn.vars.add(new Var(z.loc, name));
+                  fn.vars.add(new Var(name));
                 }
               });
           return assign(loc, y, assignment());
@@ -1239,7 +1233,7 @@ public final class Parser {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       var loc = new Loc(file, line);
       lex();
-      var r = mkVar(loc);
+      var r = new Var(fn);
       var yes = new Block(loc, "ifTrue");
       var no = new Block(loc, "ifFalse");
       var after = new Block(loc, "ifAfter");

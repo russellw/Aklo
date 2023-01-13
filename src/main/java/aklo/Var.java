@@ -3,17 +3,16 @@ package aklo;
 public final class Var extends Term {
   public String name;
   public Type type = Type.ANY;
-  public Object val;
 
-  public Var(Loc loc, String name) {
-    // TODO does this need location?
-    super(loc);
+  public Var(String name) {
+    super(null);
     this.name = name;
   }
 
-  public Var(Loc loc) {
-    super(loc);
+  public Var(Fn f) {
+    super(null);
     name = null;
+    f.vars.add(this);
   }
 
   @Override
