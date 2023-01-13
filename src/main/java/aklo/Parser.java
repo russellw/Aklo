@@ -234,105 +234,111 @@ public final class Parser {
           }
           if (col != cols.get(cols.size() - 1))
             throw new CompileError(file, line, "inconsistent indent");
+          return;
         }
         case ' ', '\f', '\r', '\t' -> {
           ti++;
           continue;
         }
         case '!' -> {
-          ti++;
-          if (text[ti] == '=') {
-            ti++;
-            tok = NE;
-            if (text[ti] == '=') {
-              ti++;
+          if (text[ti + 1] == '=') {
+            if (text[ti + 2] == '=') {
+              ti += 3;
               tok = NE_NUM;
+              return;
             }
+            ti += 2;
+            tok = NE;
+            return;
           }
         }
         case ':' -> {
-          ti++;
-          if (text[ti] == '=') {
-            ti++;
+          if (text[ti + 1] == '=') {
+            ti += 2;
             tok = ASSIGN;
+            return;
           }
         }
         case '@' -> {
-          ti++;
-          if (text[ti] == '=') {
-            ti++;
+          if (text[ti + 1] == '=') {
+            ti += 2;
             tok = CAT_ASSIGN;
+            return;
           }
         }
         case '=' -> {
-          ti++;
-          if (text[ti] == '=') {
-            ti++;
-            tok = EQ;
-            if (text[ti] == '=') {
-              ti++;
+          if (text[ti + 1] == '=') {
+            if (text[ti + 2] == '=') {
+              ti += 3;
               tok = EQ_NUM;
+              return;
             }
+            ti += 2;
+            tok = EQ;
+            return;
           }
         }
         case '*' -> {
-          ti++;
-          if (text[ti] == '*') {
-            ti++;
+          if (text[ti + 1] == '*') {
+            ti += 2;
             tok = EXP;
+            return;
           }
         }
         case '/' -> {
-          ti++;
-          if (text[ti] == '/') {
-            ti++;
+          if (text[ti + 1] == '/') {
+            ti += 2;
             tok = DIV_INT;
+            return;
           }
         }
         case '+' -> {
-          ti++;
-          switch (text[ti]) {
+          switch (text[ti + 1]) {
             case '=' -> {
-              ti++;
+              ti += 2;
               tok = ADD_ASSIGN;
+              return;
             }
             case '+' -> {
-              ti++;
+              ti += 2;
               tok = INC;
+              return;
             }
           }
         }
         case '-' -> {
-          ti++;
-          switch (text[ti]) {
+          switch (text[ti + 1]) {
             case '=' -> {
-              ti++;
+              ti += 2;
               tok = SUB_ASSIGN;
+              return;
             }
             case '-' -> {
-              ti++;
+              ti += 2;
               tok = DEC;
+              return;
             }
           }
         }
         case '<' -> {
-          ti++;
-          switch (text[ti]) {
+          switch (text[ti + 1]) {
             case '=' -> {
-              ti++;
+              ti += 2;
               tok = LE;
+              return;
             }
             case '<' -> {
-              ti++;
+              ti += 2;
               tok = APPEND;
+              return;
             }
           }
         }
         case '>' -> {
-          ti++;
-          if (text[ti] == '=') {
-            ti++;
+          if (text[ti + 1] == '=') {
+            ti += 2;
             tok = GE;
+            return;
           }
         }
         case '#' -> {
@@ -340,14 +346,17 @@ public final class Parser {
           if (text[ti] != '"') throw new CompileError(file, line, "stray '#'");
           lexQuote();
           tok = RAW;
+          return;
         }
         case '"' -> {
           lexQuote();
           tok = STR;
+          return;
         }
         case '\'' -> {
           lexQuote();
           tok = SYM;
+          return;
         }
         case 'A',
             'B',
@@ -408,6 +417,7 @@ public final class Parser {
           while (isWord(text[ti]));
           tok = WORD;
           tokString = sb.toString().toLowerCase(Locale.ROOT);
+          return;
         }
         case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.' -> {
           var sb = new StringBuilder();
@@ -492,9 +502,10 @@ public final class Parser {
             }
 
           tokString = sb.toString();
+          return;
         }
-        default -> ti++;
       }
+      ti++;
       return;
     }
     tok = DEDENT;

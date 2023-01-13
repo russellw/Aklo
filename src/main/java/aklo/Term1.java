@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+// TODO rename to Unary...?
 public abstract class Term1 extends Term {
   public Term arg;
 
