@@ -188,10 +188,8 @@ public final class Parser {
           var line1 = line;
           do {
             ti++;
-            switch (text[ti]) {
-              case '\n' -> line1++;
-              case -1 -> throw new CompileError(file, line, "unmatched '{'");
-            }
+            if (ti == text.length) throw new CompileError(file, line, "unmatched '{'");
+            if (text[ti] == '\n') line1++;
           } while (text[ti] != '}');
           ti++;
           line = line1;
