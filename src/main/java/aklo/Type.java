@@ -112,6 +112,12 @@ public abstract class Type {
 
   public abstract Kind kind();
 
+  public final String descriptor() {
+    var s = toString();
+    if (s.length() > 1) s = 'L' + s + ';';
+    return s;
+  }
+
   public static Type of(String s) {
     return switch (s) {
       case "V" -> VOID;

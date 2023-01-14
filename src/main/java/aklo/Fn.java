@@ -6,10 +6,8 @@ public final class Fn extends Term {
   public final String name;
   public final List<Var> params = new ArrayList<>();
   public Type rtype = Type.ANY;
-
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
-
   public final List<Block> blocks = new ArrayList<>();
 
   public Fn(Loc loc, String name) {
@@ -32,6 +30,14 @@ public final class Fn extends Term {
   @Override
   public Tag tag() {
     return Tag.FN;
+  }
+
+  public String descriptor() {
+    var sb = new StringBuilder("(");
+    for (var x : params) sb.append(x.type.descriptor());
+    sb.append(')');
+    sb.append(rtype.descriptor());
+    return sb.toString();
   }
 
   private void addBlock(Block block) {
