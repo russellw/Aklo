@@ -13,8 +13,8 @@ public final class Program {
   public final List<Var> vars = new ArrayList<>();
   public final List<Fn> fns = new ArrayList<>();
 
-  private static final class LinkLocals {
-    final LinkLocals outer;
+  private final class Link {
+    final Link outer;
     final Map<String, Term> locals = new HashMap<>();
 
     Term get(String name) {
@@ -37,19 +37,36 @@ public final class Program {
         throw new CompileError(a.loc, a.get(0) + ": assigning a function");
     }
 
-    LinkLocals(LinkLocals outer, Fn f) {
+    Link(Link outer, Fn f) {
       this.outer = outer;
+      for (var g : f.fns) {
+        new Link(this, g);
+        if (g.name != null) locals.put(g.name, g);
+      }
+      for (var x : f.params) if (x.name != null) locals.put(x.name, x);
       for (var x : f.vars) if (x.name != null) locals.put(x.name, x);
-      for (var x : f.fns) if (x.name != null) locals.put(x.name, x);
       for (var block : f.blocks) for (var a : block.insns) link(a);
+      fns.add(f);
     }
   }
 
   public Program(Map<List<String>, Fn> modules) {
+    var main = new Fn(null, "main");
+    main.rtype = Type.VOID;
     for (var module : modules.values()) {
-      new LinkLocals(null, module);
-      fns.add(module);
+      // resolve names to variables and functions
+      new Link(null, module);
+
+      // Module scope variables are static
+      vars.addAll(module.vars);
+      module.vars.clear();
+
+      // modules may contain initialization code
+      // so each module is called as a function from main
+      main.blocks.get(0).insns.add(new Call(module.loc, List.of(module)));
     }
+    main.blocks.get(0).insns.add(new ReturnVoid(main.loc));
+    fns.add(main);
   }
 
   public void write() throws IOException {
@@ -57,12 +74,14 @@ public final class Program {
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
     // functions
+    // TODO factor out into Fn method?
     for (var f : fns) {
       // label blocks
       for (var block : f.blocks) block.label = new Label();
 
       // assign local variable numbers
       var i = 0;
+      for (var x : f.params) x.localVar = i++;
       for (var x : f.vars) x.localVar = i++;
       for (var block : f.blocks)
         for (var a : block.insns)
@@ -77,7 +96,7 @@ public final class Program {
           }
 
       // emit code
-      var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+      var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, f.name, f.descriptor(), null, null);
       mv.visitCode();
       for (var block : f.blocks) {
         mv.visitLabel(block.label);

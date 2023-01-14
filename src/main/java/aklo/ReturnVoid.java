@@ -1,12 +1,12 @@
 package aklo;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.RETURN;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class Return extends Term1 {
-  public Return(Loc loc, Term arg) {
-    super(loc, arg);
+public final class ReturnVoid extends Term {
+  public ReturnVoid(Loc loc) {
+    super(loc);
   }
 
   @Override
@@ -16,8 +16,7 @@ public final class Return extends Term1 {
 
   @Override
   public void emit(MethodVisitor mv) {
-    arg.load(mv);
-    mv.visitInsn(ARETURN);
+    mv.visitInsn(RETURN);
   }
 
   @Override

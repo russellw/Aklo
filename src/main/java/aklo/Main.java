@@ -80,8 +80,12 @@ final class Main {
       packages.add(Path.of(s));
     }
 
+    // modules may contain initialization code
+    // that is guaranteed to be run in deterministic order
+    // so make sure the collection of modules keeps deterministic order
+    var modules = new LinkedHashMap<List<String>, Fn>();
+
     // parse
-    var modules = new HashMap<List<String>, Fn>();
     for (var p : packages) {
       var i = p.getNameCount() - 1;
       try (var files = Files.walk(p)) {
@@ -96,6 +100,7 @@ final class Main {
 
           // parse the module
           var module = new Fn(loc, names.get(names.size() - 1));
+          module.rtype = Type.VOID;
           new Parser(file, Files.readAllBytes(Path.of(file)), module);
           modules.put(names, module);
         }

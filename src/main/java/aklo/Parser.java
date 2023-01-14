@@ -1541,9 +1541,8 @@ public final class Parser {
 
     // parse
     var c = new Context(module);
-    Term r = Const.ZERO;
-    while (tok != DEDENT) r = c.stmt();
-    c.insn(new Return(module.loc, r));
+    while (tok != DEDENT) c.stmt();
+    c.insn(new ReturnVoid(module.loc));
     module.initVars();
   }
 }
