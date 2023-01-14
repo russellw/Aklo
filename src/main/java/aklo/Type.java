@@ -13,6 +13,18 @@ public abstract class Type {
           return Kind.BOOL;
         }
       };
+  public static final Type STRING =
+      new Type() {
+        @Override
+        public String toString() {
+          return "java/lang/String";
+        }
+
+        @Override
+        public Kind kind() {
+          return Kind.STRING;
+        }
+      };
   public static final Type VOID =
       new Type() {
         @Override

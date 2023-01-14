@@ -11,4 +11,6 @@ public enum Kind {
   DOUBLE,
   BOOL,
   VOID,
+  STRING,
+  ARRAY,
 }
