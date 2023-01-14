@@ -28,8 +28,8 @@ public final class Invoke extends Terms {
           case INVOKESPECIAL -> "special";
           default -> throw new IllegalStateException(Integer.toString(opcode));
         });
-    System.out.printf(" \"%s\", \"%s\", \"%s\"", owner, name, descriptor);
-    for (var a : this) System.out.print(", " + refs.get(a));
+    System.out.printf(" \"%s\" \"%s\" \"%s\"", owner, name, descriptor);
+    for (var a : this) dbg(refs, a);
   }
 
   public Invoke(

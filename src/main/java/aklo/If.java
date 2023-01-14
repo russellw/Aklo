@@ -24,7 +24,7 @@ public final class If extends Term1 {
   @Override
   public void dbg(Map<Term, Integer> refs) {
     super.dbg(refs);
-    System.out.printf(", %s, %s", trueTarget, falseTarget);
+    System.out.printf(" %s %s", trueTarget, falseTarget);
   }
 
   public If(Loc loc, Term cond, Block trueTarget, Block falseTarget) {

@@ -48,14 +48,14 @@ public abstract class Term extends AbstractCollection<Term> {
 
   public void dbg(Map<Term, Integer> refs) {
     System.out.print(this);
-    for (var i = 0; i < size(); i++) {
-      if (i > 0) System.out.print(',');
-      System.out.print(' ');
-      var a = get(i);
-      var j = refs.get(a);
-      if (j == null) System.out.print(a);
-      else System.out.print("%" + j);
-    }
+    for (var i = 0; i < size(); i++) dbg(refs, get(i));
+  }
+
+  public void dbg(Map<Term, Integer> refs, Term a) {
+    System.out.print(' ');
+    var j = refs.get(a);
+    if (j == null) System.out.print(a);
+    else System.out.print("%" + j);
   }
 
   public final void walk(Consumer<Term> f) {
