@@ -20,6 +20,12 @@ public final class Call extends Terms {
   }
 
   @Override
+  public Type type() {
+    var f = (Fn) get(0);
+    return f.rtype;
+  }
+
+  @Override
   public void emit(MethodVisitor mv) {
     for (var i = 1; i < size(); i++) get(i).load(mv);
     var f = (Fn) get(0);
