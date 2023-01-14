@@ -1,6 +1,8 @@
 package aklo;
 
-public abstract class Type {
+import java.util.AbstractList;
+
+public abstract class Type extends AbstractList<Type> {
   public static final Type BOOL =
       new Type() {
         @Override
@@ -124,7 +126,17 @@ public abstract class Type {
 
   public abstract Kind kind();
 
-  public final String descriptor() {
+  @Override
+  public Type get(int i) {
+    throw new UnsupportedOperationException(toString());
+  }
+
+  @Override
+  public int size() {
+    return 0;
+  }
+
+  public String descriptor() {
     var s = toString();
     if (s.length() > 1) s = 'L' + s + ';';
     return s;

@@ -52,6 +52,8 @@ public final class Program {
 
   public Program(Map<List<String>, Fn> modules) {
     var main = new Fn(null, "main");
+    var args = new Var(main.params);
+    args.type = new ArrayType(Type.STRING);
     main.rtype = Type.VOID;
     for (var module : modules.values()) {
       // resolve names to variables and functions
