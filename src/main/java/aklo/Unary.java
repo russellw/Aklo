@@ -24,13 +24,13 @@ abstract class Unary extends Term {
   }
 
   @Override
-  void set(int i, Term a) {
+  void set(int i, Object a) {
     assert i == 0;
     arg = a;
   }
 
   @Override
-  Term get(int i) {
+  Object get(int i) {
     assert i == 0;
     return arg;
   }
@@ -73,7 +73,7 @@ abstract class Unary extends Term {
   }
 
   @Override
-  public final Iterator<Term> iterator() {
+  public final Iterator<Object> iterator() {
     return new Iterator<>() {
       private int i;
 

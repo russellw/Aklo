@@ -13,7 +13,7 @@ abstract class Ternary extends Term {
   }
 
   @Override
-  void set(int i, Term a) {
+  void set(int i, Object a) {
     switch (i) {
       case 0 -> arg0 = a;
       case 1 -> arg1 = a;
@@ -23,7 +23,7 @@ abstract class Ternary extends Term {
   }
 
   @Override
-  Term get(int i) {
+  Object get(int i) {
     return switch (i) {
       case 0 -> arg0;
       case 1 -> arg1;
@@ -43,7 +43,7 @@ abstract class Ternary extends Term {
   }
 
   @Override
-  public final Iterator<Term> iterator() {
+  public final Iterator<Object> iterator() {
     return new Iterator<>() {
       private int i;
 
@@ -54,7 +54,7 @@ abstract class Ternary extends Term {
       }
 
       @Override
-      public Term next() {
+      public Object next() {
         return get(i++);
       }
     };

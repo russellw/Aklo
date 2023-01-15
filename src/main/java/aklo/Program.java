@@ -16,9 +16,9 @@ final class Program {
 
   private static final class Link {
     final Link outer;
-    final Map<String, Term> locals = new HashMap<>();
+    final Map<String, Object> locals = new HashMap<>();
 
-    Term get(String name) {
+    Object get(String name) {
       for (var l = this; ; l = l.outer) {
         if (l == null) return null;
         var r = l.locals.get(name);
@@ -66,9 +66,9 @@ final class Program {
 
       // modules may contain initialization code
       // so each module is called as a function from main
-      main.blocks.get(0).insns.add(new Call(module.loc, List.of(module)));
+      main.blocks.get(0).insns.add(new Call(null, List.of(module)));
     }
-    main.blocks.get(0).insns.add(new ReturnVoid(main.loc));
+    main.blocks.get(0).insns.add(new ReturnVoid(null));
     fns.add(main);
   }
 

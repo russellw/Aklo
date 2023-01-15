@@ -12,7 +12,7 @@ abstract class Nary extends Term {
   }
 
   @Override
-  void set(int i, Term a) {
+  void set(int i, Object a) {
     terms[i] = a;
   }
 
@@ -27,12 +27,12 @@ abstract class Nary extends Term {
   }
 
   @Override
-  Term get(int i) {
+  Object get(int i) {
     return terms[i];
   }
 
   @Override
-  public final Iterator<Term> iterator() {
+  public final Iterator<Object> iterator() {
     return new Iterator<>() {
       private int i;
 

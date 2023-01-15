@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
-abstract class Term extends AbstractCollection<Term> {
+abstract class Term extends AbstractCollection<Object> {
   final Loc loc;
 
   Term(Loc loc) {
@@ -39,7 +39,7 @@ abstract class Term extends AbstractCollection<Term> {
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }
 
-  static void dbg(Map<Object, Integer> refs, Term a) {
+  static void dbg(Map<Object, Integer> refs, Object a) {
     System.out.print(' ');
     var j = refs.get(a);
     if (j == null) System.out.print(a);
@@ -48,10 +48,10 @@ abstract class Term extends AbstractCollection<Term> {
 
   final void walk(Consumer<Term> f) {
     f.accept(this);
-    for (var a : this) a.walk(f);
+    for (var a : this)if(a instanceof Term a1) a1.walk(f);
   }
 
-  void set(int i, Term a) {
+  void set(int i, Object a) {
     throw new UnsupportedOperationException(toString());
   }
 
@@ -143,7 +143,7 @@ abstract class Term extends AbstractCollection<Term> {
     mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
   }
 
-  Term get(int i) {
+  Object get(int i) {
     throw new UnsupportedOperationException(toString());
   }
 
@@ -153,7 +153,7 @@ abstract class Term extends AbstractCollection<Term> {
   }
 
   @Override
-  public Iterator<Term> iterator() {
+  public Iterator<Object> iterator() {
     return new Iterator<>() {
       @Override
       public boolean hasNext() {
@@ -161,7 +161,7 @@ abstract class Term extends AbstractCollection<Term> {
       }
 
       @Override
-      public Term next() {
+      public Object next() {
         throw new UnsupportedOperationException();
       }
     };

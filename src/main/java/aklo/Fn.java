@@ -6,7 +6,7 @@ import java.util.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 
-final class Fn extends Term {
+final class Fn {
   final String name;
   final List<Var> params = new ArrayList<>();
   Type rtype = Type.ANY;
@@ -15,7 +15,6 @@ final class Fn extends Term {
   final List<Block> blocks = new ArrayList<>();
 
   Fn(Loc loc, String name) {
-    super(loc);
     this.name = name;
     addBlock(new Block(loc, "entry"));
   }
@@ -36,7 +35,7 @@ final class Fn extends Term {
 
     // which instructions are used as input to others, therefore needing reference numbers?
     var used = new HashSet<Term>();
-    for (var block : blocks) for (var a : block.insns) used.addAll(a);
+    for (var block : blocks) for (var a : block.insns)for(var b:a)if(b instanceof Term b1) used.add(b1);
 
     // assign reference numbers to instructions
     for (var block : blocks)
@@ -78,7 +77,7 @@ final class Fn extends Term {
 
   void initVars() {
     var r = new ArrayList<Term>();
-    for (var x : vars) r.add(new Assign(loc, x, Const.ZERO));
+    for (var x : vars) r.add(new Assign(blocks.get(0). loc, x, Const.ZERO));
     blocks.get(0).insns.addAll(0, r);
   }
 
@@ -87,10 +86,6 @@ final class Fn extends Term {
     return name;
   }
 
-  @Override
-  Tag tag() {
-    return Tag.FN;
-  }
 
   String descriptor() {
     var sb = new StringBuilder("(");
