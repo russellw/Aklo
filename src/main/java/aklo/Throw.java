@@ -4,6 +4,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Map;
+
 final class Throw extends Unary {
   @Override
   boolean isTerminator() {
@@ -15,10 +17,10 @@ final class Throw extends Unary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
     mv.visitInsn(DUP);
-    arg.load(mv);
+    arg.load(, mv);
     mv.visitMethodInsn(
         INVOKESTATIC, "aklo/Etc", "decode", "(Ljava/lang/Object;)Ljava/lang/String;", false);
     mv.visitMethodInsn(

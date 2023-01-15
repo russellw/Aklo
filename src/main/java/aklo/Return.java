@@ -4,6 +4,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Map;
+
 final class Return extends Unary {
   Return(Loc loc, Term arg) {
     super(loc, arg);
@@ -15,8 +17,8 @@ final class Return extends Unary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg.load(, mv);
     mv.visitInsn(ARETURN);
   }
 

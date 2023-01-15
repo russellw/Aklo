@@ -5,14 +5,16 @@ import static org.objectweb.asm.Opcodes.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+
 import org.objectweb.asm.MethodVisitor;
 
 final class ListOf extends Nary {
   @Override
-  void emit(MethodVisitor mv) {
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     var n = size();
     if (n <= 10) {
-      for (var a : this) a.load(mv);
+      for (var a : this) a.load(, mv);
       mv.visitMethodInsn(
           INVOKESTATIC,
           "java/util/List",
@@ -26,7 +28,7 @@ final class ListOf extends Nary {
     for (var i = 0; i < n; i++) {
       mv.visitInsn(DUP);
       emitInt(mv, i);
-      get(i).load(mv);
+      get(i).load(, mv);
       mv.visitInsn(AASTORE);
     }
     mv.visitMethodInsn(

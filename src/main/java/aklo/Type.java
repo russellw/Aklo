@@ -135,6 +135,9 @@ abstract class Type extends AbstractList<Type> {
   public int size() {
     return 0;
   }
+  int wordSize(){
+      return 1;
+  }
 
   String descriptor() {
     var s = toString();

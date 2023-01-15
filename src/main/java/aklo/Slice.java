@@ -3,6 +3,8 @@ package aklo;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.util.List;
+import java.util.Map;
+
 import org.objectweb.asm.MethodVisitor;
 
 @SuppressWarnings("unchecked")
@@ -12,10 +14,10 @@ final class Slice extends Ternary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg0.load(mv);
-    arg1.load(mv);
-    arg2.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg0.load(, mv);
+    arg1.load(, mv);
+    arg2.load(, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Slice",

@@ -3,6 +3,8 @@ package aklo;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.math.BigInteger;
+import java.util.Map;
+
 import org.objectweb.asm.MethodVisitor;
 
 final class Lt extends Binary {
@@ -16,9 +18,9 @@ final class Lt extends Binary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg0.load(mv);
-    arg1.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg0.load(, mv);
+    arg1.load(, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",

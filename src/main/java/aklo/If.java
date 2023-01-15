@@ -14,8 +14,8 @@ final class If extends Unary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg.load(, mv);
     mv.visitMethodInsn(INVOKESTATIC, "aklo/Etc", "truth", "(Ljava/lang/Object;)Z", false);
     mv.visitJumpInsn(IFNE, trueTarget.label);
     mv.visitJumpInsn(GOTO, falseTarget.label);

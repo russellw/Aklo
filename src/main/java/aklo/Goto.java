@@ -19,7 +19,7 @@ final class Goto extends Term {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     mv.visitJumpInsn(GOTO, target.label);
   }
 

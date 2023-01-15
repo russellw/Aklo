@@ -19,26 +19,39 @@ final class Fn extends Term {
     this.name = name;
     addBlock(new Block(loc, "entry"));
   }
+  private Map<Object,Integer>refs(){
+    var i = 0;
+    var r = new HashMap<Object, Integer>();
+
+    //assign reference numbers to variables
+    for (var x : params){
+      r.put(x,i);
+      i+=x.type.wordSize();
+    }
+    for (var x : vars){
+      r.put(x,i);
+      i+=x.type.wordSize();
+    }
+
+    // which instructions are used as input to others, therefore needing reference numbers?
+    var used = new HashSet<Term>();
+    for (var block : blocks) for (var a : block.insns) used.addAll(a);
+
+    // assign reference numbers to instructions
+    for (var block : blocks)
+      for (var a : block.insns) if (used.contains(a)) {
+        r.put(a, i);
+        i+=a.type().wordSize();
+      }
+
+    return r;
+  }
 
   void write(ClassWriter w) {
+    var refs=refs();
+
     // label blocks
     for (var block : blocks) block.label = new Label();
-
-    // assign local variable numbers
-    var i = 0;
-    for (var x : params) x.localVar = i++;
-    for (var x : vars) x.localVar = i++;
-    for (var block : blocks)
-      for (var a : block.insns)
-        switch (a.type().kind()) {
-          case VOID -> {}
-          case DOUBLE -> {
-            // TODO long
-            a.localVar = i;
-            i += 2;
-          }
-          default -> a.localVar = i++;
-        }
 
     // emit code
     var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, name, descriptor(), null, null);
@@ -46,12 +59,12 @@ final class Fn extends Term {
     for (var block : blocks) {
       mv.visitLabel(block.label);
       for (var a : block.insns) {
-        a.emit(mv);
-        switch (a.type().kind()) {
-          case VOID -> {}
-            // case DOUBLE -> mv.visitVarInsn(DSTORE, a.localVar);
-          default -> mv.visitVarInsn(ASTORE, a.localVar);
-        }
+        a.emit(refs, mv);
+        var i=refs.get(a);
+        if(i==null)
+          mv.visitInsn(POP);
+        else
+           mv.visitVarInsn(ASTORE,i);
       }
     }
     mv.visitInsn(RETURN);
@@ -89,6 +102,8 @@ final class Fn extends Term {
 
   @SuppressWarnings("unused")
   void dbg() {
+    var refs=refs();
+
     // make block names unique
     var names = new HashSet<String>();
     for (var block : blocks) {
@@ -112,15 +127,6 @@ final class Fn extends Term {
 
     // local variables
     for (var x : vars) System.out.printf("  var %s %s\n", x, x.type);
-
-    // which instructions are used as input to others, therefore needing reference numbers?
-    var used = new HashSet<Term>();
-    for (var block : blocks) for (var a : block.insns) used.addAll(a);
-
-    // assign reference numbers to instructions
-    var refs = new HashMap<Object, Integer>();
-    for (var block : blocks)
-      for (var a : block.insns) if (used.contains(a)) refs.put(a, refs.size());
 
     // blocks
     for (var block : blocks) {

@@ -4,12 +4,14 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Map;
+
 final class InstanceOf extends Unary {
   final Type type;
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg.load(, mv);
     mv.visitTypeInsn(INSTANCEOF, type.toString());
     mv.visitMethodInsn(
         INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);

@@ -13,8 +13,8 @@ final class Invoke extends Nary {
   final String descriptor;
 
   @Override
-  void emit(MethodVisitor mv) {
-    for (var a : this) a.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    for (var a : this) a.load(, mv);
     mv.visitMethodInsn(opcode, owner, name, descriptor, false);
   }
 

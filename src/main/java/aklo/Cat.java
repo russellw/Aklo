@@ -4,15 +4,17 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Map;
+
 final class Cat extends Binary {
   Cat(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    arg0.load(mv);
-    arg1.load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    arg0.load(, mv);
+    arg1.load(, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",

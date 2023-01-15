@@ -3,6 +3,8 @@ package aklo;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.util.List;
+import java.util.Map;
+
 import org.objectweb.asm.MethodVisitor;
 
 final class Call extends Nary {
@@ -26,8 +28,8 @@ final class Call extends Nary {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
-    for (var i = 1; i < size(); i++) get(i).load(mv);
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
+    for (var i = 1; i < size(); i++) get(i).load(, mv);
     var f = (Fn) get(0);
     mv.visitMethodInsn(INVOKESTATIC, "a", f.name, f.descriptor(), false);
   }

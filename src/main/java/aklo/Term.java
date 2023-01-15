@@ -8,7 +8,6 @@ import org.objectweb.asm.MethodVisitor;
 
 abstract class Term extends AbstractCollection<Term> {
   final Loc loc;
-  int localVar = -1;
 
   Term(Loc loc) {
     this.loc = loc;
@@ -25,7 +24,7 @@ abstract class Term extends AbstractCollection<Term> {
     mv.visitIntInsn(BIPUSH, n);
   }
 
-  void emit(MethodVisitor mv) {
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     throw new UnsupportedOperationException(str());
   }
 
@@ -71,13 +70,14 @@ abstract class Term extends AbstractCollection<Term> {
     return Type.VOID;
   }
 
-  void load(MethodVisitor mv) {
-    if (localVar < 0) throw new IllegalStateException(String.format("%s: %s", loc, this));
+  void load(Map<Object, Integer> refs, MethodVisitor mv) {
+    var i=refs.get(this);
+    if (i==null) throw new IllegalStateException(String.format("%s: %s", loc, this));
     // TODO
     switch (type().kind()) {
       case VOID -> throw new UnsupportedOperationException(toString());
         // case DOUBLE -> mv.visitVarInsn(DLOAD, localVar);
-      default -> mv.visitVarInsn(ALOAD, localVar);
+      default -> mv.visitVarInsn(ALOAD, i);
     }
   }
 

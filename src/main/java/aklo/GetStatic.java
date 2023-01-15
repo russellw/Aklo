@@ -4,6 +4,8 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Map;
+
 final class GetStatic extends Term {
   final String owner;
   final String name;
@@ -15,7 +17,7 @@ final class GetStatic extends Term {
   }
 
   @Override
-  void emit(MethodVisitor mv) {
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     mv.visitFieldInsn(GETSTATIC, owner, name, descriptor);
   }
 
