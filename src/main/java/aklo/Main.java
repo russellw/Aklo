@@ -108,9 +108,9 @@ final class Main {
     }
 
     // convert to basic blocks
-    var program = new Program(modules);
+    Program.init(modules);
 
     // write class file
-    program.write();
+    Program.write();
   }
 }

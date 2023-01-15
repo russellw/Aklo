@@ -10,10 +10,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 
 public final class Program {
-  public final List<Var> vars = new ArrayList<>();
-  public final List<Fn> fns = new ArrayList<>();
+  private Program() {}
 
-  private final class Link {
+  public static final List<Var> vars = new ArrayList<>();
+  public static final List<Fn> fns = new ArrayList<>();
+
+  private static final class Link {
     final Link outer;
     final Map<String, Term> locals = new HashMap<>();
 
@@ -50,7 +52,7 @@ public final class Program {
     }
   }
 
-  public Program(Map<List<String>, Fn> modules) {
+  public static void init(Map<List<String>, Fn> modules) {
     var main = new Fn(null, "main");
     var args = new Var(main.params);
     args.type = new ArrayType(Type.STRING);
@@ -71,7 +73,7 @@ public final class Program {
     fns.add(main);
   }
 
-  public void write() throws IOException {
+  public static void write() throws IOException {
     var w = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
