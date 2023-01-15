@@ -874,49 +874,47 @@ final class Parser {
       throw new CompileError(loc, "expected expression");
     }
 
-    void assignSubscript(Term y, Term x, Block fail, int i) {
-      y = y.get(i);
+    void assignSubscript(Term y, Object x, Block fail, int i) {
       var loc = fail.loc;
-      x = new Subscript(loc, x, new Const(x.loc, BigInteger.valueOf(i)));
-      insn(x);
-      assign(y, x, fail);
+      assign(y.get(i), insn(new Subscript(loc, x, new Const(loc, BigInteger.valueOf(i)))), fail);
     }
 
-    void assign(Term y, Term x, Block fail) {
+    void assign(Object y, Object x, Block fail) {
       var loc = fail.loc;
-      switch (y.tag()) {
-        case CONST -> {
-          var eq = new Eq(loc, y, x);
-          insn(eq);
-          var after = new Block(loc, "assignCheckAfter");
-          insn(new If(loc, eq, after, fail));
-          add(after);
-        }
-          // TODO Var is impossible here?
-        case ID, VAR -> insn(new Assign(loc, y, x));
-        case LIST_OF -> {
-          var n = y.size();
-          for (var i = 0; i < n; i++) assignSubscript(y, x, fail, i);
-        }
-        case CAT -> {
-          // head atoms
-          if (!(y.get(0) instanceof ListOf s))
-            throw new CompileError(loc, y + ": invalid assignment");
-          var n = s.size();
-          for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
+      if (y instanceof Term y1)
+        switch (y1.tag()) {
+          case CONST -> {
+            var eq = new Eq(loc, y, x);
+            insn(eq);
+            var after = new Block(loc, "assignCheckAfter");
+            insn(new If(loc, eq, after, fail));
+            add(after);
+          }
+            // TODO Var is impossible here?
+          case ID, VAR -> insn(new Assign(loc, y, x));
+          case LIST_OF -> {
+            var n = y1.size();
+            for (var i = 0; i < n; i++) assignSubscript(y1, x, fail, i);
+          }
+          case CAT -> {
+            // head atoms
+            if (!(y1.get(0) instanceof ListOf s))
+              throw new CompileError(loc, y + ": invalid assignment");
+            var n = s.size();
+            for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
 
-          // rest of the list
-          var len = new Len(loc, x);
-          insn(len);
-          var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
-          insn(slice);
-          assign(y.get(1), slice, fail);
+            // rest of the list
+            var len = new Len(loc, x);
+            insn(len);
+            var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
+            insn(slice);
+            assign(y1.get(1), slice, fail);
+          }
+          default -> throw new CompileError(loc, y + ": invalid assignment");
         }
-        default -> throw new CompileError(loc, y + ": invalid assignment");
-      }
     }
 
-    Term assign(Loc loc, Term y, Term x) {
+    Object assign(Loc loc, Object y, Object x) {
       // assign
       var fail = new Block(loc, "assignFail");
       assign(y, x, fail);
@@ -932,7 +930,7 @@ final class Parser {
       return x;
     }
 
-    Var postInc(Term y, Term x) {
+    Var postInc(Object y, Term x) {
       var loc = x.loc;
       lex();
       var old = new Var(fn.vars);
@@ -1012,7 +1010,7 @@ final class Parser {
       expect(')');
     }
 
-    Term not(Loc loc, Term a) {
+    Var not(Loc loc, Object a) {
       var r = new Var(fn.vars);
       var yes = new Block(loc, "notTrue");
       var no = new Block(loc, "notFalse");
