@@ -54,8 +54,8 @@ final class ListOf extends Nary {
   }
 
   @Override
-  Type type() {
-    return Type.ANY;
+  String type() {
+    return "Ljava/util/List;";
   }
 
   @Override

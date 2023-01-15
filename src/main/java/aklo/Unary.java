@@ -14,8 +14,8 @@ abstract class Unary extends Term {
   }
 
   @Override
-  Type type() {
-    return Type.of(arg);
+  String type() {
+    return Etc.typeof(arg);
   }
 
   @Override

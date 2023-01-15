@@ -55,8 +55,8 @@ abstract class Term extends AbstractCollection<Object> {
     throw new UnsupportedOperationException(toString());
   }
 
-  Type type() {
-    return Type.VOID;
+  String type() {
+    return "V";
   }
 
   static void load(Map<Object, Integer> refs, MethodVisitor mv, Object a) {

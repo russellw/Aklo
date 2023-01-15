@@ -4,7 +4,7 @@ import java.util.List;
 
 final class Var {
   String name;
-  Type type = Type.ANY;
+  String type = "Ljava/lang/Object;";
 
   Var(String name, List<Var> s) {
     this.name = name;

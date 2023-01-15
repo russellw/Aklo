@@ -17,8 +17,8 @@ abstract class Binary extends Term {
   }
 
   @Override
-  Type type() {
-    return Type.of(arg0);
+  String type() {
+    return Etc.typeof(arg0);
   }
 
   @Override

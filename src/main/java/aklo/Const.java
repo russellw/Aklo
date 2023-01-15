@@ -28,7 +28,7 @@ final class Const extends Term {
   }
 
   @Override
-  Type type() {
-    return Type.INT;
+  String type() {
+    return Etc.typeof(val);
   }
 }

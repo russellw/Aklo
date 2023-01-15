@@ -11,8 +11,8 @@ final class Assign extends Binary {
   }
 
   @Override
-  Type type() {
-    return Type.VOID;
+  String type() {
+    return "V";
   }
 
   @Override

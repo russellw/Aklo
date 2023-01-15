@@ -17,7 +17,7 @@ final class Call extends Nary {
   }
 
   @Override
-  Type type() {
+  String type() {
     var f = (Fn) get(0);
     return f.rtype;
   }

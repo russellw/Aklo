@@ -54,8 +54,8 @@ final class Program {
   static void init(Map<List<String>, Fn> modules) {
     var main = new Fn(null, "main");
     var args = new Var(main.params);
-    args.type = new ArrayType(Type.STRING);
-    main.rtype = Type.VOID;
+    args.type = "[Ljava/lang/String;";
+    main.rtype = "V";
     for (var module : modules.values()) {
       // resolve names to variables and functions
       new Link(null, module);

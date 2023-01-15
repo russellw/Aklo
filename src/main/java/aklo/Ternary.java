@@ -33,11 +33,6 @@ abstract class Ternary extends Term {
   }
 
   @Override
-  Type type() {
-    return Type.ANY;
-  }
-
-  @Override
   public int size() {
     return 3;
   }

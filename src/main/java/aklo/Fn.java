@@ -9,7 +9,7 @@ import org.objectweb.asm.Label;
 final class Fn {
   final String name;
   final List<Var> params = new ArrayList<>();
-  Type rtype = Type.ANY;
+  String rtype = "Ljava/lang/Object;";
   final List<Var> vars = new ArrayList<>();
   final List<Fn> fns = new ArrayList<>();
   final List<Block> blocks = new ArrayList<>();
@@ -19,6 +19,10 @@ final class Fn {
     addBlock(new Block(loc, "entry"));
   }
 
+  private static int wordSize(String type) {
+    return 1;
+  }
+
   private Map<Object, Integer> refs() {
     var i = 0;
     var r = new HashMap<Object, Integer>();
@@ -26,11 +30,11 @@ final class Fn {
     // assign reference numbers to variables
     for (var x : params) {
       r.put(x, i);
-      i += x.type.wordSize();
+      i += wordSize(x.type);
     }
     for (var x : vars) {
       r.put(x, i);
-      i += x.type.wordSize();
+      i += wordSize(x.type);
     }
 
     // which instructions are used as input to others, therefore needing reference numbers?
@@ -43,7 +47,7 @@ final class Fn {
       for (var a : block.insns)
         if (used.contains(a)) {
           r.put(a, i);
-          i += a.type().wordSize();
+          i += wordSize(a.type());
         }
 
     return r;
@@ -64,8 +68,8 @@ final class Fn {
         a.emit(refs, mv);
         var i = refs.get(a);
         if (i == null)
-          switch (a.type().kind()) {
-            case VOID -> {}
+          switch (a.type()) {
+            case "V" -> {}
             default -> mv.visitInsn(POP);
           }
         else mv.visitVarInsn(ASTORE, i);
@@ -89,9 +93,9 @@ final class Fn {
 
   String descriptor() {
     var sb = new StringBuilder("(");
-    for (var x : params) sb.append(x.type.descriptor());
+    for (var x : params) sb.append(x.type);
     sb.append(')');
-    sb.append(rtype.descriptor());
+    sb.append(rtype);
     return sb.toString();
   }
 

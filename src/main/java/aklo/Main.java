@@ -100,7 +100,7 @@ final class Main {
 
           // parse the module
           var module = new Fn(loc, names.get(names.size() - 1));
-          module.rtype = Type.VOID;
+          module.rtype = "V";
           new Parser(file, Files.readAllBytes(Path.of(file)), module);
           modules.put(names, module);
         }

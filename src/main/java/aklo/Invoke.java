@@ -49,11 +49,9 @@ final class Invoke extends Nary {
   }
 
   @Override
-  Type type() {
+  String type() {
     var i = descriptor.lastIndexOf(')');
-    // TODO
-    // return Type.of(descriptor.substring(i + 1));
-    return descriptor.endsWith("V") ? Type.VOID : Type.ANY;
+    return descriptor.substring(i + 1);
   }
 
   @Override

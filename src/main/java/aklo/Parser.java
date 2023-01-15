@@ -707,25 +707,25 @@ final class Parser {
           case WORD -> {
             switch (s) {
               case "bool?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.BOOL));
+                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Boolean;"));
               }
               case "int?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.INT));
+                return insn(new InstanceOf(loc, arg(), "Ljava/math/BigInteger;"));
               }
               case "float?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.FLOAT));
+                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Float;"));
               }
               case "double?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.DOUBLE));
+                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Double;"));
               }
               case "rat?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.RAT));
+                return insn(new InstanceOf(loc, arg(), "Laklo/BigRational;"));
               }
               case "list?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.LIST));
+                return insn(new InstanceOf(loc, arg(), "Ljava/util/List;"));
               }
               case "sym?" -> {
-                return insn(new InstanceOf(loc, arg(), Type.SYM));
+                return insn(new InstanceOf(loc, arg(), "Laklo/Sym;"));
               }
               case "slice" -> {
                 var t = arg1();
