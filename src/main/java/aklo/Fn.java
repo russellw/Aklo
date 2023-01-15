@@ -2,6 +2,7 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.math.BigInteger;
 import java.util.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -82,7 +83,7 @@ final class Fn {
 
   void initVars() {
     var r = new ArrayList<Term>();
-    for (var x : vars) r.add(new Assign(blocks.get(0).loc, x, Const.ZERO));
+    for (var x : vars) r.add(new Assign(blocks.get(0).loc, x, BigInteger.ZERO));
     blocks.get(0).insns.addAll(0, r);
   }
 

@@ -2,11 +2,7 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import java.math.BigInteger;
-
 final class Const extends Term {
-  static final Const ZERO = new Const(null, BigInteger.ZERO);
-  static final Const ONE = new Const(null, BigInteger.ONE);
   final Object val;
 
   Const(Loc loc, Object val) {

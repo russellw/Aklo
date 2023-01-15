@@ -705,6 +705,7 @@ final class Parser {
             return a;
           }
           case WORD -> {
+            // TODO
             switch (s) {
               case "bool?" -> {
                 return insn(new InstanceOf(loc, arg(), "Ljava/lang/Boolean;"));
@@ -980,11 +981,11 @@ final class Parser {
           }
           case INC -> {
             var loc = new Loc(file, line);
-            return postInc(a, insn(new Add(loc, a, Const.ONE)));
+            return postInc(a, insn(new Add(loc, a, BigInteger.ONE)));
           }
           case DEC -> {
             var loc = new Loc(file, line);
-            return postInc(a, insn(new Sub(loc, a, Const.ONE)));
+            return postInc(a, insn(new Sub(loc, a, BigInteger.ONE)));
           }
           default -> {
             return a;
@@ -1059,13 +1060,13 @@ final class Parser {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          return assign(loc, y, insn(new Add(loc, y, Const.ONE)));
+          return assign(loc, y, insn(new Add(loc, y, BigInteger.ONE)));
         }
         case DEC -> {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          return assign(loc, y, insn(new Sub(loc, y, Const.ONE)));
+          return assign(loc, y, insn(new Sub(loc, y, BigInteger.ONE)));
         }
         case '!' -> {
           var loc = new Loc(file, line);
@@ -1293,7 +1294,7 @@ final class Parser {
                   yield block();
                 }
                 case "elif" -> insn(new Assign(loc, r, xif()));
-                default -> Const.ZERO;
+                default -> BigInteger.ZERO;
               }));
       insn(new Goto(loc, after));
 
@@ -1332,10 +1333,10 @@ final class Parser {
         case '^' -> {
           // TODO change to return?
           lex();
-          var a = tok == '\n' ? Const.ZERO : commas();
+          var a = tok == '\n' ? BigInteger.ZERO : commas();
           expectNewline();
           insn(new Return(loc, a));
-          return Const.ZERO;
+          return BigInteger.ZERO;
         }
         case WORD -> {
           switch (tokString) {
@@ -1402,11 +1403,11 @@ final class Parser {
             }
             case "while" -> {
               xwhile(null, false);
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "dowhile" -> {
               xwhile(null, true);
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "break" -> {
               lex();
@@ -1430,7 +1431,7 @@ final class Parser {
               expectNewline();
               insn(new Goto(loc, target));
               add(new Block(loc, "breakAfter"));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "continue" -> {
               lex();
@@ -1454,7 +1455,7 @@ final class Parser {
               expectNewline();
               insn(new Goto(loc, target));
               add(new Block(loc, "continueAfter"));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "exit" -> {
               lex();
@@ -1462,14 +1463,14 @@ final class Parser {
               expectNewline();
               // exit should ideally be a terminating instruction
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "printn" -> {
               lex();
               var a = commas();
               expectNewline();
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "throw" -> {
               lex();
@@ -1477,7 +1478,7 @@ final class Parser {
               expectNewline();
               insn(new Throw(loc, a));
               add(new Block(loc, "throwAfter"));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             case "print" -> {
               lex();
@@ -1485,7 +1486,7 @@ final class Parser {
               if (tok != '\n') a = insn(new Cat(loc, commas(), a));
               expectNewline();
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
-              return Const.ZERO;
+              return BigInteger.ZERO;
             }
             default -> {
               // labeling a statement needs a second token of lookahead
@@ -1504,11 +1505,11 @@ final class Parser {
                       // TODO for, case
                     case "dowhile" -> {
                       xwhile(label, true);
-                      return Const.ZERO;
+                      return BigInteger.ZERO;
                     }
                     case "while" -> {
                       xwhile(label, false);
-                      return Const.ZERO;
+                      return BigInteger.ZERO;
                     }
                   }
                   throw new CompileError(loc, "expected statement after label");
