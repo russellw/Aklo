@@ -3,8 +3,8 @@ package aklo;
 import java.util.List;
 
 final class Case extends Nary {
-  Case(List<Term> terms) {
-    super(terms.get(0).loc, terms);
+  Case(List<Object> terms) {
+    super(null, terms);
   }
 
   @Override

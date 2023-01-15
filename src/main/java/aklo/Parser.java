@@ -1219,7 +1219,8 @@ final class Parser {
         case '=' -> {
           var loc = new Loc(file, line);
           lex();
-          y.walk(
+          Term.walk(
+              y,
               z -> {
                 if (z instanceof Id z1) {
                   var name = z1.name;
@@ -1255,15 +1256,15 @@ final class Parser {
       return y;
     }
 
-    Term block() {
+    Object block() {
       expectIndent();
-      Term r;
+      Object r;
       do r = stmt();
       while (!eat(DEDENT));
       return r;
     }
 
-    Term xif() {
+    Var xif() {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       var loc = new Loc(file, line);
       lex();
@@ -1380,11 +1381,12 @@ final class Parser {
               return xif();
             }
             case "case" -> {
+              // TODO
               lex();
               var r = new ArrayList<>(List.of(commas()));
               expectIndent();
               do {
-                var s = new ArrayList<Term>();
+                var s = new ArrayList<>();
                 do s.add(commas());
                 while (eat('\n'));
                 s.add(block());
