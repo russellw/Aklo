@@ -104,7 +104,16 @@ public final class Etc {
     return true;
   }
 
+  @SuppressWarnings("unused")
   public static void dbg(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
+  }
+
+  public static Object mul(Object a, Object b) {
+    return Term2.eval(new Mul(null, null, null), a, b);
+  }
+
+  public static Object add(Object a, Object b) {
+    return Term2.eval(new Add(null, null, null), a, b);
   }
 }
