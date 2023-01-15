@@ -38,7 +38,7 @@ abstract class Term extends AbstractCollection<Term> {
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }
 
-  void dbg(Map<Object, Integer> refs, Term a) {
+  static void dbg(Map<Object, Integer> refs, Term a) {
     System.out.print(' ');
     var j = refs.get(a);
     if (j == null) System.out.print(a);
