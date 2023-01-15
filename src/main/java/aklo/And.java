@@ -6,8 +6,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class BitXor extends Binary {
-  BitXor(Loc loc, Object arg0, Object arg1) {
+final class And extends Binary {
+  And(Loc loc, Object arg0, Object arg1) {
     super(loc, arg0, arg1);
   }
 
@@ -18,18 +18,18 @@ final class BitXor extends Binary {
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",
-        "bitXor",
+        "bitAnd",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
   }
 
   @Override
   Object apply(BigInteger a, BigInteger b) {
-    return a.xor(b);
+    return a.and(b);
   }
 
   @Override
   Tag tag() {
-    return Tag.BIT_XOR;
+    return Tag.AND;
   }
 }

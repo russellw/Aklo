@@ -785,7 +785,7 @@ final class Parser {
                         argN()));
               }
               case "bitnot" -> {
-                return insn(new BitNot(loc, arg()));
+                return insn(new Not(loc, arg()));
               }
               case "len" -> {
                 return insn(new Len(loc, arg()));
@@ -814,13 +814,13 @@ final class Parser {
                 return insn(new Cmp(loc, arg1(), argN()));
               }
               case "bitand" -> {
-                return insn(new BitAnd(loc, arg1(), argN()));
+                return insn(new And(loc, arg1(), argN()));
               }
               case "bitor" -> {
-                return insn(new BitOr(loc, arg1(), argN()));
+                return insn(new Or(loc, arg1(), argN()));
               }
               case "bitxor" -> {
-                return insn(new BitXor(loc, arg1(), argN()));
+                return insn(new Xor(loc, arg1(), argN()));
               }
               case "shl" -> {
                 return insn(new Shl(loc, arg1(), argN()));

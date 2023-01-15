@@ -6,8 +6,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class BitAnd extends Binary {
-  BitAnd(Loc loc, Object arg0, Object arg1) {
+final class Or extends Binary {
+  Or(Loc loc, Object arg0, Object arg1) {
     super(loc, arg0, arg1);
   }
 
@@ -18,18 +18,18 @@ final class BitAnd extends Binary {
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",
-        "bitAnd",
+        "bitOr",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
   }
 
   @Override
   Object apply(BigInteger a, BigInteger b) {
-    return a.and(b);
+    return a.or(b);
   }
 
   @Override
   Tag tag() {
-    return Tag.BIT_AND;
+    return Tag.OR;
   }
 }

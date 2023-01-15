@@ -6,8 +6,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class BitNot extends Unary {
-  BitNot(Loc loc, Object arg) {
+final class Not extends Unary {
+  Not(Loc loc, Object arg) {
     super(loc, arg);
   }
 
@@ -25,6 +25,6 @@ final class BitNot extends Unary {
 
   @Override
   Tag tag() {
-    return Tag.BIT_NOT;
+    return Tag.NOT;
   }
 }

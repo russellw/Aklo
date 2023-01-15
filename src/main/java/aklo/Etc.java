@@ -118,19 +118,19 @@ public final class Etc {
   }
 
   public static Object bitAnd(Object a, Object b) {
-    return Binary.eval(new BitAnd(null, null, null), a, b);
+    return Binary.eval(new And(null, null, null), a, b);
   }
 
   public static Object bitNot(Object a) {
-    return Unary.eval(new BitNot(null, null), a);
+    return Unary.eval(new Not(null, null), a);
   }
 
   public static Object bitOr(Object a, Object b) {
-    return Binary.eval(new BitOr(null, null, null), a, b);
+    return Binary.eval(new Or(null, null, null), a, b);
   }
 
   public static Object bitXor(Object a, Object b) {
-    return Binary.eval(new BitXor(null, null, null), a, b);
+    return Binary.eval(new Xor(null, null, null), a, b);
   }
 
   public static Object cmp(Object a, Object b) {
