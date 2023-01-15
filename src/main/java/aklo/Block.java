@@ -8,7 +8,7 @@ final class Block {
   final Loc loc;
   String name;
   Label label;
-  final List<Term> insns = new ArrayList<>();
+  final List<Insn> insns = new ArrayList<>();
 
   Block(Loc loc, String name) {
     this.loc = loc;

@@ -628,7 +628,7 @@ final class Parser {
       return fn.blocks.get(fn.blocks.size() - 1);
     }
 
-    Term insn(Term a) {
+    Insn insn(Insn a) {
       // TODO block should be an instruction constructor parameter
       lastBlock().insns.add(a);
       return a;
@@ -654,7 +654,7 @@ final class Parser {
       return a;
     }
 
-    Term listRest(Loc loc, List<Object> s, Object t) {
+    Insn listRest(Loc loc, List<Object> s, Object t) {
       return insn(new Cat(loc, insn(new ListOf(loc, s)), t));
     }
 
@@ -875,14 +875,14 @@ final class Parser {
       throw new CompileError(loc, "expected expression");
     }
 
-    void assignSubscript(Term y, Object x, Block fail, int i) {
+    void assignSubscript(Insn y, Object x, Block fail, int i) {
       var loc = fail.loc;
       assign(y.get(i), insn(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
     }
 
     void assign(Object y, Object x, Block fail) {
       var loc = fail.loc;
-      if (y instanceof Term y1)
+      if (y instanceof Insn y1)
         switch (y1.tag()) {
           case CONST -> {
             var eq = new Eq(loc, y, x);
@@ -931,7 +931,7 @@ final class Parser {
       return x;
     }
 
-    Var postInc(Object y, Term x) {
+    Var postInc(Object y, Insn x) {
       var loc = x.loc;
       lex();
       var old = new Var(fn.vars);
@@ -1220,7 +1220,7 @@ final class Parser {
         case '=' -> {
           var loc = new Loc(file, line);
           lex();
-          Term.walk(
+          Insn.walk(
               y,
               z -> {
                 if (z instanceof String name && !locals.containsKey(name))

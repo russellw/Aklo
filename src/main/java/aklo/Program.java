@@ -27,7 +27,7 @@ final class Program {
     }
 
     @SuppressWarnings("ConstantConditions")
-    void link(Term a) {
+    void link(Insn a) {
       for (var i = 0; i < a.size(); i++)
         if (a.get(i) instanceof String name) {
           var x = get(name);

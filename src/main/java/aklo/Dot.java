@@ -2,7 +2,7 @@ package aklo;
 
 import java.util.List;
 
-final class Dot extends Term {
+final class Dot extends Insn {
   final String[] names;
 
   Dot(Loc loc, List<String> names) {

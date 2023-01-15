@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class Goto extends Term {
+final class Goto extends Insn {
   final Block target;
 
   @Override

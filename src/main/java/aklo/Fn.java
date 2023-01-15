@@ -39,9 +39,9 @@ final class Fn {
     }
 
     // which instructions are used as input to others, therefore needing reference numbers?
-    var used = new HashSet<Term>();
+    var used = new HashSet<Insn>();
     for (var block : blocks)
-      for (var a : block.insns) for (var b : a) if (b instanceof Term b1) used.add(b1);
+      for (var a : block.insns) for (var b : a) if (b instanceof Insn b1) used.add(b1);
 
     // assign reference numbers to instructions
     for (var block : blocks)
@@ -82,7 +82,7 @@ final class Fn {
   }
 
   void initVars() {
-    var r = new ArrayList<Term>();
+    var r = new ArrayList<Insn>();
     for (var x : vars) r.add(new Assign(blocks.get(0).loc, x, BigInteger.ZERO));
     blocks.get(0).insns.addAll(0, r);
   }

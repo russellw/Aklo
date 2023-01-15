@@ -191,7 +191,7 @@ public final class Etc {
 
   static String typeof(Object a) {
     if (a instanceof Var a1) return a1.type;
-    if (a instanceof Term a1) return a1.type();
+    if (a instanceof Insn a1) return a1.type();
     return a.getClass().descriptorString();
   }
 }

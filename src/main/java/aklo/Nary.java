@@ -3,7 +3,7 @@ package aklo;
 import java.util.Iterator;
 import java.util.List;
 
-abstract class Nary extends Term {
+abstract class Nary extends Insn {
   private final Object[] args;
 
   Nary(Loc loc, Object[] args) {

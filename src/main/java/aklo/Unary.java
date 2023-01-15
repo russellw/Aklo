@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-abstract class Unary extends Term {
+abstract class Unary extends Insn {
   Object arg;
 
   Unary(Loc loc, Object arg) {

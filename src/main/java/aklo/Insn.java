@@ -7,10 +7,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
-abstract class Term extends AbstractCollection<Object> {
+abstract class Insn extends AbstractCollection<Object> {
   final Loc loc;
 
-  Term(Loc loc) {
+  Insn(Loc loc) {
     this.loc = loc;
   }
 
@@ -48,7 +48,7 @@ abstract class Term extends AbstractCollection<Object> {
 
   static void walk(Object a, Consumer<Object> f) {
     f.accept(a);
-    if (a instanceof Term a1) for (var b : a1) walk(b, f);
+    if (a instanceof Insn a1) for (var b : a1) walk(b, f);
   }
 
   void set(int i, Object a) {
