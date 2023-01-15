@@ -17,7 +17,7 @@ final class Assign extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    Term.load(refs, mv, arg1);
+    load(refs, mv, arg1);
     var i = refs.get(arg0);
     if (i == null) throw new IllegalStateException(String.format("%s: %s", loc, this));
     mv.visitVarInsn(ASTORE, i);

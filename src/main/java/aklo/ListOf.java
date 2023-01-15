@@ -13,7 +13,7 @@ final class ListOf extends Nary {
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     var n = size();
     if (n <= 10) {
-      for (var a : this) Term.load(refs, mv, a);
+      for (var a : this) load(refs, mv, a);
       mv.visitMethodInsn(
           INVOKESTATIC,
           "java/util/List",
@@ -27,7 +27,7 @@ final class ListOf extends Nary {
     for (var i = 0; i < n; i++) {
       mv.visitInsn(DUP);
       emitInt(mv, i);
-      Term.load(refs, mv, get(i));
+      load(refs, mv, get(i));
       mv.visitInsn(AASTORE);
     }
     mv.visitMethodInsn(

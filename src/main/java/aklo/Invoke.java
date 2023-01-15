@@ -14,7 +14,7 @@ final class Invoke extends Nary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    for (var a : this) Term.load(refs, mv, a);
+    for (var a : this) load(refs, mv, a);
     mv.visitMethodInsn(opcode, owner, name, descriptor, false);
   }
 

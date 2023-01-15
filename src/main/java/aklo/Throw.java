@@ -19,7 +19,7 @@ final class Throw extends Unary {
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
     mv.visitInsn(DUP);
-    Term.load(refs, mv, arg);
+    load(refs, mv, arg);
     mv.visitMethodInsn(
         INVOKESTATIC, "aklo/Etc", "decode", "(Ljava/lang/Object;)Ljava/lang/String;", false);
     mv.visitMethodInsn(

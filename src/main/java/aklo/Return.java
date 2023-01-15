@@ -17,7 +17,7 @@ final class Return extends Unary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    Term.load(refs, mv, arg);
+    load(refs, mv, arg);
     mv.visitInsn(ARETURN);
   }
 

@@ -28,7 +28,7 @@ final class Call extends Nary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    for (var i = 1; i < size(); i++) Term.load(refs, mv, get(i));
+    for (var i = 1; i < size(); i++) load(refs, mv, get(i));
     var f = (Fn) get(0);
     mv.visitMethodInsn(INVOKESTATIC, "a", f.name, f.descriptor(), false);
   }
