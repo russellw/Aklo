@@ -1,6 +1,10 @@
 package aklo;
 
+import static org.objectweb.asm.Opcodes.*;
+
 import java.util.*;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 
 public final class Fn extends Term {
   public final String name;
@@ -14,6 +18,45 @@ public final class Fn extends Term {
     super(loc);
     this.name = name;
     addBlock(new Block(loc, "entry"));
+  }
+
+  void write(ClassWriter w) {
+    // label blocks
+    for (var block : blocks) block.label = new Label();
+
+    // assign local variable numbers
+    var i = 0;
+    for (var x : params) x.localVar = i++;
+    for (var x : vars) x.localVar = i++;
+    for (var block : blocks)
+      for (var a : block.insns)
+        switch (a.type().kind()) {
+          case VOID -> {}
+          case DOUBLE -> {
+            // TODO long
+            a.localVar = i;
+            i += 2;
+          }
+          default -> a.localVar = i++;
+        }
+
+    // emit code
+    var mv = w.visitMethod(ACC_PUBLIC | ACC_STATIC, name, descriptor(), null, null);
+    mv.visitCode();
+    for (var block : blocks) {
+      mv.visitLabel(block.label);
+      for (var a : block.insns) {
+        a.emit(mv);
+        switch (a.type().kind()) {
+          case VOID -> {}
+            // case DOUBLE -> mv.visitVarInsn(DSTORE, a.localVar);
+          default -> mv.visitVarInsn(ASTORE, a.localVar);
+        }
+      }
+    }
+    mv.visitInsn(RETURN);
+    mv.visitMaxs(0, 0);
+    mv.visitEnd();
   }
 
   public void initVars() {
@@ -44,6 +87,7 @@ public final class Fn extends Term {
     blocks.add(block);
   }
 
+  @SuppressWarnings("unused")
   public void dbg() {
     // make block names unique
     var names = new HashSet<String>();
