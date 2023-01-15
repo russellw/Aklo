@@ -43,9 +43,9 @@ final class ListOf extends Nary {
   }
 
   static ListOf of(Loc loc, byte[] s) {
-    var terms = new Term[s.length];
-    for (var i = 0; i < s.length; i++) terms[i] = new Const(loc, BigInteger.valueOf(s[i] & 0xff));
-    return new ListOf(loc, terms);
+    var r = new Object[s.length];
+    for (var i = 0; i < s.length; i++) r[i] = BigInteger.valueOf(s[i] & 0xff);
+    return new ListOf(loc, r);
   }
 
   ListOf(Loc loc, Object[] args) {

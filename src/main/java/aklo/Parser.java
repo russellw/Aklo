@@ -829,43 +829,43 @@ final class Parser {
                 return insn(new Shr(loc, arg1(), argN()));
               }
               case "true" -> {
-                return new Const(loc, true);
+                return Boolean.TRUE;
               }
               case "false" -> {
-                return new Const(loc, false);
+                return Boolean.FALSE;
               }
             }
             return new Id(loc, s);
           }
           case FLOAT -> {
-            return new Const(loc, Float.parseFloat(s));
+            return Float.parseFloat(s);
           }
           case DOUBLE -> {
-            return new Const(loc, Double.parseDouble(s));
+            return Double.parseDouble(s);
           }
           case INTEGER -> {
             if (s.charAt(0) == '0' && s.length() > 1)
               switch (s.charAt(1)) {
                 case 'b', 'B' -> {
-                  return new Const(loc, new BigInteger(s.substring(2), 2));
+                  return new BigInteger(s.substring(2), 2);
                 }
                 case 'o', 'O' -> {
-                  return new Const(loc, new BigInteger(s.substring(2), 8));
+                  return new BigInteger(s.substring(2), 8);
                 }
                 case 'x', 'X' -> {
-                  return new Const(loc, new BigInteger(s.substring(2), 16));
+                  return new BigInteger(s.substring(2), 16);
                 }
               }
-            return new Const(loc, new BigInteger(s));
+            return new BigInteger(s);
           }
           case STR -> {
-            return new Const(loc, Etc.encode(unesc(s)));
+            return Etc.encode(unesc(s));
           }
           case SYM -> {
-            return new Const(loc, Sym.intern(unesc(s)));
+            return Sym.intern(unesc(s));
           }
           case RAW -> {
-            return new Const(loc, Etc.encode(s));
+            return Etc.encode(s);
           }
         }
       } catch (NumberFormatException e) {
@@ -877,7 +877,7 @@ final class Parser {
 
     void assignSubscript(Term y, Object x, Block fail, int i) {
       var loc = fail.loc;
-      assign(y.get(i), insn(new Subscript(loc, x, new Const(loc, BigInteger.valueOf(i)))), fail);
+      assign(y.get(i), insn(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
     }
 
     void assign(Object y, Object x, Block fail) {
@@ -907,7 +907,7 @@ final class Parser {
             // rest of the list
             var len = new Len(loc, x);
             insn(len);
-            var slice = new Slice(loc, x, new Const(loc, BigInteger.valueOf(n)), len);
+            var slice = new Slice(loc, x, BigInteger.valueOf(n), len);
             insn(slice);
             assign(y1.get(1), slice, fail);
           }
@@ -924,7 +924,7 @@ final class Parser {
 
       // fail
       add(fail);
-      insn(new Throw(loc, new Const(loc, Etc.encode("assign failed"))));
+      insn(new Throw(loc, Etc.encode("assign failed")));
 
       // after
       add(after);
@@ -1022,12 +1022,12 @@ final class Parser {
 
       // true
       add(yes);
-      insn(new Assign(loc, r, new Const(loc, false)));
+      insn(new Assign(loc, r, false));
       insn(new Goto(loc, after));
 
       // false
       add(no);
-      insn(new Assign(loc, r, new Const(loc, true)));
+      insn(new Assign(loc, r, true));
       insn(new Goto(loc, after));
 
       // after
@@ -1355,16 +1355,13 @@ final class Parser {
               insn(
                   new Throw(
                       loc,
-                      new Const(
-                          loc,
-                          Etc.encode(
-                              String.format(
-                                  "%s:%d: %s: %s",
-                                  loc.file(), loc.line(), fn.name, cond.toString())))));
+                      Etc.encode(
+                          String.format(
+                              "%s:%d: %s: %s", loc.file(), loc.line(), fn.name, cond.toString()))));
 
               // after
               add(after);
-              return new Const(loc, BigInteger.ZERO);
+              return BigInteger.ZERO;
             }
             case "fn" -> {
               lex();
@@ -1459,7 +1456,7 @@ final class Parser {
             }
             case "exit" -> {
               lex();
-              var a = tok == '\n' ? new Const(loc, BigInteger.ZERO) : expr();
+              var a = tok == '\n' ? BigInteger.ZERO : expr();
               expectNewline();
               // exit should ideally be a terminating instruction
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a));
@@ -1482,7 +1479,7 @@ final class Parser {
             }
             case "print" -> {
               lex();
-              Term a = new Const(loc, BigInteger.TEN);
+              Object a = BigInteger.TEN;
               if (tok != '\n') a = insn(new Cat(loc, commas(), a));
               expectNewline();
               insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));

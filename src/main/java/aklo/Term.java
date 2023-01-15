@@ -67,8 +67,6 @@ abstract class Term extends AbstractCollection<Object> {
       return;
     }
 
-    if (a instanceof Const a1) a = a1.val;
-
     // scalars with special logic
     if (a instanceof BigInteger a1) {
       try {
