@@ -16,14 +16,10 @@ final class Shl extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Shl",
-        "eval",
+        "aklo/Etc",
+        "shl",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new Shl(null, null, null), a, b);
   }
 
   @Override

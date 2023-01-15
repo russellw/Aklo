@@ -17,7 +17,7 @@ final class Add extends Term2 {
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",
-        "eval",
+        "add",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
   }

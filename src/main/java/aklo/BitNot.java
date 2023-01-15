@@ -14,11 +14,7 @@ final class BitNot extends Term1 {
   void emit(MethodVisitor mv) {
     arg.load(mv);
     mv.visitMethodInsn(
-        INVOKESTATIC, "aklo/BitNot", "eval", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
-  }
-
-  static Object eval(Object a) {
-    return Term1.eval(new BitNot(null, null), a);
+        INVOKESTATIC, "aklo/Etc", "bitNot", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
   }
 
   @Override

@@ -2,7 +2,6 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 final class Subscript extends Term2 {
@@ -16,14 +15,10 @@ final class Subscript extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Subscript",
-        "eval",
+        "aklo/Etc",
+        "subscript",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object s, Object i) {
-    return ((List) s).get(Etc.intVal(i));
   }
 
   @Override

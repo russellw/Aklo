@@ -16,14 +16,10 @@ final class BitAnd extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/BitAnd",
-        "eval",
+        "aklo/Etc",
+        "bitAnd",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new BitAnd(null, null, null), a, b);
   }
 
   @Override

@@ -14,11 +14,7 @@ final class Neg extends Term1 {
   void emit(MethodVisitor mv) {
     arg.load(mv);
     mv.visitMethodInsn(
-        INVOKESTATIC, "aklo/Neg", "eval", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
-  }
-
-  static Object eval(Object a) {
-    return Term1.eval(new Neg(null, null), a);
+        INVOKESTATIC, "aklo/Etc", "neg", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
   }
 
   @Override

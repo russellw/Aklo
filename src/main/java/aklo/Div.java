@@ -16,14 +16,10 @@ final class Div extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Div",
-        "eval",
+        "aklo/Etc",
+        "div",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new Div(null, null, null), a, b);
   }
 
   @Override

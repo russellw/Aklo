@@ -21,14 +21,10 @@ final class Le extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Le",
-        "eval",
+        "aklo/Etc",
+        "le",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new Le(null, null, null), a, b);
   }
 
   @Override

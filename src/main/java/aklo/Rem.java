@@ -21,14 +21,10 @@ final class Rem extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Rem",
-        "eval",
+        "aklo/Etc",
+        "rem",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new Rem(null, null, null), a, b);
   }
 
   @Override

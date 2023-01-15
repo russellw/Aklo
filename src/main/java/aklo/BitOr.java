@@ -16,14 +16,10 @@ final class BitOr extends Term2 {
     arg1.load(mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/BitOr",
-        "eval",
+        "aklo/Etc",
+        "bitOr",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Term2.eval(new BitOr(null, null, null), a, b);
   }
 
   @Override
