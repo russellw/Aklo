@@ -2,10 +2,10 @@ package aklo;
 
 import java.util.Iterator;
 
-abstract class Term3 extends Term {
+abstract class Ternary extends Term {
   Term arg0, arg1, arg2;
 
-  Term3(Loc loc, Term arg0, Term arg1, Term arg2) {
+  Ternary(Loc loc, Term arg0, Term arg1, Term arg2) {
     super(loc);
     this.arg0 = arg0;
     this.arg1 = arg1;

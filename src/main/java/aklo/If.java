@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class If extends Term1 {
+final class If extends Unary {
   final Block trueTarget, falseTarget;
 
   @Override

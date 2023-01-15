@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class Cat extends Term2 {
+final class Cat extends Binary {
   Cat(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }

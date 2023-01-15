@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
 
-final class Add extends Term2 {
+final class Add extends Binary {
   Add(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }

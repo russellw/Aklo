@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class Eq extends Term2 {
+final class Eq extends Binary {
   Eq(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }

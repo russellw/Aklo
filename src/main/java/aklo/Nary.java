@@ -3,10 +3,10 @@ package aklo;
 import java.util.Iterator;
 import java.util.List;
 
-abstract class Terms extends Term {
+abstract class Nary extends Term {
   private final Term[] terms;
 
-  Terms(Loc loc, Term[] terms) {
+  Nary(Loc loc, Term[] terms) {
     super(loc);
     this.terms = terms;
   }
@@ -16,7 +16,7 @@ abstract class Terms extends Term {
     terms[i] = a;
   }
 
-  Terms(Loc loc, List<Term> terms) {
+  Nary(Loc loc, List<Term> terms) {
     super(loc);
     this.terms = terms.toArray(new Term[0]);
   }

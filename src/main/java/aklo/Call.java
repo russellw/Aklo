@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
-final class Call extends Terms {
+final class Call extends Nary {
   Call(Loc loc, List<Term> terms) {
     super(loc, terms);
   }

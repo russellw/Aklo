@@ -1,6 +1,6 @@
 package aklo;
 
-final class GetField extends Term1 {
+final class GetField extends Unary {
   final String owner;
   final String name;
   final String descriptor;

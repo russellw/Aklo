@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
-final class ListOf extends Terms {
+final class ListOf extends Nary {
   @Override
   void emit(MethodVisitor mv) {
     var n = size();

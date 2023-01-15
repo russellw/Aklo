@@ -1,6 +1,6 @@
 package aklo;
 
-final class Not extends Term1 {
+final class Not extends Unary {
   Not(Loc loc, Term arg) {
     super(loc, arg);
   }

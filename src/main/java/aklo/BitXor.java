@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
 
-final class BitXor extends Term2 {
+final class BitXor extends Binary {
   BitXor(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }

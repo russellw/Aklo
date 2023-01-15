@@ -7,10 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-abstract class Term2 extends Term {
+abstract class Binary extends Term {
   Term arg0, arg1;
 
-  Term2(Loc loc, Term arg0, Term arg1) {
+  Binary(Loc loc, Term arg0, Term arg1) {
     super(loc);
     this.arg0 = arg0;
     this.arg1 = arg1;
@@ -55,14 +55,14 @@ abstract class Term2 extends Term {
     throw new UnsupportedOperationException(toString());
   }
 
-  static Object evals(Term2 op, List<Object> s, List<Object> t) {
+  static Object evals(Binary op, List<Object> s, List<Object> t) {
     var r = new Object[s.size()];
     for (var i = 0; i < r.length; i++) r[i] = eval(op, s.get(i), t.get(i));
     return Arrays.asList(r);
   }
 
   @SuppressWarnings("ConstantConditions")
-  static Object eval(Term2 op, Object a, Object b) {
+  static Object eval(Binary op, Object a, Object b) {
     // atoms
     do {
       if (a instanceof BigInteger a1) {

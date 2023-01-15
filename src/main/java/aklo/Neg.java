@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
 
-final class Neg extends Term1 {
+final class Neg extends Unary {
   Neg(Loc loc, Term arg) {
     super(loc, arg);
   }

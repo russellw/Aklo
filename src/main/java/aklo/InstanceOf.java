@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class InstanceOf extends Term1 {
+final class InstanceOf extends Unary {
   final Type type;
 
   @Override

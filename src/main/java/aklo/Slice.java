@@ -6,7 +6,7 @@ import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 @SuppressWarnings("unchecked")
-final class Slice extends Term3 {
+final class Slice extends Ternary {
   Slice(Loc loc, Term s, Term i, Term j) {
     super(loc, s, i, j);
   }

@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import java.math.BigInteger;
 import org.objectweb.asm.MethodVisitor;
 
-final class Shr extends Term2 {
+final class Shr extends Binary {
   Shr(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }
@@ -23,7 +23,7 @@ final class Shr extends Term2 {
   }
 
   static Object eval(Object a, Object b) {
-    return Term2.eval(new Shr(null, null, null), a, b);
+    return Binary.eval(new Shr(null, null, null), a, b);
   }
 
   @Override

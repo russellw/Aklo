@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class Throw extends Term1 {
+final class Throw extends Unary {
   @Override
   boolean isTerminator() {
     return true;

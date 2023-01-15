@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class Return extends Term1 {
+final class Return extends Unary {
   Return(Loc loc, Term arg) {
     super(loc, arg);
   }

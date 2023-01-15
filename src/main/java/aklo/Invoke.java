@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class Invoke extends Terms {
+final class Invoke extends Nary {
   final int opcode;
   final String owner;
   final String name;

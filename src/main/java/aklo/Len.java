@@ -4,7 +4,7 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import org.objectweb.asm.MethodVisitor;
 
-final class Len extends Term1 {
+final class Len extends Unary {
   Len(Loc loc, Term arg) {
     super(loc, arg);
   }

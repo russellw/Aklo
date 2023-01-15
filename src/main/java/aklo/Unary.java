@@ -5,11 +5,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-// TODO rename to Unary...?
-abstract class Term1 extends Term {
+abstract class Unary extends Term {
   Term arg;
 
-  Term1(Loc loc, Term arg) {
+  Unary(Loc loc, Term arg) {
     super(loc);
     this.arg = arg;
   }
@@ -36,7 +35,7 @@ abstract class Term1 extends Term {
     return arg;
   }
 
-  static Object eval(Term1 op, Object a) {
+  static Object eval(Unary op, Object a) {
     // most likely case is integers
     if (a instanceof BigInteger a1) return op.apply(a1);
 
