@@ -835,7 +835,7 @@ final class Parser {
                 return Boolean.FALSE;
               }
             }
-            return new Id(loc, s);
+            return s;
           }
           case FLOAT -> {
             return Float.parseFloat(s);
@@ -974,8 +974,8 @@ final class Parser {
           case '.' -> {
             // TODO this should probably be primary
             var loc = new Loc(file, line);
-            if (!(a instanceof Id a1)) throw new CompileError(loc, "expected identifier");
-            var r = new ArrayList<>(List.of(a1.name));
+            if (!(a instanceof String name)) throw new CompileError(loc, "expected identifier");
+            var r = new ArrayList<>(List.of(name));
             while (eat('.')) r.add(word());
             a = new Dot(loc, r);
           }
@@ -1223,10 +1223,8 @@ final class Parser {
           Term.walk(
               y,
               z -> {
-                if (z instanceof Id z1) {
-                  var name = z1.name;
-                  if (!locals.containsKey(name)) locals.put(name, new Var(name, fn.vars));
-                }
+                if (z instanceof String name && !locals.containsKey(name))
+                  locals.put(name, new Var(name, fn.vars));
               });
           return assign(loc, y, assignment());
         }
@@ -1242,13 +1240,11 @@ final class Parser {
         }
         case CAT_ASSIGN -> {
           var loc = new Loc(file, line);
-          if (!(y instanceof Id)) throw new CompileError(loc, "@=: expected identifier on left");
           lex();
           return assign(loc, y, insn(new Cat(loc, y, assignment())));
         }
         case APPEND -> {
           var loc = new Loc(file, line);
-          if (!(y instanceof Id)) throw new CompileError(loc, "<<: expected identifier on left");
           lex();
           return assign(
               loc, y, insn(new Cat(loc, y, insn(new ListOf(loc, List.of(assignment()))))));

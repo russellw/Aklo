@@ -29,9 +29,9 @@ final class Program {
     @SuppressWarnings("ConstantConditions")
     void link(Term a) {
       for (var i = 0; i < a.size(); i++)
-        if (a.get(i) instanceof Id id) {
-          var x = get(id.name);
-          if (x == null) throw new CompileError(a.loc, id + " not found");
+        if (a.get(i) instanceof String name) {
+          var x = get(name);
+          if (x == null) throw new CompileError(a.loc, name + " not found");
           a.set(i, x);
         }
       if (a instanceof Assign && a.get(0) instanceof Fn)
