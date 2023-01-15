@@ -14,9 +14,9 @@ final class Slice extends Ternary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg0.load(refs, mv);
-    arg1.load(refs, mv);
-    arg2.load(refs, mv);
+    Term.load(refs, mv, arg0);
+    Term.load(refs, mv, arg1);
+    Term.load(refs, mv, arg2);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Slice",

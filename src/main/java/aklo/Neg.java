@@ -13,7 +13,7 @@ final class Neg extends Unary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg.load(refs, mv);
+    Term.load(refs, mv, arg);
     mv.visitMethodInsn(
         INVOKESTATIC, "aklo/Etc", "neg", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
   }

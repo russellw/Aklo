@@ -12,8 +12,8 @@ final class Cat extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg0.load(refs, mv);
-    arg1.load(refs, mv);
+    Term.load(refs, mv, arg0);
+    Term.load(refs, mv, arg1);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",
