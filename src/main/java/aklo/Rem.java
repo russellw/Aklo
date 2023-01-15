@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.math.BigInteger;
 import java.util.Map;
-
 import org.objectweb.asm.MethodVisitor;
 
 final class Rem extends Binary {
@@ -19,8 +18,8 @@ final class Rem extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg0.load(, mv);
-    arg1.load(, mv);
+    arg0.load(refs, mv);
+    arg1.load(refs, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",

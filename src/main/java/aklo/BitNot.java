@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.math.BigInteger;
 import java.util.Map;
-
 import org.objectweb.asm.MethodVisitor;
 
 final class BitNot extends Unary {
@@ -14,7 +13,7 @@ final class BitNot extends Unary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg.load(, mv);
+    arg.load(refs, mv);
     mv.visitMethodInsn(
         INVOKESTATIC, "aklo/Etc", "bitNot", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
   }

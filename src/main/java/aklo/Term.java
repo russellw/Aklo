@@ -25,24 +25,12 @@ abstract class Term extends AbstractCollection<Term> {
   }
 
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    throw new UnsupportedOperationException(str());
+    throw new UnsupportedOperationException(String.format("%s: %s", loc, this));
   }
 
   @Override
   public String toString() {
     return tag().name().toLowerCase(Locale.ROOT);
-  }
-
-  final String str() {
-    var s = toString();
-    if (isEmpty()) return s;
-    var sb = new StringBuilder(s + '(');
-    for (var i = 0; i < size(); i++) {
-      if (i > 0) sb.append(", ");
-      sb.append(get(i).str());
-    }
-    sb.append(')');
-    return sb.toString();
   }
 
   void dbg(Map<Object, Integer> refs) {
@@ -71,8 +59,8 @@ abstract class Term extends AbstractCollection<Term> {
   }
 
   void load(Map<Object, Integer> refs, MethodVisitor mv) {
-    var i=refs.get(this);
-    if (i==null) throw new IllegalStateException(String.format("%s: %s", loc, this));
+    var i = refs.get(this);
+    if (i == null) throw new IllegalStateException(String.format("%s: %s", loc, this));
     // TODO
     switch (type().kind()) {
       case VOID -> throw new UnsupportedOperationException(toString());

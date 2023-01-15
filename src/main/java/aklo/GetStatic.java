@@ -2,9 +2,8 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import org.objectweb.asm.MethodVisitor;
-
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 final class GetStatic extends Term {
   final String owner;

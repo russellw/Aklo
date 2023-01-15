@@ -2,9 +2,8 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.ASTORE;
 
-import org.objectweb.asm.MethodVisitor;
-
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 final class Assign extends Binary {
   Assign(Loc loc, Term arg0, Term arg1) {
@@ -18,9 +17,10 @@ final class Assign extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg1.load(, mv);
-    if (arg0.localVar < 0) throw new IllegalStateException(str());
-    mv.visitVarInsn(ASTORE, arg0.localVar);
+    arg1.load(refs, mv);
+    var i = refs.get(arg0);
+    if (i == null) throw new IllegalStateException(String.format("%s: %s", loc, this));
+    mv.visitVarInsn(ASTORE, i);
   }
 
   @Override

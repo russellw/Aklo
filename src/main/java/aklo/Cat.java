@@ -2,9 +2,8 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import org.objectweb.asm.MethodVisitor;
-
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 final class Cat extends Binary {
   Cat(Loc loc, Term arg0, Term arg1) {
@@ -13,8 +12,8 @@ final class Cat extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg0.load(, mv);
-    arg1.load(, mv);
+    arg0.load(refs, mv);
+    arg1.load(refs, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",

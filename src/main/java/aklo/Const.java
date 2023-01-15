@@ -5,7 +5,6 @@ import static org.objectweb.asm.Opcodes.*;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
 import org.objectweb.asm.MethodVisitor;
 
 final class Const extends Term {

@@ -19,18 +19,19 @@ final class Fn extends Term {
     this.name = name;
     addBlock(new Block(loc, "entry"));
   }
-  private Map<Object,Integer>refs(){
+
+  private Map<Object, Integer> refs() {
     var i = 0;
     var r = new HashMap<Object, Integer>();
 
-    //assign reference numbers to variables
-    for (var x : params){
-      r.put(x,i);
-      i+=x.type.wordSize();
+    // assign reference numbers to variables
+    for (var x : params) {
+      r.put(x, i);
+      i += x.type.wordSize();
     }
-    for (var x : vars){
-      r.put(x,i);
-      i+=x.type.wordSize();
+    for (var x : vars) {
+      r.put(x, i);
+      i += x.type.wordSize();
     }
 
     // which instructions are used as input to others, therefore needing reference numbers?
@@ -39,16 +40,17 @@ final class Fn extends Term {
 
     // assign reference numbers to instructions
     for (var block : blocks)
-      for (var a : block.insns) if (used.contains(a)) {
-        r.put(a, i);
-        i+=a.type().wordSize();
-      }
+      for (var a : block.insns)
+        if (used.contains(a)) {
+          r.put(a, i);
+          i += a.type().wordSize();
+        }
 
     return r;
   }
 
   void write(ClassWriter w) {
-    var refs=refs();
+    var refs = refs();
 
     // label blocks
     for (var block : blocks) block.label = new Label();
@@ -60,11 +62,13 @@ final class Fn extends Term {
       mv.visitLabel(block.label);
       for (var a : block.insns) {
         a.emit(refs, mv);
-        var i=refs.get(a);
-        if(i==null)
-          mv.visitInsn(POP);
-        else
-           mv.visitVarInsn(ASTORE,i);
+        var i = refs.get(a);
+        if (i == null)
+          switch (a.type().kind()) {
+            case VOID -> {}
+            default -> mv.visitInsn(POP);
+          }
+        else mv.visitVarInsn(ASTORE, i);
       }
     }
     mv.visitInsn(RETURN);
@@ -102,7 +106,7 @@ final class Fn extends Term {
 
   @SuppressWarnings("unused")
   void dbg() {
-    var refs=refs();
+    var refs = refs();
 
     // make block names unique
     var names = new HashSet<String>();

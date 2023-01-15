@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 import java.math.BigInteger;
 import java.util.Map;
-
 import org.objectweb.asm.MethodVisitor;
 
 final class Sub extends Binary {
@@ -34,9 +33,9 @@ final class Sub extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    //TODO factor this out?
-    arg0.load(, mv);
-    arg1.load(, mv);
+    // TODO factor this out?
+    arg0.load(refs, mv);
+    arg1.load(refs, mv);
     mv.visitMethodInsn(
         INVOKESTATIC,
         "aklo/Etc",

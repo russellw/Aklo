@@ -2,9 +2,8 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import org.objectweb.asm.MethodVisitor;
-
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 final class Return extends Unary {
   Return(Loc loc, Term arg) {
@@ -18,7 +17,7 @@ final class Return extends Unary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    arg.load(, mv);
+    arg.load(refs, mv);
     mv.visitInsn(ARETURN);
   }
 

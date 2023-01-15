@@ -2,9 +2,8 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.RETURN;
 
-import org.objectweb.asm.MethodVisitor;
-
 import java.util.Map;
+import org.objectweb.asm.MethodVisitor;
 
 final class ReturnVoid extends Term {
   ReturnVoid(Loc loc) {
