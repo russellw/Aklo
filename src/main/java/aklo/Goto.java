@@ -14,7 +14,7 @@ final class Goto extends Term {
   }
 
   @Override
-  void dbg(Map<Term, Integer> refs) {
+  void dbg(Map<Object, Integer> refs) {
     System.out.print("goto " + target);
   }
 

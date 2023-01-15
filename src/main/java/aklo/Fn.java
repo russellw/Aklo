@@ -118,7 +118,7 @@ final class Fn extends Term {
     for (var block : blocks) for (var a : block.insns) used.addAll(a);
 
     // assign reference numbers to instructions
-    var refs = new HashMap<Term, Integer>();
+    var refs = new HashMap<Object, Integer>();
     for (var block : blocks)
       for (var a : block.insns) if (used.contains(a)) refs.put(a, refs.size());
 
