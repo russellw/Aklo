@@ -16,7 +16,7 @@ final class Block {
   }
 
   @Override
-  String toString() {
+  public String toString() {
     assert name != null;
     return name;
   }

@@ -6,7 +6,7 @@ abstract class Type extends AbstractList<Type> {
   static final Type BOOL =
       new Type() {
         @Override
-        String toString() {
+        public String toString() {
           return "java/lang/Boolean";
         }
 
@@ -18,7 +18,7 @@ abstract class Type extends AbstractList<Type> {
   static final Type STRING =
       new Type() {
         @Override
-        String toString() {
+        public String toString() {
           return "java/lang/String";
         }
 
@@ -35,14 +35,14 @@ abstract class Type extends AbstractList<Type> {
         }
 
         @Override
-        String toString() {
+        public String toString() {
           return "V";
         }
       };
   static final Type FLOAT =
       new Type() {
         @Override
-        String toString() {
+        public String toString() {
           return "java/lang/Float";
         }
 
@@ -54,7 +54,7 @@ abstract class Type extends AbstractList<Type> {
   static final Type DOUBLE =
       new Type() {
         @Override
-        String toString() {
+        public String toString() {
           return "java/lang/Double";
         }
 
@@ -71,7 +71,7 @@ abstract class Type extends AbstractList<Type> {
         }
 
         @Override
-        String toString() {
+        public String toString() {
           return "java/math/BigInteger";
         }
       };

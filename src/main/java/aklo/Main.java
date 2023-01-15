@@ -49,7 +49,7 @@ final class Main {
     return file.substring(0, i);
   }
 
-  static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
     // command line
     if (args.length == 0) {
       System.err.println("Usage: aklo [options] packages");

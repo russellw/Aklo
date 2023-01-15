@@ -12,7 +12,7 @@ final class Sym {
   }
 
   @Override
-  String toString() {
+  public String toString() {
     return name;
   }
 
