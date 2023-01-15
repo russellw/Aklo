@@ -635,30 +635,30 @@ final class Parser {
     }
 
     // expressions
-    Term arg() {
+    Object arg() {
       expect('(');
       var a = expr();
       expect(')');
       return a;
     }
 
-    Term arg1() {
+    Object arg1() {
       expect('(');
       return expr();
     }
 
-    Term argN() {
+    Object argN() {
       expect(',');
       var a = expr();
       expect(')');
       return a;
     }
 
-    Term listRest(Loc loc, List<Term> s, Term t) {
+    Term listRest(Loc loc, List<Object> s, Object t) {
       return insn(new Cat(loc, insn(new ListOf(loc, s)), t));
     }
 
-    Term primary() {
+    Object primary() {
       var loc = new Loc(file, line);
 
       // having noted the current line, factor out the moving to the next token
@@ -669,7 +669,7 @@ final class Parser {
       try {
         switch (k) {
           case '[' -> {
-            var r = new ArrayList<Term>();
+            var r = new ArrayList<>();
             switch (tok) {
               case INDENT -> {
                 lex();
@@ -932,7 +932,7 @@ final class Parser {
       return x;
     }
 
-    Term postInc(Term y, Term x) {
+    Var postInc(Term y, Term x) {
       var loc = x.loc;
       lex();
       var old = new Var(fn.vars);
@@ -941,7 +941,7 @@ final class Parser {
       return old;
     }
 
-    Term postfix() {
+    Object postfix() {
       var a = primary();
       for (; ; )
         switch (tok) {
@@ -1036,7 +1036,7 @@ final class Parser {
       return r;
     }
 
-    Term prefix() {
+    Object prefix() {
       switch (tok) {
         case '\\' -> {
           var loc = new Loc(file, line);
@@ -1125,7 +1125,7 @@ final class Parser {
       init('|', 1);
     }
 
-    Term infix(int prec) {
+    Object infix(int prec) {
       var a = prefix();
       for (; ; ) {
         var k = tok;
@@ -1154,17 +1154,17 @@ final class Parser {
               case NE_NUM -> not(loc, insn(new EqNum(loc, a, b)));
               case '&' -> {
                 var r = new Var(fn.vars);
-                var yes = new Block(a.loc, "andTrue");
-                var after = new Block(a.loc, "andAfter");
+                var yes = new Block(loc, "andTrue");
+                var after = new Block(loc, "andAfter");
 
                 // condition
-                insn(new Assign(a.loc, r, a));
-                insn(new If(a.loc, r, yes, after));
+                insn(new Assign(loc, r, a));
+                insn(new If(loc, r, yes, after));
 
                 // true
                 add(yes);
-                insn(new Assign(a.loc, r, b));
-                insn(new Goto(a.loc, after));
+                insn(new Assign(loc, r, b));
+                insn(new Goto(loc, after));
 
                 // after
                 add(after);
@@ -1172,17 +1172,17 @@ final class Parser {
               }
               case '|' -> {
                 var r = new Var(fn.vars);
-                var no = new Block(a.loc, "orFalse");
-                var after = new Block(a.loc, "orAfter");
+                var no = new Block(loc, "orFalse");
+                var after = new Block(loc, "orAfter");
 
                 // condition
-                insn(new Assign(a.loc, r, a));
-                insn(new If(a.loc, r, after, no));
+                insn(new Assign(loc, r, a));
+                insn(new If(loc, r, after, no));
 
                 // false
                 add(no);
-                insn(new Assign(a.loc, r, b));
-                insn(new Goto(a.loc, after));
+                insn(new Assign(loc, r, b));
+                insn(new Goto(loc, after));
 
                 // after
                 add(after);
@@ -1193,11 +1193,11 @@ final class Parser {
       }
     }
 
-    Term expr() {
+    Object expr() {
       return infix(1);
     }
 
-    Term commas() {
+    Object commas() {
       var a = expr();
       if (tok != ',') return a;
       var loc = new Loc(file, line);
@@ -1210,7 +1210,7 @@ final class Parser {
     }
 
     // statements
-    Term assignment() {
+    Object assignment() {
       var y = commas();
       switch (tok) {
         case ASSIGN -> {
@@ -1327,7 +1327,7 @@ final class Parser {
       add(after);
     }
 
-    Term stmt() {
+    Object stmt() {
       var loc = new Loc(file, line);
       switch (tok) {
         case '^' -> {
@@ -1542,7 +1542,7 @@ final class Parser {
     // parse
     var c = new Context(module);
     while (tok != DEDENT) c.stmt();
-    c.insn(new ReturnVoid(module.loc));
+    c.insn(new ReturnVoid(null));
     module.initVars();
   }
 }

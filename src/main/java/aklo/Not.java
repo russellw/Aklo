@@ -1,7 +1,7 @@
 package aklo;
 
 final class Not extends Unary {
-  Not(Loc loc, Term arg) {
+  Not(Loc loc, Object arg) {
     super(loc, arg);
   }
 

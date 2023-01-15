@@ -27,7 +27,7 @@ final class If extends Unary {
     System.out.printf(" %s %s", trueTarget, falseTarget);
   }
 
-  If(Loc loc, Term cond, Block trueTarget, Block falseTarget) {
+  If(Loc loc, Object cond, Block trueTarget, Block falseTarget) {
     super(loc, cond);
     this.trueTarget = trueTarget;
     this.falseTarget = falseTarget;

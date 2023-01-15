@@ -146,18 +146,7 @@ abstract class Type extends AbstractList<Type> {
     return s;
   }
 
-  static Type of(String s) {
-    return switch (s) {
-      case "V" -> VOID;
-      case "java/lang/Float" -> FLOAT;
-      case "java/lang/Double" -> DOUBLE;
-      case "java/lang/Boolean" -> BOOL;
-      case "aklo/BigRational" -> RAT;
-      case "java/math/BigInteger" -> INT;
-      case "java/util/List" -> LIST;
-      case "java/lang/Object" -> ANY;
-      case "aklo/Sym" -> SYM;
-      default -> throw new IllegalArgumentException(s);
-    };
+  static Type of(Object a) {
+    throw new UnsupportedOperationException(a.toString());
   }
 }

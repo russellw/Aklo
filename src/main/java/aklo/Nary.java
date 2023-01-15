@@ -4,31 +4,31 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract class Nary extends Term {
-  private final Term[] terms;
+  private final Object[] args;
 
-  Nary(Loc loc, Term[] terms) {
+  Nary(Loc loc, Object[] args) {
     super(loc);
-    this.terms = terms;
+    this.args = args;
   }
 
   @Override
   void set(int i, Object a) {
-    terms[i] = a;
+    args[i] = a;
   }
 
-  Nary(Loc loc, List<Term> terms) {
+  Nary(Loc loc, List<Object> args) {
     super(loc);
-    this.terms = terms.toArray(new Term[0]);
+    this.args = args.toArray();
   }
 
   @Override
   public int size() {
-    return terms.length;
+    return args.length;
   }
 
   @Override
   Object get(int i) {
-    return terms[i];
+    return args[i];
   }
 
   @Override
@@ -38,12 +38,12 @@ abstract class Nary extends Term {
 
       @Override
       public boolean hasNext() {
-        return i < terms.length;
+        return i < args.length;
       }
 
       @Override
-      public Term next() {
-        return terms[i++];
+      public Object next() {
+        return args[i++];
       }
     };
   }

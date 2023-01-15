@@ -7,12 +7,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Call extends Nary {
-  Call(Loc loc, List<Term> terms) {
-    super(loc, terms);
-  }
-
-  Call(Loc loc, Term[] terms) {
-    super(loc, terms);
+  Call(Loc loc, List<Object> args) {
+    super(loc, args);
   }
 
   @Override

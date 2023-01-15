@@ -16,7 +16,7 @@ final class InstanceOf extends Unary {
         INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
   }
 
-  InstanceOf(Loc loc, Term arg, Type type) {
+  InstanceOf(Loc loc, Object arg, Type type) {
     super(loc, arg);
     this.type = type;
   }

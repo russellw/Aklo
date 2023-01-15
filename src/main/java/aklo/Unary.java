@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract class Unary extends Term {
-  Term arg;
+  Object arg;
 
-  Unary(Loc loc, Term arg) {
+  Unary(Loc loc, Object arg) {
     super(loc);
     this.arg = arg;
   }
 
   @Override
   Type type() {
-    return arg.type();
+    return Type.of(arg);
   }
 
   @Override
@@ -83,7 +83,7 @@ abstract class Unary extends Term {
       }
 
       @Override
-      public Term next() {
+      public Object next() {
         assert i == 0;
         i++;
         return arg;

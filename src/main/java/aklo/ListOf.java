@@ -34,8 +34,8 @@ final class ListOf extends Nary {
         INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
   }
 
-  ListOf(Loc loc, List<Term> terms) {
-    super(loc, terms);
+  ListOf(Loc loc, List<Object> args) {
+    super(loc, args);
   }
 
   static ListOf encode(Loc loc, String s) {
@@ -48,9 +48,9 @@ final class ListOf extends Nary {
     return new ListOf(loc, terms);
   }
 
-  ListOf(Loc loc, Term[] terms) {
+  ListOf(Loc loc, Object[] args) {
     // TODO do we need two constructors?
-    super(loc, terms);
+    super(loc, args);
   }
 
   @Override

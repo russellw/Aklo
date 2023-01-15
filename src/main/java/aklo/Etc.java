@@ -184,4 +184,8 @@ public final class Etc {
   public static Object subscript(Object s, Object i) {
     return ((List) s).get(intVal(i));
   }
+
+  public static List<Object> slice(Object s, Object i, Object j) {
+    return ((List) s).subList(intVal(i), intVal(j));
+  }
 }

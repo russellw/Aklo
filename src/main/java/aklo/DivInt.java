@@ -7,7 +7,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class DivInt extends Binary {
-  DivInt(Loc loc, Term arg0, Term arg1) {
+  DivInt(Loc loc, Object arg0, Object arg1) {
     super(loc, arg0, arg1);
   }
 

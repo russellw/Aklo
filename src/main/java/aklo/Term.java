@@ -48,7 +48,7 @@ abstract class Term extends AbstractCollection<Object> {
 
   final void walk(Consumer<Term> f) {
     f.accept(this);
-    for (var a : this)if(a instanceof Term a1) a1.walk(f);
+    for (var a : this) if (a instanceof Term a1) a1.walk(f);
   }
 
   void set(int i, Object a) {

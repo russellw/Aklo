@@ -6,7 +6,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Len extends Unary {
-  Len(Loc loc, Term arg) {
+  Len(Loc loc, Object arg) {
     super(loc, arg);
   }
 

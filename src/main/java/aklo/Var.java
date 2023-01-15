@@ -16,7 +16,6 @@ final class Var {
     s.add(this);
   }
 
-
   @Override
   public String toString() {
     if (name != null) return name;

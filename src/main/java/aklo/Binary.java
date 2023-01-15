@@ -8,9 +8,9 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 abstract class Binary extends Term {
-  Term arg0, arg1;
+  Object arg0, arg1;
 
-  Binary(Loc loc, Term arg0, Term arg1) {
+  Binary(Loc loc, Object arg0, Object arg1) {
     super(loc);
     this.arg0 = arg0;
     this.arg1 = arg1;
@@ -18,7 +18,7 @@ abstract class Binary extends Term {
 
   @Override
   Type type() {
-    return arg0.type();
+    return Type.of(arg0);
   }
 
   @Override

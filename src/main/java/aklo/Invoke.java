@@ -32,16 +32,16 @@ final class Invoke extends Nary {
     for (var a : this) dbg(refs, a);
   }
 
-  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, List<Term> terms) {
-    super(loc, terms);
+  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, List<Object> args) {
+    super(loc, args);
     this.opcode = opcode;
     this.owner = owner;
     this.name = name;
     this.descriptor = descriptor;
   }
 
-  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, Term... terms) {
-    super(loc, terms);
+  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, Object... args) {
+    super(loc, args);
     this.opcode = opcode;
     this.owner = owner;
     this.name = name;

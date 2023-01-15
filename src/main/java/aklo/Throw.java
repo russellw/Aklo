@@ -11,7 +11,7 @@ final class Throw extends Unary {
     return true;
   }
 
-  Throw(Loc loc, Term arg) {
+  Throw(Loc loc, Object arg) {
     super(loc, arg);
   }
 

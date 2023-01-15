@@ -7,7 +7,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class BitNot extends Unary {
-  BitNot(Loc loc, Term arg) {
+  BitNot(Loc loc, Object arg) {
     super(loc, arg);
   }
 

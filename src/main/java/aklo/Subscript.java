@@ -6,7 +6,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Subscript extends Binary {
-  Subscript(Loc loc, Term arg0, Term arg1) {
+  Subscript(Loc loc, Object arg0, Object arg1) {
     super(loc, arg0, arg1);
   }
 
