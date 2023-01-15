@@ -4,24 +4,24 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class Return extends Term1 {
-  public Return(Loc loc, Term arg) {
+final class Return extends Term1 {
+  Return(Loc loc, Term arg) {
     super(loc, arg);
   }
 
   @Override
-  public boolean isTerminator() {
+  boolean isTerminator() {
     return true;
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     arg.load(mv);
     mv.visitInsn(ARETURN);
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.RETURN;
   }
 }

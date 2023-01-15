@@ -4,13 +4,13 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class Cat extends Term2 {
-  public Cat(Loc loc, Term arg0, Term arg1) {
+final class Cat extends Term2 {
+  Cat(Loc loc, Term arg0, Term arg1) {
     super(loc, arg0, arg1);
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     arg0.load(mv);
     arg1.load(mv);
     mv.visitMethodInsn(
@@ -22,7 +22,7 @@ public final class Cat extends Term2 {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.CAT;
   }
 }

@@ -1,6 +1,6 @@
 package aklo;
 
-public enum Kind {
+enum Kind {
   // TODO INT32, INT32_PRIM etc
   ANY,
   INT,

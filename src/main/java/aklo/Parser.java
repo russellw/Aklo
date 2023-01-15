@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.math.BigInteger;
 import java.util.*;
 
-public final class Parser {
+final class Parser {
   // Tokens
   private static final int ADD_ASSIGN = -2;
   private static final int APPEND = -3;
@@ -1526,7 +1526,7 @@ public final class Parser {
   }
 
   // top level
-  public Parser(String file, byte[] text, Fn module) {
+  Parser(String file, byte[] text, Fn module) {
     // init
     this.file = file;
     if (!(text.length > 0 && text[text.length - 1] == '\n')) {

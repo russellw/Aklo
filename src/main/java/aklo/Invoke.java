@@ -6,20 +6,20 @@ import java.util.List;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-public final class Invoke extends Terms {
-  public final int opcode;
-  public final String owner;
-  public final String name;
-  public final String descriptor;
+final class Invoke extends Terms {
+  final int opcode;
+  final String owner;
+  final String name;
+  final String descriptor;
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     for (var a : this) a.load(mv);
     mv.visitMethodInsn(opcode, owner, name, descriptor, false);
   }
 
   @Override
-  public void dbg(Map<Term, Integer> refs) {
+  void dbg(Map<Term, Integer> refs) {
     System.out.print("invoke");
     System.out.print(
         switch (opcode) {
@@ -32,8 +32,7 @@ public final class Invoke extends Terms {
     for (var a : this) dbg(refs, a);
   }
 
-  public Invoke(
-      Loc loc, int opcode, String owner, String name, String descriptor, List<Term> terms) {
+  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, List<Term> terms) {
     super(loc, terms);
     this.opcode = opcode;
     this.owner = owner;
@@ -41,7 +40,7 @@ public final class Invoke extends Terms {
     this.descriptor = descriptor;
   }
 
-  public Invoke(Loc loc, int opcode, String owner, String name, String descriptor, Term... terms) {
+  Invoke(Loc loc, int opcode, String owner, String name, String descriptor, Term... terms) {
     super(loc, terms);
     this.opcode = opcode;
     this.owner = owner;
@@ -50,7 +49,7 @@ public final class Invoke extends Terms {
   }
 
   @Override
-  public Type type() {
+  Type type() {
     var i = descriptor.lastIndexOf(')');
     // TODO
     // return Type.of(descriptor.substring(i + 1));
@@ -58,7 +57,7 @@ public final class Invoke extends Terms {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.INVOKE;
   }
 }

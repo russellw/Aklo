@@ -6,15 +6,15 @@ import java.util.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 
-public final class Fn extends Term {
-  public final String name;
-  public final List<Var> params = new ArrayList<>();
-  public Type rtype = Type.ANY;
-  public final List<Var> vars = new ArrayList<>();
-  public final List<Fn> fns = new ArrayList<>();
-  public final List<Block> blocks = new ArrayList<>();
+final class Fn extends Term {
+  final String name;
+  final List<Var> params = new ArrayList<>();
+  Type rtype = Type.ANY;
+  final List<Var> vars = new ArrayList<>();
+  final List<Fn> fns = new ArrayList<>();
+  final List<Block> blocks = new ArrayList<>();
 
-  public Fn(Loc loc, String name) {
+  Fn(Loc loc, String name) {
     super(loc);
     this.name = name;
     addBlock(new Block(loc, "entry"));
@@ -59,7 +59,7 @@ public final class Fn extends Term {
     mv.visitEnd();
   }
 
-  public void initVars() {
+  void initVars() {
     var r = new ArrayList<Term>();
     for (var x : vars) r.add(new Assign(loc, x, Const.ZERO));
     blocks.get(0).insns.addAll(0, r);
@@ -71,11 +71,11 @@ public final class Fn extends Term {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.FN;
   }
 
-  public String descriptor() {
+  String descriptor() {
     var sb = new StringBuilder("(");
     for (var x : params) sb.append(x.type.descriptor());
     sb.append(')');
@@ -88,7 +88,7 @@ public final class Fn extends Term {
   }
 
   @SuppressWarnings("unused")
-  public void dbg() {
+  void dbg() {
     // make block names unique
     var names = new HashSet<String>();
     for (var block : blocks) {

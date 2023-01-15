@@ -1,14 +1,14 @@
 package aklo;
 
-public final class ArrayType extends Type {
-  public final Type elem;
+final class ArrayType extends Type {
+  final Type elem;
 
-  public ArrayType(Type elem) {
+  ArrayType(Type elem) {
     this.elem = elem;
   }
 
   @Override
-  public String descriptor() {
+  String descriptor() {
     return '[' + elem.descriptor();
   }
 
@@ -24,7 +24,7 @@ public final class ArrayType extends Type {
   }
 
   @Override
-  public Kind kind() {
+  Kind kind() {
     return Kind.ARRAY;
   }
 }

@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
-public final class BigRational extends Number implements Comparable<BigRational> {
-  public static final BigRational ZERO = new BigRational(BigInteger.ZERO);
-  public static final BigRational ONE = new BigRational(BigInteger.ONE);
-  public final BigInteger num, den;
+final class BigRational extends Number implements Comparable<BigRational> {
+  static final BigRational ZERO = new BigRational(BigInteger.ZERO);
+  static final BigRational ONE = new BigRational(BigInteger.ONE);
+  final BigInteger num, den;
 
   private BigRational(BigInteger num) {
     this.num = num;
@@ -29,7 +29,7 @@ public final class BigRational extends Number implements Comparable<BigRational>
     this.den = den;
   }
 
-  public BigRational add(BigRational b) {
+  BigRational add(BigRational b) {
     return new BigRational(num.multiply(b.den).add(b.num.multiply(den)), den.multiply(b.den));
   }
 
@@ -38,7 +38,7 @@ public final class BigRational extends Number implements Comparable<BigRational>
     return num.multiply(b.den).compareTo(b.num.multiply(den));
   }
 
-  public BigRational divide(BigRational b) {
+  BigRational divide(BigRational b) {
     return new BigRational(num.multiply(b.den), den.multiply(b.num));
   }
 
@@ -77,15 +77,15 @@ public final class BigRational extends Number implements Comparable<BigRational>
     return num.divide(den).longValue();
   }
 
-  public BigRational multiply(BigRational b) {
+  BigRational multiply(BigRational b) {
     return new BigRational(num.multiply(b.num), den.multiply(b.den));
   }
 
-  public BigRational negate() {
+  BigRational negate() {
     return new BigRational(num.negate(), den);
   }
 
-  public static BigRational of(BigDecimal value) {
+  static BigRational of(BigDecimal value) {
     var n = value.unscaledValue();
     var scale = value.scale();
     return (scale >= 0)
@@ -93,19 +93,19 @@ public final class BigRational extends Number implements Comparable<BigRational>
         : of(n.multiply(BigInteger.TEN.pow(-scale)));
   }
 
-  public static BigRational of(BigInteger num) {
+  static BigRational of(BigInteger num) {
     return new BigRational(num);
   }
 
-  public static BigRational of(double value) {
+  static BigRational of(double value) {
     return of(BigDecimal.valueOf(value));
   }
 
-  public static BigRational of(long num) {
+  static BigRational of(long num) {
     return of(BigInteger.valueOf(num));
   }
 
-  public static BigRational of(String s) {
+  static BigRational of(String s) {
     BigInteger num, den;
     var i = s.indexOf('/');
     if (i < 0) {
@@ -118,23 +118,23 @@ public final class BigRational extends Number implements Comparable<BigRational>
     return of(num, den);
   }
 
-  public int signum() {
+  int signum() {
     return num.signum();
   }
 
-  public static BigRational of(BigInteger num, BigInteger den) {
+  static BigRational of(BigInteger num, BigInteger den) {
     return new BigRational(num, den);
   }
 
-  public static BigRational of(long num, long den) {
+  static BigRational of(long num, long den) {
     return new BigRational(BigInteger.valueOf(num), BigInteger.valueOf(den));
   }
 
-  public static BigRational ofDecimal(String s) {
+  static BigRational ofDecimal(String s) {
     return of(new BigDecimal(s));
   }
 
-  public BigRational subtract(BigRational b) {
+  BigRational subtract(BigRational b) {
     return new BigRational(num.multiply(b.den).subtract(b.num.multiply(den)), den.multiply(b.den));
   }
 

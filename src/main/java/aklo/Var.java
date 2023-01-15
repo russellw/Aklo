@@ -2,24 +2,24 @@ package aklo;
 
 import java.util.List;
 
-public final class Var extends Term {
-  public String name;
-  public Type type = Type.ANY;
+final class Var extends Term {
+  String name;
+  Type type = Type.ANY;
 
-  public Var(String name, List<Var> s) {
+  Var(String name, List<Var> s) {
     super(null);
     this.name = name;
     s.add(this);
   }
 
-  public Var(List<Var> s) {
+  Var(List<Var> s) {
     super(null);
     name = null;
     s.add(this);
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.VAR;
   }
 
@@ -30,7 +30,7 @@ public final class Var extends Term {
   }
 
   @Override
-  public Type type() {
+  Type type() {
     return type;
   }
 }

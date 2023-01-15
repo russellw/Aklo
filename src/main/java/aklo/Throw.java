@@ -4,18 +4,18 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class Throw extends Term1 {
+final class Throw extends Term1 {
   @Override
-  public boolean isTerminator() {
+  boolean isTerminator() {
     return true;
   }
 
-  public Throw(Loc loc, Term arg) {
+  Throw(Loc loc, Term arg) {
     super(loc, arg);
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     mv.visitTypeInsn(NEW, "java/lang/RuntimeException");
     mv.visitInsn(DUP);
     arg.load(mv);
@@ -27,7 +27,7 @@ public final class Throw extends Term1 {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.THROW;
   }
 }

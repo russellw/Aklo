@@ -7,22 +7,22 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public abstract class Term2 extends Term {
-  public Term arg0, arg1;
+abstract class Term2 extends Term {
+  Term arg0, arg1;
 
-  public Term2(Loc loc, Term arg0, Term arg1) {
+  Term2(Loc loc, Term arg0, Term arg1) {
     super(loc);
     this.arg0 = arg0;
     this.arg1 = arg1;
   }
 
   @Override
-  public Type type() {
+  Type type() {
     return arg0.type();
   }
 
   @Override
-  public void set(int i, Term a) {
+  void set(int i, Term a) {
     switch (i) {
       case 0 -> arg0 = a;
       case 1 -> arg1 = a;
@@ -31,7 +31,7 @@ public abstract class Term2 extends Term {
   }
 
   @Override
-  public Term get(int i) {
+  Term get(int i) {
     return switch (i) {
       case 0 -> arg0;
       case 1 -> arg1;
@@ -39,30 +39,30 @@ public abstract class Term2 extends Term {
     };
   }
 
-  public Object apply(double a, double b) {
+  Object apply(double a, double b) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public Object apply(float a, float b) {
+  Object apply(float a, float b) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public Object apply(BigInteger a, BigInteger b) {
+  Object apply(BigInteger a, BigInteger b) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public Object apply(BigRational a, BigRational b) {
+  Object apply(BigRational a, BigRational b) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public static Object evals(Term2 op, List<Object> s, List<Object> t) {
+  static Object evals(Term2 op, List<Object> s, List<Object> t) {
     var r = new Object[s.size()];
     for (var i = 0; i < r.length; i++) r[i] = eval(op, s.get(i), t.get(i));
     return Arrays.asList(r);
   }
 
   @SuppressWarnings("ConstantConditions")
-  public static Object eval(Term2 op, Object a, Object b) {
+  static Object eval(Term2 op, Object a, Object b) {
     // atoms
     do {
       if (a instanceof BigInteger a1) {

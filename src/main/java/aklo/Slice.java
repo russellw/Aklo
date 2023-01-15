@@ -6,13 +6,13 @@ import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
 @SuppressWarnings("unchecked")
-public final class Slice extends Term3 {
-  public Slice(Loc loc, Term s, Term i, Term j) {
+final class Slice extends Term3 {
+  Slice(Loc loc, Term s, Term i, Term j) {
     super(loc, s, i, j);
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     arg0.load(mv);
     arg1.load(mv);
     arg2.load(mv);
@@ -24,12 +24,12 @@ public final class Slice extends Term3 {
         false);
   }
 
-  public static List<Object> eval(Object s, Object i, Object j) {
+  static List<Object> eval(Object s, Object i, Object j) {
     return ((List) s).subList(Etc.intVal(i), Etc.intVal(j));
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.SLICE;
   }
 }

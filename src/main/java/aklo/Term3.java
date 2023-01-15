@@ -2,10 +2,10 @@ package aklo;
 
 import java.util.Iterator;
 
-public abstract class Term3 extends Term {
-  public Term arg0, arg1, arg2;
+abstract class Term3 extends Term {
+  Term arg0, arg1, arg2;
 
-  public Term3(Loc loc, Term arg0, Term arg1, Term arg2) {
+  Term3(Loc loc, Term arg0, Term arg1, Term arg2) {
     super(loc);
     this.arg0 = arg0;
     this.arg1 = arg1;
@@ -13,7 +13,7 @@ public abstract class Term3 extends Term {
   }
 
   @Override
-  public void set(int i, Term a) {
+  void set(int i, Term a) {
     switch (i) {
       case 0 -> arg0 = a;
       case 1 -> arg1 = a;
@@ -23,7 +23,7 @@ public abstract class Term3 extends Term {
   }
 
   @Override
-  public Term get(int i) {
+  Term get(int i) {
     return switch (i) {
       case 0 -> arg0;
       case 1 -> arg1;
@@ -33,7 +33,7 @@ public abstract class Term3 extends Term {
   }
 
   @Override
-  public Type type() {
+  Type type() {
     return Type.ANY;
   }
 

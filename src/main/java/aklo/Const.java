@@ -6,12 +6,12 @@ import java.math.BigInteger;
 import java.util.List;
 import org.objectweb.asm.MethodVisitor;
 
-public final class Const extends Term {
-  public static final Const ZERO = new Const(null, BigInteger.ZERO);
-  public static final Const ONE = new Const(null, BigInteger.ONE);
-  public final Object val;
+final class Const extends Term {
+  static final Const ZERO = new Const(null, BigInteger.ZERO);
+  static final Const ONE = new Const(null, BigInteger.ONE);
+  final Object val;
 
-  public Const(Loc loc, Object val) {
+  Const(Loc loc, Object val) {
     // TODO does this need location?
     // or is this class even necessary?
     super(loc);
@@ -20,7 +20,7 @@ public final class Const extends Term {
   }
 
   @Override
-  public void load(MethodVisitor mv) {
+  void load(MethodVisitor mv) {
     load(mv, val);
   }
 
@@ -105,12 +105,12 @@ public final class Const extends Term {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.CONST;
   }
 
   @Override
-  public Type type() {
+  Type type() {
     return Type.INT;
   }
 }

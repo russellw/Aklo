@@ -3,20 +3,20 @@ package aklo;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class Terms extends Term {
+abstract class Terms extends Term {
   private final Term[] terms;
 
-  public Terms(Loc loc, Term[] terms) {
+  Terms(Loc loc, Term[] terms) {
     super(loc);
     this.terms = terms;
   }
 
   @Override
-  public void set(int i, Term a) {
+  void set(int i, Term a) {
     terms[i] = a;
   }
 
-  public Terms(Loc loc, List<Term> terms) {
+  Terms(Loc loc, List<Term> terms) {
     super(loc);
     this.terms = terms.toArray(new Term[0]);
   }
@@ -27,7 +27,7 @@ public abstract class Terms extends Term {
   }
 
   @Override
-  public Term get(int i) {
+  Term get(int i) {
     return terms[i];
   }
 

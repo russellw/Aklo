@@ -1,11 +1,11 @@
 package aklo;
 
-public final class GetField extends Term1 {
-  public final String owner;
-  public final String name;
-  public final String descriptor;
+final class GetField extends Term1 {
+  final String owner;
+  final String name;
+  final String descriptor;
 
-  public GetField(Loc loc, String owner, String name, String descriptor, Term arg) {
+  GetField(Loc loc, String owner, String name, String descriptor, Term arg) {
     super(loc, arg);
     this.owner = owner;
     this.name = name;
@@ -13,7 +13,7 @@ public final class GetField extends Term1 {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.GET_FIELD;
   }
 }

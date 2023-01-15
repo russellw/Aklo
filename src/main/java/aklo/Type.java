@@ -2,83 +2,83 @@ package aklo;
 
 import java.util.AbstractList;
 
-public abstract class Type extends AbstractList<Type> {
-  public static final Type BOOL =
+abstract class Type extends AbstractList<Type> {
+  static final Type BOOL =
       new Type() {
         @Override
-        public String toString() {
+        String toString() {
           return "java/lang/Boolean";
         }
 
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.BOOL;
         }
       };
-  public static final Type STRING =
+  static final Type STRING =
       new Type() {
         @Override
-        public String toString() {
+        String toString() {
           return "java/lang/String";
         }
 
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.STRING;
         }
       };
-  public static final Type VOID =
+  static final Type VOID =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.VOID;
         }
 
         @Override
-        public String toString() {
+        String toString() {
           return "V";
         }
       };
-  public static final Type FLOAT =
+  static final Type FLOAT =
       new Type() {
         @Override
-        public String toString() {
+        String toString() {
           return "java/lang/Float";
         }
 
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.FLOAT;
         }
       };
-  public static final Type DOUBLE =
+  static final Type DOUBLE =
       new Type() {
         @Override
-        public String toString() {
+        String toString() {
           return "java/lang/Double";
         }
 
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.DOUBLE;
         }
       };
-  public static final Type INT =
+  static final Type INT =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.INT;
         }
 
         @Override
-        public String toString() {
+        String toString() {
           return "java/math/BigInteger";
         }
       };
-  public static final Type RAT =
+  static final Type RAT =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.RAT;
         }
 
@@ -87,10 +87,10 @@ public abstract class Type extends AbstractList<Type> {
           return "aklo/BigRational";
         }
       };
-  public static final Type ANY =
+  static final Type ANY =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.ANY;
         }
 
@@ -99,10 +99,10 @@ public abstract class Type extends AbstractList<Type> {
           return "java/lang/Object";
         }
       };
-  public static final Type LIST =
+  static final Type LIST =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.LIST;
         }
 
@@ -111,10 +111,10 @@ public abstract class Type extends AbstractList<Type> {
           return "java/util/List";
         }
       };
-  public static final Type SYM =
+  static final Type SYM =
       new Type() {
         @Override
-        public Kind kind() {
+        Kind kind() {
           return Kind.SYM;
         }
 
@@ -124,7 +124,7 @@ public abstract class Type extends AbstractList<Type> {
         }
       };
 
-  public abstract Kind kind();
+  abstract Kind kind();
 
   @Override
   public Type get(int i) {
@@ -136,13 +136,13 @@ public abstract class Type extends AbstractList<Type> {
     return 0;
   }
 
-  public String descriptor() {
+  String descriptor() {
     var s = toString();
     if (s.length() > 1) s = 'L' + s + ';';
     return s;
   }
 
-  public static Type of(String s) {
+  static Type of(String s) {
     return switch (s) {
       case "V" -> VOID;
       case "java/lang/Float" -> FLOAT;

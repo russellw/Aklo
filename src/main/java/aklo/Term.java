@@ -6,26 +6,26 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
-public abstract class Term extends AbstractCollection<Term> {
-  public final Loc loc;
-  public int localVar = -1;
+abstract class Term extends AbstractCollection<Term> {
+  final Loc loc;
+  int localVar = -1;
 
-  public Term(Loc loc) {
+  Term(Loc loc) {
     this.loc = loc;
   }
 
-  public abstract Tag tag();
+  abstract Tag tag();
 
-  public boolean isTerminator() {
+  boolean isTerminator() {
     return false;
   }
 
-  public static void emitInt(MethodVisitor mv, int n) {
+  static void emitInt(MethodVisitor mv, int n) {
     // TODO
     mv.visitIntInsn(BIPUSH, n);
   }
 
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     throw new UnsupportedOperationException(str());
   }
 
@@ -34,7 +34,7 @@ public abstract class Term extends AbstractCollection<Term> {
     return tag().name().toLowerCase(Locale.ROOT);
   }
 
-  public final String str() {
+  final String str() {
     var s = toString();
     if (isEmpty()) return s;
     var sb = new StringBuilder(s + '(');
@@ -46,32 +46,32 @@ public abstract class Term extends AbstractCollection<Term> {
     return sb.toString();
   }
 
-  public void dbg(Map<Term, Integer> refs) {
+  void dbg(Map<Term, Integer> refs) {
     System.out.print(this);
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }
 
-  public void dbg(Map<Term, Integer> refs, Term a) {
+  void dbg(Map<Term, Integer> refs, Term a) {
     System.out.print(' ');
     var j = refs.get(a);
     if (j == null) System.out.print(a);
     else System.out.print("%" + j);
   }
 
-  public final void walk(Consumer<Term> f) {
+  final void walk(Consumer<Term> f) {
     f.accept(this);
     for (var a : this) a.walk(f);
   }
 
-  public void set(int i, Term a) {
+  void set(int i, Term a) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public Type type() {
+  Type type() {
     return Type.VOID;
   }
 
-  public void load(MethodVisitor mv) {
+  void load(MethodVisitor mv) {
     if (localVar < 0) throw new IllegalStateException(String.format("%s: %s", loc, this));
     // TODO
     switch (type().kind()) {
@@ -81,7 +81,7 @@ public abstract class Term extends AbstractCollection<Term> {
     }
   }
 
-  public Term get(int i) {
+  Term get(int i) {
     throw new UnsupportedOperationException(toString());
   }
 

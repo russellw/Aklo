@@ -8,11 +8,11 @@ import java.nio.file.Path;
 import java.util.*;
 import org.objectweb.asm.ClassWriter;
 
-public final class Program {
+final class Program {
   private Program() {}
 
-  public static final List<Var> vars = new ArrayList<>();
-  public static final List<Fn> fns = new ArrayList<>();
+  static final List<Var> vars = new ArrayList<>();
+  static final List<Fn> fns = new ArrayList<>();
 
   private static final class Link {
     final Link outer;
@@ -51,7 +51,7 @@ public final class Program {
     }
   }
 
-  public static void init(Map<List<String>, Fn> modules) {
+  static void init(Map<List<String>, Fn> modules) {
     var main = new Fn(null, "main");
     var args = new Var(main.params);
     args.type = new ArrayType(Type.STRING);
@@ -72,7 +72,7 @@ public final class Program {
     fns.add(main);
   }
 
-  public static void write() throws IOException {
+  static void write() throws IOException {
     var w = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 

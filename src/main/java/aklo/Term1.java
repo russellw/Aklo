@@ -6,16 +6,16 @@ import java.util.Iterator;
 import java.util.List;
 
 // TODO rename to Unary...?
-public abstract class Term1 extends Term {
-  public Term arg;
+abstract class Term1 extends Term {
+  Term arg;
 
-  public Term1(Loc loc, Term arg) {
+  Term1(Loc loc, Term arg) {
     super(loc);
     this.arg = arg;
   }
 
   @Override
-  public Type type() {
+  Type type() {
     return arg.type();
   }
 
@@ -25,18 +25,18 @@ public abstract class Term1 extends Term {
   }
 
   @Override
-  public void set(int i, Term a) {
+  void set(int i, Term a) {
     assert i == 0;
     arg = a;
   }
 
   @Override
-  public Term get(int i) {
+  Term get(int i) {
     assert i == 0;
     return arg;
   }
 
-  public static Object eval(Term1 op, Object a) {
+  static Object eval(Term1 op, Object a) {
     // most likely case is integers
     if (a instanceof BigInteger a1) return op.apply(a1);
 
@@ -57,19 +57,19 @@ public abstract class Term1 extends Term {
     throw new IllegalArgumentException(String.format("%s(%s)", op, a));
   }
 
-  public double apply(double a) {
+  double apply(double a) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public float apply(float a) {
+  float apply(float a) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public BigInteger apply(BigInteger a) {
+  BigInteger apply(BigInteger a) {
     throw new UnsupportedOperationException(toString());
   }
 
-  public BigRational apply(BigRational a) {
+  BigRational apply(BigRational a) {
     throw new UnsupportedOperationException(toString());
   }
 

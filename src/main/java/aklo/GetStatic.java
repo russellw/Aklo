@@ -4,10 +4,10 @@ import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.MethodVisitor;
 
-public final class GetStatic extends Term {
-  public final String owner;
-  public final String name;
-  public final String descriptor;
+final class GetStatic extends Term {
+  final String owner;
+  final String name;
+  final String descriptor;
 
   @Override
   public String toString() {
@@ -15,11 +15,11 @@ public final class GetStatic extends Term {
   }
 
   @Override
-  public void emit(MethodVisitor mv) {
+  void emit(MethodVisitor mv) {
     mv.visitFieldInsn(GETSTATIC, owner, name, descriptor);
   }
 
-  public GetStatic(Loc loc, String owner, String name, String descriptor) {
+  GetStatic(Loc loc, String owner, String name, String descriptor) {
     super(loc);
     this.owner = owner;
     this.name = name;
@@ -27,7 +27,7 @@ public final class GetStatic extends Term {
   }
 
   @Override
-  public Tag tag() {
+  Tag tag() {
     return Tag.GET_STATIC;
   }
 }
