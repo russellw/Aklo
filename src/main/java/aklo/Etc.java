@@ -20,6 +20,7 @@ public final class Etc {
     throw new IllegalArgumentException(a.toString());
   }
 
+  @SuppressWarnings("unused")
   public static void exit(Object a) {
     System.exit(intVal(a));
   }

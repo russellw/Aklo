@@ -936,15 +936,24 @@ final class Parser {
     }
 
     void params() {
-      // TODO optional ()?
-      expect('(');
-      if (eat(INDENT))
-        do {
-          param();
-          expectNewline();
-        } while (!eat(DEDENT));
-      else if (tok != ')') do param(); while (eat(','));
-      expect(')');
+      switch (tok) {
+        case INDENT -> {}
+        case '(' -> {
+          lex();
+          if (eat(INDENT))
+            do {
+              param();
+              expectNewline();
+            } while (!eat(DEDENT));
+          else if (tok != ')') do param(); while (eat(','));
+          expect(')');
+        }
+        case WORD -> {
+          do param();
+          while (eat(','));
+        }
+        default -> throw new CompileError(file, line, "expected parameters");
+      }
     }
 
     Var not(Loc loc, Object a) {
