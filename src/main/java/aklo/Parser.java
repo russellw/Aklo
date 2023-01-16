@@ -28,9 +28,7 @@ final class Parser {
   private static final int STR = -20;
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
-  private static final int INTEGER = -23;
-  private static final int FLOAT = -24;
-  private static final int DOUBLE = -25;
+  private static final int NUM = -23;
   private static final int RAW = -26;
 
   // File state
@@ -77,6 +75,16 @@ final class Parser {
     if (isLower(c)) return c - 'a' + 10;
     if (isUpper(c)) return c - 'A' + 10;
     return 99;
+  }
+
+  private static boolean isDigits(String s) {
+    for (var i = 0; i < s.length(); i++) if (!isDigit(s.charAt(i))) return false;
+    return true;
+  }
+
+  private static boolean isHex(String s) {
+    for (var i = 0; i < s.length(); i++) if (digit(s.charAt(i)) >= 16) return false;
+    return true;
   }
 
   private static String unesc(String s) {
@@ -147,13 +155,6 @@ final class Parser {
   private void readc(StringBuilder sb) {
     sb.append((char) text[ti]);
     ti++;
-  }
-
-  private void digits(StringBuilder sb) {
-    while (isDigit(text[ti])) {
-      readc(sb);
-      if (text[ti] == '_') ti++;
-    }
   }
 
   private void lexQuote() {
@@ -422,117 +423,97 @@ final class Parser {
         }
         case '.' -> {
           if (!isDigit(text[ti + 1])) break;
-
-          var sb = new StringBuilder();
-          tok = DOUBLE;
+          var i = ti;
 
           // decimal part
-          readc(sb);
-          digits(sb);
+          do i++;
+          while (isWord(text[i]));
 
-          // exponent
-          switch (text[ti]) {
-            case 'e', 'E' -> {
-              readc(sb);
-              switch (text[ti]) {
-                case '+', '-' -> readc(sb);
+          // signed exponent
+          switch (text[i]) {
+            case '+', '-' -> {
+              switch (text[i - 1]) {
+                case 'e', 'E' -> {
+                  do i++;
+                  while (isWord(text[i]));
+                }
               }
-              digits(sb);
             }
           }
 
-          // suffix
-          switch (text[ti]) {
-            case 'f', 'F' -> {
-              ti++;
-              tok = FLOAT;
-            }
-          }
-
-          tokString = sb.toString();
+          tok = NUM;
+          tokString = new String(text, ti, i - ti, StandardCharsets.US_ASCII);
+          ti = i;
           return;
         }
-        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
-          var sb = new StringBuilder();
+        case '0' -> {
+          var i = ti;
 
-          // leading digits
-          digits(sb);
-          tok = INTEGER;
+          // integer part
+          do i++;
+          while (isWord(text[i]));
 
-          // prefix
-          // TODO refactor
-          switch (text[ti]) {
-            case 'b', 'B', 'o', 'O' -> {
-              readc(sb);
-              if (text[ti] == '_') ti++;
+          // decimal part
+          if (text[i] == '.') do i++; while (isWord(text[i]));
 
-              // integer
-              digits(sb);
-            }
+          // signed exponent
+          switch (text[ti + 1]) {
             case 'x', 'X' -> {
-              readc(sb);
-              if (text[ti] == '_') ti++;
-
-              // integer part
-              while (digit(text[ti]) < 16) {
-                readc(sb);
-                if (text[ti] == '_') ti++;
-              }
-
-              // decimal part
-              if (text[ti] == '.') {
-                readc(sb);
-                digits(sb);
-                tok = DOUBLE;
-              }
-
-              // exponent
-              switch (text[ti]) {
-                case 'p', 'P' -> {
-                  readc(sb);
-                  switch (text[ti]) {
-                    case '+', '-' -> readc(sb);
+              switch (text[i]) {
+                case '+', '-' -> {
+                  switch (text[i - 1]) {
+                    case 'p', 'P' -> {
+                      do i++;
+                      while (isWord(text[i]));
+                    }
                   }
-                  digits(sb);
-                  tok = DOUBLE;
                 }
               }
             }
             default -> {
-              // integer part, if any, is already done
-              // decimal part
-              if (text[ti] == '.') {
-                readc(sb);
-                digits(sb);
-
-                // now we know we have a floating-point number, though not which precision
-                tok = DOUBLE;
-              }
-
-              // exponent
-              switch (text[ti]) {
-                case 'e', 'E' -> {
-                  readc(sb);
-                  switch (text[ti]) {
-                    case '+', '-' -> readc(sb);
+              switch (text[i]) {
+                case '+', '-' -> {
+                  switch (text[i - 1]) {
+                    case 'e', 'E' -> {
+                      do i++;
+                      while (isWord(text[i]));
+                    }
                   }
-                  digits(sb);
-                  tok = DOUBLE;
                 }
               }
             }
           }
 
-          // suffix
-          if (tok == DOUBLE)
-            switch (text[ti]) {
-              case 'f', 'F' -> {
-                ti++;
-                tok = FLOAT;
+          tok = NUM;
+          tokString = new String(text, ti, i - ti, StandardCharsets.US_ASCII);
+          ti = i;
+          return;
+        }
+        case '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
+          var i = ti;
+
+          // integer part
+          do i++;
+          while (isWord(text[i]));
+
+          // decimal part
+          if (text[i] == '.') do i++; while (isWord(text[i]));
+
+          // signed exponent
+          switch (text[i]) {
+            case '+', '-' -> {
+              switch (text[i - 1]) {
+                case 'e', 'E' -> {
+                  do i++;
+                  while (isWord(text[i]));
+                }
               }
             }
+          }
 
-          tokString = sb.toString();
+          tok = NUM;
+          tokString = new String(text, ti, i - ti, StandardCharsets.US_ASCII);
+          ti = i;
           return;
         }
       }
@@ -796,13 +777,9 @@ final class Parser {
               }
             };
           }
-          case FLOAT -> {
-            return Float.parseFloat(s);
-          }
-          case DOUBLE -> {
-            return Double.parseDouble(s);
-          }
-          case INTEGER -> {
+          case NUM -> {
+            s = s.replace("_", "");
+            if (isDigits(s)) return new BigInteger(s);
             if (s.charAt(0) == '0' && s.length() > 1)
               switch (s.charAt(1)) {
                 case 'b', 'B' -> {
@@ -812,10 +789,15 @@ final class Parser {
                   return new BigInteger(s.substring(2), 8);
                 }
                 case 'x', 'X' -> {
-                  return new BigInteger(s.substring(2), 16);
+                  var s2 = s.substring(2);
+                  if (isHex(s2)) return new BigInteger(s2, 16);
                 }
               }
-            return new BigInteger(s);
+            var i = s.length() - 1;
+            return switch (s.charAt(i)) {
+              case 'f', 'F' -> Float.parseFloat(s.substring(0, i));
+              default -> Double.parseDouble(s);
+            };
           }
           case STR -> {
             return Etc.encode(unesc(s));
