@@ -2,7 +2,7 @@ package aklo;
 
 import java.util.Iterator;
 
-abstract class Ternary extends Insn {
+abstract class Ternary extends Instruction {
   Object arg0, arg1, arg2;
 
   Ternary(Loc loc, Object arg0, Object arg1, Object arg2) {

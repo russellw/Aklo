@@ -27,7 +27,7 @@ final class Program {
     }
 
     @SuppressWarnings("ConstantConditions")
-    void link(Insn a) {
+    void link(Instruction a) {
       for (var i = 0; i < a.size(); i++)
         if (a.get(i) instanceof String name) {
           var x = get(name);
@@ -46,7 +46,7 @@ final class Program {
       }
       for (var x : f.params) if (x.name != null) locals.put(x.name, x);
       for (var x : f.vars) if (x.name != null) locals.put(x.name, x);
-      for (var block : f.blocks) for (var a : block.insns) link(a);
+      for (var block : f.blocks) for (var a : block.instructions) link(a);
       fns.add(f);
     }
   }
@@ -66,9 +66,9 @@ final class Program {
 
       // modules may contain initialization code
       // so each module is called as a function from main
-      main.blocks.get(0).insns.add(new Call(null, module));
+      main.blocks.get(0).instructions.add(new Call(null, module));
     }
-    main.blocks.get(0).insns.add(new ReturnVoid(null));
+    main.blocks.get(0).instructions.add(new ReturnVoid(null));
     fns.add(main);
   }
 

@@ -7,10 +7,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
-abstract class Insn extends AbstractCollection<Object> {
+abstract class Instruction extends AbstractCollection<Object> {
   final Loc loc;
 
-  Insn(Loc loc) {
+  Instruction(Loc loc) {
     this.loc = loc;
   }
 
@@ -46,7 +46,7 @@ abstract class Insn extends AbstractCollection<Object> {
 
   static void walk(Object a, Consumer<Object> f) {
     f.accept(a);
-    if (a instanceof Insn a1) for (var b : a1) walk(b, f);
+    if (a instanceof Instruction a1) for (var b : a1) walk(b, f);
   }
 
   void set(int i, Object a) {

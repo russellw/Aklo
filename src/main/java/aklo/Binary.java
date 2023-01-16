@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-abstract class Binary extends Insn {
+abstract class Binary extends Instruction {
   Object arg0, arg1;
 
   Binary(Loc loc, Object arg0, Object arg1) {

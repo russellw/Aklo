@@ -39,13 +39,14 @@ final class Fn {
     }
 
     // which instructions are used as input to others, therefore needing reference numbers?
-    var used = new HashSet<Insn>();
+    var used = new HashSet<Instruction>();
     for (var block : blocks)
-      for (var a : block.insns) for (var b : a) if (b instanceof Insn b1) used.add(b1);
+      for (var a : block.instructions)
+        for (var b : a) if (b instanceof Instruction b1) used.add(b1);
 
     // assign reference numbers to instructions
     for (var block : blocks)
-      for (var a : block.insns)
+      for (var a : block.instructions)
         if (used.contains(a)) {
           r.put(a, i);
           i += wordSize(a.type());
@@ -65,7 +66,7 @@ final class Fn {
     mv.visitCode();
     for (var block : blocks) {
       mv.visitLabel(block.label);
-      for (var a : block.insns) {
+      for (var a : block.instructions) {
         a.emit(refs, mv);
         var i = refs.get(a);
         if (i == null)
@@ -82,9 +83,9 @@ final class Fn {
   }
 
   void initVars() {
-    var r = new ArrayList<Insn>();
+    var r = new ArrayList<Instruction>();
     for (var x : vars) r.add(new Assign(blocks.get(0).loc, x, BigInteger.ZERO));
-    blocks.get(0).insns.addAll(0, r);
+    blocks.get(0).instructions.addAll(0, r);
   }
 
   @Override
@@ -135,7 +136,7 @@ final class Fn {
     // blocks
     for (var block : blocks) {
       if (block.name != null) System.out.printf("  %s:\n", block.name);
-      for (var a : block.insns) {
+      for (var a : block.instructions) {
         System.out.print("    ");
         var r = refs.get(a);
         if (r != null) System.out.printf("%%%d = ", r);

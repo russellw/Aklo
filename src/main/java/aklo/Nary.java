@@ -2,7 +2,7 @@ package aklo;
 
 import java.util.Iterator;
 
-abstract class Nary extends Insn {
+abstract class Nary extends Instruction {
   final Object[] args;
 
   Nary(Loc loc, Object[] args) {

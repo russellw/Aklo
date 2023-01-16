@@ -5,7 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
-final class GetStatic extends Insn {
+final class GetStatic extends Instruction {
   final String owner;
   final String name;
   final String descriptor;

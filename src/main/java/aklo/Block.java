@@ -8,7 +8,7 @@ final class Block {
   final Loc loc;
   String name;
   Label label;
-  final List<Insn> insns = new ArrayList<>();
+  final List<Instruction> instructions = new ArrayList<>();
 
   Block(Loc loc, String name) {
     this.loc = loc;
@@ -22,8 +22,8 @@ final class Block {
   }
 
   boolean hasTerminator() {
-    var n = insns.size();
+    var n = instructions.size();
     if (n == 0) return false;
-    return insns.get(n - 1).isTerminator();
+    return instructions.get(n - 1).isTerminator();
   }
 }
