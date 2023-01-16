@@ -29,7 +29,6 @@ final class Parser {
   private static final int SUB_ASSIGN = -21;
   private static final int SYM = -22;
   private static final int NUM = -23;
-  private static final int RAW = -26;
 
   // File state
   private final String file;
@@ -91,12 +90,17 @@ final class Parser {
     return isUpper(c) ? c + 32 : c;
   }
 
-  private static String unesc(String s) {
+  // tokenizer
+  private void lexQuote() {
+    var quote = text[ti];
+    var i = ti + 1;
     var sb = new StringBuilder();
-    for (var i = 0; i < s.length(); ) {
-      var c = s.charAt(i++);
-      if (c == '\\' && i < s.length()) {
-        c = s.charAt(i++);
+    while (text[i] != quote) {
+      var c = (char) (text[i++] & 0xff);
+      if (c < ' ') throw new CompileError(file, line, "unclosed quote");
+      if (c == '\\') {
+        c = (char) (text[i++] & 0xff);
+        if (c < ' ') throw new CompileError(file, line, "unclosed quote");
         switch (c) {
           case 'b' -> c = '\b';
           case 'f' -> c = '\f';
@@ -109,8 +113,8 @@ final class Parser {
           case '0', '1', '2', '3', '4', '5', '6', '7' -> {
             i--;
             var n = 0;
-            for (int j = 0; j < 3 && i < s.length(); j++) {
-              var d = digit(s.charAt(i));
+            for (var j = 0; j < 3; j++) {
+              var d = digit(text[i]);
               if (d >= 8) break;
               i++;
               n = n * 8 + d;
@@ -119,8 +123,8 @@ final class Parser {
           }
           case 'u' -> {
             var n = 0;
-            for (int j = 0; j < 4 && i < s.length(); j++) {
-              var d = digit(s.charAt(i));
+            for (var j = 0; j < 4; j++) {
+              var d = digit(text[i]);
               if (d >= 16) break;
               i++;
               n = n * 16 + d;
@@ -129,8 +133,8 @@ final class Parser {
           }
           case 'x' -> {
             var n = 0;
-            for (int j = 0; j < 2 && i < s.length(); j++) {
-              var d = digit(s.charAt(i));
+            for (var j = 0; j < 2; j++) {
+              var d = digit(text[i]);
               if (d >= 16) break;
               i++;
               n = n * 16 + d;
@@ -139,8 +143,8 @@ final class Parser {
           }
           case 'U' -> {
             var n = 0;
-            for (int j = 0; j < 8 && i < s.length(); j++) {
-              var d = digit(s.charAt(i));
+            for (var j = 0; j < 8; j++) {
+              var d = digit(text[i]);
               if (d >= 16) break;
               i++;
               n = n * 16 + d;
@@ -152,25 +156,7 @@ final class Parser {
       }
       sb.append(c);
     }
-    return sb.toString();
-  }
-
-  // Tokenizer
-  private void readc(StringBuilder sb) {
-    sb.append((char) text[ti]);
-    ti++;
-  }
-
-  private void lexQuote() {
-    var quote = text[ti];
-    var sb = new StringBuilder();
-    ti++;
-    while (text[ti] != quote) {
-      if (text[ti] == '\\') readc(sb);
-      if (text[ti] < ' ') throw new CompileError(file, line, "unclosed quote");
-      readc(sb);
-    }
-    ti++;
+    ti = i + 1;
     tokString = sb.toString();
   }
 
@@ -348,10 +334,16 @@ final class Parser {
           }
         }
         case '#' -> {
-          ti++;
-          if (text[ti] != '"') throw new CompileError(file, line, "stray '#'");
-          lexQuote();
-          tok = RAW;
+          if (text[ti + 1] != '"') throw new CompileError(file, line, "stray '#'");
+          var i = ti + 2;
+          while (text[i] != '"') {
+            if (text[i] == '\\') i++;
+            if ((text[i] & 0xff) < ' ') throw new CompileError(file, line, "unclosed quote");
+            i++;
+          }
+          tok = STR;
+          tokString = new String(text, ti + 2, i - ti, StandardCharsets.US_ASCII);
+          ti = i + 1;
           return;
         }
         case '"' -> {
@@ -800,19 +792,16 @@ final class Parser {
                 }
               }
             var i = s.length() - 1;
-            return switch (s.charAt(i)) {
+            return switch (text[i]) {
               case 'f', 'F' -> Float.parseFloat(s.substring(0, i));
               default -> Double.parseDouble(s);
             };
           }
           case STR -> {
-            return Etc.encode(unesc(s));
+            return Etc.encode(s);
           }
           case SYM -> {
-            return Sym.intern(unesc(s));
-          }
-          case RAW -> {
-            return Etc.encode(s);
+            return Sym.intern(s);
           }
         }
       } catch (NumberFormatException e) {
