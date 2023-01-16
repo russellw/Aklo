@@ -882,35 +882,43 @@ final class Parser {
 
     void assign(Object y, Object x, Block fail) {
       var loc = fail.loc;
+
+      // single assignment
       if (y instanceof String || y instanceof Var) {
         // TODO Var is impossible here?
         insn(new Assign(loc, y, x));
         return;
       }
-      if (y instanceof Insn y1) {
-        switch (y1.tag()) {
-          case LIST_OF -> {
-            var n = y1.size();
-            for (var i = 0; i < n; i++) assignSubscript(y1, x, fail, i);
-          }
-          case CAT -> {
-            // head atoms
-            if (!(y1.get(0) instanceof ListOf s))
-              throw new CompileError(loc, y + ": invalid assignment");
-            var n = s.size();
-            for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
 
-            // rest of the list
-            var len = new Len(loc, x);
-            insn(len);
-            var slice = new Slice(loc, x, BigInteger.valueOf(n), len);
-            insn(slice);
-            assign(y1.get(1), slice, fail);
-          }
-          default -> throw new CompileError(loc, y + ": invalid assignment");
-        }
+      // multiple assignment
+      if (y instanceof ListOf y1) {
+        var n = y1.size();
+        for (var i = 0; i < n; i++) assignSubscript(y1, x, fail, i);
         return;
       }
+
+      // multiple assignment with tail
+      if (y instanceof Cat y1) {
+        // head atoms
+        if (!(y1.get(0) instanceof ListOf s))
+          throw new CompileError(loc, y + ": invalid assignment");
+        var n = s.size();
+        for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
+
+        // rest of the list
+        var len = new Len(loc, x);
+        insn(len);
+        var slice = new Slice(loc, x, BigInteger.valueOf(n), len);
+        insn(slice);
+        assign(y1.get(1), slice, fail);
+
+        return;
+      }
+
+      // Cannot assign to any other compound expression
+      if (y instanceof Insn) throw new CompileError(loc, y + ": invalid assignment");
+
+      // assigning to a constant means an error check
       var eq = new Eq(loc, y, x);
       insn(eq);
       var after = new Block(loc, "assignCheckAfter");
