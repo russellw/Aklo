@@ -882,17 +882,13 @@ final class Parser {
 
     void assign(Object y, Object x, Block fail) {
       var loc = fail.loc;
-      if (y instanceof Insn y1)
+      if (y instanceof String || y instanceof Var) {
+        // TODO Var is impossible here?
+        insn(new Assign(loc, y, x));
+        return;
+      }
+      if (y instanceof Insn y1) {
         switch (y1.tag()) {
-          case CONST -> {
-            var eq = new Eq(loc, y, x);
-            insn(eq);
-            var after = new Block(loc, "assignCheckAfter");
-            insn(new If(loc, eq, after, fail));
-            add(after);
-          }
-            // TODO Var is impossible here?
-          case ID, VAR -> insn(new Assign(loc, y, x));
           case LIST_OF -> {
             var n = y1.size();
             for (var i = 0; i < n; i++) assignSubscript(y1, x, fail, i);
@@ -913,6 +909,13 @@ final class Parser {
           }
           default -> throw new CompileError(loc, y + ": invalid assignment");
         }
+        return;
+      }
+      var eq = new Eq(loc, y, x);
+      insn(eq);
+      var after = new Block(loc, "assignCheckAfter");
+      insn(new If(loc, eq, after, fail));
+      add(after);
     }
 
     Object assign(Loc loc, Object y, Object x) {
