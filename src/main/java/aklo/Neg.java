@@ -37,9 +37,4 @@ final class Neg extends Unary {
   BigRational apply(BigRational a) {
     return a.negate();
   }
-
-  @Override
-  Tag tag() {
-    return Tag.NEG;
-  }
 }

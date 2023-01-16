@@ -12,11 +12,6 @@ final class EqNum extends Binary {
   }
 
   @Override
-  Tag tag() {
-    return Tag.EQ_NUM;
-  }
-
-  @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     load(refs, mv, arg0);
     load(refs, mv, arg1);

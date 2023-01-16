@@ -26,9 +26,4 @@ final class Throw extends Unary {
         INVOKESPECIAL, "java/lang/RuntimeException", "<init>", "(Ljava/lang/String;)V", false);
     mv.visitInsn(ATHROW);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.THROW;
-  }
 }

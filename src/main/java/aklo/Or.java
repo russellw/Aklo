@@ -27,9 +27,4 @@ final class Or extends Binary {
   Object apply(BigInteger a, BigInteger b) {
     return a.or(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.OR;
-  }
 }

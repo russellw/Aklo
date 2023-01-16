@@ -53,9 +53,4 @@ final class Invoke extends Nary {
     var i = descriptor.lastIndexOf(')');
     return descriptor.substring(i + 1);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.INVOKE;
-  }
 }

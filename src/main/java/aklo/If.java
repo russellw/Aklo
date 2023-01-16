@@ -32,9 +32,4 @@ final class If extends Unary {
     this.trueTarget = trueTarget;
     this.falseTarget = falseTarget;
   }
-
-  @Override
-  Tag tag() {
-    return Tag.IF;
-  }
 }

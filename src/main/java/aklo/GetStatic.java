@@ -26,9 +26,4 @@ final class GetStatic extends Insn {
     this.name = name;
     this.descriptor = descriptor;
   }
-
-  @Override
-  Tag tag() {
-    return Tag.GET_STATIC;
-  }
 }

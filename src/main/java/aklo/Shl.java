@@ -27,9 +27,4 @@ final class Shl extends Binary {
   Object apply(BigInteger a, BigInteger b) {
     return a.shiftLeft(b.intValueExact());
   }
-
-  @Override
-  Tag tag() {
-    return Tag.SHL;
-  }
 }

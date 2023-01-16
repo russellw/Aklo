@@ -20,9 +20,4 @@ final class InstanceOf extends Unary {
     super(loc, arg);
     this.type = type;
   }
-
-  @Override
-  Tag tag() {
-    return Tag.INSTANCE_OF;
-  }
 }

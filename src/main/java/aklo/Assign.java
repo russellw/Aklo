@@ -22,9 +22,4 @@ final class Assign extends Binary {
     if (i == null) throw new IllegalStateException(String.format("%s: %s", loc, this));
     mv.visitVarInsn(ASTORE, i);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.ASSIGN;
-  }
 }

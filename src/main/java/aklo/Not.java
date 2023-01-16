@@ -22,9 +22,4 @@ final class Not extends Unary {
   BigInteger apply(BigInteger a) {
     return a.not();
   }
-
-  @Override
-  Tag tag() {
-    return Tag.NOT;
-  }
 }

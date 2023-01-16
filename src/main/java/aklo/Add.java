@@ -42,9 +42,4 @@ final class Add extends Binary {
   Object apply(BigRational a, BigRational b) {
     return a.add(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.ADD;
-  }
 }

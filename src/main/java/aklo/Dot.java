@@ -9,9 +9,4 @@ final class Dot extends Insn {
     super(loc);
     this.names = names.toArray(new String[0]);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.DOT;
-  }
 }

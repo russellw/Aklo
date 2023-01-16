@@ -42,9 +42,4 @@ final class Exp extends Binary {
   Object apply(BigRational a, BigRational b) {
     return Math.pow(a.doubleValue(), b.doubleValue());
   }
-
-  @Override
-  Tag tag() {
-    return Tag.EXP;
-  }
 }

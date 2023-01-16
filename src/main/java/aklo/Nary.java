@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 abstract class Nary extends Insn {
+  // TODO should this be a list?
   final Object[] args;
 
   Nary(Loc loc, Object[] args) {

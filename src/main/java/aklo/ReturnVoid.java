@@ -19,9 +19,4 @@ final class ReturnVoid extends Insn {
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     mv.visitInsn(RETURN);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.RETURN;
-  }
 }

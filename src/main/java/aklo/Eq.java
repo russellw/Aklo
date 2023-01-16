@@ -18,9 +18,4 @@ final class Eq extends Binary {
     mv.visitMethodInsn(
         INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.EQ;
-  }
 }

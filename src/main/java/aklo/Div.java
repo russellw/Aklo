@@ -42,9 +42,4 @@ final class Div extends Binary {
   Object apply(BigRational a, BigRational b) {
     return a.divide(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.DIV;
-  }
 }

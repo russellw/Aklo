@@ -21,9 +21,4 @@ final class Subscript extends Binary {
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.SUBSCRIPT;
-  }
 }

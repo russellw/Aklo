@@ -42,9 +42,4 @@ final class Mul extends Binary {
   Object apply(BigRational a, BigRational b) {
     return a.multiply(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.MUL;
-  }
 }

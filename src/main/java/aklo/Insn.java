@@ -14,8 +14,6 @@ abstract class Insn extends AbstractCollection<Object> {
     this.loc = loc;
   }
 
-  abstract Tag tag();
-
   boolean isTerminator() {
     return false;
   }
@@ -31,7 +29,7 @@ abstract class Insn extends AbstractCollection<Object> {
 
   @Override
   public String toString() {
-    return tag().name().toLowerCase(Locale.ROOT);
+    return getClass().getSimpleName();
   }
 
   void dbg(Map<Object, Integer> refs) {

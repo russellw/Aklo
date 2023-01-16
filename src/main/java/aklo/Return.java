@@ -20,9 +20,4 @@ final class Return extends Unary {
     load(refs, mv, arg);
     mv.visitInsn(ARETURN);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.RETURN;
-  }
 }

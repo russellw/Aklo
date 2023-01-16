@@ -11,9 +11,4 @@ final class GetField extends Unary {
     this.name = name;
     this.descriptor = descriptor;
   }
-
-  @Override
-  Tag tag() {
-    return Tag.GET_FIELD;
-  }
 }

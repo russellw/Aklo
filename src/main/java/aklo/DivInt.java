@@ -27,9 +27,4 @@ final class DivInt extends Binary {
   Object apply(BigInteger a, BigInteger b) {
     return a.divide(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.DIV_INT;
-  }
 }

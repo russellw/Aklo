@@ -33,7 +33,6 @@ final class Sub extends Binary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    // TODO factor this out?
     load(refs, mv, arg0);
     load(refs, mv, arg1);
     mv.visitMethodInsn(
@@ -42,10 +41,5 @@ final class Sub extends Binary {
         "sub",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  @Override
-  Tag tag() {
-    return Tag.SUB;
   }
 }

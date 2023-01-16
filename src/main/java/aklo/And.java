@@ -27,9 +27,4 @@ final class And extends Binary {
   Object apply(BigInteger a, BigInteger b) {
     return a.and(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.AND;
-  }
 }

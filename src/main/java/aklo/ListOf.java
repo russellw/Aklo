@@ -57,9 +57,4 @@ final class ListOf extends Nary {
   String type() {
     return "Ljava/util/List;";
   }
-
-  @Override
-  Tag tag() {
-    return Tag.LIST_OF;
-  }
 }

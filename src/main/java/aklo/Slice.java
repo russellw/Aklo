@@ -27,9 +27,4 @@ final class Slice extends Ternary {
   String type() {
     return "Ljava/util/List;";
   }
-
-  @Override
-  Tag tag() {
-    return Tag.SLICE;
-  }
 }

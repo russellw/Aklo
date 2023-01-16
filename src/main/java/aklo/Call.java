@@ -12,11 +12,6 @@ final class Call extends Nary {
   }
 
   @Override
-  Tag tag() {
-    return Tag.CALL;
-  }
-
-  @Override
   String type() {
     var f = (Fn) get(0);
     return f.rtype;

@@ -16,9 +16,4 @@ final class Len extends Unary {
     mv.visitMethodInsn(
         INVOKESTATIC, "aklo/Etc", "len", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.LEN;
-  }
 }

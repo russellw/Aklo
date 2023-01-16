@@ -27,9 +27,4 @@ final class Goto extends Insn {
     super(loc);
     this.target = target;
   }
-
-  @Override
-  Tag tag() {
-    return Tag.GOTO;
-  }
 }

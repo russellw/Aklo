@@ -21,9 +21,4 @@ final class Cat extends Binary {
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
         false);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.CAT;
-  }
 }

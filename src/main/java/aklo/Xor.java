@@ -27,9 +27,4 @@ final class Xor extends Binary {
   Object apply(BigInteger a, BigInteger b) {
     return a.xor(b);
   }
-
-  @Override
-  Tag tag() {
-    return Tag.XOR;
-  }
 }
