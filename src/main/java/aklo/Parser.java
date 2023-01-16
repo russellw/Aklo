@@ -92,6 +92,7 @@ final class Parser {
 
   // tokenizer
   private void lexQuote() {
+    // TODO handling of literal Unicode characters
     var quote = text[ti];
     var i = ti + 1;
     var sb = new StringBuilder();
@@ -860,18 +861,17 @@ final class Parser {
       assert !(y instanceof Var);
 
       // assigning to a constant means an error check
-      var eq = new Eq(loc, y, x);
-      ins(eq);
       var after = new Block(loc, "assignCheckAfter");
-      ins(new If(loc, eq, after, fail));
+      ins(new If(loc, ins(new Eq(loc, y, x)), after, fail));
       add(after);
     }
 
     Object assign(Loc loc, Object y, Object x) {
-      // assign
       var fail = new Block(loc, "assignFail");
-      assign(y, x, fail);
       var after = new Block(loc, "assignAfter");
+
+      // assign
+      assign(y, x, fail);
       ins(new Goto(loc, after));
 
       // fail
@@ -1281,10 +1281,10 @@ final class Parser {
           switch (tokString) {
             case "assert" -> {
               lex();
-
-              // condition
               var no = new Block(loc, "ifFalse");
               var after = new Block(loc, "ifAfter");
+
+              // condition
               ins(new If(loc, expr(), after, no));
               expectNewline();
 
