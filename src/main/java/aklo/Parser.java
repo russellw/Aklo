@@ -1281,13 +1281,12 @@ final class Parser {
           switch (tokString) {
             case "assert" -> {
               lex();
-              var cond = expr();
-              expectNewline();
-              var no = new Block(loc, "ifFalse");
-              var after = new Block(loc, "ifAfter");
 
               // condition
-              ins(new If(loc, cond, after, no));
+              var no = new Block(loc, "ifFalse");
+              var after = new Block(loc, "ifAfter");
+              ins(new If(loc, expr(), after, no));
+              expectNewline();
 
               // false
               add(no);
@@ -1296,7 +1295,7 @@ final class Parser {
                       loc,
                       Etc.encode(
                           String.format(
-                              "%s:%d: %s: %s", loc.file(), loc.line(), fn.name, cond.toString()))));
+                              "%s:%d: %s: assert failed", loc.file(), loc.line(), fn.name))));
 
               // after
               add(after);
