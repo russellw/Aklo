@@ -385,7 +385,6 @@ final class Parser {
             'Y',
             'Z',
             '_',
-            '$',
             'a',
             'b',
             'c',
@@ -705,25 +704,25 @@ final class Parser {
             // TODO
             switch (s) {
               case "bool?" -> {
-                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Boolean;"));
+                return ins(new InstanceOf(loc, arg(), "java/lang/Boolean"));
               }
               case "int?" -> {
-                return ins(new InstanceOf(loc, arg(), "Ljava/math/BigInteger;"));
+                return ins(new InstanceOf(loc, arg(), "java/math/BigInteger"));
               }
               case "float?" -> {
-                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Float;"));
+                return ins(new InstanceOf(loc, arg(), "java/lang/Float"));
               }
               case "double?" -> {
-                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Double;"));
+                return ins(new InstanceOf(loc, arg(), "java/lang/Double"));
               }
               case "rat?" -> {
-                return ins(new InstanceOf(loc, arg(), "Laklo/BigRational;"));
+                return ins(new InstanceOf(loc, arg(), "aklo/BigRational"));
               }
               case "list?" -> {
-                return ins(new InstanceOf(loc, arg(), "Ljava/util/List;"));
+                return ins(new InstanceOf(loc, arg(), "java/util/List"));
               }
               case "sym?" -> {
-                return ins(new InstanceOf(loc, arg(), "Laklo/Sym;"));
+                return ins(new InstanceOf(loc, arg(), "aklo/Sym"));
               }
               case "slice" -> {
                 var t = arg1();
@@ -947,7 +946,7 @@ final class Parser {
     Var postInc(Object y, Instruction x) {
       var loc = x.loc;
       lex();
-      var old = new Var(fn.vars);
+      var old = new Var("old$", fn.vars);
       ins(new Assign(loc, old, y));
       assign(loc, y, x);
       return old;
@@ -1017,7 +1016,7 @@ final class Parser {
     }
 
     Var not(Loc loc, Object a) {
-      var r = new Var(fn.vars);
+      var r = new Var("not$", fn.vars);
       var yes = new Block(loc, "notTrue");
       var no = new Block(loc, "notFalse");
       var after = new Block(loc, "notAfter");
@@ -1157,7 +1156,7 @@ final class Parser {
               case NE -> not(loc, ins(new Eq(loc, a, b)));
               case NE_NUM -> not(loc, ins(new EqNum(loc, a, b)));
               case '&' -> {
-                var r = new Var(fn.vars);
+                var r = new Var("and$", fn.vars);
                 var yes = new Block(loc, "andTrue");
                 var after = new Block(loc, "andAfter");
 
@@ -1175,7 +1174,7 @@ final class Parser {
                 yield r;
               }
               case '|' -> {
-                var r = new Var(fn.vars);
+                var r = new Var("or$", fn.vars);
                 var no = new Block(loc, "orFalse");
                 var after = new Block(loc, "orAfter");
 
@@ -1269,7 +1268,7 @@ final class Parser {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       var loc = new Loc(file, line);
       lex();
-      var r = new Var(fn.vars);
+      var r = new Var("if$", fn.vars);
       var yes = new Block(loc, "ifTrue");
       var no = new Block(loc, "ifFalse");
       var after = new Block(loc, "ifAfter");

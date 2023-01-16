@@ -194,4 +194,8 @@ public final class Etc {
     if (a instanceof Instruction a1) return a1.type();
     return a.getClass().descriptorString();
   }
+
+  public static Object shr(Object a, Object b) {
+    return Binary.eval(new Shr(null, null, null), a, b);
+  }
 }

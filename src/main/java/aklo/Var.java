@@ -11,14 +11,8 @@ final class Var {
     s.add(this);
   }
 
-  Var(List<Var> s) {
-    name = null;
-    s.add(this);
-  }
-
   @Override
   public String toString() {
-    if (name != null) return name;
-    return '#' + Integer.toHexString(hashCode());
+    return name;
   }
 }

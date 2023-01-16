@@ -17,14 +17,10 @@ final class Shr extends Binary {
     load(refs, mv, arg1);
     mv.visitMethodInsn(
         INVOKESTATIC,
-        "aklo/Shr",
-        "eval",
+        "aklo/Etc",
+        "shr",
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
         false);
-  }
-
-  static Object eval(Object a, Object b) {
-    return Binary.eval(new Shr(null, null, null), a, b);
   }
 
   @Override

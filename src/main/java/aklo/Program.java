@@ -53,7 +53,7 @@ final class Program {
 
   static void init(Map<List<String>, Fn> modules) {
     var main = new Fn(null, "main");
-    var args = new Var(main.params);
+    var args = new Var("args", main.params);
     args.type = "[Ljava/lang/String;";
     main.rtype = "V";
     for (var module : modules.values()) {
@@ -77,7 +77,11 @@ final class Program {
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
     // global variables
-    for (var x : vars) w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
+    var i = 0;
+    for (var x : vars) {
+      if (x.name.endsWith("$")) x.name += i++;
+      w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
+    }
 
     // functions
     for (var f : fns) f.write(w);
