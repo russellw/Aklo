@@ -792,7 +792,7 @@ final class Parser {
                 }
               }
             var i = s.length() - 1;
-            return switch (text[i]) {
+            return switch (s.charAt(i)) {
               case 'f', 'F' -> Float.parseFloat(s.substring(0, i));
               default -> Double.parseDouble(s);
             };
