@@ -1,6 +1,5 @@
 package aklo;
 
-
 import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
@@ -832,8 +831,7 @@ final class Parser {
       var loc = fail.loc;
 
       // single assignment
-      if (y instanceof String || y instanceof Var) {
-        // TODO Var is impossible here?
+      if (y instanceof String) {
         ins(new Assign(loc, y, x));
         return;
       }
@@ -865,6 +863,12 @@ final class Parser {
 
       // Cannot assign to any other compound expression
       if (y instanceof Instruction) throw new CompileError(loc, y + ": invalid assignment");
+
+      // names have not yet been resolved to variables
+      // so the only way for the left-hand side to be an actual variable at this point
+      // would be if it were a complex expression that generates one
+      // and this possibility has just been excluded
+      assert !(y instanceof Var);
 
       // assigning to a constant means an error check
       var eq = new Eq(loc, y, x);
