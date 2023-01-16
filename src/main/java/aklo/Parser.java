@@ -835,6 +835,11 @@ final class Parser {
                 return Boolean.FALSE;
               }
             }
+            if (tok == '.') {
+              var sb = new StringBuilder(s);
+              while (eat('.')) sb.append(word());
+              s = sb.toString();
+            }
             return s;
           }
           case FLOAT -> {
@@ -981,14 +986,6 @@ final class Parser {
             }
             expect(')');
             a = insn(new Call(loc, r.toArray()));
-          }
-          case '.' -> {
-            // TODO this should probably be primary
-            var loc = new Loc(file, line);
-            if (!(a instanceof String name)) throw new CompileError(loc, "expected identifier");
-            var r = new ArrayList<>(List.of(name));
-            while (eat('.')) r.add(word());
-            a = new Dot(loc, r);
           }
           case INC -> {
             var loc = new Loc(file, line);
