@@ -65,6 +65,12 @@ abstract class Instruction extends AbstractCollection<Object> {
       return;
     }
 
+    // global variable
+    if (a instanceof Var a1) {
+      mv.visitFieldInsn(GETSTATIC, "a", a1.name, a1.type);
+      return;
+    }
+
     // scalars with special logic
     if (a instanceof BigInteger a1) {
       try {

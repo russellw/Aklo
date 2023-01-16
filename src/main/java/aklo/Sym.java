@@ -3,7 +3,7 @@ package aklo;
 import java.util.HashMap;
 import java.util.Map;
 
-final class Sym {
+public final class Sym {
   private static final Map<String, Sym> syms = new HashMap<>();
   private final String name;
 
@@ -16,7 +16,7 @@ final class Sym {
     return name;
   }
 
-  static Sym intern(String name) {
+  public static Sym intern(String name) {
     var a = syms.get(name);
     if (a == null) {
       a = new Sym(name);

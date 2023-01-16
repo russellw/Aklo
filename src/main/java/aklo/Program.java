@@ -76,6 +76,9 @@ final class Program {
     var w = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
+    // global variables
+    for (var x : vars) w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
+
     // functions
     for (var f : fns) f.write(w);
 
