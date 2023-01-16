@@ -2,6 +2,7 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -43,6 +44,7 @@ final class Parser {
 
   // current token
   private int tok;
+  private byte[] tokBytes;
   private String tokString;
 
   private static boolean isDigit(int c) {
@@ -92,15 +94,14 @@ final class Parser {
 
   // tokenizer
   private void lexQuote() {
-    // TODO handling of literal Unicode characters
     var quote = text[ti];
     var i = ti + 1;
-    var sb = new StringBuilder();
+    var baos = new ByteArrayOutputStream();
     while (text[i] != quote) {
-      var c = (char) (text[i++] & 0xff);
+      var c = text[i++] & 0xff;
       if (c < ' ') throw new CompileError(file, line, "unclosed quote");
       if (c == '\\') {
-        c = (char) (text[i++] & 0xff);
+        c = text[i++] & 0xff;
         if (c < ' ') throw new CompileError(file, line, "unclosed quote");
         switch (c) {
           case 'b' -> c = '\b';
@@ -113,52 +114,40 @@ final class Parser {
           case 'v' -> c = 0xb;
           case '0', '1', '2', '3', '4', '5', '6', '7' -> {
             i--;
-            var n = 0;
+            c = 0;
             for (var j = 0; j < 3; j++) {
               var d = digit(text[i]);
               if (d >= 8) break;
               i++;
-              n = n * 8 + d;
+              c = c * 8 + d;
             }
-            c = (char) n;
-          }
-          case 'u' -> {
-            var n = 0;
-            for (var j = 0; j < 4; j++) {
-              var d = digit(text[i]);
-              if (d >= 16) break;
-              i++;
-              n = n * 16 + d;
-            }
-            c = (char) n;
           }
           case 'x' -> {
-            var n = 0;
+            c = 0;
             for (var j = 0; j < 2; j++) {
               var d = digit(text[i]);
               if (d >= 16) break;
               i++;
-              n = n * 16 + d;
+              c = c * 16 + d;
             }
-            c = (char) n;
           }
-          case 'U' -> {
-            var n = 0;
+          case 'u', 'U' -> {
+            c = 0;
             for (var j = 0; j < 8; j++) {
               var d = digit(text[i]);
               if (d >= 16) break;
               i++;
-              n = n * 16 + d;
+              c = c * 16 + d;
             }
-            sb.appendCodePoint(n);
+            baos.writeBytes(Character.toString(c).getBytes(StandardCharsets.UTF_8));
             continue;
           }
         }
       }
-      sb.append(c);
+      baos.write(c);
     }
     ti = i + 1;
-    tokString = sb.toString();
+    tokBytes = baos.toByteArray();
   }
 
   private void lex() {
@@ -343,7 +332,9 @@ final class Parser {
             i++;
           }
           tok = STR;
-          tokString = new String(text, ti + 2, i - ti, StandardCharsets.US_ASCII);
+          var n = i - (ti + 2);
+          tokBytes = new byte[n];
+          System.arraycopy(text, ti + 2, tokBytes, 0, n);
           ti = i + 1;
           return;
         }
@@ -640,6 +631,7 @@ final class Parser {
 
       // having noted the current line, factor out the moving to the next token
       var k = tok;
+      var b = tokBytes;
       var s = tokString;
       lex();
 
@@ -799,10 +791,10 @@ final class Parser {
             };
           }
           case STR -> {
-            return Etc.encode(s);
+            return Etc.list(b);
           }
           case SYM -> {
-            return Sym.intern(s);
+            return Sym.intern(new String(b, StandardCharsets.UTF_8));
           }
         }
       } catch (NumberFormatException e) {
