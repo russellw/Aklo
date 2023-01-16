@@ -628,7 +628,7 @@ final class Parser {
       return fn.blocks.get(fn.blocks.size() - 1);
     }
 
-    Instruction insn(Instruction a) {
+    Instruction ins(Instruction a) {
       // TODO block should be an instruction constructor parameter
       lastBlock().instructions.add(a);
       return a;
@@ -655,7 +655,7 @@ final class Parser {
     }
 
     Instruction listRest(Loc loc, List<Object> s, Object t) {
-      return insn(new Cat(loc, insn(new ListOf(loc, s.toArray())), t));
+      return ins(new Cat(loc, ins(new ListOf(loc, s.toArray())), t));
     }
 
     Object primary() {
@@ -697,7 +697,7 @@ final class Parser {
               }
             }
             expect(']');
-            return insn(new ListOf(loc, r.toArray()));
+            return ins(new ListOf(loc, r.toArray()));
           }
           case '(' -> {
             var a = commas();
@@ -708,33 +708,33 @@ final class Parser {
             // TODO
             switch (s) {
               case "bool?" -> {
-                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Boolean;"));
+                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Boolean;"));
               }
               case "int?" -> {
-                return insn(new InstanceOf(loc, arg(), "Ljava/math/BigInteger;"));
+                return ins(new InstanceOf(loc, arg(), "Ljava/math/BigInteger;"));
               }
               case "float?" -> {
-                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Float;"));
+                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Float;"));
               }
               case "double?" -> {
-                return insn(new InstanceOf(loc, arg(), "Ljava/lang/Double;"));
+                return ins(new InstanceOf(loc, arg(), "Ljava/lang/Double;"));
               }
               case "rat?" -> {
-                return insn(new InstanceOf(loc, arg(), "Laklo/BigRational;"));
+                return ins(new InstanceOf(loc, arg(), "Laklo/BigRational;"));
               }
               case "list?" -> {
-                return insn(new InstanceOf(loc, arg(), "Ljava/util/List;"));
+                return ins(new InstanceOf(loc, arg(), "Ljava/util/List;"));
               }
               case "sym?" -> {
-                return insn(new InstanceOf(loc, arg(), "Laklo/Sym;"));
+                return ins(new InstanceOf(loc, arg(), "Laklo/Sym;"));
               }
               case "slice" -> {
                 var t = arg1();
                 expect(',');
-                return insn(new Slice(loc, t, expr(), argN()));
+                return ins(new Slice(loc, t, expr(), argN()));
               }
               case "parserat" -> {
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -744,7 +744,7 @@ final class Parser {
                         arg()));
               }
               case "parsefloat" -> {
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -754,7 +754,7 @@ final class Parser {
                         arg()));
               }
               case "parsedouble" -> {
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -766,7 +766,7 @@ final class Parser {
               case "parseint" -> {
                 var t = arg1();
                 if (eat(')'))
-                  return insn(
+                  return ins(
                       new Invoke(
                           loc,
                           INVOKESTATIC,
@@ -774,7 +774,7 @@ final class Parser {
                           "parseInt",
                           "(Ljava/lang/Object;)Ljava/math/BigInteger;",
                           t));
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -785,13 +785,13 @@ final class Parser {
                         argN()));
               }
               case "bitnot" -> {
-                return insn(new Not(loc, arg()));
+                return ins(new Not(loc, arg()));
               }
               case "len" -> {
-                return insn(new Len(loc, arg()));
+                return ins(new Len(loc, arg()));
               }
               case "intern" -> {
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -801,7 +801,7 @@ final class Parser {
                         arg()));
               }
               case "str" -> {
-                return insn(
+                return ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -811,22 +811,22 @@ final class Parser {
                         arg()));
               }
               case "cmp" -> {
-                return insn(new Cmp(loc, arg1(), argN()));
+                return ins(new Cmp(loc, arg1(), argN()));
               }
               case "bitand" -> {
-                return insn(new And(loc, arg1(), argN()));
+                return ins(new And(loc, arg1(), argN()));
               }
               case "bitor" -> {
-                return insn(new Or(loc, arg1(), argN()));
+                return ins(new Or(loc, arg1(), argN()));
               }
               case "bitxor" -> {
-                return insn(new Xor(loc, arg1(), argN()));
+                return ins(new Xor(loc, arg1(), argN()));
               }
               case "shl" -> {
-                return insn(new Shl(loc, arg1(), argN()));
+                return ins(new Shl(loc, arg1(), argN()));
               }
               case "shr" -> {
-                return insn(new Shr(loc, arg1(), argN()));
+                return ins(new Shr(loc, arg1(), argN()));
               }
               case "true" -> {
                 return Boolean.TRUE;
@@ -882,7 +882,7 @@ final class Parser {
 
     void assignSubscript(Object[] y, Object x, Block fail, int i) {
       var loc = fail.loc;
-      assign(y[i], insn(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
+      assign(y[i], ins(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
     }
 
     void assign(Object y, Object x, Block fail) {
@@ -891,7 +891,7 @@ final class Parser {
       // single assignment
       if (y instanceof String || y instanceof Var) {
         // TODO Var is impossible here?
-        insn(new Assign(loc, y, x));
+        ins(new Assign(loc, y, x));
         return;
       }
 
@@ -912,9 +912,9 @@ final class Parser {
 
         // rest of the list
         var len = new Len(loc, x);
-        insn(len);
+        ins(len);
         var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
-        insn(slice);
+        ins(slice);
         assign(y1.arg1, slice, fail);
 
         return;
@@ -925,9 +925,9 @@ final class Parser {
 
       // assigning to a constant means an error check
       var eq = new Eq(loc, y, x);
-      insn(eq);
+      ins(eq);
       var after = new Block(loc, "assignCheckAfter");
-      insn(new If(loc, eq, after, fail));
+      ins(new If(loc, eq, after, fail));
       add(after);
     }
 
@@ -936,11 +936,11 @@ final class Parser {
       var fail = new Block(loc, "assignFail");
       assign(y, x, fail);
       var after = new Block(loc, "assignAfter");
-      insn(new Goto(loc, after));
+      ins(new Goto(loc, after));
 
       // fail
       add(fail);
-      insn(new Throw(loc, Etc.encode("assign failed")));
+      ins(new Throw(loc, Etc.encode("assign failed")));
 
       // after
       add(after);
@@ -951,7 +951,7 @@ final class Parser {
       var loc = x.loc;
       lex();
       var old = new Var(fn.vars);
-      insn(new Assign(loc, old, y));
+      ins(new Assign(loc, old, y));
       assign(loc, y, x);
       return old;
     }
@@ -963,7 +963,7 @@ final class Parser {
           case '[' -> {
             var loc = new Loc(file, line);
             lex();
-            a = insn(new Subscript(loc, a, expr()));
+            a = ins(new Subscript(loc, a, expr()));
             expect(']');
           }
           case '(' -> {
@@ -985,15 +985,15 @@ final class Parser {
               }
             }
             expect(')');
-            a = insn(new Call(loc, r.toArray()));
+            a = ins(new Call(loc, r.toArray()));
           }
           case INC -> {
             var loc = new Loc(file, line);
-            return postInc(a, insn(new Add(loc, a, BigInteger.ONE)));
+            return postInc(a, ins(new Add(loc, a, BigInteger.ONE)));
           }
           case DEC -> {
             var loc = new Loc(file, line);
-            return postInc(a, insn(new Sub(loc, a, BigInteger.ONE)));
+            return postInc(a, ins(new Sub(loc, a, BigInteger.ONE)));
           }
           default -> {
             return a;
@@ -1026,17 +1026,17 @@ final class Parser {
       var after = new Block(loc, "notAfter");
 
       // condition
-      insn(new If(loc, a, yes, no));
+      ins(new If(loc, a, yes, no));
 
       // true
       add(yes);
-      insn(new Assign(loc, r, false));
-      insn(new Goto(loc, after));
+      ins(new Assign(loc, r, false));
+      ins(new Goto(loc, after));
 
       // false
       add(no);
-      insn(new Assign(loc, r, true));
-      insn(new Goto(loc, after));
+      ins(new Assign(loc, r, true));
+      ins(new Goto(loc, after));
 
       // after
       add(after);
@@ -1058,7 +1058,7 @@ final class Parser {
           expect('(');
           var r = tok == INDENT ? c.block() : c.commas();
           loc = new Loc(file, line);
-          insn(new Return(loc, r));
+          ins(new Return(loc, r));
           expect(')');
           f.initVars();
           fn.fns.add(f);
@@ -1068,13 +1068,13 @@ final class Parser {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          return assign(loc, y, insn(new Add(loc, y, BigInteger.ONE)));
+          return assign(loc, y, ins(new Add(loc, y, BigInteger.ONE)));
         }
         case DEC -> {
           var loc = new Loc(file, line);
           lex();
           var y = postfix();
-          return assign(loc, y, insn(new Sub(loc, y, BigInteger.ONE)));
+          return assign(loc, y, ins(new Sub(loc, y, BigInteger.ONE)));
         }
         case '!' -> {
           var loc = new Loc(file, line);
@@ -1084,7 +1084,7 @@ final class Parser {
         case '-' -> {
           var loc = new Loc(file, line);
           lex();
-          return insn(new Neg(loc, prefix()));
+          return ins(new Neg(loc, prefix()));
         }
       }
       return postfix();
@@ -1143,35 +1143,35 @@ final class Parser {
         var b = infix(op.prec + op.left);
         a =
             switch (k) {
-              case EXP -> insn(new Exp(loc, a, b));
-              case '*' -> insn(new Mul(loc, a, b));
-              case '/' -> insn(new Div(loc, a, b));
-              case '%' -> insn(new Rem(loc, a, b));
-              case DIV_INT -> insn(new DivInt(loc, a, b));
-              case '+' -> insn(new Add(loc, a, b));
-              case '-' -> insn(new Sub(loc, a, b));
-              case '@' -> insn(new Cat(loc, a, b));
-              case '<' -> insn(new Lt(loc, a, b));
-              case '>' -> insn(new Lt(loc, b, a));
-              case LE -> insn(new Le(loc, a, b));
-              case GE -> insn(new Le(loc, b, a));
-              case EQ -> insn(new Eq(loc, a, b));
-              case EQ_NUM -> insn(new EqNum(loc, a, b));
-              case NE -> not(loc, insn(new Eq(loc, a, b)));
-              case NE_NUM -> not(loc, insn(new EqNum(loc, a, b)));
+              case EXP -> ins(new Exp(loc, a, b));
+              case '*' -> ins(new Mul(loc, a, b));
+              case '/' -> ins(new Div(loc, a, b));
+              case '%' -> ins(new Rem(loc, a, b));
+              case DIV_INT -> ins(new DivInt(loc, a, b));
+              case '+' -> ins(new Add(loc, a, b));
+              case '-' -> ins(new Sub(loc, a, b));
+              case '@' -> ins(new Cat(loc, a, b));
+              case '<' -> ins(new Lt(loc, a, b));
+              case '>' -> ins(new Lt(loc, b, a));
+              case LE -> ins(new Le(loc, a, b));
+              case GE -> ins(new Le(loc, b, a));
+              case EQ -> ins(new Eq(loc, a, b));
+              case EQ_NUM -> ins(new EqNum(loc, a, b));
+              case NE -> not(loc, ins(new Eq(loc, a, b)));
+              case NE_NUM -> not(loc, ins(new EqNum(loc, a, b)));
               case '&' -> {
                 var r = new Var(fn.vars);
                 var yes = new Block(loc, "andTrue");
                 var after = new Block(loc, "andAfter");
 
                 // condition
-                insn(new Assign(loc, r, a));
-                insn(new If(loc, r, yes, after));
+                ins(new Assign(loc, r, a));
+                ins(new If(loc, r, yes, after));
 
                 // true
                 add(yes);
-                insn(new Assign(loc, r, b));
-                insn(new Goto(loc, after));
+                ins(new Assign(loc, r, b));
+                ins(new Goto(loc, after));
 
                 // after
                 add(after);
@@ -1183,13 +1183,13 @@ final class Parser {
                 var after = new Block(loc, "orAfter");
 
                 // condition
-                insn(new Assign(loc, r, a));
-                insn(new If(loc, r, after, no));
+                ins(new Assign(loc, r, a));
+                ins(new If(loc, r, after, no));
 
                 // false
                 add(no);
-                insn(new Assign(loc, r, b));
-                insn(new Goto(loc, after));
+                ins(new Assign(loc, r, b));
+                ins(new Goto(loc, after));
 
                 // after
                 add(after);
@@ -1213,7 +1213,7 @@ final class Parser {
         if (eat('@')) return listRest(loc, r, expr());
         r.add(expr());
       }
-      return insn(new ListOf(loc, r.toArray()));
+      return ins(new ListOf(loc, r.toArray()));
     }
 
     // statements
@@ -1239,22 +1239,22 @@ final class Parser {
         case ADD_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, insn(new Add(loc, y, assignment())));
+          return assign(loc, y, ins(new Add(loc, y, assignment())));
         }
         case SUB_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, insn(new Sub(loc, y, assignment())));
+          return assign(loc, y, ins(new Sub(loc, y, assignment())));
         }
         case CAT_ASSIGN -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, insn(new Cat(loc, y, assignment())));
+          return assign(loc, y, ins(new Cat(loc, y, assignment())));
         }
         case APPEND -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(loc, y, insn(new Cat(loc, y, insn(new ListOf(loc, assignment())))));
+          return assign(loc, y, ins(new Cat(loc, y, ins(new ListOf(loc, assignment())))));
         }
       }
       return y;
@@ -1278,16 +1278,16 @@ final class Parser {
       var after = new Block(loc, "ifAfter");
 
       // condition
-      insn(new If(loc, expr(), yes, no));
+      ins(new If(loc, expr(), yes, no));
 
       // true
       add(yes);
-      insn(new Assign(loc, r, block()));
-      insn(new Goto(loc, after));
+      ins(new Assign(loc, r, block()));
+      ins(new Goto(loc, after));
 
       // false
       add(no);
-      insn(
+      ins(
           new Assign(
               loc,
               r,
@@ -1296,10 +1296,10 @@ final class Parser {
                   lex();
                   yield block();
                 }
-                case "elif" -> insn(new Assign(loc, r, xif()));
+                case "elif" -> ins(new Assign(loc, r, xif()));
                 default -> BigInteger.ZERO;
               }));
-      insn(new Goto(loc, after));
+      ins(new Goto(loc, after));
 
       // after
       add(after);
@@ -1315,16 +1315,16 @@ final class Parser {
       var c = new Context(this, label, cond, after);
 
       // before
-      insn(new Goto(loc, doWhile ? body : cond));
+      ins(new Goto(loc, doWhile ? body : cond));
 
       // condition
       add(cond);
-      insn(new If(loc, c.expr(), body, after));
+      ins(new If(loc, c.expr(), body, after));
 
       // body
       add(body);
       c.block();
-      insn(new Goto(loc, cond));
+      ins(new Goto(loc, cond));
 
       // after
       add(after);
@@ -1338,7 +1338,7 @@ final class Parser {
           lex();
           var a = tok == '\n' ? BigInteger.ZERO : commas();
           expectNewline();
-          insn(new Return(loc, a));
+          ins(new Return(loc, a));
           return BigInteger.ZERO;
         }
         case WORD -> {
@@ -1351,11 +1351,11 @@ final class Parser {
               var after = new Block(loc, "ifAfter");
 
               // condition
-              insn(new If(loc, cond, after, no));
+              ins(new If(loc, cond, after, no));
 
               // false
               add(no);
-              insn(
+              ins(
                   new Throw(
                       loc,
                       Etc.encode(
@@ -1373,7 +1373,7 @@ final class Parser {
               check(loc.line(), name, f);
               var c = new Context(f);
               c.params();
-              c.insn(new Return(loc, c.block()));
+              c.ins(new Return(loc, c.block()));
               f.initVars();
               fn.fns.add(f);
               return f;
@@ -1430,7 +1430,7 @@ final class Parser {
                   if (target != null) break;
                 }
               expectNewline();
-              insn(new Goto(loc, target));
+              ins(new Goto(loc, target));
               add(new Block(loc, "breakAfter"));
               return BigInteger.ZERO;
             }
@@ -1454,7 +1454,7 @@ final class Parser {
                   if (target != null) break;
                 }
               expectNewline();
-              insn(new Goto(loc, target));
+              ins(new Goto(loc, target));
               add(new Block(loc, "continueAfter"));
               return BigInteger.ZERO;
             }
@@ -1463,30 +1463,30 @@ final class Parser {
               var a = tok == '\n' ? BigInteger.ZERO : expr();
               expectNewline();
               // exit should ideally be a terminating instruction
-              insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a));
+              ins(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "exit", "(Ljava/lang/Object;)V", a));
               return BigInteger.ZERO;
             }
             case "printn" -> {
               lex();
               var a = commas();
               expectNewline();
-              insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
+              ins(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
               return BigInteger.ZERO;
             }
             case "throw" -> {
               lex();
               var a = commas();
               expectNewline();
-              insn(new Throw(loc, a));
+              ins(new Throw(loc, a));
               add(new Block(loc, "throwAfter"));
               return BigInteger.ZERO;
             }
             case "print" -> {
               lex();
               Object a = BigInteger.TEN;
-              if (tok != '\n') a = insn(new Cat(loc, commas(), a));
+              if (tok != '\n') a = ins(new Cat(loc, commas(), a));
               expectNewline();
-              insn(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
+              ins(new Invoke(loc, INVOKESTATIC, "aklo/Etc", "print", "(Ljava/lang/Object;)V", a));
               return BigInteger.ZERO;
             }
             default -> {
@@ -1544,7 +1544,7 @@ final class Parser {
     // parse
     var c = new Context(module);
     while (tok != DEDENT) c.stmt();
-    c.insn(new ReturnVoid(null));
+    c.ins(new ReturnVoid(null));
     module.initVars();
   }
 }
