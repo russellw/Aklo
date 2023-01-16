@@ -3,6 +3,7 @@ package aklo;
 import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 final class Parser {
@@ -411,12 +412,12 @@ final class Parser {
             'x',
             'y',
             'z' -> {
-          // TODO optimize?
-          var sb = new StringBuilder();
-          do readc(sb);
-          while (isWord(text[ti]));
+          var i = ti;
+          do i++;
+          while (isWord(text[i]));
           tok = WORD;
-          tokString = sb.toString().toLowerCase(Locale.ROOT);
+          tokString = new String(text, ti, i - ti, StandardCharsets.US_ASCII);
+          ti = i;
           return;
         }
         case '.' -> {
