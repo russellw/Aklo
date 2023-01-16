@@ -875,9 +875,9 @@ final class Parser {
       throw new CompileError(loc, "expected expression");
     }
 
-    void assignSubscript(Insn y, Object x, Block fail, int i) {
+    void assignSubscript(Object[] y, Object x, Block fail, int i) {
       var loc = fail.loc;
-      assign(y.get(i), insn(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
+      assign(y[i], insn(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
     }
 
     void assign(Object y, Object x, Block fail) {
@@ -892,25 +892,25 @@ final class Parser {
 
       // multiple assignment
       if (y instanceof ListOf y1) {
-        var n = y1.size();
-        for (var i = 0; i < n; i++) assignSubscript(y1, x, fail, i);
+        var s = y1.args;
+        for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
         return;
       }
 
       // multiple assignment with tail
       if (y instanceof Cat y1) {
         // head atoms
-        if (!(y1.get(0) instanceof ListOf s))
+        if (!(y1.arg0 instanceof ListOf s0))
           throw new CompileError(loc, y + ": invalid assignment");
-        var n = s.size();
-        for (var i = 0; i < n; i++) assignSubscript(s, x, fail, i);
+        var s = s0.args;
+        for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
 
         // rest of the list
         var len = new Len(loc, x);
         insn(len);
-        var slice = new Slice(loc, x, BigInteger.valueOf(n), len);
+        var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
         insn(slice);
-        assign(y1.get(1), slice, fail);
+        assign(y1.arg1, slice, fail);
 
         return;
       }
