@@ -701,68 +701,47 @@ final class Parser {
             return a;
           }
           case WORD -> {
-            // TODO
-            switch (s) {
-              case "bool?" -> {
-                return ins(new InstanceOf(loc, arg(), "java/lang/Boolean"));
-              }
-              case "int?" -> {
-                return ins(new InstanceOf(loc, arg(), "java/math/BigInteger"));
-              }
-              case "float?" -> {
-                return ins(new InstanceOf(loc, arg(), "java/lang/Float"));
-              }
-              case "double?" -> {
-                return ins(new InstanceOf(loc, arg(), "java/lang/Double"));
-              }
-              case "rat?" -> {
-                return ins(new InstanceOf(loc, arg(), "aklo/BigRational"));
-              }
-              case "list?" -> {
-                return ins(new InstanceOf(loc, arg(), "java/util/List"));
-              }
-              case "sym?" -> {
-                return ins(new InstanceOf(loc, arg(), "aklo/Sym"));
-              }
+            return switch (s) {
+              case "bool?" -> ins(new InstanceOf(loc, arg(), "java/lang/Boolean"));
+              case "int?" -> ins(new InstanceOf(loc, arg(), "java/math/BigInteger"));
+              case "float?" -> ins(new InstanceOf(loc, arg(), "java/lang/Float"));
+              case "double?" -> ins(new InstanceOf(loc, arg(), "java/lang/Double"));
+              case "rat?" -> ins(new InstanceOf(loc, arg(), "aklo/BigRational"));
+              case "list?" -> ins(new InstanceOf(loc, arg(), "java/util/List"));
+              case "sym?" -> ins(new InstanceOf(loc, arg(), "aklo/Sym"));
               case "slice" -> {
                 var t = arg1();
                 expect(',');
-                return ins(new Slice(loc, t, expr(), argN()));
+                yield ins(new Slice(loc, t, expr(), argN()));
               }
-              case "parserat" -> {
-                return ins(
-                    new Invoke(
-                        loc,
-                        INVOKESTATIC,
-                        "aklo/Etc",
-                        "parseRat",
-                        "(Ljava/lang/Object;)Laklo/BigRational;",
-                        arg()));
-              }
-              case "parsefloat" -> {
-                return ins(
-                    new Invoke(
-                        loc,
-                        INVOKESTATIC,
-                        "aklo/Etc",
-                        "parseFloat",
-                        "(Ljava/lang/Object;)Ljava/lang/Float;",
-                        arg()));
-              }
-              case "parsedouble" -> {
-                return ins(
-                    new Invoke(
-                        loc,
-                        INVOKESTATIC,
-                        "aklo/Etc",
-                        "parseDouble",
-                        "(Ljava/lang/Object;)Ljava/lang/Double;",
-                        arg()));
-              }
+              case "parserat" -> ins(
+                  new Invoke(
+                      loc,
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "parseRat",
+                      "(Ljava/lang/Object;)Laklo/BigRational;",
+                      arg()));
+              case "parsefloat" -> ins(
+                  new Invoke(
+                      loc,
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "parseFloat",
+                      "(Ljava/lang/Object;)Ljava/lang/Float;",
+                      arg()));
+              case "parsedouble" -> ins(
+                  new Invoke(
+                      loc,
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "parseDouble",
+                      "(Ljava/lang/Object;)Ljava/lang/Double;",
+                      arg()));
               case "parseint" -> {
                 var t = arg1();
                 if (eat(')'))
-                  return ins(
+                  yield ins(
                       new Invoke(
                           loc,
                           INVOKESTATIC,
@@ -770,7 +749,7 @@ final class Parser {
                           "parseInt",
                           "(Ljava/lang/Object;)Ljava/math/BigInteger;",
                           t));
-                return ins(
+                yield ins(
                     new Invoke(
                         loc,
                         INVOKESTATIC,
@@ -780,63 +759,41 @@ final class Parser {
                         t,
                         argN()));
               }
-              case "bitnot" -> {
-                return ins(new Not(loc, arg()));
+              case "bitnot" -> ins(new Not(loc, arg()));
+              case "len" -> ins(new Len(loc, arg()));
+              case "intern" -> ins(
+                  new Invoke(
+                      loc,
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "intern",
+                      "(Ljava/lang/Object;)Laklo/Sym;",
+                      arg()));
+              case "str" -> ins(
+                  new Invoke(
+                      loc,
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "str",
+                      "(Ljava/lang/Object;)Ljava/util/List;",
+                      arg()));
+              case "cmp" -> ins(new Cmp(loc, arg1(), argN()));
+              case "bitand" -> ins(new And(loc, arg1(), argN()));
+              case "bitor" -> ins(new Or(loc, arg1(), argN()));
+              case "bitxor" -> ins(new Xor(loc, arg1(), argN()));
+              case "shl" -> ins(new Shl(loc, arg1(), argN()));
+              case "shr" -> ins(new Shr(loc, arg1(), argN()));
+              case "true" -> Boolean.TRUE;
+              case "false" -> Boolean.FALSE;
+              default -> {
+                if (tok == '.') {
+                  var sb = new StringBuilder(s);
+                  while (eat('.')) sb.append(word());
+                  s = sb.toString();
+                }
+                yield s;
               }
-              case "len" -> {
-                return ins(new Len(loc, arg()));
-              }
-              case "intern" -> {
-                return ins(
-                    new Invoke(
-                        loc,
-                        INVOKESTATIC,
-                        "aklo/Etc",
-                        "intern",
-                        "(Ljava/lang/Object;)Laklo/Sym;",
-                        arg()));
-              }
-              case "str" -> {
-                return ins(
-                    new Invoke(
-                        loc,
-                        INVOKESTATIC,
-                        "aklo/Etc",
-                        "str",
-                        "(Ljava/lang/Object;)Ljava/util/List;",
-                        arg()));
-              }
-              case "cmp" -> {
-                return ins(new Cmp(loc, arg1(), argN()));
-              }
-              case "bitand" -> {
-                return ins(new And(loc, arg1(), argN()));
-              }
-              case "bitor" -> {
-                return ins(new Or(loc, arg1(), argN()));
-              }
-              case "bitxor" -> {
-                return ins(new Xor(loc, arg1(), argN()));
-              }
-              case "shl" -> {
-                return ins(new Shl(loc, arg1(), argN()));
-              }
-              case "shr" -> {
-                return ins(new Shr(loc, arg1(), argN()));
-              }
-              case "true" -> {
-                return Boolean.TRUE;
-              }
-              case "false" -> {
-                return Boolean.FALSE;
-              }
-            }
-            if (tok == '.') {
-              var sb = new StringBuilder(s);
-              while (eat('.')) sb.append(word());
-              s = sb.toString();
-            }
-            return s;
+            };
           }
           case FLOAT -> {
             return Float.parseFloat(s);
