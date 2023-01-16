@@ -55,6 +55,10 @@ final class Fn {
     return r;
   }
 
+  Block lastBlock() {
+    return blocks.get(blocks.size() - 1);
+  }
+
   void write(ClassWriter w) {
     var refs = refs();
 

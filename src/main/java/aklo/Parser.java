@@ -624,13 +624,10 @@ final class Parser {
       fn.blocks.add(block);
     }
 
-    Block lastBlock() {
-      return fn.blocks.get(fn.blocks.size() - 1);
-    }
-
     Instruction ins(Instruction a) {
-      // TODO block should be an instruction constructor parameter
-      lastBlock().instructions.add(a);
+      // TODO block should be an instruction constructor parameter?
+      // depending on how the optimizer typically needs to work
+      fn.lastBlock().instructions.add(a);
       return a;
     }
 

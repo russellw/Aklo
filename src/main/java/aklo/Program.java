@@ -66,9 +66,9 @@ final class Program {
 
       // modules may contain initialization code
       // so each module is called as a function from main
-      main.blocks.get(0).instructions.add(new Call(null, module));
+      main.lastBlock().instructions.add(new Call(null, module));
     }
-    main.blocks.get(0).instructions.add(new ReturnVoid(null));
+    main.lastBlock().instructions.add(new ReturnVoid(null));
     fns.add(main);
   }
 
