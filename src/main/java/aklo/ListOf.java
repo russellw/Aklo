@@ -2,8 +2,6 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
@@ -31,17 +29,6 @@ final class ListOf extends Nary {
     }
     mv.visitMethodInsn(
         INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
-  }
-
-  static ListOf encode(Loc loc, String s) {
-    // TODO
-    return of(loc, s.getBytes(StandardCharsets.UTF_8));
-  }
-
-  static ListOf of(Loc loc, byte[] s) {
-    var r = new Object[s.length];
-    for (var i = 0; i < s.length; i++) r[i] = BigInteger.valueOf(s[i] & 0xff);
-    return new ListOf(loc, r);
   }
 
   ListOf(Loc loc, Object... args) {
