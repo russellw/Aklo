@@ -1,5 +1,6 @@
 package aklo;
 
+
 import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
@@ -85,6 +86,10 @@ final class Parser {
   private static boolean isHex(String s) {
     for (var i = 0; i < s.length(); i++) if (digit(s.charAt(i)) >= 16) return false;
     return true;
+  }
+
+  private static int toLower(int c) {
+    return isUpper(c) ? c + 32 : c;
   }
 
   private static String unesc(String s) {
@@ -414,8 +419,10 @@ final class Parser {
             'y',
             'z' -> {
           var i = ti;
-          do i++;
-          while (isWord(text[i]));
+          do {
+            text[i] = (byte) toLower(text[i]);
+            i++;
+          } while (isWord(text[i]));
           tok = WORD;
           tokString = new String(text, ti, i - ti, StandardCharsets.US_ASCII);
           ti = i;
