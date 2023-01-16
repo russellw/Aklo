@@ -66,7 +66,7 @@ final class Program {
 
       // modules may contain initialization code
       // so each module is called as a function from main
-      main.blocks.get(0).insns.add(new Call(null, List.of(module)));
+      main.blocks.get(0).insns.add(new Call(null, module));
     }
     main.blocks.get(0).insns.add(new ReturnVoid(null));
     fns.add(main);

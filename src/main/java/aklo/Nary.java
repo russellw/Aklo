@@ -1,10 +1,8 @@
 package aklo;
 
 import java.util.Iterator;
-import java.util.List;
 
 abstract class Nary extends Insn {
-  // TODO should this be a list?
   final Object[] args;
 
   Nary(Loc loc, Object[] args) {
@@ -15,11 +13,6 @@ abstract class Nary extends Insn {
   @Override
   void set(int i, Object a) {
     args[i] = a;
-  }
-
-  Nary(Loc loc, List<Object> args) {
-    super(loc);
-    this.args = args.toArray();
   }
 
   @Override

@@ -4,7 +4,6 @@ import static org.objectweb.asm.Opcodes.*;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
@@ -34,11 +33,8 @@ final class ListOf extends Nary {
         INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
   }
 
-  ListOf(Loc loc, List<Object> args) {
-    super(loc, args);
-  }
-
   static ListOf encode(Loc loc, String s) {
+    // TODO
     return of(loc, s.getBytes(StandardCharsets.UTF_8));
   }
 
@@ -48,8 +44,7 @@ final class ListOf extends Nary {
     return new ListOf(loc, r);
   }
 
-  ListOf(Loc loc, Object[] args) {
-    // TODO do we need two constructors?
+  ListOf(Loc loc, Object... args) {
     super(loc, args);
   }
 

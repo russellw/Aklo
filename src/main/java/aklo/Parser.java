@@ -655,7 +655,7 @@ final class Parser {
     }
 
     Insn listRest(Loc loc, List<Object> s, Object t) {
-      return insn(new Cat(loc, insn(new ListOf(loc, s)), t));
+      return insn(new Cat(loc, insn(new ListOf(loc, s.toArray())), t));
     }
 
     Object primary() {
@@ -697,7 +697,7 @@ final class Parser {
               }
             }
             expect(']');
-            return insn(new ListOf(loc, r));
+            return insn(new ListOf(loc, r.toArray()));
           }
           case '(' -> {
             var a = commas();
@@ -980,7 +980,7 @@ final class Parser {
               }
             }
             expect(')');
-            a = insn(new Call(loc, r));
+            a = insn(new Call(loc, r.toArray()));
           }
           case '.' -> {
             // TODO this should probably be primary
@@ -1216,7 +1216,7 @@ final class Parser {
         if (eat('@')) return listRest(loc, r, expr());
         r.add(expr());
       }
-      return insn(new ListOf(loc, r));
+      return insn(new ListOf(loc, r.toArray()));
     }
 
     // statements
@@ -1257,8 +1257,7 @@ final class Parser {
         case APPEND -> {
           var loc = new Loc(file, line);
           lex();
-          return assign(
-              loc, y, insn(new Cat(loc, y, insn(new ListOf(loc, List.of(assignment()))))));
+          return assign(loc, y, insn(new Cat(loc, y, insn(new ListOf(loc, assignment())))));
         }
       }
       return y;
@@ -1390,14 +1389,15 @@ final class Parser {
               lex();
               var r = new ArrayList<>(List.of(commas()));
               expectIndent();
-              do {
-                var s = new ArrayList<>();
-                do s.add(commas());
-                while (eat('\n'));
-                s.add(block());
-                r.add(new Case(s));
-              } while (!eat(DEDENT));
-              return new Case(r);
+              throw new UnsupportedOperationException();
+              //              do {
+              //                var s = new ArrayList<>();
+              //                do s.add(commas());
+              //                while (eat('\n'));
+              //                s.add(block());
+              //                r.add(new Case(s));
+              //              } while (!eat(DEDENT));
+              //              return new Case(r);
             }
             case "for" -> {
               lex();
