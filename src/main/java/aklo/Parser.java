@@ -162,18 +162,21 @@ final class Parser {
       tok = text[ti];
       switch (text[ti]) {
         case ';' -> {
-          do ti++;
-          while (text[ti] != '\n');
+          var i = ti;
+          do i++;
+          while (text[i] != '\n');
+          ti = i;
           continue;
         }
         case '{' -> {
+          var i = ti;
           var line1 = line;
           do {
-            ti++;
-            if (ti == text.length) throw new CompileError(file, line, "unmatched '{'");
-            if (text[ti] == '\n') line1++;
-          } while (text[ti] != '}');
-          ti++;
+            i++;
+            if (i == text.length) throw new CompileError(file, line, "unmatched '{'");
+            if (text[i] == '\n') line1++;
+          } while (text[i] != '}');
+          ti = i + 1;
           line = line1;
           continue;
         }
@@ -532,6 +535,14 @@ final class Parser {
   }
 
   // parser
+  private CompileError err(String msg) {
+    var line1 = line;
+    switch (tok) {
+      case '\n', INDENT -> line1--;
+    }
+    return new CompileError(file, line1, msg);
+  }
+
   private boolean eat(int k) {
     if (tok != k) return false;
     lex();
@@ -539,15 +550,15 @@ final class Parser {
   }
 
   private void expect(char k) {
-    if (!eat(k)) throw new CompileError(file, line, String.format("expected '%c'", k));
+    if (!eat(k)) throw err(String.format("expected '%c'", k));
   }
 
   private void expectIndent() {
-    if (!eat(INDENT)) throw new CompileError(file, line, "expected indented block");
+    if (!eat(INDENT)) throw err("expected indented block");
   }
 
   private void expectNewline() {
-    if (!eat('\n')) throw new CompileError(file, line, "expected newline");
+    if (!eat('\n')) throw err("expected newline");
   }
 
   private String currentWord() {
@@ -557,7 +568,7 @@ final class Parser {
 
   private String word() {
     var s = tokString;
-    if (!eat(WORD)) throw new CompileError(file, line, "expected word");
+    if (!eat(WORD)) throw err("expected word");
     return s;
   }
 
@@ -586,9 +597,8 @@ final class Parser {
       this.breakTarget = breakTarget;
     }
 
-    void local(int line, String name, Object x) {
-      if (locals.put(name, x) != null)
-        throw new CompileError(new Loc(file, line), name + " defined twice");
+    void local(String name, Object x) {
+      if (locals.put(name, x) != null) throw err(name + " defined twice");
     }
 
     void add(Block block) {
@@ -787,10 +797,10 @@ final class Parser {
           }
         }
       } catch (NumberFormatException e) {
-        throw new CompileError(loc, e.toString());
+        throw err(e.toString());
       }
 
-      throw new CompileError(loc, "expected expression");
+      throw err("expected expression");
     }
 
     void assignSubscript(Object[] y, Object x, Block fail, int i) {
@@ -817,8 +827,7 @@ final class Parser {
       // multiple assignment with tail
       if (y instanceof Cat y1) {
         // head atoms
-        if (!(y1.arg0 instanceof ListOf s0))
-          throw new CompileError(loc, y + ": invalid assignment");
+        if (!(y1.arg0 instanceof ListOf s0)) throw err(y + ": invalid assignment");
         var s = s0.args;
         for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
 
@@ -828,7 +837,7 @@ final class Parser {
       }
 
       // Cannot assign to any other compound expression
-      if (y instanceof Instruction) throw new CompileError(loc, y + ": invalid assignment");
+      if (y instanceof Instruction) throw err(y + ": invalid assignment");
 
       // names have not yet been resolved to variables
       // so the only way for the left-hand side to be an actual variable at this point
@@ -911,7 +920,7 @@ final class Parser {
     void param() {
       var line1 = line;
       var name = word();
-      local(line1, name, new Var(name, fn.params));
+      local(name, new Var(name, fn.params));
     }
 
     void params() {
@@ -931,7 +940,7 @@ final class Parser {
           do param();
           while (eat(','));
         }
-        default -> throw new CompileError(file, line, "expected parameters");
+        default -> throw err("expected parameters");
       }
     }
 
@@ -1249,8 +1258,7 @@ final class Parser {
       // multiple assignment with tail
       if (y instanceof Cat y1) {
         // head atoms
-        if (!(y1.arg0 instanceof ListOf s0))
-          throw new CompileError(loc, y + ": invalid assignment");
+        if (!(y1.arg0 instanceof ListOf s0)) throw err(y + ": invalid assignment");
         var s = s0.args;
         for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
 
@@ -1260,7 +1268,7 @@ final class Parser {
       }
 
       // Cannot assign to any other compound expression
-      if (y instanceof Instruction) throw new CompileError(loc, y + ": invalid assignment");
+      if (y instanceof Instruction) throw err(y + ": invalid assignment");
 
       // names have not yet been resolved to variables
       // so the only way for the left-hand side to be an actual variable at this point
@@ -1345,7 +1353,7 @@ final class Parser {
               lex();
               var name = word();
               var f = new Fn(name);
-              local(loc.line(), name, f);
+              local(name, f);
               var c = new Context(f);
               c.params();
               c.ins(new Return(c.block()));
@@ -1379,7 +1387,7 @@ final class Parser {
               if (tok == WORD) {
                 var label = word();
                 for (var c = this; ; c = c.outer) {
-                  if (c == null) throw new CompileError(loc, label + ": not found");
+                  if (c == null) throw err(label + ": not found");
                   if (label.equals(c.label)) {
                     target = c.breakTarget;
                     assert target != null;
@@ -1388,7 +1396,7 @@ final class Parser {
                 }
               } else
                 for (var c = this; ; c = c.outer) {
-                  if (c == null) throw new CompileError(loc, "break without loop or case");
+                  if (c == null) throw err("break without loop or case");
                   target = c.breakTarget;
                   if (target != null) break;
                 }
@@ -1403,16 +1411,16 @@ final class Parser {
               if (tok == WORD) {
                 var label = word();
                 for (var c = this; ; c = c.outer) {
-                  if (c == null) throw new CompileError(loc, label + ": not found");
+                  if (c == null) throw err(label + ": not found");
                   if (label.equals(c.label)) {
                     target = c.continueTarget;
-                    if (target == null) throw new CompileError(loc, label + ": not a loop");
+                    if (target == null) throw err(label + ": not a loop");
                     break;
                   }
                 }
               } else
                 for (var c = this; ; c = c.outer) {
-                  if (c == null) throw new CompileError(loc, "continue without loop");
+                  if (c == null) throw err("continue without loop");
                   target = c.continueTarget;
                   if (target != null) break;
                 }
@@ -1479,9 +1487,9 @@ final class Parser {
                       return BigInteger.ZERO;
                     }
                   }
-                  throw new CompileError(loc, "expected statement after label");
+                  throw err("expected statement after label");
                 }
-                case '\n' -> throw new CompileError(loc, "expected statement");
+                case '\n' -> throw err("expected statement");
               }
             }
           }
