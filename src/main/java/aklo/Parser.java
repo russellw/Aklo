@@ -811,7 +811,7 @@ final class Parser {
 
     void assign(Object y, Object x, Block fail) {
       // single assignment
-      if (y instanceof String) {
+      if (y instanceof String || y instanceof Var) {
         ins(new Assign(y, x));
         return;
       }
@@ -837,12 +837,6 @@ final class Parser {
 
       // Cannot assign to any other compound expression
       if (y instanceof Instruction) throw err(y + ": invalid assignment");
-
-      // names have not yet been resolved to variables
-      // so the only way for the left-hand side to be an actual variable at this point
-      // would be if it were a complex expression that generates one
-      // and this possibility has just been excluded
-      assert !(y instanceof Var);
 
       // assigning to a constant means an error check
       branch(ins(new Eq(y, x)), fail);
@@ -1220,7 +1214,7 @@ final class Parser {
                   lex();
                   yield block();
                 }
-                case "elif" -> ins(new Assign(r, xif()));
+                case "elif" -> assign(r, xif());
                 default -> BigInteger.ZERO;
               }));
       ins(new Goto(after));
@@ -1236,7 +1230,7 @@ final class Parser {
 
     void check(Object y, Object x, Block fail) {
       // single assignment
-      if (y instanceof String) return;
+      if (y instanceof String || y instanceof Var) return;
 
       // multiple assignment
       if (y instanceof ListOf y1) {
@@ -1259,12 +1253,6 @@ final class Parser {
 
       // Cannot assign to any other compound expression
       if (y instanceof Instruction) throw err(y + ": invalid assignment");
-
-      // names have not yet been resolved to variables
-      // so the only way for the left-hand side to be an actual variable at this point
-      // would be if it were a complex expression that generates one
-      // and this possibility has just been excluded
-      assert !(y instanceof Var);
 
       // assigning to a constant means an error check
       branch(ins(new Eq(y, x)), fail);
