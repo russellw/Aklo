@@ -1192,15 +1192,11 @@ final class Parser {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       lex();
       var r = new Var("if$", fn.vars);
-      var yes = new Block("ifTrue");
-      var no = new Block("ifFalse");
-      var after = new Block("ifAfter");
+      var no = new Block("no");
+      var after = new Block("after");
 
       // condition
-      ins(new If(expr(), yes, no));
-
-      // true
-      add(yes);
+      branch(expr(), no);
       ins(new Assign(r, block()));
       ins(new Goto(after));
 
