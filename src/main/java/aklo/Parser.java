@@ -942,15 +942,11 @@ final class Parser {
 
     Var not(Object a) {
       var r = new Var("not$", fn.vars);
-      var yes = new Block("notTrue");
-      var no = new Block("notFalse");
-      var after = new Block("notAfter");
+      var no = new Block("no");
+      var after = new Block("after");
 
       // condition
-      ins(new If(a, yes, no));
-
-      // true
-      add(yes);
+      branch(a, no);
       ins(new Assign(r, false));
       ins(new Goto(after));
 
