@@ -7,6 +7,44 @@ import java.util.*;
 final class Main {
   private Main() {}
 
+  private static final class Link {
+    final Link outer;
+    final Map<String, Object> locals = new HashMap<>();
+    int line;
+
+    Object get(String name) {
+      for (var l = this; ; l = l.outer) {
+        if (l == null) return null;
+        var r = l.locals.get(name);
+        if (r != null) return r;
+      }
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    void link(Instruction a) {
+      for (var i = 0; i < a.size(); i++)
+        if (a.get(i) instanceof String name) {
+          var x = get(name);
+          if (x == null) throw new CompileError(a.loc.file(), line, name + " not found");
+          a.set(i, x);
+        }
+      if (a instanceof Assign && a.get(0) instanceof Fn)
+        throw new CompileError(a.loc.file(), line, a.get(0) + ": assigning a function");
+      if (a instanceof Line a1) line = a1.line;
+    }
+
+    Link(Link outer, Fn f) {
+      this.outer = outer;
+      for (var g : f.fns) {
+        new Link(this, g);
+        locals.put(g.name, g);
+      }
+      for (var x : f.params) locals.put(x.name, x);
+      for (var x : f.vars) locals.put(x.name, x);
+      for (var block : f.blocks) for (var a : block.instructions) link(a);
+    }
+  }
+
   private static void options() {
     System.out.println("-h  Show help");
     System.out.println("-V  Show version");
@@ -91,7 +129,6 @@ final class Main {
       try (var files = Files.walk(p)) {
         for (var path : files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
           var file = path.toString();
-          var loc = new Loc(file, 1);
 
           // module name runs from the package root to the file
           var names = new ArrayList<String>();
@@ -106,6 +143,9 @@ final class Main {
         }
       }
     }
+
+    // resolve names to variables and functions
+    for (var module : modules.values()) new Link(null, module);
 
     // convert to basic blocks
     Program.init(modules);

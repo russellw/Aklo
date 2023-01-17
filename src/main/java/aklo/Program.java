@@ -14,43 +14,9 @@ final class Program {
   static final List<Var> vars = new ArrayList<>();
   static final List<Fn> fns = new ArrayList<>();
 
-  private static final class Link {
-    final Link outer;
-    final Map<String, Object> locals = new HashMap<>();
-    int line;
-
-    Object get(String name) {
-      for (var l = this; ; l = l.outer) {
-        if (l == null) return null;
-        var r = l.locals.get(name);
-        if (r != null) return r;
-      }
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    void link(Instruction a) {
-      for (var i = 0; i < a.size(); i++)
-        if (a.get(i) instanceof String name) {
-          var x = get(name);
-          if (x == null) throw new CompileError(a.loc.file(), line, name + " not found");
-          a.set(i, x);
-        }
-      if (a instanceof Assign && a.get(0) instanceof Fn)
-        throw new CompileError(a.loc.file(), line, a.get(0) + ": assigning a function");
-      if (a instanceof Line a1) line = a1.line;
-    }
-
-    Link(Link outer, Fn f) {
-      this.outer = outer;
-      for (var g : f.fns) {
-        new Link(this, g);
-        if (g.name != null) locals.put(g.name, g);
-      }
-      for (var x : f.params) if (x.name != null) locals.put(x.name, x);
-      for (var x : f.vars) if (x.name != null) locals.put(x.name, x);
-      for (var block : f.blocks) for (var a : block.instructions) link(a);
-      fns.add(f);
-    }
+  private static void lift(Fn f) {
+    for (var g : f.fns) lift(g);
+    fns.add(f);
   }
 
   static void init(Map<List<String>, Fn> modules) {
@@ -59,8 +25,8 @@ final class Program {
     args.type = "[Ljava/lang/String;";
     main.rtype = "V";
     for (var module : modules.values()) {
-      // resolve names to variables and functions
-      new Link(null, module);
+      // lift functions to global scope
+      lift(module);
 
       // Module scope variables are static
       vars.addAll(module.vars);

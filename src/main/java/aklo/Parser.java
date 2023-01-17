@@ -972,7 +972,7 @@ final class Parser {
       switch (tok) {
         case '\\' -> {
           lex();
-          var f = new Fn("lambda");
+          var f = new Fn("lambda$");
           var c = new Context(f);
 
           // parameters
