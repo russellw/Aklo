@@ -1032,9 +1032,6 @@ final class Parser {
 
       prec--;
       init('&', 1);
-
-      prec--;
-      init('|', 1);
     }
 
     Object infix(int prec) {
@@ -1081,31 +1078,40 @@ final class Parser {
                 add(after);
                 yield r;
               }
-              case '|' -> {
-                var r = new Var("or$", fn.vars);
-                var no = new Block("orFalse");
-                var after = new Block("orAfter");
-
-                // condition
-                ins(new Assign(r, a));
-                ins(new If(r, after, no));
-
-                // false
-                add(no);
-                ins(new Assign(r, b));
-                ins(new Goto(after));
-
-                // after
-                add(after);
-                yield r;
-              }
               default -> throw new IllegalStateException(Integer.toString(k));
             };
       }
     }
 
+    Object and() {
+      var a = infix(1);
+      return a;
+    }
+
+    Object or() {
+      var a = and();
+      if (!eat('|')) return a;
+      var r = new Var("or$", fn.vars);
+      // TODO check consistency of block names
+      var no = new Block("orFalse");
+      var after = new Block("orAfter");
+
+      // condition
+      ins(new Assign(r, a));
+      ins(new If(r, after, no));
+
+      // false
+      add(no);
+      ins(new Assign(r, or()));
+      ins(new Goto(after));
+
+      // after
+      add(after);
+      return r;
+    }
+
     Object expr() {
-      return infix(1);
+      return or();
     }
 
     Object commas() {
