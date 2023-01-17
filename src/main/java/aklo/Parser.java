@@ -586,7 +586,7 @@ final class Parser {
       this.breakTarget = breakTarget;
     }
 
-    void check(int line, String name, Object x) {
+    void local(int line, String name, Object x) {
       if (locals.put(name, x) != null)
         throw new CompileError(new Loc(file, line), name + " defined twice");
     }
@@ -839,7 +839,6 @@ final class Parser {
         var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
         ins(slice);
         assign(y1.arg1, slice, fail);
-
         return;
       }
 
@@ -853,7 +852,7 @@ final class Parser {
       assert !(y instanceof Var);
 
       // assigning to a constant means an error check
-      var after = new Block(loc, "assignCheckAfter");
+      var after = new Block(loc, "assignAfter");
       ins(new If(loc, ins(new Eq(loc, y, x)), after, fail));
       add(after);
     }
@@ -932,7 +931,7 @@ final class Parser {
     void param() {
       var line1 = line;
       var name = word();
-      check(line1, name, new Var(name, fn.params));
+      local(line1, name, new Var(name, fn.params));
     }
 
     void params() {
@@ -1205,6 +1204,30 @@ final class Parser {
       return r;
     }
 
+    void xwhile(String label, boolean doWhile) {
+      var loc = new Loc(file, line);
+      lex();
+      var body = new Block(loc, "whileBody");
+      var cond = new Block(loc, "whileCond");
+      var after = new Block(loc, "whileAfter");
+      var c = new Context(this, label, cond, after);
+
+      // before
+      ins(new Goto(loc, doWhile ? body : cond));
+
+      // condition
+      add(cond);
+      ins(new If(loc, c.expr(), body, after));
+
+      // body
+      add(body);
+      c.block();
+      ins(new Goto(loc, cond));
+
+      // after
+      add(after);
+    }
+
     Var xif() {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       var loc = new Loc(file, line);
@@ -1243,28 +1266,88 @@ final class Parser {
       return r;
     }
 
-    void xwhile(String label, boolean doWhile) {
+    void checkSubscript(Object[] y, Object x, Block fail, int i) {
+      var loc = fail.loc;
+      check(y[i], ins(new Subscript(loc, x, BigInteger.valueOf(i))), fail);
+    }
+
+    void check(Object y, Object x, Block fail) {
+      var loc = fail.loc;
+
+      // single assignment
+      if (y instanceof String) return;
+
+      // multiple assignment
+      if (y instanceof ListOf y1) {
+        var s = y1.args;
+        for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
+        return;
+      }
+
+      // multiple assignment with tail
+      if (y instanceof Cat y1) {
+        // head atoms
+        if (!(y1.arg0 instanceof ListOf s0))
+          throw new CompileError(loc, y + ": invalid assignment");
+        var s = s0.args;
+        for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
+
+        // rest of the list
+        var len = new Len(loc, x);
+        ins(len);
+        var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
+        ins(slice);
+        check(y1.arg1, slice, fail);
+        return;
+      }
+
+      // Cannot assign to any other compound expression
+      if (y instanceof Instruction) throw new CompileError(loc, y + ": invalid assignment");
+
+      // names have not yet been resolved to variables
+      // so the only way for the left-hand side to be an actual variable at this point
+      // would be if it were a complex expression that generates one
+      // and this possibility has just been excluded
+      assert !(y instanceof Var);
+
+      // assigning to a constant means an error check
+      // TODO factor out
+      var after = new Block(loc, "checkAfter");
+      ins(new If(loc, ins(new Eq(loc, y, x)), after, fail));
+      add(after);
+    }
+
+    Object xcase(String label) {
       var loc = new Loc(file, line);
       lex();
-      var body = new Block(loc, "whileBody");
-      var cond = new Block(loc, "whileCond");
-      var after = new Block(loc, "whileAfter");
-      var c = new Context(this, label, cond, after);
+      var r = new Var("case$", fn.vars);
+      var after = new Block(loc, "caseAfter");
+      var c = new Context(this, label, continueTarget, after);
 
-      // before
-      ins(new Goto(loc, doWhile ? body : cond));
+      // value
+      lex();
+      var x = commas();
 
-      // condition
-      add(cond);
-      ins(new If(loc, c.expr(), body, after));
+      // default result
+      ins(new Assign(loc, r, BigInteger.ZERO));
 
-      // body
-      add(body);
-      c.block();
-      ins(new Goto(loc, cond));
+      // alternatives
+      expectIndent();
+      do {
+        var yes = new Block(loc, "caseYes");
+        var no = new Block(loc, "caseNo");
+        do {
+          commas();
+        } while (eat('\n'));
+        add(yes);
+        ins(new Assign(loc, r, block()));
+        ins(new Goto(loc, after));
+        add(no);
+      } while (!eat(DEDENT));
 
       // after
       add(after);
+      return r;
     }
 
     Object stmt() {
@@ -1306,7 +1389,7 @@ final class Parser {
               lex();
               var name = word();
               var f = new Fn(loc, name);
-              check(loc.line(), name, f);
+              local(loc.line(), name, f);
               var c = new Context(f);
               c.params();
               c.ins(new Return(loc, c.block()));
@@ -1318,19 +1401,7 @@ final class Parser {
               return xif();
             }
             case "case" -> {
-              // TODO
-              lex();
-              var r = new ArrayList<>(List.of(commas()));
-              expectIndent();
-              throw new UnsupportedOperationException();
-              //              do {
-              //                var s = new ArrayList<>();
-              //                do s.add(commas());
-              //                while (eat('\n'));
-              //                s.add(block());
-              //                r.add(new Case(s));
-              //              } while (!eat(DEDENT));
-              //              return new Case(r);
+              return xcase(null);
             }
             case "for" -> {
               lex();
@@ -1439,7 +1510,10 @@ final class Parser {
                   assert tok == ':';
                   lex();
                   switch (currentWord()) {
-                      // TODO for, case
+                      // TODO for
+                    case "case" -> {
+                      return xcase(label);
+                    }
                     case "dowhile" -> {
                       xwhile(label, true);
                       return BigInteger.ZERO;
