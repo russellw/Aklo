@@ -834,11 +834,10 @@ final class Parser {
         for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
 
         // rest of the list
-        var len = new Len(loc, x);
-        ins(len);
-        var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
-        ins(slice);
-        assign(y1.arg1, slice, fail);
+        assign(
+            y1.arg1,
+            ins(new Slice(loc, x, BigInteger.valueOf(s.length), ins(new Len(loc, x)))),
+            fail);
         return;
       }
 
@@ -1293,11 +1292,10 @@ final class Parser {
         for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
 
         // rest of the list
-        var len = new Len(loc, x);
-        ins(len);
-        var slice = new Slice(loc, x, BigInteger.valueOf(s.length), len);
-        ins(slice);
-        check(y1.arg1, slice, fail);
+        check(
+            y1.arg1,
+            ins(new Slice(loc, x, BigInteger.valueOf(s.length), ins(new Len(loc, x)))),
+            fail);
         return;
       }
 
