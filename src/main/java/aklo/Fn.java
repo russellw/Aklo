@@ -15,9 +15,9 @@ final class Fn {
   final List<Fn> fns = new ArrayList<>();
   final List<Block> blocks = new ArrayList<>();
 
-  Fn(Loc loc, String name) {
+  Fn(String name) {
     this.name = name;
-    addBlock(new Block(loc, "entry"));
+    addBlock(new Block("entry"));
   }
 
   private static int wordSize(String type) {
@@ -88,7 +88,7 @@ final class Fn {
 
   void initVars() {
     var r = new ArrayList<Instruction>();
-    for (var x : vars) r.add(new Assign(blocks.get(0).loc, x, BigInteger.ZERO));
+    for (var x : vars) r.add(new Assign(x, BigInteger.ZERO));
     blocks.get(0).instructions.addAll(0, r);
   }
 

@@ -6,10 +6,6 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class ReturnVoid extends Instruction {
-  ReturnVoid(Loc loc) {
-    super(loc);
-  }
-
   @Override
   boolean isTerminator() {
     return true;

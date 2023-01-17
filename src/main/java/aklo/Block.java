@@ -5,13 +5,12 @@ import java.util.List;
 import org.objectweb.asm.Label;
 
 final class Block {
-  final Loc loc;
+  Loc loc;
   String name;
   Label label;
   final List<Instruction> instructions = new ArrayList<>();
 
-  Block(Loc loc, String name) {
-    this.loc = loc;
+  Block(String name) {
     this.name = name;
   }
 

@@ -7,8 +7,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Or extends Binary {
-  Or(Loc loc, Object arg0, Object arg1) {
-    super(loc, arg0, arg1);
+  Or(Object arg0, Object arg1) {
+    super(arg0, arg1);
   }
 
   @Override

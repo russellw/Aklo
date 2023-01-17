@@ -7,8 +7,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Shl extends Binary {
-  Shl(Loc loc, Object arg0, Object arg1) {
-    super(loc, arg0, arg1);
+  Shl(Object arg0, Object arg1) {
+    super(arg0, arg1);
   }
 
   @Override

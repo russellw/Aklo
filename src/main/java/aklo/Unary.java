@@ -8,8 +8,7 @@ import java.util.List;
 abstract class Unary extends Instruction {
   Object arg;
 
-  Unary(Loc loc, Object arg) {
-    super(loc);
+  Unary(Object arg) {
     this.arg = arg;
   }
 

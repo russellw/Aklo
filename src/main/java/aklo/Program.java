@@ -52,7 +52,7 @@ final class Program {
   }
 
   static void init(Map<List<String>, Fn> modules) {
-    var main = new Fn(null, "main");
+    var main = new Fn("main");
     var args = new Var("args", main.params);
     args.type = "[Ljava/lang/String;";
     main.rtype = "V";
@@ -66,9 +66,9 @@ final class Program {
 
       // modules may contain initialization code
       // so each module is called as a function from main
-      main.lastBlock().instructions.add(new Call(null, module));
+      main.lastBlock().instructions.add(new Call(module));
     }
-    main.lastBlock().instructions.add(new ReturnVoid(null));
+    main.lastBlock().instructions.add(new ReturnVoid());
     fns.add(main);
   }
 

@@ -7,8 +7,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Not extends Unary {
-  Not(Loc loc, Object arg) {
-    super(loc, arg);
+  Not(Object arg) {
+    super(arg);
   }
 
   @Override

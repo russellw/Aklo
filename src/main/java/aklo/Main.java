@@ -99,7 +99,7 @@ final class Main {
             names.add(withoutExt(path.getName(j).toString()));
 
           // parse the module
-          var module = new Fn(loc, names.get(names.size() - 1));
+          var module = new Fn(names.get(names.size() - 1));
           module.rtype = "V";
           new Parser(file, Files.readAllBytes(Path.of(file)), module);
           modules.put(names, module);

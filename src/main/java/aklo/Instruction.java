@@ -8,11 +8,7 @@ import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
 abstract class Instruction extends AbstractCollection<Object> {
-  final Loc loc;
-
-  Instruction(Loc loc) {
-    this.loc = loc;
-  }
+  Loc loc;
 
   boolean isTerminator() {
     return false;

@@ -5,8 +5,7 @@ import java.util.Iterator;
 abstract class Ternary extends Instruction {
   Object arg0, arg1, arg2;
 
-  Ternary(Loc loc, Object arg0, Object arg1, Object arg2) {
-    super(loc);
+  Ternary(Object arg0, Object arg1, Object arg2) {
     this.arg0 = arg0;
     this.arg1 = arg1;
     this.arg2 = arg2;

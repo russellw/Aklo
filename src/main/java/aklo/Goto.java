@@ -23,8 +23,8 @@ final class Goto extends Instruction {
     mv.visitJumpInsn(GOTO, target.label);
   }
 
-  Goto(Loc loc, Block target) {
-    super(loc);
+  Goto(Block target) {
+    super();
     this.target = target;
   }
 }

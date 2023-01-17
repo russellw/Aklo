@@ -6,8 +6,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Call extends Nary {
-  Call(Loc loc, Object... args) {
-    super(loc, args);
+  Call(Object... args) {
+    super(args);
   }
 
   @Override

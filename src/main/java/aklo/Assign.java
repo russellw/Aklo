@@ -6,8 +6,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Assign extends Binary {
-  Assign(Loc loc, Object arg0, Object arg1) {
-    super(loc, arg0, arg1);
+  Assign(Object arg0, Object arg1) {
+    super(arg0, arg1);
   }
 
   @Override

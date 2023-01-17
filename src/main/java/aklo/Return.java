@@ -6,8 +6,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Return extends Unary {
-  Return(Loc loc, Object arg) {
-    super(loc, arg);
+  Return(Object arg) {
+    super(arg);
   }
 
   @Override

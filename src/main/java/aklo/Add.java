@@ -7,8 +7,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Add extends Binary {
-  Add(Loc loc, Object arg0, Object arg1) {
-    super(loc, arg0, arg1);
+  Add(Object arg0, Object arg1) {
+    super(arg0, arg1);
   }
 
   @Override

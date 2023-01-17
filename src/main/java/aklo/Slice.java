@@ -6,8 +6,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Slice extends Ternary {
-  Slice(Loc loc, Object s, Object i, Object j) {
-    super(loc, s, i, j);
+  Slice(Object s, Object i, Object j) {
+    super(s, i, j);
   }
 
   @Override

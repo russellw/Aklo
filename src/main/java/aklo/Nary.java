@@ -5,8 +5,7 @@ import java.util.Iterator;
 abstract class Nary extends Instruction {
   final Object[] args;
 
-  Nary(Loc loc, Object[] args) {
-    super(loc);
+  Nary(Object[] args) {
     this.args = args;
   }
 

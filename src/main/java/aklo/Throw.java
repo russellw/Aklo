@@ -11,8 +11,8 @@ final class Throw extends Unary {
     return true;
   }
 
-  Throw(Loc loc, Object arg) {
-    super(loc, arg);
+  Throw(Object arg) {
+    super(arg);
   }
 
   @Override

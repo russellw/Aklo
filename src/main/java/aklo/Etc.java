@@ -111,51 +111,51 @@ public final class Etc {
   }
 
   public static Object mul(Object a, Object b) {
-    return Binary.eval(new Mul(null, null, null), a, b);
+    return Binary.eval(new Mul(null, null), a, b);
   }
 
   public static Object add(Object a, Object b) {
-    return Binary.eval(new Add(null, null, null), a, b);
+    return Binary.eval(new Add(null, null), a, b);
   }
 
   public static Object bitAnd(Object a, Object b) {
-    return Binary.eval(new And(null, null, null), a, b);
+    return Binary.eval(new And(null, null), a, b);
   }
 
   public static Object bitNot(Object a) {
-    return Unary.eval(new Not(null, null), a);
+    return Unary.eval(new Not(null), a);
   }
 
   public static Object bitOr(Object a, Object b) {
-    return Binary.eval(new Or(null, null, null), a, b);
+    return Binary.eval(new Or(null, null), a, b);
   }
 
   public static Object bitXor(Object a, Object b) {
-    return Binary.eval(new Xor(null, null, null), a, b);
+    return Binary.eval(new Xor(null, null), a, b);
   }
 
   public static Object cmp(Object a, Object b) {
-    return Binary.eval(new Cmp(null, null, null), a, b);
+    return Binary.eval(new Cmp(null, null), a, b);
   }
 
   public static Object div(Object a, Object b) {
-    return Binary.eval(new Div(null, null, null), a, b);
+    return Binary.eval(new Div(null, null), a, b);
   }
 
   public static Object divInt(Object a, Object b) {
-    return Binary.eval(new DivInt(null, null, null), a, b);
+    return Binary.eval(new DivInt(null, null), a, b);
   }
 
   public static Object eqNum(Object a, Object b) {
-    return Binary.eval(new EqNum(null, null, null), a, b);
+    return Binary.eval(new EqNum(null, null), a, b);
   }
 
   public static Object exp(Object a, Object b) {
-    return Binary.eval(new Exp(null, null, null), a, b);
+    return Binary.eval(new Exp(null, null), a, b);
   }
 
   public static Object le(Object a, Object b) {
-    return Binary.eval(new Le(null, null, null), a, b);
+    return Binary.eval(new Le(null, null), a, b);
   }
 
   public static Object len(Object s) {
@@ -163,23 +163,23 @@ public final class Etc {
   }
 
   public static Object lt(Object a, Object b) {
-    return Binary.eval(new Lt(null, null, null), a, b);
+    return Binary.eval(new Lt(null, null), a, b);
   }
 
   public static Object neg(Object a) {
-    return Unary.eval(new Neg(null, null), a);
+    return Unary.eval(new Neg(null), a);
   }
 
   public static Object rem(Object a, Object b) {
-    return Binary.eval(new Rem(null, null, null), a, b);
+    return Binary.eval(new Rem(null, null), a, b);
   }
 
   public static Object shl(Object a, Object b) {
-    return Binary.eval(new Shl(null, null, null), a, b);
+    return Binary.eval(new Shl(null, null), a, b);
   }
 
   public static Object sub(Object a, Object b) {
-    return Binary.eval(new Sub(null, null, null), a, b);
+    return Binary.eval(new Sub(null, null), a, b);
   }
 
   public static Object subscript(Object s, Object i) {
@@ -197,6 +197,6 @@ public final class Etc {
   }
 
   public static Object shr(Object a, Object b) {
-    return Binary.eval(new Shr(null, null, null), a, b);
+    return Binary.eval(new Shr(null, null), a, b);
   }
 }

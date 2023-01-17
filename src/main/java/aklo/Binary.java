@@ -10,8 +10,7 @@ import java.util.List;
 abstract class Binary extends Instruction {
   Object arg0, arg1;
 
-  Binary(Loc loc, Object arg0, Object arg1) {
-    super(loc);
+  Binary(Object arg0, Object arg1) {
     this.arg0 = arg0;
     this.arg1 = arg1;
   }

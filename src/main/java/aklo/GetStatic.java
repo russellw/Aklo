@@ -20,8 +20,8 @@ final class GetStatic extends Instruction {
     mv.visitFieldInsn(GETSTATIC, owner, name, descriptor);
   }
 
-  GetStatic(Loc loc, String owner, String name, String descriptor) {
-    super(loc);
+  GetStatic(String owner, String name, String descriptor) {
+    super();
     this.owner = owner;
     this.name = name;
     this.descriptor = descriptor;

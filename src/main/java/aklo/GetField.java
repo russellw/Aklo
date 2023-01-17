@@ -5,8 +5,8 @@ final class GetField extends Unary {
   final String name;
   final String descriptor;
 
-  GetField(Loc loc, String owner, String name, String descriptor, Object arg) {
-    super(loc, arg);
+  GetField(String owner, String name, String descriptor, Object arg) {
+    super(arg);
     this.owner = owner;
     this.name = name;
     this.descriptor = descriptor;

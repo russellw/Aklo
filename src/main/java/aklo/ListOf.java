@@ -31,8 +31,8 @@ final class ListOf extends Nary {
         INVOKESTATIC, "java/util/Arrays", "asList", "([Ljava/lang/Object;)Ljava/util/List;", false);
   }
 
-  ListOf(Loc loc, Object... args) {
-    super(loc, args);
+  ListOf(Object... args) {
+    super(args);
   }
 
   @Override
