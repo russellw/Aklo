@@ -53,3 +53,5 @@ assert bitNot (0)==-1
 
 a=1
 assert bitNot (a)==-2
+
+assert 5|(1/0)==5
