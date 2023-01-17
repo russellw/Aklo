@@ -19,12 +19,12 @@ final class Program {
     fns.add(f);
   }
 
-  static void init(Map<List<String>, Fn> modules) {
+  static void init(List<Fn> modules) {
     var main = new Fn("main");
     var args = new Var("args", main.params);
     args.type = "[Ljava/lang/String;";
     main.rtype = "V";
-    for (var module : modules.values()) {
+    for (var module : modules) {
       // lift functions to global scope
       lift(module);
 

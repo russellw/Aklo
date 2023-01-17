@@ -5,7 +5,6 @@ import java.util.List;
 import org.objectweb.asm.Label;
 
 final class Block {
-  Loc loc;
   String name;
   Label label;
   final List<Instruction> instructions = new ArrayList<>();

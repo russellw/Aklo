@@ -5,6 +5,9 @@ import java.nio.file.*;
 import java.util.*;
 
 final class Main {
+  private static String file;
+  private static final Map<List<String>, Fn> namesModules = new HashMap<>();
+
   private Main() {}
 
   private static final class Link {
@@ -25,11 +28,11 @@ final class Main {
       for (var i = 0; i < a.size(); i++)
         if (a.get(i) instanceof String name) {
           var x = get(name);
-          if (x == null) throw new CompileError(a.loc.file(), line, name + " not found");
+          if (x == null) throw new CompileError(file, line, name + " not found");
           a.set(i, x);
         }
       if (a instanceof Assign && a.get(0) instanceof Fn)
-        throw new CompileError(a.loc.file(), line, a.get(0) + ": assigning a function");
+        throw new CompileError(file, line, a.get(0) + ": assigning a function");
       if (a instanceof Line a1) line = a1.line;
     }
 
@@ -118,17 +121,15 @@ final class Main {
       packages.add(Path.of(s));
     }
 
-    // modules may contain initialization code
-    // that is guaranteed to be run in deterministic order
-    // so make sure the collection of modules keeps deterministic order
-    var modules = new LinkedHashMap<List<String>, Fn>();
+    var modules = new ArrayList<Fn>();
+    var moduleFiles = new HashMap<Fn, String>();
 
     // parse
     for (var p : packages) {
       var i = p.getNameCount() - 1;
       try (var files = Files.walk(p)) {
         for (var path : files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
-          var file = path.toString();
+          file = path.toString();
 
           // module name runs from the package root to the file
           var names = new ArrayList<String>();
@@ -139,13 +140,19 @@ final class Main {
           var module = new Fn(names.get(names.size() - 1));
           module.rtype = "V";
           new Parser(file, Files.readAllBytes(Path.of(file)), module);
-          modules.put(names, module);
+
+          modules.add(module);
+          namesModules.put(names, module);
+          moduleFiles.put(module, file);
         }
       }
     }
 
     // resolve names to variables and functions
-    for (var module : modules.values()) new Link(null, module);
+    for (var module : modules) {
+      file = moduleFiles.get(module);
+      new Link(null, module);
+    }
 
     // convert to basic blocks
     Program.init(modules);

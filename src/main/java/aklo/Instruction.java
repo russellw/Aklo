@@ -8,8 +8,6 @@ import java.util.function.Consumer;
 import org.objectweb.asm.MethodVisitor;
 
 abstract class Instruction extends AbstractCollection<Object> {
-  Loc loc;
-
   boolean isTerminator() {
     return false;
   }
@@ -20,7 +18,7 @@ abstract class Instruction extends AbstractCollection<Object> {
   }
 
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    throw new UnsupportedOperationException(String.format("%s: %s", loc, this));
+    throw new UnsupportedOperationException(toString());
   }
 
   @Override

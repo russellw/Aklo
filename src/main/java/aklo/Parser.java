@@ -637,14 +637,10 @@ final class Parser {
     }
 
     Object primary() {
-      var loc = new Loc(file, line);
-
-      // having noted the current line, factor out the moving to the next token
       var k = tok;
       var b = tokBytes;
       var s = tokString;
       lex();
-
       try {
         switch (k) {
           case '[' -> {
@@ -804,13 +800,10 @@ final class Parser {
     }
 
     void assignSubscript(Object[] y, Object x, Block fail, int i) {
-      var loc = fail.loc;
       assign(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), fail);
     }
 
     void assign(Object y, Object x, Block fail) {
-      var loc = fail.loc;
-
       // single assignment
       if (y instanceof String) {
         ins(new Assign(y, x));
@@ -918,7 +911,6 @@ final class Parser {
     }
 
     void param() {
-      var line1 = line;
       var name = word();
       local(name, new Var(name, fn.params));
     }
@@ -1243,8 +1235,6 @@ final class Parser {
     }
 
     void check(Object y, Object x, Block fail) {
-      var loc = fail.loc;
-
       // single assignment
       if (y instanceof String) return;
 
@@ -1317,7 +1307,6 @@ final class Parser {
 
     Object stmt() {
       ins(new Line(line));
-      var loc = new Loc(file, line);
       switch (tok) {
         case '^' -> {
           // TODO change to return?
@@ -1330,6 +1319,7 @@ final class Parser {
         case WORD -> {
           switch (tokString) {
             case "assert" -> {
+              var msg = String.format("%s:%d: %s: assert failed", file, line, fn.name);
               lex();
               var no = new Block("ifFalse");
               var after = new Block("ifAfter");
@@ -1340,11 +1330,7 @@ final class Parser {
 
               // false
               add(no);
-              ins(
-                  new Throw(
-                      Etc.encode(
-                          String.format(
-                              "%s:%d: %s: assert failed", loc.file(), loc.line(), fn.name))));
+              ins(new Throw(Etc.encode(msg)));
 
               // after
               add(after);
