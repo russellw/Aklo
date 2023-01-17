@@ -17,6 +17,7 @@ final class Program {
   private static final class Link {
     final Link outer;
     final Map<String, Object> locals = new HashMap<>();
+    int line;
 
     Object get(String name) {
       for (var l = this; ; l = l.outer) {
@@ -31,11 +32,12 @@ final class Program {
       for (var i = 0; i < a.size(); i++)
         if (a.get(i) instanceof String name) {
           var x = get(name);
-          if (x == null) throw new CompileError(a.loc, name + " not found");
+          if (x == null) throw new CompileError(a.loc.file(), line, name + " not found");
           a.set(i, x);
         }
       if (a instanceof Assign && a.get(0) instanceof Fn)
-        throw new CompileError(a.loc, a.get(0) + ": assigning a function");
+        throw new CompileError(a.loc.file(), line, a.get(0) + ": assigning a function");
+      if (a instanceof Line a1) line = a1.line;
     }
 
     Link(Link outer, Fn f) {

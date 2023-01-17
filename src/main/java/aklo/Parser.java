@@ -1316,6 +1316,7 @@ final class Parser {
     }
 
     Object stmt() {
+      ins(new Line(line));
       var loc = new Loc(file, line);
       switch (tok) {
         case '^' -> {
