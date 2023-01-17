@@ -183,8 +183,8 @@ final class Parser {
         case '\n' -> {
           // next line
           ti++;
-          if (ti == text.length) return;
           line++;
+          if (ti == text.length) return;
 
           // measure indent
           var col = 0;
