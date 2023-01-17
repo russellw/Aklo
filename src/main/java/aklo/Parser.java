@@ -1029,9 +1029,6 @@ final class Parser {
       init(NE, 1);
       init(EQ_NUM, 1);
       init(NE_NUM, 1);
-
-      prec--;
-      init('&', 1);
     }
 
     Object infix(int prec) {
@@ -1060,24 +1057,6 @@ final class Parser {
               case EQ_NUM -> ins(new EqNum(a, b));
               case NE -> not(ins(new Eq(a, b)));
               case NE_NUM -> not(ins(new EqNum(a, b)));
-              case '&' -> {
-                var r = new Var("and$", fn.vars);
-                var yes = new Block("andTrue");
-                var after = new Block("andAfter");
-
-                // condition
-                ins(new Assign(r, a));
-                ins(new If(r, yes, after));
-
-                // true
-                add(yes);
-                ins(new Assign(r, b));
-                ins(new Goto(after));
-
-                // after
-                add(after);
-                yield r;
-              }
               default -> throw new IllegalStateException(Integer.toString(k));
             };
       }
@@ -1085,7 +1064,23 @@ final class Parser {
 
     Object and() {
       var a = infix(1);
-      return a;
+      if (!eat('&')) return a;
+      var r = new Var("and$", fn.vars);
+      var yes = new Block("andTrue");
+      var after = new Block("andAfter");
+
+      // condition
+      ins(new Assign(r, a));
+      ins(new If(r, yes, after));
+
+      // true
+      add(yes);
+      ins(new Assign(r, and()));
+      ins(new Goto(after));
+
+      // after
+      add(after);
+      return r;
     }
 
     Object or() {

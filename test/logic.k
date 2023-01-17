@@ -54,9 +54,11 @@ assert bitNot (0)==-1
 a=1
 assert bitNot (a)==-2
 
-assert 5|(1/0)==5
+assert (5|(1/0))==5
 assert (1|2|3|4)==1
 assert (0|2|3|4)==2
 assert (0|0|3|4)==3
 assert (0|0|0|4)==4
 assert (0|0|0|0)==0
+
+assert (0&(1/0))==0
