@@ -799,6 +799,12 @@ final class Parser {
       throw err("expected expression");
     }
 
+    void branch(Object cond, Block no) {
+      var yes = new Block("yes");
+      ins(new If(cond, yes, no));
+      add(yes);
+    }
+
     void assignSubscript(Object[] y, Object x, Block fail, int i) {
       assign(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), fail);
     }
@@ -839,9 +845,7 @@ final class Parser {
       assert !(y instanceof Var);
 
       // assigning to a constant means an error check
-      var after = new Block("assignAfter");
-      ins(new If(ins(new Eq(y, x)), after, fail));
-      add(after);
+      branch(ins(new Eq(y, x)), fail);
     }
 
     Object assign(Object y, Object x) {
@@ -1267,10 +1271,7 @@ final class Parser {
       assert !(y instanceof Var);
 
       // assigning to a constant means an error check
-      // TODO factor out
-      var after = new Block("checkAfter");
-      ins(new If(ins(new Eq(y, x)), after, fail));
-      add(after);
+      branch(ins(new Eq(y, x)), fail);
     }
 
     Object xcase(String label) {
