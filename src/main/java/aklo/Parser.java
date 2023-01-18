@@ -1038,8 +1038,6 @@ final class Parser {
               case '+' -> ins(new Add(a, b));
               case '-' -> ins(new Sub(a, b));
               case '@' -> ins(new Cat(a, b));
-              case NE -> not(ins(new Eq(a, b)));
-              case NE_NUM -> not(ins(new EqNum(a, b)));
               default -> throw new IllegalStateException(Integer.toString(k));
             };
       }
@@ -1054,37 +1052,47 @@ final class Parser {
           var after = new Block("comparisonAfter");
           for (; ; ) {
             Object b;
-            Instruction cond;
+            Object cond;
             switch (tok) {
               case '<' -> {
                 lex();
                 b = infix(1);
-                cond = new Lt(a, b);
+                cond = ins(new Lt(a, b));
               }
               case '>' -> {
                 lex();
                 b = infix(1);
-                cond = new Lt(b, a);
+                cond = ins(new Lt(b, a));
               }
               case LE -> {
                 lex();
                 b = infix(1);
-                cond = new Le(a, b);
+                cond = ins(new Le(a, b));
               }
               case GE -> {
                 lex();
                 b = infix(1);
-                cond = new Le(b, a);
+                cond = ins(new Le(b, a));
               }
               case EQ -> {
                 lex();
                 b = infix(1);
-                cond = new Eq(a, b);
+                cond = ins(new Eq(a, b));
+              }
+              case NE -> {
+                lex();
+                b = infix(1);
+                cond = not(ins(new Eq(a, b)));
               }
               case EQ_NUM -> {
                 lex();
                 b = infix(1);
-                cond = new EqNum(a, b);
+                cond = ins(new EqNum(a, b));
+              }
+              case NE_NUM -> {
+                lex();
+                b = infix(1);
+                cond = not(ins(new EqNum(a, b)));
               }
               default -> {
                 ins(new Assign(r, true));
@@ -1100,7 +1108,7 @@ final class Parser {
                 return r;
               }
             }
-            branch(ins(cond), no);
+            branch(cond, no);
             a = b;
           }
         }
