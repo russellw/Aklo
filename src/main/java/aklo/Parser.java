@@ -1377,9 +1377,9 @@ final class Parser {
         ins(new Goto(after));
 
         // after
-        // TODO after
         add(altAfter);
       } while (!eat(DEDENT));
+      ins(new Goto(after));
 
       // after
       add(after);
