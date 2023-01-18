@@ -1045,23 +1045,6 @@ final class Parser {
       }
     }
 
-    void comparison(Object a, Var r, Block no) {
-      loop:
-      for (; ; )
-        switch (tok) {
-          case '<' -> {
-            lex();
-            var b = infix(1);
-            branch(ins(new Lt(a, b)), no);
-            a = b;
-          }
-          default -> {
-            ins(new Assign(r, true));
-            break loop;
-          }
-        }
-    }
-
     Object comparison() {
       var a = infix(1);
       switch (tok) {
