@@ -1295,6 +1295,7 @@ final class Parser {
     }
 
     void checkLen(Object[] y, Object x, Block fail) {
+      branch(ins(new InstanceOf(x, "java/util/List")), fail);
       branch(ins(new Le(BigInteger.valueOf(y.length), ins(new Len(x)))), fail);
     }
 
