@@ -643,6 +643,11 @@ final class Parser {
       return ins(new Cat(ins(new ListOf(s.toArray())), t));
     }
 
+    Instruction str(Object a) {
+      return ins(
+          new Invoke(INVOKESTATIC, "aklo/Etc", "str", "(Ljava/lang/Object;)Ljava/util/List;", a));
+    }
+
     Object primary() {
       var k = tok;
       var b = tokBytes;
@@ -745,13 +750,7 @@ final class Parser {
               case "intern" -> ins(
                   new Invoke(
                       INVOKESTATIC, "aklo/Etc", "intern", "(Ljava/lang/Object;)Laklo/Sym;", arg()));
-              case "str" -> ins(
-                  new Invoke(
-                      INVOKESTATIC,
-                      "aklo/Etc",
-                      "str",
-                      "(Ljava/lang/Object;)Ljava/util/List;",
-                      arg()));
+              case "str" -> str(arg());
               case "cmp" -> ins(new Cmp(arg1(), argN()));
               case "bitand" -> ins(new And(arg1(), argN()));
               case "bitor" -> ins(new Or(arg1(), argN()));
@@ -1388,6 +1387,23 @@ final class Parser {
         }
         case WORD -> {
           switch (tokString) {
+            case "dbg" -> {
+              var msg = String.format("%s:%d: %s", file, line, fn.name);
+              lex();
+              var a =
+                  tok == '\n'
+                      ? Etc.encode(msg)
+                      : ins(new Cat(Etc.encode(msg + ": "), str(commas())));
+              expectNewline();
+              ins(
+                  new Invoke(
+                      INVOKESTATIC,
+                      "aklo/Etc",
+                      "print",
+                      "(Ljava/lang/Object;)V",
+                      ins(new Cat(a, BigInteger.TEN))));
+              return BigInteger.ZERO;
+            }
             case "assert" -> {
               var msg = String.format("%s:%d: %s: assert failed", file, line, fn.name);
               lex();
