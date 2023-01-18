@@ -800,6 +800,11 @@ final class Parser {
     }
 
     void branch(Object cond, Block no) {
+      // there are several conditional constructs
+      // in which we can factor out the creation of the 'yes' block
+      // this is possible if we don't otherwise need to refer to that block
+      // and useful if we need it to exist
+      // because we need to do something only if the condition is true
       var yes = new Block("yes");
       ins(new If(cond, yes, no));
       add(yes);
@@ -1121,6 +1126,7 @@ final class Parser {
     Object and() {
       var a = comparison();
       if (!eat('&')) return a;
+
       var r = new Var("and$", fn.vars);
       var yes = new Block("andTrue");
       var after = new Block("andAfter");
@@ -1142,6 +1148,7 @@ final class Parser {
     Object or() {
       var a = and();
       if (!eat('|')) return a;
+
       var r = new Var("or$", fn.vars);
       // TODO check consistency of block names
       var no = new Block("orNo");
@@ -1177,6 +1184,15 @@ final class Parser {
     }
 
     // statements
+    void def(Object y) {
+      Instruction.walk(
+          y,
+          z -> {
+            if (z instanceof String name && !locals.containsKey(name))
+              locals.put(name, new Var(name, fn.vars));
+          });
+    }
+
     Object assignment() {
       var y = commas();
       switch (tok) {
@@ -1186,12 +1202,7 @@ final class Parser {
         }
         case '=' -> {
           lex();
-          Instruction.walk(
-              y,
-              z -> {
-                if (z instanceof String name && !locals.containsKey(name))
-                  locals.put(name, new Var(name, fn.vars));
-              });
+          def(y);
           return assign(y, assignment());
         }
         case ADD_ASSIGN -> {
@@ -1318,8 +1329,7 @@ final class Parser {
       var c = new Context(this, label, continueTarget, after);
 
       // value
-      lex();
-      var x = commas();
+      var x = c.commas();
 
       // default result
       ins(new Assign(r, BigInteger.ZERO));
@@ -1327,15 +1337,30 @@ final class Parser {
       // alternatives
       expectIndent();
       do {
+        // result block
         var yes = new Block("caseYes");
-        var no = new Block("caseNo");
+
+        // patterns
         do {
-          commas();
+          // next pattern
+          var no = new Block("caseNo");
+
+          // assign this pattern and go to the result block
+          var y = c.commas();
+          def(y);
+          check(y, x, no);
+          assign(y, x, no);
+          ins(new Goto(yes));
+
+          // otherwise, try the next pattern
+          add(no);
         } while (eat('\n'));
+
+        // result block
         add(yes);
-        ins(new Assign(r, block()));
+        // TODO replace with assign()
+        ins(new Assign(r, c.block()));
         ins(new Goto(after));
-        add(no);
       } while (!eat(DEDENT));
 
       // after
