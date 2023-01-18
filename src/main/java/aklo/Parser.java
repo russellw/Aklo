@@ -1350,13 +1350,12 @@ final class Parser {
       // alternatives
       expectIndent();
       do {
-        // result block
-        var yes = new Block("caseYes");
+        var yes = new Block("altYes");
+        var altAfter = new Block("altAfter");
 
         // patterns
         do {
-          // next pattern
-          var no = new Block("caseNo");
+          var no = new Block("altNo");
 
           // assign this pattern and go to the result block
           var y = c.commas();
@@ -1368,12 +1367,17 @@ final class Parser {
           // otherwise, try the next pattern
           add(no);
         } while (eat('\n'));
+        ins(new Goto(altAfter));
 
         // result block
         add(yes);
         // TODO replace with assign()
         ins(new Assign(r, c.block()));
         ins(new Goto(after));
+
+        // after
+        // TODO after
+        add(altAfter);
       } while (!eat(DEDENT));
 
       // after
