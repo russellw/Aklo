@@ -1294,6 +1294,10 @@ final class Parser {
       return r;
     }
 
+    void checkLen(Object[] y, Object x, Block fail) {
+      branch(ins(new Le(BigInteger.valueOf(y.length), ins(new Len(x)))), fail);
+    }
+
     void checkSubscript(Object[] y, Object x, Block fail, int i) {
       check(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), fail);
     }
@@ -1305,6 +1309,7 @@ final class Parser {
       // multiple assignment
       if (y instanceof ListOf y1) {
         var s = y1.args;
+        checkLen(s, x, fail);
         for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
         return;
       }
@@ -1314,6 +1319,7 @@ final class Parser {
         // head atoms
         if (!(y1.arg0 instanceof ListOf s0)) throw err(y + ": invalid assignment");
         var s = s0.args;
+        checkLen(s, x, fail);
         for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
 
         // rest of the list
@@ -1322,6 +1328,7 @@ final class Parser {
       }
 
       // Cannot assign to any other compound expression
+      // TODO is y a useful part of the error message?
       if (y instanceof Instruction) throw err(y + ": invalid assignment");
 
       // assigning to a constant means an error check
