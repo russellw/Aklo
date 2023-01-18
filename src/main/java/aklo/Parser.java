@@ -1018,17 +1018,6 @@ final class Parser {
       init('+', 1);
       init('-', 1);
       init('@', 1);
-
-      prec--;
-      // TODO chained comparisons like Python?
-      init('<', 1);
-      init(LE, 1);
-      init('>', 1);
-      init(GE, 1);
-      init(EQ, 1);
-      init(NE, 1);
-      init(EQ_NUM, 1);
-      init(NE_NUM, 1);
     }
 
     Object infix(int prec) {
@@ -1049,12 +1038,6 @@ final class Parser {
               case '+' -> ins(new Add(a, b));
               case '-' -> ins(new Sub(a, b));
               case '@' -> ins(new Cat(a, b));
-              case '<' -> ins(new Lt(a, b));
-              case '>' -> ins(new Lt(b, a));
-              case LE -> ins(new Le(a, b));
-              case GE -> ins(new Le(b, a));
-              case EQ -> ins(new Eq(a, b));
-              case EQ_NUM -> ins(new EqNum(a, b));
               case NE -> not(ins(new Eq(a, b)));
               case NE_NUM -> not(ins(new EqNum(a, b)));
               default -> throw new IllegalStateException(Integer.toString(k));
@@ -1062,8 +1045,90 @@ final class Parser {
       }
     }
 
-    Object and() {
+    void comparison(Object a, Var r, Block no) {
+      loop:
+      for (; ; )
+        switch (tok) {
+          case '<' -> {
+            lex();
+            var b = infix(1);
+            branch(ins(new Lt(a, b)), no);
+            a = b;
+          }
+          default -> {
+            ins(new Assign(r, true));
+            break loop;
+          }
+        }
+    }
+
+    Object comparison() {
       var a = infix(1);
+      switch (tok) {
+        case '<', '>', LE, GE, EQ, EQ_NUM, NE, NE_NUM -> {
+          var r = new Var("comparison$", fn.vars);
+          var no = new Block("comparisonNo");
+          var after = new Block("comparisonAfter");
+          for (; ; ) {
+            Object b;
+            Instruction cond;
+            switch (tok) {
+              case '<' -> {
+                lex();
+                b = infix(1);
+                cond = new Lt(a, b);
+              }
+              case '>' -> {
+                lex();
+                b = infix(1);
+                cond = new Lt(b, a);
+              }
+              case LE -> {
+                lex();
+                b = infix(1);
+                cond = new Le(a, b);
+              }
+              case GE -> {
+                lex();
+                b = infix(1);
+                cond = new Le(b, a);
+              }
+              case EQ -> {
+                lex();
+                b = infix(1);
+                cond = new Eq(a, b);
+              }
+              case EQ_NUM -> {
+                lex();
+                b = infix(1);
+                cond = new EqNum(a, b);
+              }
+              default -> {
+                ins(new Assign(r, true));
+                ins(new Goto(after));
+
+                // false
+                add(no);
+                ins(new Assign(r, false));
+                ins(new Goto(after));
+
+                // after
+                add(after);
+                return r;
+              }
+            }
+            branch(ins(cond), no);
+            a = b;
+          }
+        }
+        default -> {
+          return a;
+        }
+      }
+    }
+
+    Object and() {
+      var a = comparison();
       if (!eat('&')) return a;
       var r = new Var("and$", fn.vars);
       var yes = new Block("andTrue");
@@ -1088,7 +1153,7 @@ final class Parser {
       if (!eat('|')) return a;
       var r = new Var("or$", fn.vars);
       // TODO check consistency of block names
-      var no = new Block("orFalse");
+      var no = new Block("orNo");
       var after = new Block("orAfter");
 
       // condition
