@@ -574,16 +574,20 @@ final class Parser {
 
   private final class Context {
     final Context outer;
+
     final Fn fn;
+    final Map<String, Object> locals;
+
     final String label;
     final Block continueTarget;
     final Block breakTarget;
 
-    final Map<String, Object> locals = new HashMap<>();
-
     Context(Fn fn) {
       outer = null;
+
       this.fn = fn;
+      locals = new HashMap<>();
+
       label = null;
       continueTarget = null;
       breakTarget = null;
@@ -591,7 +595,10 @@ final class Parser {
 
     Context(Context outer, String label, Block continueTarget, Block breakTarget) {
       this.outer = outer;
+
       fn = outer.fn;
+      locals = outer.locals;
+
       this.label = label;
       this.continueTarget = continueTarget;
       this.breakTarget = breakTarget;

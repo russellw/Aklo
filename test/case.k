@@ -1,3 +1,5 @@
+{
+TODO fix syms
 case '+',1,2
 	'+',x,y
 		a=x+y
@@ -11,6 +13,7 @@ case '-',1,2
 	'-',x,y
 		a=x-y
 assert a==-1
+}
 
 case 1,2
 	a,b,c
