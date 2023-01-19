@@ -42,6 +42,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         </executions>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>aklo</directory>
+      </resource>
+    </resources>
   </build>
   <dependencies>
     <dependency>
