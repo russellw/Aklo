@@ -1239,29 +1239,6 @@ final class Parser {
       return r;
     }
 
-    void xwhile(String label, boolean doWhile) {
-      lex();
-      var body = new Block("whileBody");
-      var cond = new Block("whileCond");
-      var after = new Block("whileAfter");
-      var c = new Context(this, label, cond, after);
-
-      // before
-      ins(new Goto(doWhile ? body : cond));
-
-      // condition
-      add(cond);
-      ins(new If(c.expr(), body, after));
-
-      // body
-      add(body);
-      c.block();
-      ins(new Goto(cond));
-
-      // after
-      add(after);
-    }
-
     Var xif() {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       lex();
@@ -1386,6 +1363,60 @@ final class Parser {
       return r;
     }
 
+    void xwhile(String label, boolean doWhile) {
+      lex();
+      var body = new Block("whileBody");
+      var cond = new Block("whileCond");
+      var after = new Block("whileAfter");
+      var c = new Context(this, label, cond, after);
+
+      // before
+      ins(new Goto(doWhile ? body : cond));
+
+      // condition
+      add(cond);
+      ins(new If(c.expr(), body, after));
+
+      // body
+      add(body);
+      c.block();
+      ins(new Goto(cond));
+
+      // after
+      add(after);
+    }
+
+    void xfor(String label) {
+      lex();
+      var i = new Var("i$", fn.vars);
+      var body = new Block("forBody");
+      var cond = new Block("forCond");
+      var after = new Block("forAfter");
+      var c = new Context(this, label, cond, after);
+
+      // before
+      var y = c.commas();
+      expect(':');
+      var s = c.commas();
+      assign(i, BigInteger.ZERO);
+      ins(new Goto(cond));
+
+      // condition
+      add(cond);
+      ins(new If(ins(new Lt(i, ins(new Len(s)))), body, after));
+
+      // body
+      add(body);
+      def(y);
+      assign(y, ins(new Subscript(s, i)));
+      assign(i, ins(new Add(i, BigInteger.ONE)));
+      c.block();
+      ins(new Goto(cond));
+
+      // after
+      add(after);
+    }
+
     Object stmt() {
       ins(new Line(line));
       switch (tok) {
@@ -1453,10 +1484,8 @@ final class Parser {
               return xcase(null);
             }
             case "for" -> {
-              lex();
-              var x = commas();
-              expect(':');
-              // TODO
+              xfor(null);
+              return BigInteger.ZERO;
             }
             case "while" -> {
               xwhile(null, false);
@@ -1559,9 +1588,12 @@ final class Parser {
                   assert tok == ':';
                   lex();
                   switch (currentWord()) {
-                      // TODO for
                     case "case" -> {
                       return xcase(label);
+                    }
+                    case "for" -> {
+                      xfor(label);
+                      return BigInteger.ZERO;
                     }
                     case "dowhile" -> {
                       xwhile(label, true);
