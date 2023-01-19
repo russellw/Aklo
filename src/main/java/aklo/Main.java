@@ -55,25 +55,16 @@ final class Main {
     System.out.println("-V  Show version");
   }
 
-  private static String version() {
+  private static String version() throws IOException {
     var properties = new Properties();
-    var stream =
-        Main.class.getClassLoader().getResourceAsStream("META-INF/maven/aklo/aklo/pom.properties");
-    if (stream == null) return null;
-    try {
+    try (var stream = Main.class.getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF")) {
       properties.load(stream);
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.exit(1);
+      return properties.getProperty("Implementation-Version");
     }
-    return properties.getProperty("version");
   }
 
-  private static void printVersion() {
-    System.out.printf(
-        "Aklo %s, %s\n",
-        Objects.toString(version(), "[unknown version, not running from jar]"),
-        System.getProperty("java.class.path"));
+  private static void printVersion() throws IOException {
+    System.out.printf("Aklo %s, %s\n", version(), System.getProperty("java.class.path"));
     System.out.printf(
         "%s, %s, %s\n",
         System.getProperty("java.vm.name"),
