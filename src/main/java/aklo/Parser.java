@@ -837,7 +837,7 @@ final class Parser {
       // multiple assignment with tail
       if (y instanceof Cat y1) {
         // head atoms
-        if (!(y1.arg0 instanceof ListOf s0)) throw err(y + ": invalid assignment");
+        if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
         var s = s0.args;
         for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
 
@@ -847,7 +847,7 @@ final class Parser {
       }
 
       // Cannot assign to any other compound expression
-      if (y instanceof Instruction) throw err(y + ": invalid assignment");
+      if (y instanceof Instruction) throw err("invalid assignment");
 
       // assigning to a constant means an error check
       branch(ins(new Eq(y, x)), fail);
@@ -1296,7 +1296,7 @@ final class Parser {
       // multiple assignment with tail
       if (y instanceof Cat y1) {
         // head atoms
-        if (!(y1.arg0 instanceof ListOf s0)) throw err(y + ": invalid assignment");
+        if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
         var s = s0.args;
         checkLen(s, x, fail);
         for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
@@ -1305,10 +1305,6 @@ final class Parser {
         check(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), fail);
         return;
       }
-
-      // Cannot assign to any other compound expression
-      // TODO is y a useful part of the error message?
-      if (y instanceof Instruction) throw err(y + ": invalid assignment");
 
       // assigning to a constant means an error check
       branch(ins(new Eq(y, x)), fail);
