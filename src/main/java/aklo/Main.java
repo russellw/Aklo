@@ -99,6 +99,11 @@ final class Main {
     }
   }
 
+  private static void loadResource(String name) throws IOException {
+    var file = name + ".k";
+    load(file, name, readResource(file));
+  }
+
   private static Fn load(String file, String name, byte[] text) {
     var module = Parser.parse(file, name, text);
     modules.add(module);
@@ -157,6 +162,7 @@ final class Main {
           }
         }
       }
+      // loadResource("ubiquitous");
 
       // resolve names to variables and functions
       for (var module : modules) {
