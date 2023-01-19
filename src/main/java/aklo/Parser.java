@@ -873,7 +873,8 @@ final class Parser {
     Var postInc(Object y, Instruction x) {
       lex();
       var old = new Var("old$", fn.vars);
-      ins(new Assign(old, y));
+      //noinspection SuspiciousNameCombination
+      assign(old, y);
       assign(y, x);
       return old;
     }
@@ -952,12 +953,12 @@ final class Parser {
 
       // condition
       branch(a, no);
-      ins(new Assign(r, false));
+      assign(r, false);
       ins(new Goto(after));
 
       // false
       add(no);
-      ins(new Assign(r, true));
+      assign(r, true);
       ins(new Goto(after));
 
       // after
@@ -1106,12 +1107,12 @@ final class Parser {
                 cond = not(ins(new EqNum(a, b)));
               }
               default -> {
-                ins(new Assign(r, true));
+                assign(r, true);
                 ins(new Goto(after));
 
                 // false
                 add(no);
-                ins(new Assign(r, false));
+                assign(r, false);
                 ins(new Goto(after));
 
                 // after
@@ -1138,12 +1139,12 @@ final class Parser {
       var after = new Block("andAfter");
 
       // condition
-      ins(new Assign(r, a));
+      assign(r, a);
       ins(new If(r, yes, after));
 
       // true
       add(yes);
-      ins(new Assign(r, and()));
+      assign(r, and());
       ins(new Goto(after));
 
       // after
@@ -1161,12 +1162,12 @@ final class Parser {
       var after = new Block("orAfter");
 
       // condition
-      ins(new Assign(r, a));
+      assign(r, a);
       ins(new If(r, after, no));
 
       // false
       add(no);
-      ins(new Assign(r, or()));
+      assign(r, or());
       ins(new Goto(after));
 
       // after
@@ -1248,7 +1249,7 @@ final class Parser {
 
       // condition
       branch(expr(), no);
-      ins(new Assign(r, block()));
+      assign(r, block());
       ins(new Goto(after));
 
       // false
@@ -1323,7 +1324,7 @@ final class Parser {
       var x = c.commas();
 
       // default result
-      ins(new Assign(r, BigInteger.ZERO));
+      assign(r, BigInteger.ZERO);
 
       // alternatives
       expectIndent();
@@ -1349,8 +1350,7 @@ final class Parser {
 
         // result block
         add(yes);
-        // TODO replace with assign()
-        ins(new Assign(r, c.block()));
+        assign(r, c.block());
         ins(new Goto(after));
 
         // after
