@@ -124,40 +124,46 @@ final class Main {
     var modules = new ArrayList<Fn>();
     var moduleFiles = new HashMap<Fn, String>();
 
-    // parse
-    for (var p : packages) {
-      var i = p.getNameCount() - 1;
-      try (var files = Files.walk(p)) {
-        for (var path : files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
-          file = path.toString();
+    try {
+      // parse
+      for (var p : packages) {
+        var i = p.getNameCount() - 1;
+        try (var files = Files.walk(p)) {
+          for (var path :
+              files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
+            file = path.toString();
 
-          // module name runs from the package root to the file
-          var names = new ArrayList<String>();
-          for (var j = i; j < path.getNameCount(); j++)
-            names.add(withoutExt(path.getName(j).toString()));
+            // module name runs from the package root to the file
+            var names = new ArrayList<String>();
+            for (var j = i; j < path.getNameCount(); j++)
+              names.add(withoutExt(path.getName(j).toString()));
 
-          // parse the module
-          var module = new Fn(names.get(names.size() - 1));
-          module.rtype = "V";
-          new Parser(file, Files.readAllBytes(Path.of(file)), module);
+            // parse the module
+            var module = new Fn(names.get(names.size() - 1));
+            module.rtype = "V";
+            new Parser(file, Files.readAllBytes(Path.of(file)), module);
 
-          modules.add(module);
-          namesModules.put(names, module);
-          moduleFiles.put(module, file);
+            modules.add(module);
+            namesModules.put(names, module);
+            moduleFiles.put(module, file);
+          }
         }
       }
+
+      // resolve names to variables and functions
+      for (var module : modules) {
+        file = moduleFiles.get(module);
+        new Link(null, module);
+      }
+
+      // convert to basic blocks
+      Program.init(modules);
+
+      // write class file
+      Program.write();
+    } catch (CompileError e) {
+      System.err.println(e.getMessage());
+      System.exit(1);
     }
-
-    // resolve names to variables and functions
-    for (var module : modules) {
-      file = moduleFiles.get(module);
-      new Link(null, module);
-    }
-
-    // convert to basic blocks
-    Program.init(modules);
-
-    // write class file
-    Program.write();
   }
 }

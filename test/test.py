@@ -55,6 +55,8 @@ def do(file):
         m = re.match(r";\s*ERR\s+(.*)", s)
         if m:
             if search1(m[1], stderr.splitlines()) and p.returncode:
+                if verbose >= 2:
+                    print(stderr, end="")
                 return
             raise Exception(stderr)
 
