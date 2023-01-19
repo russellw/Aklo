@@ -816,11 +816,11 @@ final class Parser {
       add(yes);
     }
 
-    void assignSubscript(Object[] y, Object x, Block fail, int i) {
-      assign(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), fail);
+    void assignSubscript(Object[] y, Object x, Block no, int i) {
+      assign(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), no);
     }
 
-    void assign(Object y, Object x, Block fail) {
+    void assign(Object y, Object x, Block no) {
       // single assignment
       if (y instanceof String || y instanceof Var) {
         ins(new Assign(y, x));
@@ -830,7 +830,7 @@ final class Parser {
       // multiple assignment
       if (y instanceof ListOf y1) {
         var s = y1.args;
-        for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
+        for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
         return;
       }
 
@@ -839,10 +839,10 @@ final class Parser {
         // head atoms
         if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
         var s = s0.args;
-        for (var i = 0; i < s.length; i++) assignSubscript(s, x, fail, i);
+        for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
 
         // rest of the list
-        assign(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), fail);
+        assign(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
         return;
       }
 
@@ -850,20 +850,21 @@ final class Parser {
       if (y instanceof Instruction) throw err("invalid assignment");
 
       // assigning to a constant means an error check
-      branch(ins(new Eq(y, x)), fail);
+      branch(ins(new Eq(y, x)), no);
     }
 
     Object assign(Object y, Object x) {
-      var fail = new Block("assignFail");
+      var no = new Block("assignNo");
       var after = new Block("assignAfter");
 
       // assign
-      assign(y, x, fail);
+      assign(y, x, no);
       ins(new Goto(after));
 
       // fail
-      add(fail);
-      ins(new Throw(Etc.encode("assign failed")));
+      add(no);
+      var msg = String.format("%s:%d: %s: assign failed", file, line, fn.name);
+      ins(new Throw(Etc.encode(msg)));
 
       // after
       add(after);
@@ -1135,7 +1136,7 @@ final class Parser {
       if (!eat('&')) return a;
 
       var r = new Var("and$", fn.vars);
-      var yes = new Block("andTrue");
+      var yes = new Block("andYes");
       var after = new Block("andAfter");
 
       // condition
@@ -1157,7 +1158,6 @@ final class Parser {
       if (!eat('|')) return a;
 
       var r = new Var("or$", fn.vars);
-      // TODO check consistency of block names
       var no = new Block("orNo");
       var after = new Block("orAfter");
 
@@ -1244,8 +1244,8 @@ final class Parser {
       assert tok == WORD && (tokString.equals("if") || tokString.equals("elif"));
       lex();
       var r = new Var("if$", fn.vars);
-      var no = new Block("no");
-      var after = new Block("after");
+      var no = new Block("ifNo");
+      var after = new Block("ifAfter");
 
       // condition
       branch(expr(), no);
@@ -1272,24 +1272,24 @@ final class Parser {
       return r;
     }
 
-    void checkLen(Object[] y, Object x, Block fail) {
-      branch(ins(new InstanceOf(x, "java/util/List")), fail);
-      branch(ins(new Le(BigInteger.valueOf(y.length), ins(new Len(x)))), fail);
+    void checkLen(Object[] y, Object x, Block no) {
+      branch(ins(new InstanceOf(x, "java/util/List")), no);
+      branch(ins(new Le(BigInteger.valueOf(y.length), ins(new Len(x)))), no);
     }
 
-    void checkSubscript(Object[] y, Object x, Block fail, int i) {
-      check(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), fail);
+    void checkSubscript(Object[] y, Object x, Block no, int i) {
+      check(y[i], ins(new Subscript(x, BigInteger.valueOf(i))), no);
     }
 
-    void check(Object y, Object x, Block fail) {
+    void check(Object y, Object x, Block no) {
       // single assignment
       if (y instanceof String || y instanceof Var) return;
 
       // multiple assignment
       if (y instanceof ListOf y1) {
         var s = y1.args;
-        checkLen(s, x, fail);
-        for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
+        checkLen(s, x, no);
+        for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
         return;
       }
 
@@ -1298,16 +1298,16 @@ final class Parser {
         // head atoms
         if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
         var s = s0.args;
-        checkLen(s, x, fail);
-        for (var i = 0; i < s.length; i++) checkSubscript(s, x, fail, i);
+        checkLen(s, x, no);
+        for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
 
         // rest of the list
-        check(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), fail);
+        check(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
         return;
       }
 
       // assigning to a constant means an error check
-      branch(ins(new Eq(y, x)), fail);
+      branch(ins(new Eq(y, x)), no);
     }
 
     Object xcase(String label) {
@@ -1422,6 +1422,7 @@ final class Parser {
           var a = tok == '\n' ? BigInteger.ZERO : commas();
           expectNewline();
           ins(new Return(a));
+          add(new Block("returnAfter"));
           return BigInteger.ZERO;
         }
         case WORD -> {
@@ -1446,8 +1447,8 @@ final class Parser {
             case "assert" -> {
               var msg = String.format("%s:%d: %s: assert failed", file, line, fn.name);
               lex();
-              var no = new Block("ifFalse");
-              var after = new Block("ifAfter");
+              var no = new Block("assertNo");
+              var after = new Block("assertAfter");
 
               // condition
               ins(new If(expr(), after, no));
