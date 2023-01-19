@@ -5,8 +5,13 @@ import subprocess
 import time
 
 parser = argparse.ArgumentParser(description="Run test cases")
+parser.add_argument("-v", "--verbose", action="count", help="increase output verbosity")
 parser.add_argument("files", nargs="*")
 args = parser.parse_args()
+
+verbose = 0
+if args.verbose:
+    verbose = args.verbose
 
 here = os.path.dirname(os.path.realpath(__file__))
 
@@ -30,7 +35,8 @@ def search1(p, ss):
 
 
 def do(file):
-    print(file)
+    if verbose >= 1:
+        print(file)
     src = [s.strip() for s in open(file).readlines()]
 
     # check how long the Aklo compiler takes to run
@@ -59,7 +65,8 @@ def do(file):
         raise Exception(str(p.returncode))
 
     # check how long the Aklo compiler takes to run
-    print(f"{time.time()-start:.3f} seconds")
+    if verbose >= 2:
+        print(f"{time.time()-start:.3f} seconds")
 
     # run the program
     p = subprocess.Popen(
@@ -70,7 +77,8 @@ def do(file):
     stdout, stderr = p.communicate()
     stdout = str(stdout, "utf-8")
     stderr = str(stderr, "utf-8")
-    print(stdout, end="")
+    if verbose >= 2:
+        print(stdout, end="")
 
     # not expecting a runtime error
     if stderr:
