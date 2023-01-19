@@ -9,6 +9,11 @@ final class Line extends Instruction {
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {}
 
+  @Override
+  void dbg(Map<Object, Integer> refs) {
+    System.out.print("Line " + line);
+  }
+
   Line(int line) {
     this.line = line;
   }

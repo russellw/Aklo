@@ -13,7 +13,7 @@ final class Fn {
   String rtype = "Ljava/lang/Object;";
   final List<Var> vars = new ArrayList<>();
   final List<Fn> fns = new ArrayList<>();
-  final List<Block> blocks = new ArrayList<>();
+  List<Block> blocks = new ArrayList<>();
 
   Fn(String name) {
     this.name = name;

@@ -13,15 +13,13 @@ final class Block {
     this.name = name;
   }
 
+  Instruction last() {
+    return instructions.get(instructions.size() - 1);
+  }
+
   @Override
   public String toString() {
     assert name != null;
     return name;
-  }
-
-  boolean hasTerminator() {
-    var n = instructions.size();
-    if (n == 0) return false;
-    return instructions.get(n - 1).isTerminator();
   }
 }

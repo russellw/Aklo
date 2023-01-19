@@ -159,6 +159,9 @@ final class Main {
       // convert to basic blocks
       Program.init(modules);
 
+      // optimize
+      Optimizer.optimize();
+
       // write class file
       Program.write();
     } catch (CompileError e) {
