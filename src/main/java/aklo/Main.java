@@ -7,6 +7,8 @@ import java.util.*;
 final class Main {
   private static String file;
   private static final Map<List<String>, Fn> namesModules = new HashMap<>();
+  private static final List<Fn> modules = new ArrayList<>();
+  private static final Map<Fn, String> moduleFiles = new HashMap<>();
 
   private Main() {}
 
@@ -90,6 +92,20 @@ final class Main {
     return file.substring(0, i);
   }
 
+  private static byte[] readResource(String file) throws IOException {
+    try (var stream = Main.class.getClassLoader().getResourceAsStream(file)) {
+      //noinspection ConstantConditions
+      return stream.readAllBytes();
+    }
+  }
+
+  private static Fn load(String file, String name, byte[] text) {
+    var module = Parser.parse(file, name, text);
+    modules.add(module);
+    moduleFiles.put(module, file);
+    return module;
+  }
+
   public static void main(String[] args) throws IOException {
     // command line
     if (args.length == 0) {
@@ -121,9 +137,6 @@ final class Main {
       packages.add(Path.of(s));
     }
 
-    var modules = new ArrayList<Fn>();
-    var moduleFiles = new HashMap<Fn, String>();
-
     try {
       // parse
       for (var p : packages) {
@@ -138,14 +151,9 @@ final class Main {
             for (var j = i; j < path.getNameCount(); j++)
               names.add(withoutExt(path.getName(j).toString()));
 
-            // parse the module
-            var module = new Fn(names.get(names.size() - 1));
-            module.rtype = "V";
-            new Parser(file, Files.readAllBytes(Path.of(file)), module);
-
-            modules.add(module);
+            // load the module
+            var module = load(file, names.get(names.size() - 1), Files.readAllBytes(Path.of(file)));
             namesModules.put(names, module);
-            moduleFiles.put(module, file);
           }
         }
       }

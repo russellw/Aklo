@@ -1616,7 +1616,7 @@ final class Parser {
   }
 
   // top level
-  Parser(String file, byte[] text, Fn module) {
+  private Parser(String file, byte[] text, Fn module) {
     // init
     this.file = file;
     if (!(text.length > 0 && text[text.length - 1] == '\n')) {
@@ -1633,6 +1633,13 @@ final class Parser {
     var c = new Context(module);
     while (tok != DEDENT) c.stmt();
     c.ins(new ReturnVoid());
+  }
+
+  static Fn parse(String file, String name, byte[] text) {
+    var module = new Fn(name);
+    module.rtype = "V";
+    new Parser(file, text, module);
     module.initVars();
+    return module;
   }
 }
