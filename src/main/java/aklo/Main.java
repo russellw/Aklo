@@ -106,13 +106,14 @@ final class Main {
           }
         }
       }
-      // loadResource("ubiquitous");
+      loadResource("ubiquitous");
 
       // resolve names to variables and functions
       for (var module : modules.values()) new Link(null, module);
 
       // convert to basic blocks
       Program.init(modules.values());
+      Verifier.verify();
 
       // optimize
       Optimizer.optimize();
