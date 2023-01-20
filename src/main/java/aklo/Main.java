@@ -5,14 +5,13 @@ import java.nio.file.*;
 import java.util.*;
 
 final class Main {
-  private static String file;
   private static final Map<List<String>, Fn> namesModules = new HashMap<>();
   private static final List<Fn> modules = new ArrayList<>();
-  private static final Map<Fn, String> moduleFiles = new HashMap<>();
 
   private static final class Link {
     final Link outer;
     final Map<String, Object> locals = new HashMap<>();
+    String file;
     int line;
 
     Object get(String name) {
@@ -33,7 +32,10 @@ final class Main {
         }
       if (a instanceof Assign && a.get(0) instanceof Fn)
         throw new CompileError(file, line, a.get(0) + ": assigning a function");
-      if (a instanceof Line a1) line = a1.line;
+      if (a instanceof Line a1) {
+        file = a1.file;
+        line = a1.line;
+      }
     }
 
     Link(Link outer, Fn f) {
@@ -102,7 +104,6 @@ final class Main {
   private static Fn load(String file, String name, byte[] text) {
     var module = Parser.parse(file, name, text);
     modules.add(module);
-    moduleFiles.put(module, file);
     return module;
   }
 
@@ -144,7 +145,7 @@ final class Main {
         try (var files = Files.walk(p)) {
           for (var path :
               files.filter(path -> path.toString().endsWith(".k")).toArray(Path[]::new)) {
-            file = path.toString();
+            var file = path.toString();
 
             // module name runs from the package root to the file
             var names = new ArrayList<String>();
@@ -157,13 +158,10 @@ final class Main {
           }
         }
       }
-      loadResource("ubiquitous");
+      // loadResource("ubiquitous");
 
       // resolve names to variables and functions
-      for (var module : modules) {
-        file = moduleFiles.get(module);
-        new Link(null, module);
-      }
+      for (var module : modules) new Link(null, module);
 
       // convert to basic blocks
       Program.init(modules);
