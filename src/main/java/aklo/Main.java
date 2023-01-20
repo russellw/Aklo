@@ -10,8 +10,6 @@ final class Main {
   private static final List<Fn> modules = new ArrayList<>();
   private static final Map<Fn, String> moduleFiles = new HashMap<>();
 
-  private Main() {}
-
   private static final class Link {
     final Link outer;
     final Map<String, Object> locals = new HashMap<>();

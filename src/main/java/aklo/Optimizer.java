@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 final class Optimizer {
-  private Optimizer() {}
-
   private static void mark(Block block, Set<Block> visited) {
     if (!visited.add(block)) return;
     var a = block.last();

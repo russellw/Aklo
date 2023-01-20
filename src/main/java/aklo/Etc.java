@@ -7,7 +7,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public final class Etc {
-  private Etc() {}
+  public static final Boolean isWindows = System.getProperty("os.name").startsWith("Windows");
 
   public static List<Object> listVal(Object a) {
     if (a instanceof List a1) return a1;
@@ -160,6 +160,22 @@ public final class Etc {
 
   public static Object len(Object s) {
     return BigInteger.valueOf(((List) s).size());
+  }
+
+  static BigInteger integerVal(Object a) {
+    if (a instanceof BigInteger a1) return a1;
+    throw new IllegalArgumentException(a.toString());
+  }
+
+  public static List<Object> range(Object i, Object j) {
+    var i1 = integerVal(i);
+    var j1 = integerVal(j);
+    var r = new ArrayList<>();
+    while (i1.compareTo(j1) < 0) {
+      r.add(i1);
+      i1 = i1.add(BigInteger.ONE);
+    }
+    return r;
   }
 
   public static Object lt(Object a, Object b) {

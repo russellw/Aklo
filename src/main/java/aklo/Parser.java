@@ -693,6 +693,23 @@ final class Parser {
           }
           case WORD -> {
             return switch (s) {
+              case "range" -> {
+                var i = arg1();
+                Object j;
+                if (eat(',')) j = expr();
+                else {
+                  j = i;
+                  i = BigInteger.ZERO;
+                }
+                expect(')');
+                yield new Invoke(
+                    INVOKESTATIC,
+                    "aklo/Etc",
+                    "range",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
+                    i,
+                    j);
+              }
               case "bool?" -> ins(new InstanceOf(arg(), "java/lang/Boolean"));
               case "int?" -> ins(new InstanceOf(arg(), "java/math/BigInteger"));
               case "float?" -> ins(new InstanceOf(arg(), "java/lang/Float"));
@@ -759,6 +776,7 @@ final class Parser {
               case "shr" -> ins(new Shr(arg1(), argN()));
               case "true" -> Boolean.TRUE;
               case "false" -> Boolean.FALSE;
+              case "windows?" -> ins(new GetStatic("aklo/Etc", "isWindows", "Ljava/lang/Boolean;"));
               default -> {
                 if (tok == '.') {
                   var sb = new StringBuilder(s);

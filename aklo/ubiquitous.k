@@ -106,18 +106,6 @@ fn filterIdx (f,s)
 fn tail (s)
 	^ drop ( 1, s)
 
-fn prn (s)
-	pr (s@"\n")
-
-fn eprn (s)
-	epr (s@"\n")
-
-fn pr (s)
-		writeStream( stdout,s)
-
-fn epr (s)
-		writeStream( stderr,s)
-
 fn take (i,s)
 	;TODO should slice take list last?
 	^ slice( s,0,i)

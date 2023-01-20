@@ -9,8 +9,6 @@ import java.util.*;
 import org.objectweb.asm.ClassWriter;
 
 final class Program {
-  private Program() {}
-
   static final List<Var> vars = new ArrayList<>();
   static final List<Fn> fns = new ArrayList<>();
 
