@@ -5,7 +5,10 @@ import static org.objectweb.asm.Opcodes.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 abstract class Instruction extends AbstractCollection<Object> {
   boolean isTerminator() {
@@ -52,20 +55,16 @@ abstract class Instruction extends AbstractCollection<Object> {
   }
 
   static void load(Map<Object, Integer> refs, MethodVisitor mv, Object a) {
-    // local variable
     var i = refs.get(a);
     if (i != null) {
       mv.visitVarInsn(ALOAD, i);
       return;
     }
 
-    // global variable
     if (a instanceof Var a1) {
       mv.visitFieldInsn(GETSTATIC, "a", a1.name, a1.type);
       return;
     }
-
-    // scalars with special logic
     if (a instanceof BigInteger a1) {
       try {
         mv.visitLdcInsn(a1.longValueExact());
@@ -98,8 +97,6 @@ abstract class Instruction extends AbstractCollection<Object> {
     if (a instanceof BigRational a1) {
       throw new UnsupportedOperationException(a.toString());
     }
-
-    // list
     if (a instanceof List a1) {
       var n = a1.size();
       if (n <= 10) {
@@ -128,15 +125,38 @@ abstract class Instruction extends AbstractCollection<Object> {
           false);
       return;
     }
-
-    // floating point is directly supported apart from the conversion to object reference
-    mv.visitLdcInsn(a);
     if (a instanceof Float) {
+      mv.visitLdcInsn(a);
       mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;", false);
       return;
     }
-    assert a instanceof Double;
-    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+    if (a instanceof Double) {
+      mv.visitLdcInsn(a);
+      mv.visitMethodInsn(
+          INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
+      return;
+    }
+    if (a instanceof Fn) {
+      mv.visitInvokeDynamicInsn(
+          "apply",
+          "()Ljava/util/function/UnaryOperator;",
+          new Handle(
+              Opcodes.H_INVOKESTATIC,
+              "java/lang/invoke/LambdaMetafactory",
+              "metafactory",
+              "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
+              false),
+          Type.getType("(Ljava/lang/Object;)Ljava/lang/Object;"),
+          new Handle(
+              Opcodes.H_INVOKESTATIC,
+              "a",
+              a.toString(),
+              "(Ljava/lang/Object;)Ljava/lang/Object;",
+              false),
+          Type.getType("(Ljava/lang/Object;)Ljava/lang/Object;"));
+      return;
+    }
+    throw new IllegalArgumentException(a.toString());
   }
 
   Object get(int i) {
