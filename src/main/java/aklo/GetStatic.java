@@ -12,7 +12,7 @@ final class GetStatic extends Instruction {
 
   @Override
   public String toString() {
-    return String.format("getstatic(\"%s\", \"%s\", \"%s\")", owner, name, descriptor);
+    return String.format("GetStatic %s %s %s", owner, name, descriptor);
   }
 
   @Override

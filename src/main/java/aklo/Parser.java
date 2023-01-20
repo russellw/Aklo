@@ -1432,7 +1432,7 @@ final class Parser {
     }
 
     Object stmt() {
-      ins(new Line(line));
+      ins(new Line(file, line));
       switch (tok) {
         case '^' -> {
           // TODO change to return?

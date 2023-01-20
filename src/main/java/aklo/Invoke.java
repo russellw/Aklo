@@ -19,7 +19,7 @@ final class Invoke extends Nary {
 
   @Override
   void dbg(Map<Object, Integer> refs) {
-    System.out.print("invoke");
+    System.out.print("Invoke");
     System.out.print(
         switch (opcode) {
           case INVOKESTATIC -> "static";
@@ -27,7 +27,7 @@ final class Invoke extends Nary {
           case INVOKESPECIAL -> "special";
           default -> throw new IllegalStateException(Integer.toString(opcode));
         });
-    System.out.printf(" \"%s\" \"%s\" \"%s\"", owner, name, descriptor);
+    System.out.printf(" %s %s %s", owner, name, descriptor);
     for (var a : this) dbg(refs, a);
   }
 

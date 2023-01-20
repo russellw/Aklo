@@ -4,6 +4,7 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 final class Line extends Instruction {
+  final String file;
   final int line;
 
   @Override
@@ -11,10 +12,11 @@ final class Line extends Instruction {
 
   @Override
   void dbg(Map<Object, Integer> refs) {
-    System.out.print("Line " + line);
+    System.out.printf("Line %s %d", file, line);
   }
 
-  Line(int line) {
+  Line(String file, int line) {
+    this.file = file;
     this.line = line;
   }
 }
