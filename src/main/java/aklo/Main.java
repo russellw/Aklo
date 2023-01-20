@@ -40,13 +40,18 @@ final class Main {
 
     Link(Link outer, Fn f) {
       this.outer = outer;
-      for (var g : f.fns) {
-        new Link(this, g);
-        locals.put(g.name, g);
-      }
       for (var x : f.params) locals.put(x.name, x);
       for (var x : f.vars) locals.put(x.name, x);
+      for (var g : f.fns) locals.put(g.name, g);
+      for (var g : f.fns) new Link(this, g);
       for (var block : f.blocks) for (var a : block.instructions) link(a);
+    }
+
+    void dbg() {
+      System.out.println();
+      System.out.println(this);
+      for (var l = this; l != null; l = l.outer) System.out.println(l.locals);
+      System.out.println();
     }
   }
 
