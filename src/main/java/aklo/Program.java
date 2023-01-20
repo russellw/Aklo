@@ -17,7 +17,7 @@ final class Program {
     fns.add(f);
   }
 
-  static void init(List<Fn> modules) {
+  static void init(Collection<Fn> modules) {
     var main = new Fn("main");
     var args = new Var("args", main.params);
     args.type = "[Ljava/lang/String;";

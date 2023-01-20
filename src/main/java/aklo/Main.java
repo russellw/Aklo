@@ -5,56 +5,7 @@ import java.nio.file.*;
 import java.util.*;
 
 final class Main {
-  private static final Map<List<String>, Fn> namesModules = new HashMap<>();
-  private static final List<Fn> modules = new ArrayList<>();
-
-  private static final class Link {
-    final Link outer;
-    final Map<String, Object> locals = new HashMap<>();
-    String file;
-    int line;
-
-    Object get(String name) {
-      for (var l = this; ; l = l.outer) {
-        if (l == null) return null;
-        var r = l.locals.get(name);
-        if (r != null) return r;
-      }
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    void link(Instruction a) {
-      for (var i = 0; i < a.size(); i++)
-        if (a.get(i) instanceof String name) {
-          var x = get(name);
-          if (x == null) throw new CompileError(file, line, name + " not found");
-          a.set(i, x);
-        }
-      if (a instanceof Assign && a.get(0) instanceof Fn)
-        throw new CompileError(file, line, a.get(0) + ": assigning a function");
-      if (a instanceof Line a1) {
-        file = a1.file;
-        line = a1.line;
-      }
-    }
-
-    Link(Link outer, Fn f) {
-      this.outer = outer;
-      for (var x : f.params) locals.put(x.name, x);
-      for (var x : f.vars) locals.put(x.name, x);
-      for (var g : f.fns) locals.put(g.name, g);
-      for (var g : f.fns) new Link(this, g);
-      for (var block : f.blocks) for (var a : block.instructions) link(a);
-    }
-
-    @SuppressWarnings("unused")
-    void dbg() {
-      System.out.println();
-      System.out.println(this);
-      for (var l = this; l != null; l = l.outer) System.out.println(l.locals);
-      System.out.println();
-    }
-  }
+  private static final Map<List<String>, Fn> modules = new LinkedHashMap<>();
 
   private static void options() {
     System.out.println("-h  Show help");
@@ -98,13 +49,11 @@ final class Main {
 
   private static void loadResource(String name) throws IOException {
     var file = name + ".k";
-    load(file, name, readResource(file));
+    load(file, List.of("aklo", name), readResource(file));
   }
 
-  private static Fn load(String file, String name, byte[] text) {
-    var module = Parser.parse(file, name, text);
-    modules.add(module);
-    return module;
+  private static void load(String file, List<String> names, byte[] text) {
+    modules.put(names, Parser.parse(file, names.get(names.size() - 1), text));
   }
 
   public static void main(String[] args) throws IOException {
@@ -153,18 +102,17 @@ final class Main {
               names.add(withoutExt(path.getName(j).toString()));
 
             // load the module
-            var module = load(file, names.get(names.size() - 1), Files.readAllBytes(Path.of(file)));
-            namesModules.put(names, module);
+            load(file, names, Files.readAllBytes(Path.of(file)));
           }
         }
       }
       // loadResource("ubiquitous");
 
       // resolve names to variables and functions
-      for (var module : modules) new Link(null, module);
+      for (var module : modules.values()) new Link(null, module);
 
       // convert to basic blocks
-      Program.init(modules);
+      Program.init(modules.values());
 
       // optimize
       Optimizer.optimize();
