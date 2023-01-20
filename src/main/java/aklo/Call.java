@@ -1,6 +1,6 @@
 package aklo;
 
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.*;
 
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
@@ -18,8 +18,18 @@ final class Call extends Nary {
 
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
-    for (var i = 1; i < size(); i++) load(refs, mv, get(i));
-    var f = (Fn) get(0);
-    mv.visitMethodInsn(INVOKESTATIC, "a", f.name, f.descriptor(), false);
+    var f = get(0);
+    if (f instanceof Fn f1) {
+      for (var i = 1; i < size(); i++) load(refs, mv, get(i));
+      mv.visitMethodInsn(INVOKESTATIC, "a", f1.name, f1.descriptor(), false);
+      return;
+    }
+    for (var i = 0; i < size(); i++) load(refs, mv, get(i));
+    mv.visitMethodInsn(
+        INVOKEINTERFACE,
+        "java/util/function/UnaryOperator",
+        "apply",
+        "(Ljava/lang/Object;)Ljava/lang/Object;",
+        true);
   }
 }

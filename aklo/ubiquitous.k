@@ -18,7 +18,7 @@ fn alnum?(c)
 	^ alpha? (c)|digit? (c)
 
 fn print?(c)
-	^" "[0]<=c&c<=126
+	^32<=c&c<=126
 
 fn exact?(a)
 	^int?(a)|rat?(a)
