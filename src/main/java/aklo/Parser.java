@@ -997,8 +997,13 @@ final class Parser {
 
           // body
           expect('(');
-          var r = tok == INDENT ? c.block() : c.commas();
-          ins(new Return(r));
+          Object r;
+          if (tok == INDENT) r = c.block();
+          else {
+            c.ins(new Line(file, line));
+            r = c.commas();
+          }
+          c.ins(new Return(r));
           expect(')');
           f.initVars();
           fn.fns.add(f);
