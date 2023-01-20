@@ -21,7 +21,7 @@ fn print?(c)
 	^" "[0]<=c&c<=126
 
 fn exact?(a)
-	^integer?(a)|rational?(a)
+	^int?(a)|rat?(a)
 
 fn inexact?(a)
 	^float?(a)|double?(a)
@@ -30,7 +30,7 @@ fn ascii?(a)
 	if atom?(a)|!a
 		^
 	for b: a
-		if !integer?(b)
+		if !int?(b)
 			^
 		if!print?(b)&!in(b,"\n\r\t")
 			^

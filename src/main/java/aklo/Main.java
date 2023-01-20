@@ -47,6 +47,7 @@ final class Main {
       for (var block : f.blocks) for (var a : block.instructions) link(a);
     }
 
+    @SuppressWarnings("unused")
     void dbg() {
       System.out.println();
       System.out.println(this);
@@ -158,7 +159,7 @@ final class Main {
           }
         }
       }
-      // loadResource("ubiquitous");
+      loadResource("ubiquitous");
 
       // resolve names to variables and functions
       for (var module : modules) {
