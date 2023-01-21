@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 abstract class Unary extends Instruction {
   Object arg;
 
@@ -34,25 +35,22 @@ abstract class Unary extends Instruction {
     return arg;
   }
 
-  static Object eval(Unary op, Object a) {
-    // most likely case is integers
-    if (a instanceof BigInteger a1) return op.apply(a1);
+  private static List<Object> evals(Unary op, List<Object> s) {
+    var r = new Object[s.size()];
+    for (var i = 0; i < r.length; i++) r[i] = eval(op, s.get(i));
+    return Arrays.asList(r);
+  }
 
-    // floating-point numbers are more common than exact rationals
-    if (a instanceof Float a1) return op.apply(a1);
-    if (a instanceof Double a1) return op.apply(a1);
-    if (a instanceof BigRational a1) return op.apply(a1);
-
-    // allow Boolean operands for convenience
-    if (a instanceof Boolean a1) return op.apply(a1 ? BigInteger.ONE : BigInteger.ZERO);
-
-    // extend to lists
-    if (a instanceof List a1) {
-      var r = new Object[a1.size()];
-      for (var i = 0; i < r.length; i++) r[i] = eval(op, a1.get(i));
-      return Arrays.asList(r);
-    }
-    throw new IllegalArgumentException(String.format("%s(%s)", op, a));
+  static Object eval(Unary op, Object a0) {
+    return switch (a0) {
+      case BigInteger a -> op.apply(a);
+      case Float a -> op.apply(a);
+      case Double a -> op.apply(a);
+      case BigRational a -> op.apply(a);
+      case Boolean a -> op.apply(a ? BigInteger.ONE : BigInteger.ZERO);
+      case List a -> evals(op, a);
+      default -> throw new IllegalArgumentException(String.format("%s(%s)", op, a0));
+    };
   }
 
   double apply(double a) {

@@ -54,7 +54,7 @@ abstract class Binary extends Instruction {
     throw new UnsupportedOperationException(toString());
   }
 
-  private static Object evals(Binary op, List<Object> s, List<Object> t) {
+  private static List<Object> evals(Binary op, List<Object> s, List<Object> t) {
     var r = new Object[s.size()];
     for (var i = 0; i < r.length; i++) r[i] = eval(op, s.get(i), t.get(i));
     return Arrays.asList(r);
