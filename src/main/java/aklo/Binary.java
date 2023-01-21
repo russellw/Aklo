@@ -65,11 +65,24 @@ abstract class Binary extends Instruction {
     // atoms
     do {
       if (a instanceof BigInteger a1) {
-        if (b instanceof BigInteger b1) return op.apply(a1, b1);
-        if (b instanceof Float b1) return op.apply(a1.floatValue(), b1);
-        if (b instanceof Double b1) return op.apply(a1.doubleValue(), b1);
-        if (b instanceof BigRational b1) return op.apply(BigRational.of(a1), b1);
-        if (b instanceof Boolean b1) return op.apply(a1, b1 ? BigInteger.ONE : BigInteger.ZERO);
+        switch (b) {
+          case BigInteger b1 -> {
+            return op.apply(a1, b1);
+          }
+          case Float b1 -> {
+            return op.apply(a1.floatValue(), b1);
+          }
+          case Double b1 -> {
+            return op.apply(a1.doubleValue(), b1);
+          }
+          case BigRational b1 -> {
+            return op.apply(BigRational.of(a1), b1);
+          }
+          case Boolean b1 -> {
+            return op.apply(a1, b1 ? BigInteger.ONE : BigInteger.ZERO);
+          }
+          default -> {}
+        }
         break;
       }
       if (a instanceof Float a1) {

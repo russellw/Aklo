@@ -44,7 +44,7 @@ def do(file):
 
     # compile Aklo code
     p = subprocess.Popen(
-        ("java", "-ea", "-jar", compiler, file),
+        ("java", "-ea", "--enable-preview", "-jar", compiler, file),
         stderr=subprocess.PIPE,
     )
     stdout, stderr = p.communicate()
@@ -72,7 +72,7 @@ def do(file):
 
     # run the program
     p = subprocess.Popen(
-        ("java", "-cp", ".;" + compiler, "-ea", "a"),
+        ("java", "-cp", ".;" + compiler, "-ea", "--enable-preview", "a"),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
