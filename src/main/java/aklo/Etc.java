@@ -15,9 +15,12 @@ public final class Etc {
   }
 
   public static int intVal(Object a) {
-    if (a instanceof BigInteger a1) return a1.intValueExact();
-    if (a instanceof Boolean a1) return a1 ? 1 : 0;
-    throw new IllegalArgumentException(a.toString());
+    // TODO names
+    return switch (a) {
+      case BigInteger a1 -> a1.intValueExact();
+      case Boolean a1 -> a1 ? 1 : 0;
+      default -> throw new IllegalArgumentException(a.toString());
+    };
   }
 
   @SuppressWarnings("unused")
@@ -96,13 +99,15 @@ public final class Etc {
   }
 
   public static boolean truth(Object a) {
-    if (a instanceof Boolean a1) return a1;
-    if (a instanceof BigInteger a1) return a1.signum() != 0;
-    if (a instanceof List a1) return !a1.isEmpty();
-    if (a instanceof Float a1) return a1 != 0.0f;
-    if (a instanceof Double a1) return a1 != 0.0;
-    if (a instanceof BigRational a1) return a1.signum() != 0;
-    return true;
+    return switch (a) {
+      case Boolean a1 -> a1;
+      case BigInteger a1 -> a1.signum() != 0;
+      case List a1 -> !a1.isEmpty();
+      case Float a1 -> a1 != 0.0f;
+      case Double a1 -> a1 != 0.0;
+      case BigRational a1 -> a1.signum() != 0;
+      default -> true;
+    };
   }
 
   @SuppressWarnings("unused")
@@ -207,9 +212,11 @@ public final class Etc {
   }
 
   static String typeof(Object a) {
-    if (a instanceof Var a1) return a1.type;
-    if (a instanceof Instruction a1) return a1.type();
-    return a.getClass().descriptorString();
+    return switch (a) {
+      case Var a1 -> a1.type;
+      case Instruction a1 -> a1.type();
+      default -> a.getClass().descriptorString();
+    };
   }
 
   public static Object shr(Object a, Object b) {

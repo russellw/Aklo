@@ -8,13 +8,13 @@ final class Optimizer {
   private static void mark(Block block, Set<Block> visited) {
     if (!visited.add(block)) return;
     var a = block.last();
-    if (a instanceof Goto a1) {
-      mark(a1.target, visited);
-      return;
-    }
-    if (a instanceof If a1) {
-      mark(a1.trueTarget, visited);
-      mark(a1.falseTarget, visited);
+    switch (a) {
+      case Goto a1 -> mark(a1.target, visited);
+      case If a1 -> {
+        mark(a1.trueTarget, visited);
+        mark(a1.falseTarget, visited);
+      }
+      default -> {}
     }
   }
 
