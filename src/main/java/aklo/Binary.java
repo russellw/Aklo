@@ -60,86 +60,61 @@ abstract class Binary extends Instruction {
     return Arrays.asList(r);
   }
 
-  @SuppressWarnings("ConstantConditions")
   static Object eval(Binary op, Object a0, Object b0) {
-    // atoms
-    do {
-      if (a0 instanceof BigInteger a) {
-        return switch (b0) {
-          case BigInteger b -> op.apply(a, b);
-          case Float b -> op.apply(a.floatValue(), b);
-          case Double b -> op.apply(a.doubleValue(), b);
-          case BigRational b -> op.apply(BigRational.of(a), b);
-          case Boolean b -> op.apply(a, b ? BigInteger.ONE : BigInteger.ZERO);
-          case List b -> evals(op, Collections.nCopies(b.size(), a), b);
-          default -> throw err(op, a0, b0);
-        };
-      }
-      if (a0 instanceof Float a) {
-        return switch (b0) {
-          case Float b -> op.apply(a, b);
-          case Double b -> op.apply(a, b);
-          case BigInteger b -> op.apply(a, b.floatValue());
-          case BigRational b -> op.apply(a, b.floatValue());
-          case Boolean b -> op.apply(a, b ? 1.0f : 0.0f);
-          case List b -> evals(op, Collections.nCopies(b.size(), a), b);
-          default -> throw err(op, a0, b0);
-        };
-      }
-      if (a0 instanceof Double a) {
-        return switch (b0) {
-          case Double b -> op.apply(a, b);
-          case Float b -> op.apply(a, b);
-          case BigInteger b -> op.apply(a, b.doubleValue());
-          case BigRational b -> op.apply(a, b.doubleValue());
-          case Boolean b -> op.apply(a, b ? 1.0 : 0.0);
-          case List b -> evals(op, Collections.nCopies(b.size(), a), b);
-          default -> throw err(op, a0, b0);
-        };
-      }
-      if (a0 instanceof BigRational a) {
-        return switch (b0) {
-          case BigRational b -> op.apply(a, b);
-          case BigInteger b -> op.apply(a, BigRational.of(b));
-          case Float b -> op.apply(a.floatValue(), b);
-          case Double b -> op.apply(a.doubleValue(), b);
-          case Boolean b -> op.apply(a, b ? BigRational.ONE : BigRational.ZERO);
-          case List b -> evals(op, Collections.nCopies(b.size(), a), b);
-          default -> throw err(op, a0, b0);
-        };
-      }
-      if (a0 instanceof Boolean a) {
-        return switch (b0) {
-          case BigInteger b -> op.apply(a ? BigInteger.ONE : BigInteger.ZERO, b);
-          case Boolean b -> op.apply(
-              a ? BigInteger.ONE : BigInteger.ZERO, b ? BigInteger.ONE : BigInteger.ZERO);
-          case Float b -> op.apply(a ? 1.0f : 0.0f, b);
-          case Double b -> op.apply(a ? 1.0 : 0.0, b);
-          case BigRational b -> op.apply(a ? BigRational.ONE : BigRational.ZERO, b);
-          case List b -> evals(op, Collections.nCopies(b.size(), a), b);
-          default -> throw err(op, a0, b0);
-        };
-      }
-    } while (false);
-
-    // lists
-    // TODO refactor?
-    do {
-      if (a0 instanceof List a) {
-        List<Object> b;
-        if (b0 instanceof List) {
-          b = (List) b0;
-          if (a.size() != b.size()) break;
-        } else b = Collections.nCopies(a.size(), b0);
-        return evals(op, a, b);
-      }
-      if (b0 instanceof List b) {
-        var a = Collections.nCopies(b.size(), a0);
-        return evals(op, a, b);
-      }
-    } while (false);
-
-    throw err(op, a0, b0);
+    return switch (a0) {
+      case BigInteger a -> switch (b0) {
+        case BigInteger b -> op.apply(a, b);
+        case Float b -> op.apply(a.floatValue(), b);
+        case Double b -> op.apply(a.doubleValue(), b);
+        case BigRational b -> op.apply(BigRational.of(a), b);
+        case Boolean b -> op.apply(a, b ? BigInteger.ONE : BigInteger.ZERO);
+        case List b -> evals(op, Collections.nCopies(b.size(), a), b);
+        default -> throw err(op, a0, b0);
+      };
+      case Float a -> switch (b0) {
+        case Float b -> op.apply(a, b);
+        case Double b -> op.apply(a, b);
+        case BigInteger b -> op.apply(a, b.floatValue());
+        case BigRational b -> op.apply(a, b.floatValue());
+        case Boolean b -> op.apply(a, b ? 1.0f : 0.0f);
+        case List b -> evals(op, Collections.nCopies(b.size(), a), b);
+        default -> throw err(op, a0, b0);
+      };
+      case Double a -> switch (b0) {
+        case Double b -> op.apply(a, b);
+        case Float b -> op.apply(a, b);
+        case BigInteger b -> op.apply(a, b.doubleValue());
+        case BigRational b -> op.apply(a, b.doubleValue());
+        case Boolean b -> op.apply(a, b ? 1.0 : 0.0);
+        case List b -> evals(op, Collections.nCopies(b.size(), a), b);
+        default -> throw err(op, a0, b0);
+      };
+      case BigRational a -> switch (b0) {
+        case BigRational b -> op.apply(a, b);
+        case BigInteger b -> op.apply(a, BigRational.of(b));
+        case Float b -> op.apply(a.floatValue(), b);
+        case Double b -> op.apply(a.doubleValue(), b);
+        case Boolean b -> op.apply(a, b ? BigRational.ONE : BigRational.ZERO);
+        case List b -> evals(op, Collections.nCopies(b.size(), a), b);
+        default -> throw err(op, a0, b0);
+      };
+      case Boolean a -> switch (b0) {
+        case BigInteger b -> op.apply(a ? BigInteger.ONE : BigInteger.ZERO, b);
+        case Boolean b -> op.apply(
+            a ? BigInteger.ONE : BigInteger.ZERO, b ? BigInteger.ONE : BigInteger.ZERO);
+        case Float b -> op.apply(a ? 1.0f : 0.0f, b);
+        case Double b -> op.apply(a ? 1.0 : 0.0, b);
+        case BigRational b -> op.apply(a ? BigRational.ONE : BigRational.ZERO, b);
+        case List b -> evals(op, Collections.nCopies(b.size(), a), b);
+        default -> throw err(op, a0, b0);
+      };
+      case List a -> // noinspection SwitchStatementWithTooFewBranches
+      switch (b0) {
+        case List b -> evals(op, a, b);
+        default -> evals(op, a, Collections.nCopies(a.size(), b0));
+      };
+      default -> throw err(op, a0, b0);
+    };
   }
 
   private static IllegalArgumentException err(Binary op, Object a, Object b) {
