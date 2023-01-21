@@ -54,7 +54,7 @@ abstract class Binary extends Instruction {
     throw new UnsupportedOperationException(toString());
   }
 
-  static Object evals(Binary op, List<Object> s, List<Object> t) {
+  private static Object evals(Binary op, List<Object> s, List<Object> t) {
     var r = new Object[s.size()];
     for (var i = 0; i < r.length; i++) r[i] = eval(op, s.get(i), t.get(i));
     return Arrays.asList(r);
@@ -65,75 +65,44 @@ abstract class Binary extends Instruction {
     // atoms
     do {
       if (a instanceof BigInteger a1) {
-        // most likely case is operands of the same type
         if (b instanceof BigInteger b1) return op.apply(a1, b1);
-
-        // floating-point numbers are more common than exact rationals
         if (b instanceof Float b1) return op.apply(a1.floatValue(), b1);
         if (b instanceof Double b1) return op.apply(a1.doubleValue(), b1);
         if (b instanceof BigRational b1) return op.apply(BigRational.of(a1), b1);
-
-        // allow Boolean operands for convenience
         if (b instanceof Boolean b1) return op.apply(a1, b1 ? BigInteger.ONE : BigInteger.ZERO);
         break;
       }
       if (a instanceof Float a1) {
-        // most likely case is operands of the same type
         if (b instanceof Float b1) return op.apply(a1, b1);
-
-        // or of different floating-point types
         if (b instanceof Double b1) return op.apply(a1, b1);
-
-        // integers are more common than exact rationals
         if (b instanceof BigInteger b1) return op.apply(a1, b1.floatValue());
         if (b instanceof BigRational b1) return op.apply(a1, b1.floatValue());
-
-        // allow Boolean operands for convenience
         if (b instanceof Boolean b1) return op.apply(a1, b1 ? 1.0f : 0.0f);
         break;
       }
       if (a instanceof Double a1) {
-        // most likely case is operands of the same type
         if (b instanceof Double b1) return op.apply(a1, b1);
-
-        // or of different floating-point types
         if (b instanceof Float b1) return op.apply(a1, b1);
-
-        // integers are more common than rationals
         if (b instanceof BigInteger b1) return op.apply(a1, b1.doubleValue());
         if (b instanceof BigRational b1) return op.apply(a1, b1.doubleValue());
-
-        // allow Boolean operands for convenience
         if (b instanceof Boolean b1) return op.apply(a1, b1 ? 1.0 : 0.0);
         break;
       }
       if (a instanceof BigRational a1) {
-        // most likely case is operands of the same type
         if (b instanceof BigRational b1) return op.apply(a1, b1);
-
-        // or both exact numbers
         if (b instanceof BigInteger b1) return op.apply(a1, BigRational.of(b1));
-
-        // floating point is less likely
         if (b instanceof Float b1) return op.apply(a1.floatValue(), b1);
         if (b instanceof Double b1) return op.apply(a1.doubleValue(), b1);
-
-        // allow Boolean operands for convenience
         if (b instanceof Boolean b1) return op.apply(a1, b1 ? BigRational.ONE : BigRational.ZERO);
         break;
       }
       if (a instanceof Boolean a1) {
-        // most likely case is integers
         if (b instanceof BigInteger b1) return op.apply(a1 ? BigInteger.ONE : BigInteger.ZERO, b1);
         if (b instanceof Boolean b1)
           return op.apply(
               a1 ? BigInteger.ONE : BigInteger.ZERO, b1 ? BigInteger.ONE : BigInteger.ZERO);
-
-        // or floating-point numbers
         if (b instanceof Float b1) return op.apply(a1 ? 1.0f : 0.0f, b1);
         if (b instanceof Double b1) return op.apply(a1 ? 1.0 : 0.0, b1);
-
-        // rationals are least likely
         if (b instanceof BigRational b1)
           return op.apply(a1 ? BigRational.ONE : BigRational.ZERO, b1);
         break;
