@@ -27,17 +27,16 @@ final class Call extends Nary {
       return;
     }
     for (var i = 0; i < size(); i++) load(refs, mv, get(i));
-    // TODO Operator vs Function?
     switch (size() - 1) {
       case 1 -> mv.visitMethodInsn(
           INVOKEINTERFACE,
-          "java/util/function/UnaryOperator",
+          "java/util/function/Function",
           "apply",
           "(Ljava/lang/Object;)Ljava/lang/Object;",
           true);
       case 2 -> mv.visitMethodInsn(
           INVOKEINTERFACE,
-          "java/util/function/BinaryOperator",
+          "java/util/function/BiFunction",
           "apply",
           "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
           true);
