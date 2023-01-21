@@ -27,6 +27,7 @@ final class Call extends Nary {
       return;
     }
     for (var i = 0; i < size(); i++) load(refs, mv, get(i));
+    // TODO Operator vs Function?
     switch (size() - 1) {
       case 1 -> mv.visitMethodInsn(
           INVOKEINTERFACE,
@@ -39,6 +40,12 @@ final class Call extends Nary {
           "java/util/function/BinaryOperator",
           "apply",
           "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          true);
+      case 3 -> mv.visitMethodInsn(
+          INVOKEINTERFACE,
+          "aklo/TriFunction",
+          "apply",
+          "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
           true);
       default -> throw new IllegalArgumentException(this + Arrays.toString(args));
     }
