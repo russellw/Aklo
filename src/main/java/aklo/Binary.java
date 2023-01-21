@@ -110,6 +110,7 @@ abstract class Binary extends Instruction {
     } while (false);
 
     // lists
+    // TODO refactor?
     do {
       if (a instanceof List a1) {
         List<Object> b1;
