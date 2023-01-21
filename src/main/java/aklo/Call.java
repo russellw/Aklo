@@ -2,6 +2,7 @@ package aklo;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import java.util.Arrays;
 import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
@@ -26,11 +27,20 @@ final class Call extends Nary {
       return;
     }
     for (var i = 0; i < size(); i++) load(refs, mv, get(i));
-    mv.visitMethodInsn(
-        INVOKEINTERFACE,
-        "java/util/function/UnaryOperator",
-        "apply",
-        "(Ljava/lang/Object;)Ljava/lang/Object;",
-        true);
+    switch (size() - 1) {
+      case 1 -> mv.visitMethodInsn(
+          INVOKEINTERFACE,
+          "java/util/function/UnaryOperator",
+          "apply",
+          "(Ljava/lang/Object;)Ljava/lang/Object;",
+          true);
+      case 2 -> mv.visitMethodInsn(
+          INVOKEINTERFACE,
+          "java/util/function/BinaryOperator",
+          "apply",
+          "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          true);
+      default -> throw new IllegalArgumentException(this + Arrays.toString(args));
+    }
   }
 }
