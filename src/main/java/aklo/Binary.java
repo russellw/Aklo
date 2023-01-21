@@ -61,63 +61,128 @@ abstract class Binary extends Instruction {
   }
 
   @SuppressWarnings("ConstantConditions")
-  static Object eval(Binary op, Object a, Object b) {
+  static Object eval(Binary op, Object a0, Object b0) {
     // atoms
     do {
-      if (a instanceof BigInteger a1) {
-        switch (b) {
-          case BigInteger b1 -> {
-            return op.apply(a1, b1);
+      if (a0 instanceof BigInteger a) {
+        switch (b0) {
+          case BigInteger b -> {
+            return op.apply(a, b);
           }
-          case Float b1 -> {
-            return op.apply(a1.floatValue(), b1);
+          case Float b -> {
+            return op.apply(a.floatValue(), b);
           }
-          case Double b1 -> {
-            return op.apply(a1.doubleValue(), b1);
+          case Double b -> {
+            return op.apply(a.doubleValue(), b);
           }
-          case BigRational b1 -> {
-            return op.apply(BigRational.of(a1), b1);
+          case BigRational b -> {
+            return op.apply(BigRational.of(a), b);
           }
-          case Boolean b1 -> {
-            return op.apply(a1, b1 ? BigInteger.ONE : BigInteger.ZERO);
+          case Boolean b -> {
+            return op.apply(a, b ? BigInteger.ONE : BigInteger.ZERO);
+          }
+          case List b -> {
+            return evals(op, Collections.nCopies(b.size(), a), b);
           }
           default -> {}
         }
         break;
       }
-      if (a instanceof Float a1) {
-        if (b instanceof Float b1) return op.apply(a1, b1);
-        if (b instanceof Double b1) return op.apply(a1, b1);
-        if (b instanceof BigInteger b1) return op.apply(a1, b1.floatValue());
-        if (b instanceof BigRational b1) return op.apply(a1, b1.floatValue());
-        if (b instanceof Boolean b1) return op.apply(a1, b1 ? 1.0f : 0.0f);
+      if (a0 instanceof Float a) {
+        switch (b0) {
+          case Float b -> {
+            return op.apply(a, b);
+          }
+          case Double b -> {
+            return op.apply(a, b);
+          }
+          case BigInteger b -> {
+            return op.apply(a, b.floatValue());
+          }
+          case BigRational b -> {
+            return op.apply(a, b.floatValue());
+          }
+          case Boolean b -> {
+            return op.apply(a, b ? 1.0f : 0.0f);
+          }
+          case List b -> {
+            return evals(op, Collections.nCopies(b.size(), a), b);
+          }
+          default -> {}
+        }
         break;
       }
-      if (a instanceof Double a1) {
-        if (b instanceof Double b1) return op.apply(a1, b1);
-        if (b instanceof Float b1) return op.apply(a1, b1);
-        if (b instanceof BigInteger b1) return op.apply(a1, b1.doubleValue());
-        if (b instanceof BigRational b1) return op.apply(a1, b1.doubleValue());
-        if (b instanceof Boolean b1) return op.apply(a1, b1 ? 1.0 : 0.0);
+      if (a0 instanceof Double a) {
+        switch (b0) {
+          case Double b -> {
+            return op.apply(a, b);
+          }
+          case Float b -> {
+            return op.apply(a, b);
+          }
+          case BigInteger b -> {
+            return op.apply(a, b.doubleValue());
+          }
+          case BigRational b -> {
+            return op.apply(a, b.doubleValue());
+          }
+          case Boolean b -> {
+            return op.apply(a, b ? 1.0 : 0.0);
+          }
+          case List b -> {
+            return evals(op, Collections.nCopies(b.size(), a), b);
+          }
+          default -> {}
+        }
         break;
       }
-      if (a instanceof BigRational a1) {
-        if (b instanceof BigRational b1) return op.apply(a1, b1);
-        if (b instanceof BigInteger b1) return op.apply(a1, BigRational.of(b1));
-        if (b instanceof Float b1) return op.apply(a1.floatValue(), b1);
-        if (b instanceof Double b1) return op.apply(a1.doubleValue(), b1);
-        if (b instanceof Boolean b1) return op.apply(a1, b1 ? BigRational.ONE : BigRational.ZERO);
+      if (a0 instanceof BigRational a) {
+        switch (b0) {
+          case BigRational b -> {
+            return op.apply(a, b);
+          }
+          case BigInteger b -> {
+            return op.apply(a, BigRational.of(b));
+          }
+          case Float b -> {
+            return op.apply(a.floatValue(), b);
+          }
+          case Double b -> {
+            return op.apply(a.doubleValue(), b);
+          }
+          case Boolean b -> {
+            return op.apply(a, b ? BigRational.ONE : BigRational.ZERO);
+          }
+          case List b -> {
+            return evals(op, Collections.nCopies(b.size(), a), b);
+          }
+          default -> {}
+        }
         break;
       }
-      if (a instanceof Boolean a1) {
-        if (b instanceof BigInteger b1) return op.apply(a1 ? BigInteger.ONE : BigInteger.ZERO, b1);
-        if (b instanceof Boolean b1)
-          return op.apply(
-              a1 ? BigInteger.ONE : BigInteger.ZERO, b1 ? BigInteger.ONE : BigInteger.ZERO);
-        if (b instanceof Float b1) return op.apply(a1 ? 1.0f : 0.0f, b1);
-        if (b instanceof Double b1) return op.apply(a1 ? 1.0 : 0.0, b1);
-        if (b instanceof BigRational b1)
-          return op.apply(a1 ? BigRational.ONE : BigRational.ZERO, b1);
+      if (a0 instanceof Boolean a) {
+        switch (b0) {
+          case BigInteger b -> {
+            return op.apply(a ? BigInteger.ONE : BigInteger.ZERO, b);
+          }
+          case Boolean b -> {
+            return op.apply(
+                a ? BigInteger.ONE : BigInteger.ZERO, b ? BigInteger.ONE : BigInteger.ZERO);
+          }
+          case Float b -> {
+            return op.apply(a ? 1.0f : 0.0f, b);
+          }
+          case Double b -> {
+            return op.apply(a ? 1.0 : 0.0, b);
+          }
+          case BigRational b -> {
+            return op.apply(a ? BigRational.ONE : BigRational.ZERO, b);
+          }
+          case List b -> {
+            return evals(op, Collections.nCopies(b.size(), a), b);
+          }
+          default -> {}
+        }
         break;
       }
     } while (false);
@@ -125,21 +190,21 @@ abstract class Binary extends Instruction {
     // lists
     // TODO refactor?
     do {
-      if (a instanceof List a1) {
-        List<Object> b1;
-        if (b instanceof List) {
-          b1 = (List) b;
-          if (a1.size() != b1.size()) break;
-        } else b1 = Collections.nCopies(a1.size(), b);
-        return evals(op, a1, b1);
+      if (a0 instanceof List a) {
+        List<Object> b;
+        if (b0 instanceof List) {
+          b = (List) b0;
+          if (a.size() != b.size()) break;
+        } else b = Collections.nCopies(a.size(), b0);
+        return evals(op, a, b);
       }
-      if (b instanceof List b1) {
-        var a1 = Collections.nCopies(b1.size(), a);
-        return evals(op, a1, b1);
+      if (b0 instanceof List b) {
+        var a = Collections.nCopies(b.size(), a0);
+        return evals(op, a, b);
       }
     } while (false);
 
-    throw new IllegalArgumentException(String.format("%s(%s, %s)", op, a, b));
+    throw new IllegalArgumentException(String.format("%s(%s, %s)", op, a0, b0));
   }
 
   @Override
