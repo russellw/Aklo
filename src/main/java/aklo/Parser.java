@@ -702,13 +702,14 @@ final class Parser {
                   i = BigInteger.ZERO;
                 }
                 expect(')');
-                yield new Invoke(
-                    INVOKESTATIC,
-                    "aklo/Etc",
-                    "range",
-                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
-                    i,
-                    j);
+                yield ins(
+                    new Invoke(
+                        INVOKESTATIC,
+                        "aklo/Etc",
+                        "range",
+                        "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;",
+                        i,
+                        j));
               }
               case "bool?" -> ins(new InstanceOf(arg(), "java/lang/Boolean"));
               case "int?" -> ins(new InstanceOf(arg(), "java/math/BigInteger"));
