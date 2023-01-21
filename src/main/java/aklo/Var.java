@@ -2,17 +2,11 @@ package aklo;
 
 import java.util.List;
 
-final class Var {
-  String name;
+final class Var extends Named {
   String type = "Ljava/lang/Object;";
 
   Var(String name, List<Var> s) {
-    this.name = name;
+    super(name);
     s.add(this);
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 }

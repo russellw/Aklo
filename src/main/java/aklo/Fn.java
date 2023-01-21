@@ -7,8 +7,7 @@ import java.util.*;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 
-final class Fn {
-  final String name;
+final class Fn extends Named {
   final List<Var> params = new ArrayList<>();
   String rtype = "Ljava/lang/Object;";
   final List<Var> vars = new ArrayList<>();
@@ -16,7 +15,7 @@ final class Fn {
   List<Block> blocks = new ArrayList<>();
 
   Fn(String name) {
-    this.name = name;
+    super(name);
     addBlock(new Block("entry"));
   }
 
@@ -92,11 +91,6 @@ final class Fn {
     blocks.get(0).instructions.addAll(0, r);
   }
 
-  @Override
-  public String toString() {
-    return name;
-  }
-
   String descriptor() {
     var sb = new StringBuilder("(");
     for (var x : params) sb.append(x.type);
@@ -112,19 +106,7 @@ final class Fn {
   @SuppressWarnings("unused")
   void dbg() {
     var refs = refs();
-
-    // make block names unique
-    var names = new HashSet<String>();
-    for (var block : blocks) {
-      if (names.add(block.name)) continue;
-      for (var i = 1; ; i++) {
-        var s = block.name + i;
-        if (names.add(s)) {
-          block.name = s;
-          break;
-        }
-      }
-    }
+    Named.unique(blocks);
 
     // header
     System.out.printf("fn %s(", name);

@@ -43,13 +43,11 @@ final class Program {
     w.visit(V17, ACC_PUBLIC, "a", null, "java/lang/Object", new String[0]);
 
     // global variables
-    var i = 0;
-    for (var x : vars) {
-      if (x.name.endsWith("$")) x.name += i++;
-      w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
-    }
+    Named.unique(vars);
+    for (var x : vars) w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
 
     // functions
+    Named.unique(fns);
     for (var f : fns) f.write(w);
 
     // write class file

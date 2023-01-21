@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.objectweb.asm.Label;
 
-final class Block {
-  String name;
+final class Block extends Named {
   Label label;
   final List<Instruction> instructions = new ArrayList<>();
 
   Block(String name) {
-    this.name = name;
+    super(name);
   }
 
   Instruction last() {
