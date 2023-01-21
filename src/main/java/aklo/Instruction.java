@@ -30,6 +30,7 @@ abstract class Instruction extends AbstractCollection<Object> {
   }
 
   void dbg(Map<Object, Integer> refs) {
+    // TODO polymorphism here should probably be in toString
     System.out.print(this);
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }

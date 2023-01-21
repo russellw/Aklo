@@ -92,8 +92,7 @@ final class Parser {
     return isUpper(c) ? c + 32 : c;
   }
 
-  // tokenizer
-  private void lexQuote() {
+  private void quote() {
     var quote = text[ti];
     var i = ti + 1;
     var baos = new ByteArrayOutputStream();
@@ -342,12 +341,12 @@ final class Parser {
           return;
         }
         case '"' -> {
-          lexQuote();
+          quote();
           tok = STR;
           return;
         }
         case '\'' -> {
-          lexQuote();
+          quote();
           tok = SYM;
           return;
         }
@@ -534,7 +533,6 @@ final class Parser {
       }
   }
 
-  // parser
   private CompileError err(String msg) {
     var line1 = line;
     switch (tok) {
@@ -619,7 +617,6 @@ final class Parser {
       return a;
     }
 
-    // expressions
     Object arg() {
       expect('(');
       var a = expr();
@@ -1032,7 +1029,6 @@ final class Parser {
       return postfix();
     }
 
-    // operator precedence parser
     record Op(int prec, int left) {}
 
     static int prec = 99;
@@ -1214,7 +1210,6 @@ final class Parser {
       return ins(new ListOf(r.toArray()));
     }
 
-    // statements
     void def(Object y) {
       Instruction.walk(
           y,
@@ -1639,7 +1634,6 @@ final class Parser {
     }
   }
 
-  // top level
   private Parser(String file, byte[] text, Fn module) {
     // init
     this.file = file;
