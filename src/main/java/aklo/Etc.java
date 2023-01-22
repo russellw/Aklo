@@ -207,8 +207,14 @@ public final class Etc {
     return ((List) s).get(intVal(i));
   }
 
-  public static List<Object> slice(Object s, Object i, Object j) {
-    return ((List) s).subList(intVal(i), intVal(j));
+  public static List<Object> slice(Object s0, Object i0, Object j0) {
+    var s = (List) s0;
+    var i = intVal(i0);
+    var j = intVal(j0);
+    i = Math.max(i, 0);
+    j = Math.min(j, s.size());
+    if (i >= j) return List.of();
+    return s.subList(i, j);
   }
 
   static String typeof(Object a) {
