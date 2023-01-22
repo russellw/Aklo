@@ -5,8 +5,6 @@ import java.nio.file.*;
 import java.util.*;
 
 final class Main {
-  private static final Map<List<String>, Fn> modules = new LinkedHashMap<>();
-
   private static void options() {
     System.out.println("-h  Show help");
     System.out.println("-V  Show version");
@@ -53,7 +51,7 @@ final class Main {
   }
 
   private static void load(String file, List<String> names, byte[] text) {
-    modules.put(names, Parser.parse(file, names.get(names.size() - 1), text));
+    Link.modules.put(names, Parser.parse(file, names.get(names.size() - 1), text));
   }
 
   public static void main(String[] args) throws IOException {
@@ -109,10 +107,10 @@ final class Main {
       loadResource("ubiquitous");
 
       // resolve names to variables and functions
-      for (var module : modules.values()) new Link(null, module);
+      Link.link();
 
       // convert to basic blocks
-      Program.init(modules.values());
+      Program.init(Link.modules.values());
       Verifier.verify();
 
       // optimize

@@ -1,11 +1,17 @@
 package aklo;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 final class Link {
+  static final Map<List<String>, Fn> modules = new LinkedHashMap<>();
+
   private final Link outer;
-  private final Map<String, Object> locals = new HashMap<>();
+  private final Map<String, Object> locals;
+
+  // TODO refactor
   private String file;
   private int line;
 
@@ -38,13 +44,28 @@ final class Link {
     }
   }
 
-  Link(Link outer, Fn f) {
+  private Link(Map<String, Object> globals, Fn module) {
+    outer = null;
+    locals = globals;
+    new Link(this, module);
+  }
+
+  private Link(Link outer, Fn f) {
     this.outer = outer;
+    locals = new HashMap<>();
     for (var x : f.params) locals.put(x.name, x);
     for (var x : f.vars) locals.put(x.name, x);
     for (var g : f.fns) locals.put(g.name, g);
     for (var g : f.fns) new Link(this, g);
     for (var block : f.blocks) for (var a : block.instructions) link(a);
+  }
+
+  static void link() {
+    var ubiquitous = modules.get(List.of("aklo", "ubiquitous"));
+    var globals = new HashMap<String, Object>();
+    for (var g : ubiquitous.fns) globals.put(g.name, g);
+
+    for (var module : Link.modules.values()) new Link(globals, module);
   }
 
   @SuppressWarnings("unused")
