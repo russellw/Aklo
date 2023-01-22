@@ -56,5 +56,45 @@ assert parseInt ("ff",16)==255
 assert parseInt ("FFFF",16)==65535
 
 assert digit ("9"[0])==9
-assert digit ("f"[0])==16
+assert digit ("f"[0])==15
 assert digit ("*"[0])>=36
+
+assert unesc( "abc")=="abc"
+assert unesc (#"\tabc\n")=="\tabc\n"
+assert unesc (#"\x41\x42")=="AB"
+
+assert reverse("abc")=="cba"
+
+assert concat(("zxc","vb"))=="zxcvb"
+
+assert replicate( 4,9)==[9,9,9,9]
+assert replicate (-1,9)==[]
+
+assert takeWhile (digit?,"123abc")=="123"
+assert takeWhile (digit?,"123")=="123"
+assert takeWhile (digit?,"abc")==""
+
+assert dropWhile (digit?,"123abc")=="abc"
+assert dropWhile (digit?,"123")==""
+assert dropWhile (digit?,"abc")=="abc"
+
+assert span (digit?,"123abc")==["123","abc"]
+
+assert splitAt(2,"abcde")==["ab","cde"]
+assert splitAt(-1,"abcde")==["","abcde"]
+assert splitAt(20,"abcde")==["abcde",""]
+
+assert zip ("abc","12")==["a1","b2"]
+assert zip3 ("abc","12","xyz")==["a1x","b2y"]
+assert zipWith(\(a,b)(a+b),[10,20],[1,2])==[11,22]
+assert zipWith3(\(a,b,c)(a+b+c),[10,20],[1,2],[100,100])==[111,122]
+assert unzip (["a1","b2","c3"])==["abc","123"]
+assert unzip3 (["a1x","b2y","c3z"])==["abc","123","xyz"]
+
+assert split(digit?,"a1b")==["a","b"]
+assert split(digit?,"")==[""]
+assert split(digit?,"1")==["",""]
+assert split(digit?,"1zzz")==["","zzz"]
+assert split(digit?,"...9")==["...",""]
+
+assert splitOn("."[0],"123.456.")==["123","456",""]
