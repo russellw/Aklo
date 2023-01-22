@@ -59,9 +59,18 @@ assert digit ("9"[0])==9
 assert digit ("f"[0])==15
 assert digit ("*"[0])>=36
 
+{
 assert unesc( "abc")=="abc"
 assert unesc (#"\tabc\n")=="\tabc\n"
 assert unesc (#"\x41\x42")=="AB"
+
+TODO
+Exception: Exception in thread "main" java.lang.NoSuchFieldError: j
+        at a.seq(Unknown Source)
+        at a.unesc(Unknown Source)
+        at a.etc(Unknown Source)
+        at a.main(Unknown Source)
+}
 
 assert reverse("abc")=="cba"
 
