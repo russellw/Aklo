@@ -29,17 +29,17 @@ public final class Etc {
   }
 
   public static void print(Object a) {
-    if (a instanceof BigInteger a0) {
-      var a1 = a0.intValueExact();
-      if (!(0 <= a1 && a1 <= 255)) throw new IllegalArgumentException(a.toString());
-      System.out.write(a1);
-      return;
+    switch (a) {
+      case BigInteger a0 -> {
+        var a1 = a0.intValueExact();
+        if (!(0 <= a1 && a1 <= 255)) throw new IllegalArgumentException(a.toString());
+        System.out.write(a1);
+      }
+      case List a1 -> {
+        for (var b : a1) print(b);
+      }
+      default -> System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
     }
-    if (a instanceof List a1) {
-      for (var b : a1) print(b);
-      return;
-    }
-    System.out.writeBytes(a.toString().getBytes(StandardCharsets.UTF_8));
   }
 
   public static BigInteger parseInt(Object s) {
