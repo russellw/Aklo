@@ -25,11 +25,16 @@ final class Link {
         if (x == null) throw new CompileError(file, line, name + " not found");
         a.set(i, x);
       }
-    if (a instanceof Assign && a.get(0) instanceof Fn)
-      throw new CompileError(file, line, a.get(0) + ": assigning a function");
-    if (a instanceof Line a1) {
-      file = a1.file;
-      line = a1.line;
+    switch (a) {
+      case Assign ignored -> {
+        if (a.get(0) instanceof Fn)
+          throw new CompileError(file, line, a.get(0) + ": assigning a function");
+      }
+      case Line a1 -> {
+        file = a1.file;
+        line = a1.line;
+      }
+      default -> {}
     }
   }
 
