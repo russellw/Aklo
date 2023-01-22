@@ -50,3 +50,11 @@ assert utf8 (0x939)==[0xe0,0xa4,0xb9]
 assert utf8 (0x20ac)==[0xe2,0x82,0xac]
 assert utf8 (0xd55c)==[0xed,0x95,0x9c]
 assert utf8 (0x10348)==[0xf0,0x90,0x8d,0x88]
+
+assert parseInt( "123",10)==123
+assert parseInt ("ff",16)==255
+assert parseInt ("FFFF",16)==65535
+
+assert digit ("9"[0])==9
+assert digit ("f"[0])==16
+assert digit ("*"[0])>=36

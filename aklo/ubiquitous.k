@@ -138,24 +138,15 @@ fn upper (a)
 		^ a-32
 	^ a
 
-fn parseInt (s,base)
-	while s&digitBase?(s[0],base)
-		c,@s=s
-		n=n*base+parseDigit (c)
-	^ n
-
-fn parseDigit (c)
+fn digit (c)
 	if digit? (c)
 		^ c-"0"[0]
 	if lower? (c)
 		^ 10+c-"a"[0]
 	if upper? (c)
 		^ 10+c-"A"[0]
-	^ -1
+	^ 99
 
-fn digitBase?(c,base)
-	n=parseDigit (c)
-	^ 0<=n&n<base
 
 fn unesc (s)
 	i=0
@@ -164,7 +155,7 @@ fn unesc (s)
 
 	fn seq (n,base)
 			while j<n
-				if !digitBase?( s[i+j],base)
+				if digit( s[i+j])>=base
 					break
 				j++
 			r@=utf8(parseInt (slice (s,i,i+j),base))
