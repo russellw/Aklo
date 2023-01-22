@@ -59,9 +59,9 @@ assert digit ("9"[0])==9
 assert digit ("f"[0])==15
 assert digit ("*"[0])>=36
 
-{
 assert unesc( "abc")=="abc"
 assert unesc (#"\tabc\n")=="\tabc\n"
+{
 assert unesc (#"\x41\x42")=="AB"
 
 TODO
