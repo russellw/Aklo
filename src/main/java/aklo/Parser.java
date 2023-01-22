@@ -837,36 +837,39 @@ final class Parser {
     }
 
     void assign(Object y, Object x, Block no) {
-      // single assignment
-      if (y instanceof String || y instanceof Var) {
-        ins(new Assign(y, x));
-        return;
+      switch (y) {
+        case String ignored -> {
+          // single assignment to variable name
+          ins(new Assign(y, x));
+        }
+        case Var ignored -> // noinspection DuplicateBranchesInSwitch
+        {
+          // single assignment to actual variable
+          ins(new Assign(y, x));
+        }
+        case ListOf y1 -> {
+          // multiple assignment
+          var s = y1.args;
+          for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
+        }
+        case Cat y1 -> {
+          // multiple assignment head
+          if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
+          var s = s0.args;
+          for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
+
+          // and tail
+          assign(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
+        }
+        case Instruction ignored -> {
+          // Cannot assign to any other compound expression
+          throw err("invalid assignment");
+        }
+        default -> {
+          // assigning to a constant means an error check
+          branch(ins(new Eq(y, x)), no);
+        }
       }
-
-      // multiple assignment
-      if (y instanceof ListOf y1) {
-        var s = y1.args;
-        for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
-        return;
-      }
-
-      // multiple assignment with tail
-      if (y instanceof Cat y1) {
-        // head atoms
-        if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
-        var s = s0.args;
-        for (var i = 0; i < s.length; i++) assignSubscript(s, x, no, i);
-
-        // rest of the list
-        assign(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
-        return;
-      }
-
-      // Cannot assign to any other compound expression
-      if (y instanceof Instruction) throw err("invalid assignment");
-
-      // assigning to a constant means an error check
-      branch(ins(new Eq(y, x)), no);
     }
 
     Object assign(Object y, Object x) {
@@ -1301,32 +1304,34 @@ final class Parser {
     }
 
     void check(Object y, Object x, Block no) {
-      // single assignment
-      if (y instanceof String || y instanceof Var) return;
+      switch (y) {
+        case String ignored -> {
+          // single assignment to variable name
+        }
+        case Var ignored -> {
+          // single assignment to actual variable
+        }
+        case ListOf y1 -> {
+          // multiple assignment
+          var s = y1.args;
+          checkLen(s, x, no);
+          for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
+        }
+        case Cat y1 -> {
+          // multiple assignment head
+          if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
+          var s = s0.args;
+          checkLen(s, x, no);
+          for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
 
-      // multiple assignment
-      if (y instanceof ListOf y1) {
-        var s = y1.args;
-        checkLen(s, x, no);
-        for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
-        return;
+          // and tail
+          check(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
+        }
+        default -> {
+          // assigning to a constant means an error check
+          branch(ins(new Eq(y, x)), no);
+        }
       }
-
-      // multiple assignment with tail
-      if (y instanceof Cat y1) {
-        // head atoms
-        if (!(y1.arg0 instanceof ListOf s0)) throw err("invalid assignment");
-        var s = s0.args;
-        checkLen(s, x, no);
-        for (var i = 0; i < s.length; i++) checkSubscript(s, x, no, i);
-
-        // rest of the list
-        check(y1.arg1, ins(new Slice(x, BigInteger.valueOf(s.length), ins(new Len(x)))), no);
-        return;
-      }
-
-      // assigning to a constant means an error check
-      branch(ins(new Eq(y, x)), no);
     }
 
     Object xcase(String label) {
