@@ -13,7 +13,7 @@ class Verifier {
   }
 
   private static void line(Instruction a) {
-    if (a instanceof Line a1) {
+    if (a instanceof Loc a1) {
       file = a1.file;
       line = a1.line;
     }

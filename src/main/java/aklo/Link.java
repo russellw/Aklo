@@ -36,7 +36,7 @@ final class Link {
         if (a.get(0) instanceof Fn)
           throw new CompileError(file, line, a.get(0) + ": assigning a function");
       }
-      case Line a1 -> {
+      case Loc a1 -> {
         file = a1.file;
         line = a1.line;
       }

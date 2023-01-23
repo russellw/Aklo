@@ -1001,7 +1001,7 @@ final class Parser {
           Object r;
           if (tok == INDENT) r = c.block();
           else {
-            c.ins(new Line(file, line));
+            c.ins(new Loc(file, line));
             r = c.commas();
           }
           c.ins(new Return(r));
@@ -1438,7 +1438,7 @@ final class Parser {
     }
 
     Object stmt() {
-      ins(new Line(file, line));
+      ins(new Loc(file, line));
       switch (tok) {
         case '^' -> {
           // TODO change to return?
