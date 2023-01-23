@@ -22,9 +22,8 @@ final class If extends Unary {
   }
 
   @Override
-  void dbg(Map<Object, Integer> refs) {
-    super.dbg(refs);
-    System.out.printf(" %s %s", trueTarget, falseTarget);
+  public String toString() {
+    return String.format("If %s %s", trueTarget, falseTarget);
   }
 
   If(Object cond, Block trueTarget, Block falseTarget) {

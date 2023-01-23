@@ -8,12 +8,12 @@ final class Line extends Instruction {
   final int line;
 
   @Override
-  void emit(Map<Object, Integer> refs, MethodVisitor mv) {}
+  public String toString() {
+    return String.format("Line %s %d", file, line);
+  }
 
   @Override
-  void dbg(Map<Object, Integer> refs) {
-    System.out.printf("Line %s %d", file, line);
-  }
+  void emit(Map<Object, Integer> refs, MethodVisitor mv) {}
 
   Line(String file, int line) {
     this.file = file;

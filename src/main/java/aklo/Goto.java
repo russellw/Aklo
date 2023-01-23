@@ -14,8 +14,8 @@ final class Goto extends Instruction {
   }
 
   @Override
-  void dbg(Map<Object, Integer> refs) {
-    System.out.print("goto " + target);
+  public String toString() {
+    return "Goto " + target;
   }
 
   @Override

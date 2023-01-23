@@ -29,8 +29,7 @@ abstract class Instruction extends AbstractCollection<Object> {
     return getClass().getSimpleName();
   }
 
-  void dbg(Map<Object, Integer> refs) {
-    // TODO polymorphism here should probably be in toString
+  final void dbg(Map<Object, Integer> refs) {
     System.out.print(this);
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }
