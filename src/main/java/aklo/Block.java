@@ -6,7 +6,7 @@ import org.objectweb.asm.Label;
 
 final class Block extends Named {
   Label label;
-  final List<Instruction> instructions = new ArrayList<>();
+  List<Instruction> instructions = new ArrayList<>();
 
   Block(String name) {
     super(name);
