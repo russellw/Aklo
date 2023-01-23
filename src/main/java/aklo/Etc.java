@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 public final class Etc {
   public static final Boolean isWindows = System.getProperty("os.name").startsWith("Windows");
 
@@ -23,7 +23,6 @@ public final class Etc {
     };
   }
 
-  @SuppressWarnings("unused")
   public static void exit(Object a) {
     System.exit(intVal(a));
   }
@@ -110,7 +109,6 @@ public final class Etc {
     };
   }
 
-  @SuppressWarnings("unused")
   public static void dbg(Object a) {
     System.out.printf("%s: %s\n", Thread.currentThread().getStackTrace()[2], a);
   }

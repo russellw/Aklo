@@ -19,12 +19,12 @@ final class Invoke extends Nary {
 
   @Override
   public String toString() {
-    var sb = new StringBuilder("Invoke ");
+    var sb = new StringBuilder("Invoke");
     sb.append(
         switch (opcode) {
-          case INVOKESTATIC -> "static";
-          case INVOKEVIRTUAL -> "virtual";
-          case INVOKESPECIAL -> "special";
+          case INVOKESTATIC -> "Static";
+          case INVOKEVIRTUAL -> "Virtual";
+          case INVOKESPECIAL -> "Special";
           default -> throw new IllegalStateException(Integer.toString(opcode));
         });
     sb.append(' ');
