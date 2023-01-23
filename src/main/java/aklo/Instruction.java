@@ -29,7 +29,7 @@ abstract class Instruction extends AbstractCollection<Object> {
     return getClass().getSimpleName();
   }
 
-  final void dbg(Map<Object, Integer> refs) {
+  void dbg(Map<Object, Integer> refs) {
     System.out.print(this);
     for (var i = 0; i < size(); i++) dbg(refs, get(i));
   }

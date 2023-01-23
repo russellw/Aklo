@@ -14,6 +14,13 @@ final class If extends Unary {
   }
 
   @Override
+  void dbg(Map<Object, Integer> refs) {
+    System.out.print("If");
+    dbg(refs, get(0));
+    System.out.printf(" %s %s", trueTarget, falseTarget);
+  }
+
+  @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     load(refs, mv, arg);
     mv.visitMethodInsn(INVOKESTATIC, "aklo/Etc", "truth", "(Ljava/lang/Object;)Z", false);
