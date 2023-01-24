@@ -11,7 +11,7 @@ final class InstanceOf extends Unary {
   @Override
   void emit(Map<Object, Integer> refs, MethodVisitor mv) {
     load(refs, mv, arg);
-    mv.visitTypeInsn(INSTANCEOF, type.toString());
+    mv.visitTypeInsn(INSTANCEOF, type.name);
     mv.visitMethodInsn(
         INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
   }
