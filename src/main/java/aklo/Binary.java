@@ -16,7 +16,7 @@ abstract class Binary extends Instruction {
   }
 
   @Override
-  String type() {
+  Type type() {
     return Etc.typeof(arg0);
   }
 

@@ -11,8 +11,8 @@ final class Assign extends Binary {
   }
 
   @Override
-  String type() {
-    return "V";
+  Type type() {
+    return Type.VOID;
   }
 
   @Override
@@ -21,7 +21,7 @@ final class Assign extends Binary {
     var i = refs.get(arg0);
     if (i == null) {
       var y = (Var) arg0;
-      mv.visitFieldInsn(PUTSTATIC, "a", y.name, y.type);
+      mv.visitFieldInsn(PUTSTATIC, "a", y.name, y.type.toString());
       return;
     }
     mv.visitVarInsn(ASTORE, i);

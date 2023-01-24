@@ -14,7 +14,7 @@ abstract class Unary extends Instruction {
   }
 
   @Override
-  String type() {
+  Type type() {
     return Etc.typeof(arg);
   }
 

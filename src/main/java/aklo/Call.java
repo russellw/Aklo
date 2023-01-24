@@ -12,10 +12,10 @@ final class Call extends Nary {
   }
 
   @Override
-  String type() {
+  Type type() {
     var f = get(0);
     if (f instanceof Fn f1) return f1.rtype;
-    return "Ljava/lang/Object;";
+    return Type.OBJECT;
   }
 
   @Override

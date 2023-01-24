@@ -9,7 +9,7 @@ import org.objectweb.asm.Label;
 
 final class Fn extends Named {
   final List<Var> params = new ArrayList<>();
-  String rtype = "Ljava/lang/Object;";
+  Type rtype = Type.OBJECT;
   final List<Var> vars = new ArrayList<>();
   final List<Fn> fns = new ArrayList<>();
   List<Block> blocks = new ArrayList<>();
@@ -19,7 +19,7 @@ final class Fn extends Named {
     addBlock(new Block("entry"));
   }
 
-  private static int wordSize(String type) {
+  private static int wordSize(Type type) {
     return 1;
   }
 
@@ -73,7 +73,7 @@ final class Fn extends Named {
         a.emit(refs, mv);
         var i = refs.get(a);
         if (i == null)
-          switch (a.type()) {
+          switch (a.type().toString()) {
             case "V" -> {}
             default -> mv.visitInsn(POP);
           }

@@ -217,11 +217,11 @@ public final class Etc {
     return s.subList(i, j);
   }
 
-  static String typeof(Object a) {
+  static Type typeof(Object a) {
     return switch (a) {
       case Var a1 -> a1.type;
       case Instruction a1 -> a1.type();
-      default -> a.getClass().descriptorString();
+      default -> Type.of(a.getClass().descriptorString());
     };
   }
 

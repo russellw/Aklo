@@ -708,13 +708,13 @@ final class Parser {
                         i,
                         j));
               }
-              case "bool?" -> ins(new InstanceOf(arg(), "java/lang/Boolean"));
-              case "int?" -> ins(new InstanceOf(arg(), "java/math/BigInteger"));
-              case "float?" -> ins(new InstanceOf(arg(), "java/lang/Float"));
-              case "double?" -> ins(new InstanceOf(arg(), "java/lang/Double"));
-              case "rat?" -> ins(new InstanceOf(arg(), "aklo/BigRational"));
-              case "list?" -> ins(new InstanceOf(arg(), "java/util/List"));
-              case "sym?" -> ins(new InstanceOf(arg(), "aklo/Sym"));
+              case "bool?" -> ins(new InstanceOf(arg(), Type.BOOL));
+              case "int?" -> ins(new InstanceOf(arg(), Type.INTEGER));
+              case "float?" -> ins(new InstanceOf(arg(), Type.FLOAT));
+              case "double?" -> ins(new InstanceOf(arg(), Type.DOUBLE));
+              case "rat?" -> ins(new InstanceOf(arg(), Type.RATIONAL));
+              case "list?" -> ins(new InstanceOf(arg(), Type.LIST));
+              case "sym?" -> ins(new InstanceOf(arg(), Type.SYM));
               case "slice" -> {
                 var t = arg1();
                 expect(',');
@@ -1295,7 +1295,7 @@ final class Parser {
     }
 
     void checkLen(Object[] y, Object x, Block no) {
-      branch(ins(new InstanceOf(x, "java/util/List")), no);
+      branch(ins(new InstanceOf(x, Type.LIST)), no);
       branch(ins(new Le(BigInteger.valueOf(y.length), ins(new Len(x)))), no);
     }
 
@@ -1660,7 +1660,7 @@ final class Parser {
 
   static Fn parse(String file, String name, byte[] text) {
     var module = new Fn(name);
-    module.rtype = "V";
+    module.rtype = Type.VOID;
     new Parser(file, text, module);
     module.initVars();
     return module;

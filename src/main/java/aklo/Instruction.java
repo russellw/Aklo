@@ -5,10 +5,7 @@ import static org.objectweb.asm.Opcodes.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Consumer;
-import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 
 abstract class Instruction extends AbstractCollection<Object> {
   boolean isTerminator() {
@@ -50,8 +47,8 @@ abstract class Instruction extends AbstractCollection<Object> {
     throw new UnsupportedOperationException(toString());
   }
 
-  String type() {
-    return "V";
+  Type type() {
+    return Type.VOID;
   }
 
   static void load(Map<Object, Integer> refs, MethodVisitor mv, Object a) {
@@ -61,7 +58,7 @@ abstract class Instruction extends AbstractCollection<Object> {
       return;
     }
     switch (a) {
-      case Var a1 -> mv.visitFieldInsn(GETSTATIC, "a", a1.name, a1.type);
+      case Var a1 -> mv.visitFieldInsn(GETSTATIC, "a", a1.name, a1.type.toString());
       case BigInteger a1 -> {
         try {
           mv.visitLdcInsn(a1.longValueExact());
@@ -124,23 +121,9 @@ abstract class Instruction extends AbstractCollection<Object> {
         mv.visitMethodInsn(
             INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
       }
-      case Fn fn -> mv.visitInvokeDynamicInsn(
-          "apply",
-          "()Ljava/util/function/UnaryOperator;",
-          new Handle(
-              Opcodes.H_INVOKESTATIC,
-              "java/lang/invoke/LambdaMetafactory",
-              "metafactory",
-              "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
-              false),
-          Type.getType("(Ljava/lang/Object;)Ljava/lang/Object;"),
-          new Handle(
-              Opcodes.H_INVOKESTATIC,
-              "a",
-              a.toString(),
-              "(Ljava/lang/Object;)Ljava/lang/Object;",
-              false),
-          Type.getType("(Ljava/lang/Object;)Ljava/lang/Object;"));
+      case Fn fn -> {
+        throw new IllegalArgumentException(a.toString());
+      }
       default -> throw new IllegalArgumentException(a.toString());
     }
   }

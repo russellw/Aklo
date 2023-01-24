@@ -10,9 +10,21 @@ import java.util.Collection;
 import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
-final class Type extends Named {
+class Type extends Named {
   // system types
-  static final Type INT = new Type("I");
+  static final Type VOID = new Type("V");
+  static final Type BOOL_PRIM = new Type("Z");
+  static final Type FLOAT_PRIM = new Type("F");
+  static final Type DOUBLE_PRIM = new Type("D");
+  static final Type INTEGER = new Type("java/math/BigInteger");
+  static final Type RATIONAL = new Type("aklo/BigRational");
+  static final Type SYM = new Type("aklo/Sym");
+  static final Type LIST = new Type("java/util/List");
+  static final Type STRING = new Type("java/lang/String");
+  static final Type BOOL = new Type("java/lang/Boolean");
+  static final Type FLOAT = new Type("java/lang/Float");
+  static final Type DOUBLE = new Type("java/lang/Double");
+  static final Type OBJECT = new Type("java/lang/Object");
 
   // the classes of the program being compiled, excluding system types
   static final Type mainClass = new Type("a");
@@ -40,8 +52,8 @@ final class Type extends Named {
   static void init(Collection<Fn> modules) {
     mainFn = new Fn("main");
     var args = new Var("args", mainFn.params);
-    args.type = "[Ljava/lang/String;";
-    mainFn.rtype = "V";
+    args.type = Array.of(STRING);
+    mainFn.rtype = VOID;
     for (var module : modules) {
       // lift functions to global scope
       lift(module);
@@ -69,7 +81,7 @@ final class Type extends Named {
 
     // static variables
     Named.unique(vars);
-    for (var x : vars) w.visitField(ACC_STATIC, x.name, x.type, null, null).visitEnd();
+    for (var x : vars) w.visitField(ACC_STATIC, x.name, x.type.toString(), null, null).visitEnd();
 
     // functions
     Named.unique(fns);
@@ -78,5 +90,21 @@ final class Type extends Named {
     // write class file
     w.visitEnd();
     Files.write(Path.of(name + ".class"), w.toByteArray());
+  }
+
+  public static Type of(String descriptor) {
+    return switch (descriptor) {
+      case "V" -> VOID;
+      case "F" -> FLOAT_PRIM;
+      case "D" -> DOUBLE_PRIM;
+      case "Z" -> BOOL_PRIM;
+      case "Laklo/BigRational;" -> RATIONAL;
+      case "Ljava/math/BigInteger;" -> INTEGER;
+      case "Ljava/util/List;" -> LIST;
+      default -> {
+        if (descriptor.startsWith("Ljava/util/ImmutableCollections$List")) yield LIST;
+        throw new IllegalArgumentException(descriptor);
+      }
+    };
   }
 }
