@@ -110,7 +110,7 @@ final class Main {
       Link.link();
 
       // convert to basic blocks
-      Program.init(Link.modules.values());
+      Type.init(Link.modules.values());
       Verifier.verify();
 
       // optimize

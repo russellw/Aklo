@@ -13,6 +13,7 @@ class Verifier {
   }
 
   private static void line(Instruction a) {
+    // TODO refactor
     if (a instanceof Loc a1) {
       file = a1.file;
       line = a1.line;
@@ -26,28 +27,29 @@ class Verifier {
   }
 
   static void verify() {
-    for (var f : Program.fns) {
-      fname = f.name;
+    for (var c : Type.classes)
+      for (var f : c.fns) {
+        fname = f.name;
 
-      // every block has exactly one terminator instruction, at the end
-      for (var block : f.blocks) {
-        check(!block.instructions.isEmpty());
-        for (var i = 0; i < block.instructions.size() - 1; i++) {
-          var a = block.instructions.get(i);
-          line(a);
-          check(a, !a.isTerminator());
+        // every block has exactly one terminator instruction, at the end
+        for (var block : f.blocks) {
+          check(!block.instructions.isEmpty());
+          for (var i = 0; i < block.instructions.size() - 1; i++) {
+            var a = block.instructions.get(i);
+            line(a);
+            check(a, !a.isTerminator());
+          }
+          check(block.last().isTerminator());
         }
-        check(block.last().isTerminator());
+
+        // every instruction referred to, is found in one of the blocks
+        var found = new HashSet<Instruction>();
+        for (var block : f.blocks) found.addAll(block.instructions);
+        for (var block : f.blocks)
+          for (var a : block.instructions) {
+            line(a);
+            for (var b : a) if (b instanceof Instruction b1) check(b1, found.contains(b1));
+          }
       }
-
-      // every instruction referred to, is found in one of the blocks
-      var found = new HashSet<Instruction>();
-      for (var block : f.blocks) found.addAll(block.instructions);
-      for (var block : f.blocks)
-        for (var a : block.instructions) {
-          line(a);
-          for (var b : a) if (b instanceof Instruction b1) check(b1, found.contains(b1));
-        }
-    }
   }
 }

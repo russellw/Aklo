@@ -6,22 +6,50 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
 final class Type extends Named {
-  // the classes of the program being compiled, excluding system types
-  static Type main;
-  static final List<Type> classes = new ArrayList<>();
-
   // system types
   static final Type INT = new Type("I");
+
+  // the classes of the program being compiled, excluding system types
+  static final Type mainClass = new Type("a");
+  static final List<Type> classes = new ArrayList<>(List.of(mainClass));
+  static Fn mainFn;
 
   final List<Var> vars = new ArrayList<>();
   final List<Fn> fns = new ArrayList<>();
 
   Type(String name) {
     super(name);
+  }
+
+  private static void lift(Fn f) {
+    for (var g : f.fns) lift(g);
+    mainClass.fns.add(f);
+  }
+
+  static void init(Collection<Fn> modules) {
+    mainFn = new Fn("main");
+    var args = new Var("args", mainFn.params);
+    args.type = "[Ljava/lang/String;";
+    mainFn.rtype = "V";
+    for (var module : modules) {
+      // lift functions to global scope
+      lift(module);
+
+      // Module scope variables are static
+      mainClass.vars.addAll(module.vars);
+      module.vars.clear();
+
+      // modules may contain initialization code
+      // so each module is called as a function from main
+      mainFn.lastBlock().instructions.add(new Call(module));
+    }
+    mainFn.lastBlock().instructions.add(new ReturnVoid());
+    mainClass.fns.add(mainFn);
   }
 
   static void writeClasses() throws IOException {
