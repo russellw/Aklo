@@ -102,6 +102,7 @@ class Type extends Named {
       case "Laklo/Sym;" -> SYM;
       case "Ljava/math/BigInteger;" -> INTEGER;
       case "Ljava/util/List;" -> LIST;
+      case "Ljava/lang/Boolean;" -> BOOL;
       default -> {
         if (descriptor.startsWith("Ljava/util/ImmutableCollections$List")) yield LIST;
         throw new IllegalArgumentException(descriptor);
