@@ -99,6 +99,7 @@ class Type extends Named {
       case "D" -> DOUBLE_PRIM;
       case "Z" -> BOOL_PRIM;
       case "Laklo/BigRational;" -> RATIONAL;
+      case "Laklo/Sym;" -> SYM;
       case "Ljava/math/BigInteger;" -> INTEGER;
       case "Ljava/util/List;" -> LIST;
       default -> {

@@ -122,7 +122,9 @@ abstract class Instruction extends AbstractCollection<Object> {
             INVOKESTATIC, "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;", false);
       }
       case Fn fn -> {
-        throw new IllegalArgumentException(a.toString());
+        // TODO
+        mv.visitInsn(ACONST_NULL);
+        // throw new IllegalArgumentException(a.toString());
       }
       default -> throw new IllegalArgumentException(a.toString());
     }
