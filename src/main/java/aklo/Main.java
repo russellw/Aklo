@@ -116,8 +116,8 @@ final class Main {
       // optimize
       Optimizer.optimize();
 
-      // write class file
-      Program.write();
+      // write class files
+      Type.writeClasses();
     } catch (CompileError e) {
       System.err.println(e.getMessage());
       System.exit(1);

@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+// many of these methods are for use at runtime
+// which means to the IDE looking at the compiler, they look unused
 @SuppressWarnings({"unchecked", "unused"})
 public final class Etc {
   public static final Boolean isWindows = System.getProperty("os.name").startsWith("Windows");

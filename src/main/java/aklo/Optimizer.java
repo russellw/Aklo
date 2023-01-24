@@ -43,10 +43,11 @@ final class Optimizer {
   static void optimize() {
     do {
       changed = false;
-      for (var f : Program.fns) {
-        deadCode(f);
-        for (var block : f.blocks) redundantLoc(block);
-      }
+      for (var c : Type.classes)
+        for (var f : c.fns) {
+          deadCode(f);
+          for (var block : f.blocks) redundantLoc(block);
+        }
     } while (changed);
   }
 }
