@@ -22,6 +22,12 @@ final class Type extends Named {
   final List<Var> vars = new ArrayList<>();
   final List<Fn> fns = new ArrayList<>();
 
+  @Override
+  public String toString() {
+    if (name.length() == 1) return name;
+    return 'L' + name + ';';
+  }
+
   Type(String name) {
     super(name);
   }
