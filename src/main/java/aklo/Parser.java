@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 final class Parser {
   // Tokens
@@ -992,11 +993,7 @@ final class Parser {
           lex();
           var f = new Fn("lambda$");
           var c = new Context(f);
-
-          // parameters
           c.params();
-
-          // body
           expect('(');
           Object r;
           if (tok == INDENT) r = c.block();
@@ -1004,6 +1001,7 @@ final class Parser {
             c.ins(new Loc(file, line));
             r = c.commas();
           }
+          // TODO what if r is void?
           c.ins(new Return(r));
           expect(')');
           f.initVars();
@@ -1489,14 +1487,7 @@ final class Parser {
             case "fn" -> {
               lex();
               var name = word();
-              var f = new Fn(name);
-              local(name, f);
-              var c = new Context(f);
-              c.params();
-              c.ins(new Return(c.block()));
-              f.initVars();
-              fn.fns.add(f);
-              return f;
+              return fn(name, (c) -> c.ins(new Return(c.block())));
             }
             case "if" -> {
               return xif();
@@ -1636,6 +1627,17 @@ final class Parser {
       var b = assignment();
       expectNewline();
       return b;
+    }
+
+    private Fn fn(String name, Consumer<Context> g) {
+      var f = new Fn(name);
+      local(name, f);
+      var c = new Context(f);
+      c.params();
+      g.accept(c);
+      f.initVars();
+      fn.fns.add(f);
+      return f;
     }
   }
 
