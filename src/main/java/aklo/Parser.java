@@ -991,22 +991,20 @@ final class Parser {
       switch (tok) {
         case '\\' -> {
           lex();
-          var f = new Fn("lambda$");
-          var c = new Context(f);
-          c.params();
-          expect('(');
-          Object r;
-          if (tok == INDENT) r = c.block();
-          else {
-            c.ins(new Loc(file, line));
-            r = c.commas();
-          }
-          // TODO what if r is void?
-          c.ins(new Return(r));
-          expect(')');
-          f.initVars();
-          fn.fns.add(f);
-          return f;
+          return fn(
+              "lambda$",
+              (c) -> {
+                expect('(');
+                Object r;
+                if (tok == INDENT) r = c.block();
+                else {
+                  c.ins(new Loc(file, line));
+                  r = c.commas();
+                }
+                // TODO what if r is void?
+                c.ins(new Return(r));
+                expect(')');
+              });
         }
         case INC -> {
           lex();
@@ -1487,7 +1485,11 @@ final class Parser {
             case "fn" -> {
               lex();
               var name = word();
-              return fn(name, (c) -> c.ins(new Return(c.block())));
+              var f = fn(name, (c) -> c.ins(new Return(c.block())));
+              // TODO this will error on duplicate function name, which is necessary
+              // but will give line number of end of function, should be start
+              local(name, f);
+              return f;
             }
             case "if" -> {
               return xif();
@@ -1629,12 +1631,11 @@ final class Parser {
       return b;
     }
 
-    private Fn fn(String name, Consumer<Context> g) {
+    private Fn fn(String name, Consumer<Context> parseBody) {
       var f = new Fn(name);
-      local(name, f);
       var c = new Context(f);
       c.params();
-      g.accept(c);
+      parseBody.accept(c);
       f.initVars();
       fn.fns.add(f);
       return f;
