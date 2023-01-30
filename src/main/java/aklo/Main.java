@@ -110,14 +110,14 @@ final class Main {
       Link.link();
 
       // convert to basic blocks
-      Type.init(Link.modules.values());
+      Class.init(Link.modules.values());
       Verifier.verify();
 
       // optimize
       Optimizer.optimize();
 
       // write class files
-      Type.writeClasses();
+      Class.writeClasses();
     } catch (CompileError e) {
       System.err.println(e.getMessage());
       System.exit(1);

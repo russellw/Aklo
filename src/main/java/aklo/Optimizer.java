@@ -43,7 +43,7 @@ final class Optimizer {
   static void optimize() {
     do {
       changed = false;
-      for (var c : Type.classes)
+      for (var c : Class.classes)
         for (var f : c.fns) {
           deadCode(f);
           for (var block : f.blocks) redundantLoc(block);

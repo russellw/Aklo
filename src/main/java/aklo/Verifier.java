@@ -27,7 +27,7 @@ class Verifier {
   }
 
   static void verify() {
-    for (var c : Type.classes)
+    for (var c : Class.classes)
       for (var f : c.fns) {
         fname = f.name;
 
