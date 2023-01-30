@@ -11,8 +11,8 @@ import java.util.List;
 import org.objectweb.asm.ClassWriter;
 
 final class Class extends Type {
+  static final List<Class> classes = new ArrayList<>();
   static final Class mainClass = new Class("a");
-  static final List<Class> classes = new ArrayList<>(List.of(mainClass));
   static Fn mainFn;
 
   final List<Var> vars = new ArrayList<>();
@@ -20,6 +20,7 @@ final class Class extends Type {
 
   Class(String name) {
     super(name);
+    classes.add(this);
   }
 
   private void write() throws IOException {
