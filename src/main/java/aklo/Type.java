@@ -52,7 +52,7 @@ class Type extends Named {
   static void init(Collection<Fn> modules) {
     mainFn = new Fn("main");
     var args = new Var("args", mainFn.params);
-    args.type = Array.of(STRING);
+    args.type = ArrayType.of(STRING);
     mainFn.rtype = VOID;
     for (var module : modules) {
       // lift functions to global scope

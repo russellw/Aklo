@@ -1,16 +1,16 @@
 package aklo;
 
-final class Array extends Type {
+final class ArrayType extends Type {
   final Type element;
 
-  private Array(Type element) {
+  private ArrayType(Type element) {
     super(null);
     this.element = element;
   }
 
-  public static Array of(Type element) {
+  public static ArrayType of(Type element) {
     // TODO intern
-    return new Array(element);
+    return new ArrayType(element);
   }
 
   @Override
